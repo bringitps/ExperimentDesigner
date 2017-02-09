@@ -9,7 +9,7 @@
         <!-- Database connection settings -->  
         <property name="connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>  
         <property name="connection.url">jdbc:sqlserver://localhost:1433;database=ExperimentDesigner</property>  
-        <property name="connection.username">sa2</property>  
+        <property name="connection.username">sa</property>  
         <property name="connection.password">edgar1987</property>  
   
         <!-- JDBC connection pool (use the built-in) -->  
@@ -26,6 +26,7 @@
    
         <property name="format_sql">true</property>
         
+        <!-- Mapping for Classes using Annotations -->
         <mapping class="com.bringit.experiment.bll.SysUser" />
         <mapping class="com.bringit.experiment.bll.Experiment" />
 

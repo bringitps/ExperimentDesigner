@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -36,14 +38,14 @@ public class Experiment {
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
 	
-	@Column(name="CreatedBy")
-	private Integer createdBy;
+	@OneToOne(optional=false)
+    @JoinColumn(name="CreatedBy", unique=false, updatable=false)
+	private SysUser createdBy;
 	
-
-	@Column(name="LastModifiedBy")
-	private Integer lastModifiedBy;
-
-
+	@OneToOne(optional=true)
+    @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
+	private SysUser lastModifiedBy;
+	
 	public Integer getExpId() {
 		return expId;
 	}
@@ -114,24 +116,24 @@ public class Experiment {
 	}
 
 
-	public Integer getCreatedBy() {
+	public SysUser getCreatedBy() {
 		return createdBy;
 	}
 
 
-	public void setCreatedBy(Integer createdBy) {
+	public void setCreatedBy(SysUser createdBy) {
 		this.createdBy = createdBy;
 	}
 
 
-	public Integer getLastModifiedBy() {
+	public SysUser getLastModifiedBy() {
 		return lastModifiedBy;
 	}
 
 
-	public void setLastModifiedBy(Integer lastModifiedBy) {
+	public void setLastModifiedBy(SysUser lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
 	}
-	
-	
+
+
 }

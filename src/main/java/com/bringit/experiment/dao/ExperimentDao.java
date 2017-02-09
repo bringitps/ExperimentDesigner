@@ -14,7 +14,7 @@ public class ExperimentDao {
 
 	private String dialectXmlFile = "mssql-hibernate.cfg.xml";
 	
-	public void addSysUser(Experiment exp) {
+	public void addExperiment(Experiment exp) {
 
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
@@ -71,7 +71,8 @@ public class ExperimentDao {
         }
     }
 
-    public List<Experiment> getAllExperiments() {
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<Experiment> getAllExperiments() {
         List<Experiment> experiments = new ArrayList<Experiment>();
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
@@ -87,7 +88,8 @@ public class ExperimentDao {
         return experiments;
     }
 
-    public Experiment getExperimentById(int expId) {
+    @SuppressWarnings("unused")
+	public Experiment getExperimentById(int expId) {
         Experiment exp = null;
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);

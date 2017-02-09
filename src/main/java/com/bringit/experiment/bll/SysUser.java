@@ -1,6 +1,4 @@
 package com.bringit.experiment.bll;
-import java.util.Base64;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

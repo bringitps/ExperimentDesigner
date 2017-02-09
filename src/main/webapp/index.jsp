@@ -8,9 +8,9 @@ pageEncoding="ISO-8859-1"%>
 		<title>Testing DB and Hibernate</title>
 	</head>
 	<body>
- 		<form action="user.jsp" method="post">  
+ 		<form action="test.jsp" method="post">  
 			<center>
-				<h2>Load Dummy User</h2>
+				<h2>Load Experiment</h2>
 				<h3>
 					<input type="submit" value="Run!"/> 
 				</h3>

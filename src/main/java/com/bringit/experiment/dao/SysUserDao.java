@@ -71,7 +71,8 @@ public class SysUserDao {
         }
     }
 
-    public List<SysUser> getAllSysUsers() {
+    @SuppressWarnings({ "unused", "unchecked" })
+	public List<SysUser> getAllSysUsers() {
         List<SysUser> sysUsers = new ArrayList<SysUser>();
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
@@ -87,7 +88,8 @@ public class SysUserDao {
         return sysUsers;
     }
 
-    public SysUser getUserById(int userId) {
+    @SuppressWarnings("unused")
+	public SysUser getUserById(int userId) {
         SysUser sysUser = null;
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);

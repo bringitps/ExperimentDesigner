@@ -5,9 +5,10 @@
   
 <%
 
-	int i=Test.createSysUserTest();  
+	//int i=Test.createSysUserTest();  
+	int i=Test.createExperimentTest(); 
 	if(i>0)  
-		out.print("You are successfully registered");  
+		out.print("Experiment Table Registered. Id: " + i);  
 
         
   

@@ -16,8 +16,26 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
-      <scope>test</scope>
     </dependency>
+    
+    <dependency>
+    	<groupId>javax.servlet</groupId>
+    	<artifactId>javax.servlet-api</artifactId>
+    	<version>3.1.0</version>
+    	<scope>provided</scope>
+	</dependency>
+    
+    <!-- Hibernate dependencies -->
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-core</artifactId>
+		<version>4.3.5.Final</version>
+	</dependency>
+	<dependency>
+		<groupId>com.microsoft.sqlserver</groupId>
+		<artifactId>mssql-jdbc</artifactId>
+		<version>6.1.0.jre8</version>
+	</dependency>
     
 	<!-- Spring dependencies -->
 	<dependency>
@@ -47,7 +65,7 @@
             <artifactId>maven-war-plugin</artifactId>
             <version>2.3</version>
             <configuration>
-             <warName>${name}</warName>
+             <warName>${finalName}</warName>
              <outputDirectory>C:\apache-tomcat-8.5.11\webapps</outputDirectory>
             </configuration>
     	</plugin>

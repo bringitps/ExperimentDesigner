@@ -29,6 +29,10 @@
         <!-- Mapping for Classes using Annotations -->
         <mapping class="com.bringit.experiment.bll.SysUser" />
         <mapping class="com.bringit.experiment.bll.Experiment" />
+        <mapping class="com.bringit.experiment.bll.ExperimentField" />
+        <mapping class="com.bringit.experiment.bll.ExperimentImage" />
+        <mapping class="com.bringit.experiment.bll.ExperimentMeasure" />
+        <mapping class="com.bringit.experiment.bll.UnitOfMeasure" />
 
     </session-factory>
 </hibernate-configuration>

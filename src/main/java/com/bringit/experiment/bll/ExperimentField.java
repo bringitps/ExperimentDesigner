@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -27,12 +29,15 @@ public class ExperimentField {
 	@Column(name="ExpFieldType")
 	private String expFieldType;
 	
-	@Column(name="ExpId")
-	private Integer expId;
-	
-	@Column(name="UomId")
-	private Integer uomId;
+	@OneToOne
+    @JoinColumn(name="ExpId", unique=false, updatable=false)
+	private Experiment experiment;
 
+	@OneToOne
+    @JoinColumn(name="UomId", unique=false, updatable=false)
+	private UnitOfMeasure unitOfMeasure;
+
+	
 	public Integer getExpFieldId() {
 		return expFieldId;
 	}
@@ -73,22 +78,20 @@ public class ExperimentField {
 		this.expFieldType = expFieldType;
 	}
 
-	public Integer getExpId() {
-		return expId;
+	public Experiment getExperiment() {
+		return experiment;
 	}
 
-	public void setExpId(Integer expId) {
-		this.expId = expId;
+	public void setExperiment(Experiment experiment) {
+		this.experiment = experiment;
 	}
 
-	public Integer getUomId() {
-		return uomId;
+	public UnitOfMeasure getUnitOfMeasure() {
+		return unitOfMeasure;
 	}
 
-	public void setUomId(Integer uomId) {
-		this.uomId = uomId;
+	public void setUnitOfMeasure(UnitOfMeasure unitOfMeasure) {
+		this.unitOfMeasure = unitOfMeasure;
 	}
-	
-	
 
 }

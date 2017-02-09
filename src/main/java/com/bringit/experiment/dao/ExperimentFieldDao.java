@@ -7,21 +7,21 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.Experiment;
+import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.dal.HibernateUtil;
 
-public class ExperimentDao {
+public class ExperimentFieldDao {
 
 	private String dialectXmlFile = "mssql-hibernate.cfg.xml";
 	
-	public void addExperiment(Experiment exp) {
+	public void addExperimentField(ExperimentField experimentField) {
 
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
-            session.save(exp);
+            session.save(experimentField);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -34,13 +34,13 @@ public class ExperimentDao {
         }
     }
 
-    public void deleteExperiment(int expId) {
+    public void deleteExperimentField(int experimentFieldId) {
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            Experiment exp = (Experiment)session.load(Experiment.class, new Integer(expId));
-            session.delete(exp);
+            ExperimentField experimentField = (ExperimentField)session.load(ExperimentField.class, new Integer(experimentFieldId));
+            session.delete(experimentField);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -53,12 +53,12 @@ public class ExperimentDao {
         }
     }
 
-    public void updateExperiment(Experiment exp) {
+    public void updateExperimentField(ExperimentField experimentField) {
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            session.update(exp);
+            session.update(experimentField);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -72,40 +72,40 @@ public class ExperimentDao {
     }
 
     @SuppressWarnings({ "unchecked", "unused" })
-	public List<Experiment> getAllExperiments() {
-        List<Experiment> experiments = new ArrayList<Experiment>();
+	public List<ExperimentField> getAllExperimentFields() {
+        List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            experiments = session.createQuery("from Experiment").list();
+            experimentFields = session.createQuery("from ExperimentField").list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return experiments;
+        return experimentFields;
     }
 
     @SuppressWarnings("unused")
-	public Experiment getExperimentById(int expId) {
-        Experiment exp = null;
+	public ExperimentField getExperimentFieldById(int experimentFieldId) {
+    	ExperimentField experimentField = null;
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from Experiment where ExpId = :id";
+            String queryString = "from Experiment where ExpFieldId = :id";
             Query query = session.createQuery(queryString);
-            query.setInteger("id", expId);
-            exp = (Experiment) query.uniqueResult();
+            query.setInteger("id", experimentFieldId);
+            experimentField = (ExperimentField) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return exp;
+        return experimentField;
     }
 	
 }

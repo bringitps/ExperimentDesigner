@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="ExperimentMeasure")
+@Table(name="UnitOfMeasure")
 public class UnitOfMeasure {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -18,7 +18,7 @@ public class UnitOfMeasure {
 	@Column(name="UomName")
 	private String uomName;
 	
-	@Column(name="uomAbbreviation")
+	@Column(name="UomAbbreviation")
 	private String uomAbbreviation;
 
 	public Integer getUomId() {

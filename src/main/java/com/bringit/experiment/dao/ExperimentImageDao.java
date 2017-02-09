@@ -7,21 +7,21 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.Experiment;
+import com.bringit.experiment.bll.ExperimentImage;
 import com.bringit.experiment.dal.HibernateUtil;
 
-public class ExperimentDao {
+public class ExperimentImageDao {
 
 	private String dialectXmlFile = "mssql-hibernate.cfg.xml";
 	
-	public void addExperiment(Experiment exp) {
+	public void addExperimentImage(ExperimentImage experimentImage) {
 
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
-            session.save(exp);
+            session.save(experimentImage);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -34,13 +34,13 @@ public class ExperimentDao {
         }
     }
 
-    public void deleteExperiment(int expId) {
+    public void deleteExperimentImage(int experimentImageId) {
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            Experiment exp = (Experiment)session.load(Experiment.class, new Integer(expId));
-            session.delete(exp);
+            ExperimentImage experimentImage = (ExperimentImage)session.load(ExperimentImage.class, new Integer(experimentImageId));
+            session.delete(experimentImage);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -53,12 +53,12 @@ public class ExperimentDao {
         }
     }
 
-    public void updateExperiment(Experiment exp) {
+    public void updateExperimentImage(ExperimentImage experimentImage) {
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            session.update(exp);
+            session.update(experimentImage);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -72,40 +72,40 @@ public class ExperimentDao {
     }
 
     @SuppressWarnings({ "unchecked", "unused" })
-	public List<Experiment> getAllExperiments() {
-        List<Experiment> experiments = new ArrayList<Experiment>();
+	public List<ExperimentImage> getAllExperimentImages() {
+        List<ExperimentImage> experimentImages = new ArrayList<ExperimentImage>();
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            experiments = session.createQuery("from Experiment").list();
+            experimentImages = session.createQuery("from ExperimentImage").list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return experiments;
+        return experimentImages;
     }
 
     @SuppressWarnings("unused")
-	public Experiment getExperimentById(int expId) {
-        Experiment exp = null;
+	public ExperimentImage getExperimentImageById(int expId) {
+    	ExperimentImage experimentImage = null;
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from Experiment where ExpId = :id";
+            String queryString = "from ExperimentImage where ExpImageId = :id";
             Query query = session.createQuery(queryString);
             query.setInteger("id", expId);
-            exp = (Experiment) query.uniqueResult();
+            experimentImage = (ExperimentImage) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return exp;
+        return experimentImage;
     }
 	
 }

@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -24,9 +26,6 @@ public class ExperimentMeasure {
 	@Column(name="ExpMeasureComment")
 	private String expMeasureComment;
 	
-	@Column(name="ExpFieldId")
-	private Integer expFieldId;
-	
 	@Column(name="CreatedBy")
 	private Integer createdBy;
 	
@@ -39,6 +38,11 @@ public class ExperimentMeasure {
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
 
+	@OneToOne
+    @JoinColumn(name="ExpFieldId", unique=false, updatable=false)
+	private ExperimentField experimentField;
+	
+	
 	public Integer getExpMeasureId() {
 		return expMeasureId;
 	}
@@ -61,14 +65,6 @@ public class ExperimentMeasure {
 
 	public void setExpMeasureComment(String expMeasureComment) {
 		this.expMeasureComment = expMeasureComment;
-	}
-
-	public Integer getExpFieldId() {
-		return expFieldId;
-	}
-
-	public void setExpFieldId(Integer expFieldId) {
-		this.expFieldId = expFieldId;
 	}
 
 	public Integer getCreatedBy() {
@@ -101,6 +97,14 @@ public class ExperimentMeasure {
 
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
+	}
+
+	public ExperimentField getExperimentField() {
+		return experimentField;
+	}
+
+	public void setExpField(ExperimentField experimentField) {
+		this.experimentField = experimentField;
 	}
 	
 	

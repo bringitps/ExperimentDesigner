@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -23,9 +25,11 @@ public class ExperimentImage {
 	@Column(name="ExpImageBase64")
 	private Blob expImageBase64;
 	
-	@Column(name="ExpId")
-	private Integer expId;
+	@OneToOne
+    @JoinColumn(name="ExpId", unique=false, updatable=false)
+	private Experiment experiment;
 
+	
 	public Integer getExpImageId() {
 		return expImageId;
 	}
@@ -50,16 +54,12 @@ public class ExperimentImage {
 		this.expImageBase64 = expImageBase64;
 	}
 
-	public Integer getExpId() {
-		return expId;
+	public Experiment getExperiment() {
+		return experiment;
 	}
 
-	public void setExpId(Integer expId) {
-		this.expId = expId;
+	public void setExperiment(Experiment experiment) {
+		this.experiment = experiment;
 	}
-	
-	
-	
-	
 
 }

@@ -10,7 +10,7 @@ pageEncoding="ISO-8859-1"%>
 	<body>
  		<form action="test.jsp" method="post">  
 			<center>
-				<h2>Load Experiment</h2>
+				<h2>Load DB Schema</h2>
 				<h3>
 					<input type="submit" value="Run!"/> 
 				</h3>

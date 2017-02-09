@@ -7,21 +7,21 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.Experiment;
+import com.bringit.experiment.bll.UnitOfMeasure;
 import com.bringit.experiment.dal.HibernateUtil;
 
-public class ExperimentDao {
+public class UnitOfMeasureDao {
 
 	private String dialectXmlFile = "mssql-hibernate.cfg.xml";
 	
-	public void addExperiment(Experiment exp) {
+	public void addUnitOfMeasure(UnitOfMeasure unitOfMeasure) {
 
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
-            session.save(exp);
+            session.save(unitOfMeasure);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -34,13 +34,13 @@ public class ExperimentDao {
         }
     }
 
-    public void deleteExperiment(int expId) {
+    public void deleteUnitOfMeasure(int uomId) {
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            Experiment exp = (Experiment)session.load(Experiment.class, new Integer(expId));
-            session.delete(exp);
+            UnitOfMeasure unitOfMeasure = (UnitOfMeasure)session.load(UnitOfMeasure.class, new Integer(uomId));
+            session.delete(unitOfMeasure);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -53,12 +53,12 @@ public class ExperimentDao {
         }
     }
 
-    public void updateExperiment(Experiment exp) {
+    public void updateUnitOfMeasure(UnitOfMeasure unitOfMeasure) {
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            session.update(exp);
+            session.update(unitOfMeasure);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -72,40 +72,40 @@ public class ExperimentDao {
     }
 
     @SuppressWarnings({ "unchecked", "unused" })
-	public List<Experiment> getAllExperiments() {
-        List<Experiment> experiments = new ArrayList<Experiment>();
+	public List<UnitOfMeasure> getAllUnitOfMeasures() {
+        List<UnitOfMeasure> unitOfMeasures = new ArrayList<UnitOfMeasure>();
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            experiments = session.createQuery("from Experiment").list();
+            unitOfMeasures = session.createQuery("from UnitOfMeasure").list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return experiments;
+        return unitOfMeasures;
     }
 
     @SuppressWarnings("unused")
-	public Experiment getExperimentById(int expId) {
-        Experiment exp = null;
+	public UnitOfMeasure getUnitOfMeasureById(int uomId) {
+    	UnitOfMeasure unitOfMeasure = null;
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from Experiment where ExpId = :id";
+            String queryString = "from UnitOfMeasure where UomId = :id";
             Query query = session.createQuery(queryString);
-            query.setInteger("id", expId);
-            exp = (Experiment) query.uniqueResult();
+            query.setInteger("id", uomId);
+            unitOfMeasure = (UnitOfMeasure) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return exp;
+        return unitOfMeasure;
     }
 	
 }

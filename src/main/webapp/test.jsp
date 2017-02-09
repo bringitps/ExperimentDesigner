@@ -5,10 +5,9 @@
   
 <%
 
-	//int i=Test.createSysUserTest();  
-	int i=Test.createExperimentTest(); 
-	if(i>0)  
-		out.print("Experiment Table Registered. Id: " + i);  
+	//int i=Test.createSysUserTest(); 
+	if(Test.buildDbSchema())  
+		out.print("DB Schema created.");  
 
         
   

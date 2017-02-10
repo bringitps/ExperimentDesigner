@@ -20,17 +20,13 @@ public class ExperimentMeasure {
 	@Column(name="ExpMeasureId")
 	private Integer expMeasureId;
 	
-	@Column(name="ExpMeasureValue")
-	private String expMeasureValue;
+	@OneToOne
+    @JoinColumn(name="CreatedBy", unique=false, updatable=false)
+	private SysUser createdBy;
 	
-	@Column(name="ExpMeasureComment")
-	private String expMeasureComment;
-	
-	@Column(name="CreatedBy")
-	private Integer createdBy;
-	
-	@Column(name="LastModifiedBy")
-	private Integer lastModifiedBy;
+	@OneToOne
+    @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
+	private SysUser lastModifiedBy;
 	
 	@Column(name="CreatedDate")
 	private Date createdDate;
@@ -51,37 +47,6 @@ public class ExperimentMeasure {
 		this.expMeasureId = expMeasureId;
 	}
 
-	public String getExpMeasureValue() {
-		return expMeasureValue;
-	}
-
-	public void setExpMeasureValue(String expMeasureValue) {
-		this.expMeasureValue = expMeasureValue;
-	}
-
-	public String getExpMeasureComment() {
-		return expMeasureComment;
-	}
-
-	public void setExpMeasureComment(String expMeasureComment) {
-		this.expMeasureComment = expMeasureComment;
-	}
-
-	public Integer getCreatedBy() {
-		return createdBy;
-	}
-
-	public void setCreatedBy(Integer createdBy) {
-		this.createdBy = createdBy;
-	}
-
-	public Integer getLastModifiedBy() {
-		return lastModifiedBy;
-	}
-
-	public void setLastModifiedBy(Integer lastModifiedBy) {
-		this.lastModifiedBy = lastModifiedBy;
-	}
 
 	public Date getCreatedDate() {
 		return createdDate;
@@ -103,7 +68,23 @@ public class ExperimentMeasure {
 		return experimentField;
 	}
 
-	public void setExpField(ExperimentField experimentField) {
+	public SysUser getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(SysUser createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public SysUser getLastModifiedBy() {
+		return lastModifiedBy;
+	}
+
+	public void setLastModifiedBy(SysUser lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
+	}
+
+	public void setExperimentField(ExperimentField experimentField) {
 		this.experimentField = experimentField;
 	}
 	

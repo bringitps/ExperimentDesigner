@@ -19,29 +19,23 @@ public class ExperimentMeasure {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="ExpMeasureId")
 	private Integer expMeasureId;
-	
-	@Column(name="ExpMeasureValue")
-	private String expMeasureValue;
-	
+		
 	@Column(name="ExpMeasureComment")
 	private String expMeasureComment;
+
+	@OneToOne
+    @JoinColumn(name="CreatedBy", unique=false, updatable=false)
+	private SysUser createdBy;
 	
-	@Column(name="CreatedBy")
-	private Integer createdBy;
-	
-	@Column(name="LastModifiedBy")
-	private Integer lastModifiedBy;
+	@OneToOne
+    @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
+	private SysUser lastModifiedBy;
 	
 	@Column(name="CreatedDate")
 	private Date createdDate;
 	
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
-
-	@OneToOne
-    @JoinColumn(name="ExpFieldId", unique=false, updatable=false)
-	private ExperimentField experimentField;
-	
 	
 	public Integer getExpMeasureId() {
 		return expMeasureId;
@@ -49,14 +43,6 @@ public class ExperimentMeasure {
 
 	public void setExpMeasureId(Integer expMeasureId) {
 		this.expMeasureId = expMeasureId;
-	}
-
-	public String getExpMeasureValue() {
-		return expMeasureValue;
-	}
-
-	public void setExpMeasureValue(String expMeasureValue) {
-		this.expMeasureValue = expMeasureValue;
 	}
 
 	public String getExpMeasureComment() {
@@ -67,19 +53,19 @@ public class ExperimentMeasure {
 		this.expMeasureComment = expMeasureComment;
 	}
 
-	public Integer getCreatedBy() {
+	public SysUser getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(Integer createdBy) {
+	public void setCreatedBy(SysUser createdBy) {
 		this.createdBy = createdBy;
 	}
 
-	public Integer getLastModifiedBy() {
+	public SysUser getLastModifiedBy() {
 		return lastModifiedBy;
 	}
 
-	public void setLastModifiedBy(Integer lastModifiedBy) {
+	public void setLastModifiedBy(SysUser lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
 	}
 
@@ -97,16 +83,5 @@ public class ExperimentMeasure {
 
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
-	}
-
-	public ExperimentField getExperimentField() {
-		return experimentField;
-	}
-
-	public void setExpField(ExperimentField experimentField) {
-		this.experimentField = experimentField;
-	}
-	
-	
-
+	}	
 }

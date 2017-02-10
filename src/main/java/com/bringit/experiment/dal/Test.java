@@ -6,12 +6,16 @@ import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.ExperimentImage;
 import com.bringit.experiment.bll.ExperimentMeasure;
+import com.bringit.experiment.bll.ExperimentMeasureFieldValue;
+import com.bringit.experiment.bll.ExperimentMeasureFieldValueUpdateLog;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.UnitOfMeasure;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.ExperimentImageDao;
 import com.bringit.experiment.dao.ExperimentMeasureDao;
+import com.bringit.experiment.dao.ExperimentMeasureFieldValueDao;
+import com.bringit.experiment.dao.ExperimentMeasureFieldValueUpdateLogDao;
 import com.bringit.experiment.dao.SysUserDao;
 import com.bringit.experiment.dao.UnitOfMeasureDao;
 
@@ -71,6 +75,8 @@ public class Test {
 		 ExperimentImageDao experimentImageDao = new ExperimentImageDao();
 		 UnitOfMeasureDao unitOfMeasureDao = new UnitOfMeasureDao();
 		 ExperimentMeasureDao experimentMeasureDao = new ExperimentMeasureDao();
+		 ExperimentMeasureFieldValueDao experimentMeasureFieldValueDao = new ExperimentMeasureFieldValueDao();
+		 ExperimentMeasureFieldValueUpdateLogDao experimentMeasureFieldValueUpdateLogDao = new ExperimentMeasureFieldValueUpdateLogDao();
 		 
 		 //New User 
 		 SysUser bringITUser = new SysUser();
@@ -101,7 +107,6 @@ public class Test {
 		 serialNumberField.setExpFieldName("Serial Number");
 		 serialNumberField.setExpFieldIsActive(true);
 		 serialNumberField.setExpFieldIsKey(true);
-		 serialNumberField.setUnitOfMeasure(unitOfMeasure);
 		 serialNumberField.setExperiment(firstExperiment);
 		 experimentFieldDao.addExperimentField(serialNumberField);	//DB Access
 		 
@@ -121,9 +126,45 @@ public class Test {
 		 experimentImageDao.addExperimentImage(experimentImage);
 		 
 		 //New Experiment Measure
-		 //ExperimentMeasure experimentMeasure = new ExperimentMeasure();
-		 //experimentMeasure.setExpField(serialNumberField);
+		 ExperimentMeasure experimentMeasure = new ExperimentMeasure();
+		 experimentMeasure.setExpMeasureComment("This is a comment for the first Experiment Measure");
+		 experimentMeasure.setCreatedBy(bringITUser);
+		 experimentMeasure.setCreatedDate(new Date());
+		 experimentMeasure.setLastModifiedBy(bringITUser);
+		 experimentMeasure.setModifiedDate(new Date());
+		 experimentMeasureDao.addExperimentMeasure(experimentMeasure);
 		 
+		 //Experiment Measure Field Value for Serial Number
+		 ExperimentMeasureFieldValue serialNumberFieldValue = new ExperimentMeasureFieldValue();
+		 serialNumberFieldValue.setExperimentMeasure(experimentMeasure);
+		 serialNumberFieldValue.setExperimentField(serialNumberField);
+		 serialNumberFieldValue.setExpMeasureValue("SN123456");
+		 experimentMeasureFieldValueDao.addExperimentMeasureFieldValue(serialNumberFieldValue);
+		 
+		 //Experiment Measure Field Value for Voltaje
+		 ExperimentMeasureFieldValue voltajeFieldValue = new ExperimentMeasureFieldValue();
+		 voltajeFieldValue.setExperimentMeasure(experimentMeasure);
+		 voltajeFieldValue.setExperimentField(serialNumberField);
+		 voltajeFieldValue.setExpMeasureValue("5.5");
+		 experimentMeasureFieldValueDao.addExperimentMeasureFieldValue(voltajeFieldValue);
+		 
+		 //Experiment Measure Field Value Update for Voltaje
+		 ExperimentMeasureFieldValueUpdateLog voltajeFieldValueUpdateLog = new ExperimentMeasureFieldValueUpdateLog();
+		 voltajeFieldValueUpdateLog.setExperimentMeasureFieldValue(voltajeFieldValue);
+		 voltajeFieldValueUpdateLog.setExpMeasureOldValue(voltajeFieldValue.getExpMeasureValue());
+		 voltajeFieldValueUpdateLog.setExpMeasureOldCreatedDate(experimentMeasure.getModifiedDate());
+		 voltajeFieldValueUpdateLog.setExpMeasureNewValue("6.5");
+		 voltajeFieldValueUpdateLog.setExpMeasureNewCreatedDate(new Date());
+		 voltajeFieldValueUpdateLog.setCreatedBy(bringITUser);
+		 experimentMeasureFieldValueUpdateLogDao.addExperimentMeasureFieldValueUpdateLog(voltajeFieldValueUpdateLog);
+		 
+		 //Update Parent Entities
+		 experimentMeasure.setLastModifiedBy(voltajeFieldValueUpdateLog.getCreatedBy());
+		 experimentMeasure.setModifiedDate(voltajeFieldValueUpdateLog.getExpMeasureNewCreatedDate());
+		 experimentMeasureDao.updateExperimentMeasure(experimentMeasure);
+		 
+		 voltajeFieldValue.setExpMeasureValue(voltajeFieldValueUpdateLog.getExpMeasureNewValue());
+		 experimentMeasureFieldValueDao.updateExperimentMeasureFieldValue(voltajeFieldValue);
 		 
 		 return true;
 	 }

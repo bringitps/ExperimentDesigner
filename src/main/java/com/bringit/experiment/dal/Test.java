@@ -6,15 +6,12 @@ import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.ExperimentImage;
 import com.bringit.experiment.bll.ExperimentMeasure;
-import com.bringit.experiment.bll.ExperimentMeasureFieldValue;
-import com.bringit.experiment.bll.ExperimentMeasureFieldValuePK;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.UnitOfMeasure;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.ExperimentImageDao;
 import com.bringit.experiment.dao.ExperimentMeasureDao;
-import com.bringit.experiment.dao.ExperimentMeasureFieldValueDao;
 import com.bringit.experiment.dao.SysUserDao;
 import com.bringit.experiment.dao.UnitOfMeasureDao;
 
@@ -74,7 +71,6 @@ public class Test {
 		 ExperimentImageDao experimentImageDao = new ExperimentImageDao();
 		 UnitOfMeasureDao unitOfMeasureDao = new UnitOfMeasureDao();
 		 ExperimentMeasureDao experimentMeasureDao = new ExperimentMeasureDao();
-		 ExperimentMeasureFieldValueDao experimentMeasureFieldValueDao = new ExperimentMeasureFieldValueDao();
 		 
 		 //New User 
 		 SysUser bringITUser = new SysUser();
@@ -125,21 +121,8 @@ public class Test {
 		 experimentImageDao.addExperimentImage(experimentImage);
 		 
 		 //New Experiment Measure
-		 ExperimentMeasure experimentMeasure = new ExperimentMeasure();
-		 experimentMeasure.setExperimentField(serialNumberField);
-		 experimentMeasure.setCreatedDate(new Date());
-		 experimentMeasure.setModifiedDate(new Date());
-		 experimentMeasure.setCreatedBy(bringITUser);
-		 experimentMeasure.setLastModifiedBy(bringITUser);
-		 experimentMeasureDao.addExperimentMeasure(experimentMeasure);
-		 
-		 //New Experiment Measure value for serialNumberField
-		 ExperimentMeasureFieldValuePK experimentMeasureFieldValuePK = new ExperimentMeasureFieldValuePK(experimentMeasure,serialNumberField);
-		 ExperimentMeasureFieldValue expMeasureFieldValueSN = new ExperimentMeasureFieldValue();
-		 expMeasureFieldValueSN.setExperimentMeasureFieldValuePK(experimentMeasureFieldValuePK);
-		 expMeasureFieldValueSN.setExpMeasureComment("no comments");
-		 expMeasureFieldValueSN.setExpMeasureValue("SN10001");
-		 experimentMeasureFieldValueDao.addExperimentMeasureFieldValue(expMeasureFieldValueSN);
+		 //ExperimentMeasure experimentMeasure = new ExperimentMeasure();
+		 //experimentMeasure.setExpField(serialNumberField);
 		 
 		 
 		 return true;

@@ -32,8 +32,6 @@
         <mapping class="com.bringit.experiment.bll.ExperimentField" />
         <mapping class="com.bringit.experiment.bll.ExperimentImage" />
         <mapping class="com.bringit.experiment.bll.ExperimentMeasure" />
-        <mapping class="com.bringit.experiment.bll.ExperimentMeasureFieldValue" />
-        <mapping class="com.bringit.experiment.bll.ExperimentMeasureFieldValuePK" />
         <mapping class="com.bringit.experiment.bll.UnitOfMeasure" />
 
     </session-factory>

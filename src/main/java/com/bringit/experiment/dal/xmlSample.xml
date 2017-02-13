@@ -1,0 +1,70 @@
+<Experiment>
+	<ExperimentName>
+		MEMs_To_Magnet_Assembly
+	</ExperimentName>
+	<ExperimentResults>
+		<moduleSerialNumber>123456</moduleSerialNumber>
+		<fpbcSerialNumber>FPBC123</fpbcSerialNumber>
+		<dieId>AA-99</dieId>
+		<waferId>BB-99</waferId>
+		<enId>EN123</enId>
+		<workOrder>WO12345</workOrder>
+		<dateTime>2017-02-12 02:20:00</dateTime>
+		<memsToMagnetOutlineX>2745</memsToMagnetOutlineX>
+		<memsToMagnetOutlineY>2750</memsToMagnetOutlineY>
+		<angle>48.1</angle>
+		<testResult>Pass</testResult>
+	</ExperimentResults>
+	<ExperimentResults>
+		<moduleSerialNumber>123457</moduleSerialNumber>
+		<fpbcSerialNumber>FPBC124</fpbcSerialNumber>
+		<dieId>AA-99</dieId>
+		<waferId>BB-99</waferId>
+		<enId>EN123</enId>
+		<workOrder>WO12345</workOrder>
+		<dateTime>2017-02-12 02:20:30</dateTime>
+		<memsToMagnetOutlineX>2755</memsToMagnetOutlineX>
+		<memsToMagnetOutlineY>2750</memsToMagnetOutlineY>
+		<angle>40.5</angle>
+		<testResult>Fail</testResult>
+	</ExperimentResults>
+	<ExperimentResults>
+		<moduleSerialNumber>123457</moduleSerialNumber>
+		<fpbcSerialNumber>FPBC125</fpbcSerialNumber>
+		<dieId>AA-99</dieId>
+		<waferId>BB-99</waferId>
+		<enId>EN123</enId>
+		<workOrder>WO12345</workOrder>
+		<dateTime>2017-02-12 02:25:30</dateTime>
+		<memsToMagnetOutlineX>2755</memsToMagnetOutlineX>
+		<memsToMagnetOutlineY>2750</memsToMagnetOutlineY>
+		<angle>40.5</angle>
+		<testResult>Fail</testResult>
+	</ExperimentResults>
+	<ExperimentResults>
+		<moduleSerialNumber>123457</moduleSerialNumber>
+		<fpbcSerialNumber>FPBC126</fpbcSerialNumber>
+		<dieId>AA-99</dieId>
+		<waferId>BB-99</waferId>
+		<enId>EN123</enId>
+		<workOrder>WO12345</workOrder>
+		<dateTime>2017-02-12 02:30:30</dateTime>
+		<memsToMagnetOutlineX>2755</memsToMagnetOutlineX>
+		<memsToMagnetOutlineY>2750</memsToMagnetOutlineY>
+		<angle>40.5</angle>
+		<testResult>Fail</testResult>
+	</ExperimentResults>
+	<ExperimentResults>
+		<moduleSerialNumber>123457</moduleSerialNumber>
+		<fpbcSerialNumber>FPBC127</fpbcSerialNumber>
+		<dieId>AA-99</dieId>
+		<waferId>BB-99</waferId>
+		<enId>EN123</enId>
+		<workOrder>WO12345</workOrder>
+		<dateTime>2017-02-12 03:20:30</dateTime>
+		<memsToMagnetOutlineX>2755</memsToMagnetOutlineX>
+		<memsToMagnetOutlineY>2745</memsToMagnetOutlineY>
+		<angle>48.2</angle>
+		<testResult>Pass</testResult>
+	</ExperimentResults>
+</Experiment>

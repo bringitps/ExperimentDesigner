@@ -6,8 +6,9 @@
 <%
 
 	//int i=Test.createSysUserTest(); 
-	if(Test.buildDbSchema())  
-		out.print("DB Schema created.");  
+	//if(Test.buildDbSchemaAndTable())  
+	//	out.print("DB Schema and Table created.");  
+	out.print(Test.buildDbSchemaAndTable());
 
         
   

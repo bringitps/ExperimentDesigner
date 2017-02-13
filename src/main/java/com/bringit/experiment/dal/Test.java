@@ -1,6 +1,8 @@
 package com.bringit.experiment.dal;
 
+import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
@@ -10,6 +12,7 @@ import com.bringit.experiment.bll.ExperimentMeasureFieldValue;
 import com.bringit.experiment.bll.ExperimentMeasureFieldValueUpdateLog;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.UnitOfMeasure;
+import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.ExperimentImageDao;
@@ -18,6 +21,8 @@ import com.bringit.experiment.dao.ExperimentMeasureFieldValueDao;
 import com.bringit.experiment.dao.ExperimentMeasureFieldValueUpdateLogDao;
 import com.bringit.experiment.dao.SysUserDao;
 import com.bringit.experiment.dao.UnitOfMeasureDao;
+import com.bringit.experiment.data.ExperimentParser;
+import com.bringit.experiment.data.ResponseObj;
 
 public class Test {
 	 
@@ -67,7 +72,99 @@ public class Test {
 		 
 	 }
 
-	 public static boolean buildDbSchema()
+
+	 public static String buildDbSchemaAndTable(){
+		 SysUserDao sysUserDao = new SysUserDao();
+		 ExperimentDao experimentDao = new ExperimentDao();
+		 ExperimentFieldDao experimentFieldDao = new ExperimentFieldDao();
+		 //ExecuteQueryDao executeQueryDao = new ExecuteQueryDao();
+		 UnitOfMeasureDao unitOfMeasureDao = new UnitOfMeasureDao();
+		 
+		//New User 
+		 SysUser bringITUser = new SysUser();
+		 bringITUser.setUserName("bit_seko");
+		 bringITUser.setUserPass("123456");
+		 sysUserDao.addSysUser(bringITUser); 						//DB Access
+		 
+		 //New Experiment
+		 Experiment firstExperiment = new Experiment();
+		 firstExperiment.setExpName("MEMS_TO_MAGNET_ASSEMBLY");
+		 firstExperiment.setExpIsActive(true);
+		 firstExperiment.setExpComments("This is the experiment for MEMs to Magnet Assembly");
+		 firstExperiment.setExpInstructions("The instructions should be here..");
+		 firstExperiment.setModifiedDate(new Date());
+		 firstExperiment.setCreatedBy(bringITUser);
+		 firstExperiment.setLastModifiedBy(bringITUser);
+		 experimentDao.addExperiment(firstExperiment);				//DB Access
+
+		 
+		 //New Unit Of Measure
+		 UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
+		 unitOfMeasure.setUomName("uMs");
+		 unitOfMeasure.setUomAbbreviation("um");
+		 unitOfMeasureDao.addUnitOfMeasure(unitOfMeasure);			//DB Access
+		 //New Unit Of Measure
+		 UnitOfMeasure unitOfMeasureAngle = new UnitOfMeasure();
+		 unitOfMeasureAngle.setUomName("o");
+		 unitOfMeasureAngle.setUomAbbreviation("grades");
+		 unitOfMeasureDao.addUnitOfMeasure(unitOfMeasureAngle);			//DB Access
+		 //Not a measure
+		 UnitOfMeasure noMeasure = new UnitOfMeasure();
+		 noMeasure.setUomName("NA");
+		 noMeasure.setUomAbbreviation("NA");
+		 unitOfMeasureDao.addUnitOfMeasure(noMeasure);			//DB Access
+		 
+		 addNewField("varchar(24)", "moduleSerialNumber",true,true,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("varchar(24)", "fpbcSerialNumber",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("varchar(24)", "dieId",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("varchar(24)", "waferId",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("varchar(24)", "enId",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("varchar(24)", "workOrder",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("datetime", "dateTime",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("float", "memsToMagnetOutlineX",true,false,unitOfMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("float", "memsToMagnetOutlineY",true,false,unitOfMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("float", "angle",true,false,unitOfMeasureAngle,firstExperiment,experimentFieldDao);
+		 addNewField("varchar(24)", "testResult",true,false,noMeasure,firstExperiment,experimentFieldDao);
+
+		 /*
+		 List<ExperimentField> fields = experimentFieldDao.getActiveExperimentFields(firstExperiment);
+		 String createTable = "CREATE TABLE "+firstExperiment.getExpName()+"(";
+		 for (ExperimentField experimentField : fields) {
+			 createTable += experimentField.getExpFieldName() + " " + experimentField.getExpFieldType() + " " + (experimentField.isExpFieldIsKey() ? "PRIMARY KEY NOT NULL," : ",");
+		 }
+		 createTable +=");";
+
+		 executeQueryDao.executeQuery(createTable);
+		 */
+		 
+		 //Read a sample XML and load it into Values table;
+		 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample.xml");
+		 ExperimentParser parser = new ExperimentParser();
+		 ResponseObj respObj = parser.parseXML(xmlFile, xmlFile.getName());
+		 
+		 return respObj.getDescription() + respObj.getDetail();
+		 
+	 }
+		public String runTest() {
+			 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample2.xml");
+			 ExperimentParser parser = new ExperimentParser();
+			 ResponseObj respObj = parser.parseXML(xmlFile, xmlFile.getName());
+			 
+			 return respObj.getDescription() + respObj.getDetail();
+		}
+		
+	 private static void addNewField(String type, String name, boolean active, boolean isKey, UnitOfMeasure uom, Experiment exp, ExperimentFieldDao dao) {
+		 ExperimentField field = new ExperimentField();
+		 field.setExpFieldType(type);
+		 field.setExpFieldName(name);
+		 field.setExpFieldIsActive(active);
+		 field.setExpFieldIsKey(isKey);
+		 field.setUnitOfMeasure(uom);
+		 field.setExperiment(exp);
+		 dao.addExperimentField(field);	
+	}
+
+	public static boolean buildDbSchema()
 	 {
 		 SysUserDao sysUserDao = new SysUserDao();
 		 ExperimentDao experimentDao = new ExperimentDao();
@@ -95,6 +192,7 @@ public class Test {
 		 firstExperiment.setLastModifiedBy(bringITUser);
 		 experimentDao.addExperiment(firstExperiment);				//DB Access
 
+		 
 		 //New Unit Of Measure
 		 UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
 		 unitOfMeasure.setUomName("Volts");
@@ -118,7 +216,8 @@ public class Test {
 		 voltageField.setUnitOfMeasure(unitOfMeasure);
 		 voltageField.setExperiment(firstExperiment);
 		 experimentFieldDao.addExperimentField(voltageField);	//DB Access
-		 
+
+
 		 //New Experiment Image
 		 ExperimentImage experimentImage = new ExperimentImage();
 		 experimentImage.setExpImagePath("image.png");
@@ -168,4 +267,6 @@ public class Test {
 		 
 		 return true;
 	 }
+
+
 }

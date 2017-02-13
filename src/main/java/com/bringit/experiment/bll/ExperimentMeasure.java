@@ -37,6 +37,9 @@ public class ExperimentMeasure {
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
 	
+	@Column(name="FileName")
+	private String fileName;
+	
 	public Integer getExpMeasureId() {
 		return expMeasureId;
 	}
@@ -83,5 +86,13 @@ public class ExperimentMeasure {
 
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}	
 }

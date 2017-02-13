@@ -107,5 +107,23 @@ public class ExperimentDao {
         }
         return exp;
     }
+    
+    @SuppressWarnings("unused")
+	public Experiment getExperimentByName(String expName) {
+        Experiment exp = null;
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            String query = "from Experiment where ExpName ='"+expName.trim()+ "' and ExpIsActive = 'true'";
+            exp = (Experiment) (session.createQuery(query).list()).get(0);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return exp;
+    }
 	
 }

@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.dal.HibernateUtil;
 
@@ -87,7 +88,41 @@ public class ExperimentFieldDao {
         }
         return experimentFields;
     }
-
+    /*
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<ExperimentField> getActiveExperimentFields() {
+        List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            experimentFields = session.createQuery("from ExperimentField where ExpFieldIsActive=true").list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return experimentFields;
+    }
+    */
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<ExperimentField> getActiveExperimentFields(Experiment firstExperiment) {
+		List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            experimentFields = session.createQuery("from ExperimentField where ExpId ="+firstExperiment.getExpId()).list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return experimentFields;
+	}
+    
     @SuppressWarnings("unused")
 	public ExperimentField getExperimentFieldById(int experimentFieldId) {
     	ExperimentField experimentField = null;
@@ -95,7 +130,7 @@ public class ExperimentFieldDao {
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from Experiment where ExpFieldId = :id";
+            String queryString = "from ExperimentField where ExpFieldId = :id";
             Query query = session.createQuery(queryString);
             query.setInteger("id", experimentFieldId);
             experimentField = (ExperimentField) query.uniqueResult();
@@ -107,5 +142,6 @@ public class ExperimentFieldDao {
         }
         return experimentField;
     }
+
 	
 }

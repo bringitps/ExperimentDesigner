@@ -15,7 +15,7 @@ public class SysUser {
 	@Column(name="UserId")
 	private Integer userId;
 
-	@Column(name="UserName")
+	@Column(name="UserName",unique=true)
 	private String UserName;
 	
 	@Column(name="UserPass")

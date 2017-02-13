@@ -95,9 +95,28 @@ public class SysUserDao {
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from User where id = :id";
+            String queryString = "from SysUser where id = :id";
             Query query = session.createQuery(queryString);
             query.setInteger("id", userId);
+            sysUser = (SysUser) query.uniqueResult();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return sysUser;
+    }
+    @SuppressWarnings("unused")
+	public SysUser getUserByUserName(String userName) {
+        SysUser sysUser = null;
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            String queryString = "from SysUser where UserName = :user";
+            Query query = session.createQuery(queryString);
+            query.setString("user", userName);
             sysUser = (SysUser) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();

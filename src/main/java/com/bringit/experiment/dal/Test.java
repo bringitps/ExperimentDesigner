@@ -21,54 +21,8 @@ import com.bringit.experiment.util.Config;
 
 public class Test {
 	 
-	 public static int createSysUserTest()
-	 {
-	     SysUserDao sysUserDao = new SysUserDao();
-		 
-	     SysUser sysUser = new SysUser();
-		 sysUser.setUserName("BringIT");
-		 sysUser.setUserPass("123456");
-		 
-		 sysUserDao.addSysUser(sysUser);
-		 
-		 return sysUser.getUserId();
-	 }
 	 
-	 public static int createExperimentTest()
-	 {
-		 SysUserDao sysUserDao = new SysUserDao();
-		 
-	     SysUser sysUser = new SysUser();
-		 sysUser.setUserName("Edgar Beltrán");
-		 sysUser.setUserPass("123456");
-		 
-		 sysUserDao.addSysUser(sysUser);
- 
-	     SysUser sysUserErik = new SysUser();
-	     sysUserErik.setUserName("Erik Tete Samario");
-	     sysUserErik.setUserPass("123456");
-		 
-		 sysUserDao.addSysUser(sysUserErik);
-		 
-		 
-		 ExperimentDao experimentDao = new ExperimentDao();
-		 
-		 Experiment experiment = new Experiment();
-		 experiment.setExpComments("Test Experiment Comments");
-		 experiment.setExpInstructions("Test Experiment Instructions");
-		 experiment.setExpIsActive(true);
-		 experiment.setExpName("Test Experiment Name");
-		 experiment.setModifiedDate(new Date());
-		 experiment.setCreatedBy(sysUser);
-		 experiment.setLastModifiedBy(sysUserErik);
-		 
-		 experimentDao.addExperiment(experiment);
-		 return experiment.getExpId();
-		 
-	 }
-
-
-	 public static String buildDbSchemaAndTable(){
+	public static String buildDbSchemaAndTable(){
 		 SysUserDao sysUserDao = new SysUserDao();
 		 ExperimentDao experimentDao = new ExperimentDao();
 		 ExperimentFieldDao experimentFieldDao = new ExperimentFieldDao();
@@ -92,7 +46,7 @@ public class Test {
 		 firstExperiment.setCreatedBy(bringITUser);
 		 firstExperiment.setLastModifiedBy(bringITUser);
 		 experimentDao.addExperiment(firstExperiment);				//DB Access
-
+		 experimentDao.updateDBDataTable(firstExperiment);
 		 
 		 //New Unit Of Measure
 		 UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
@@ -122,7 +76,8 @@ public class Test {
 		 addNewField("angle", "float", "angle",true,false,unitOfMeasureAngle,firstExperiment,experimentFieldDao);
 		 addNewField("testResult", "varchar(24)", "testResult",true,false,noMeasure,firstExperiment,experimentFieldDao);
 		
-		 
+		 /*
+		  *Operation already covered by updateDBDataTable function of ExperimentDao Class
 		 List<ExperimentField> fields = experimentFieldDao.getActiveExperimentFields(firstExperiment);
 		 String createTable = "CREATE TABLE "+firstExperiment.getExpDbTableNameId()+"(";
 		 for (ExperimentField experimentField : fields) {
@@ -131,7 +86,8 @@ public class Test {
 		 createTable +=");";
 
 		 executeQueryDao.executeQuery(createTable);
-
+		 */
+		 
 		 //Read a sample XML and load it into Values table;
 		 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample.xml");
 		 ExperimentParser parser = new ExperimentParser();
@@ -140,7 +96,7 @@ public class Test {
 		 return respObj.getDescription() + respObj.getDetail();
 		 
 	 }
-		public String runTest() {
+	public String runTest() {
 			 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample2.xml");
 			 ExperimentParser parser = new ExperimentParser();
 			 ResponseObj respObj = parser.parseXML(xmlFile, xmlFile.getName());
@@ -148,18 +104,6 @@ public class Test {
 			 return respObj.getDescription() + respObj.getDetail();
 		}
 		
-	 private static void addNewField(String dbDataTableFieldNameId, String type, String name, boolean active, boolean isKey, UnitOfMeasure uom, Experiment exp, ExperimentFieldDao dao) {
-		 ExperimentField field = new ExperimentField();
-		 field.setExpDbFieldNameId(dbDataTableFieldNameId);
-		 field.setExpFieldType(type);
-		 field.setExpFieldName(name);
-		 field.setExpFieldIsActive(active);
-		 field.setExpFieldIsKey(isKey);
-		 field.setUnitOfMeasure(uom);
-		 field.setExperiment(exp);
-		 dao.addExperimentField(field);	
-		 dao.updateDBDataTableField(field);
-	}
 
 	public static boolean buildDbSchema()
 	 {
@@ -175,7 +119,7 @@ public class Test {
 		 bringITUser.setUserPass("123456");
 		 sysUserDao.addSysUser(bringITUser); 						//DB Access
 		 
-		//New Experiment
+		 //New Experiment
 		 Experiment firstExperiment = new Experiment();
 		 firstExperiment.setExpDbTableNameId("mems_to_magnet_assembly");
 		 firstExperiment.setExpName("MEMS_TO_MAGNET_ASSEMBLY");
@@ -225,9 +169,21 @@ public class Test {
 		 experimentImageDao.addExperimentImage(experimentImage);
 		 
 		 return true;
-
-		 
 		
 	 }
 
+	 private static void addNewField(String dbDataTableFieldNameId, String type, String name, boolean active, boolean isKey, UnitOfMeasure uom, Experiment exp, ExperimentFieldDao dao) {
+		 ExperimentField field = new ExperimentField();
+		 field.setExpDbFieldNameId(dbDataTableFieldNameId);
+		 field.setExpFieldType(type);
+		 field.setExpFieldName(name);
+		 field.setExpFieldIsActive(active);
+		 field.setExpFieldIsKey(isKey);
+		 field.setUnitOfMeasure(uom);
+		 field.setExperiment(exp);
+		 dao.addExperimentField(field);	
+		 dao.updateDBDataTableField(field);
+	}
+
+	
 }

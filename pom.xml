@@ -10,6 +10,7 @@
   
   <properties>
 	<spring.version>4.0.1.RELEASE</spring.version>
+	<database.dialect>sqlserver</database.dialect>
   </properties>
   <dependencies>
     <dependency>
@@ -69,12 +70,11 @@
             <artifactId>maven-war-plugin</artifactId>
             <version>2.3</version>
             <configuration>
-             <warName>${finalName}</warName>
-             <outputDirectory>C:\apache-tomcat-8.5.11\webapps</outputDirectory>
-            </configuration>
+             	<warName>${finalName}</warName>
+             	<outputDirectory>C:\apache-tomcat-8.5.11\webapps</outputDirectory>
+          	</configuration>
     	</plugin>
+    	
     </plugins>
-    
-    
   </build>
 </project>

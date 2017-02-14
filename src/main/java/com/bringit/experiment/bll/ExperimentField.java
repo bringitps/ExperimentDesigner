@@ -16,6 +16,9 @@ public class ExperimentField {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="ExpFieldId")
 	private Integer expFieldId;
+
+	@Column(name="ExpDbFieldNameId")
+	private String expDbFieldNameId;
 	
 	@Column(name="ExpFieldIsActive")
 	private boolean expFieldIsActive;
@@ -44,6 +47,14 @@ public class ExperimentField {
 
 	public void setExpFieldId(Integer expFieldId) {
 		this.expFieldId = expFieldId;
+	}
+
+	public String getExpDbFieldNameId() {
+		return expDbFieldNameId;
+	}
+
+	public void setExpDbFieldNameId(String expDbFieldNameId) {
+		this.expDbFieldNameId = expDbFieldNameId;
 	}
 
 	public boolean isExpFieldIsActive() {

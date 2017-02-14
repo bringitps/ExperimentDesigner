@@ -6,13 +6,9 @@ import org.jdom.input.SAXBuilder;
 
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
-import com.bringit.experiment.bll.ExperimentMeasure;
-import com.bringit.experiment.bll.ExperimentMeasureFieldValue;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
-import com.bringit.experiment.dao.ExperimentMeasureDao;
-import com.bringit.experiment.dao.ExperimentMeasureFieldValueDao;
 import com.bringit.experiment.dao.SysUserDao;
 
 import java.io.File;
@@ -28,6 +24,7 @@ public class ExperimentParser {
     	ResponseObj respObj = new ResponseObj();
     	respObj.setCode(0);
     	respObj.setDescription("Xml Loaded Successfully");
+    	/*
         try {
         	
         	ExperimentDao experimentDao = new ExperimentDao();
@@ -118,7 +115,7 @@ public class ExperimentParser {
     		respObj.setDescription("Unknown error, check for details.");
     		respObj.setDetail(e+e.getMessage());
     		return respObj;
-        }
+        }*/
         return null;
     }
 }

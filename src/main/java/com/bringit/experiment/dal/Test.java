@@ -1,28 +1,23 @@
 package com.bringit.experiment.dal;
 
-import java.io.File;
+import java.io.*;
 import java.util.Date;
 import java.util.List;
 
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.ExperimentImage;
-import com.bringit.experiment.bll.ExperimentMeasure;
-import com.bringit.experiment.bll.ExperimentMeasureFieldValue;
-import com.bringit.experiment.bll.ExperimentMeasureFieldValueUpdateLog;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.UnitOfMeasure;
 import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.ExperimentImageDao;
-import com.bringit.experiment.dao.ExperimentMeasureDao;
-import com.bringit.experiment.dao.ExperimentMeasureFieldValueDao;
-import com.bringit.experiment.dao.ExperimentMeasureFieldValueUpdateLogDao;
 import com.bringit.experiment.dao.SysUserDao;
 import com.bringit.experiment.dao.UnitOfMeasureDao;
 import com.bringit.experiment.data.ExperimentParser;
 import com.bringit.experiment.data.ResponseObj;
+import com.bringit.experiment.util.Config;
 
 public class Test {
 	 
@@ -114,18 +109,7 @@ public class Test {
 		 noMeasure.setUomAbbreviation("NA");
 		 unitOfMeasureDao.addUnitOfMeasure(noMeasure);			//DB Access
 		 
-		 addNewField("varchar(24)", "moduleSerialNumber",true,true,noMeasure,firstExperiment,experimentFieldDao);
-		 addNewField("varchar(24)", "fpbcSerialNumber",true,false,noMeasure,firstExperiment,experimentFieldDao);
-		 addNewField("varchar(24)", "dieId",true,false,noMeasure,firstExperiment,experimentFieldDao);
-		 addNewField("varchar(24)", "waferId",true,false,noMeasure,firstExperiment,experimentFieldDao);
-		 addNewField("varchar(24)", "enId",true,false,noMeasure,firstExperiment,experimentFieldDao);
-		 addNewField("varchar(24)", "workOrder",true,false,noMeasure,firstExperiment,experimentFieldDao);
-		 addNewField("datetime", "dateTime",true,false,noMeasure,firstExperiment,experimentFieldDao);
-		 addNewField("float", "memsToMagnetOutlineX",true,false,unitOfMeasure,firstExperiment,experimentFieldDao);
-		 addNewField("float", "memsToMagnetOutlineY",true,false,unitOfMeasure,firstExperiment,experimentFieldDao);
-		 addNewField("float", "angle",true,false,unitOfMeasureAngle,firstExperiment,experimentFieldDao);
-		 addNewField("varchar(24)", "testResult",true,false,noMeasure,firstExperiment,experimentFieldDao);
-
+		
 		 /*
 		 List<ExperimentField> fields = experimentFieldDao.getActiveExperimentFields(firstExperiment);
 		 String createTable = "CREATE TABLE "+firstExperiment.getExpName()+"(";
@@ -153,8 +137,9 @@ public class Test {
 			 return respObj.getDescription() + respObj.getDetail();
 		}
 		
-	 private static void addNewField(String type, String name, boolean active, boolean isKey, UnitOfMeasure uom, Experiment exp, ExperimentFieldDao dao) {
+	 private static void addNewField(String dbDataTableFieldNameId, String type, String name, boolean active, boolean isKey, UnitOfMeasure uom, Experiment exp, ExperimentFieldDao dao) {
 		 ExperimentField field = new ExperimentField();
+		 field.setExpDbFieldNameId(dbDataTableFieldNameId);
 		 field.setExpFieldType(type);
 		 field.setExpFieldName(name);
 		 field.setExpFieldIsActive(active);
@@ -162,6 +147,7 @@ public class Test {
 		 field.setUnitOfMeasure(uom);
 		 field.setExperiment(exp);
 		 dao.addExperimentField(field);	
+		 dao.updateDBDataTableField(field);
 	}
 
 	public static boolean buildDbSchema()
@@ -171,9 +157,6 @@ public class Test {
 		 ExperimentFieldDao experimentFieldDao = new ExperimentFieldDao();
 		 ExperimentImageDao experimentImageDao = new ExperimentImageDao();
 		 UnitOfMeasureDao unitOfMeasureDao = new UnitOfMeasureDao();
-		 ExperimentMeasureDao experimentMeasureDao = new ExperimentMeasureDao();
-		 ExperimentMeasureFieldValueDao experimentMeasureFieldValueDao = new ExperimentMeasureFieldValueDao();
-		 ExperimentMeasureFieldValueUpdateLogDao experimentMeasureFieldValueUpdateLogDao = new ExperimentMeasureFieldValueUpdateLogDao();
 		 
 		 //New User 
 		 SysUser bringITUser = new SysUser();
@@ -181,42 +164,48 @@ public class Test {
 		 bringITUser.setUserPass("123456");
 		 sysUserDao.addSysUser(bringITUser); 						//DB Access
 		 
-		 //New Experiment
+		//New Experiment
 		 Experiment firstExperiment = new Experiment();
-		 firstExperiment.setExpName("First Experiment Name");
+		 firstExperiment.setExpDbTableNameId("mems_to_magnet_assembly");
+		 firstExperiment.setExpName("MEMS_TO_MAGNET_ASSEMBLY");
 		 firstExperiment.setExpIsActive(true);
-		 firstExperiment.setExpComments("First Experiment Comments");
-		 firstExperiment.setExpInstructions("First Experiment Instructions");
+		 firstExperiment.setExpComments("This is the experiment for MEMs to Magnet Assembly");
+		 firstExperiment.setExpInstructions("The instructions should be here..");
 		 firstExperiment.setModifiedDate(new Date());
 		 firstExperiment.setCreatedBy(bringITUser);
 		 firstExperiment.setLastModifiedBy(bringITUser);
 		 experimentDao.addExperiment(firstExperiment);				//DB Access
-
+		 experimentDao.updateDBDataTable(firstExperiment);
 		 
 		 //New Unit Of Measure
 		 UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
-		 unitOfMeasure.setUomName("Volts");
-		 unitOfMeasure.setUomAbbreviation("V");
+		 unitOfMeasure.setUomName("uMs");
+		 unitOfMeasure.setUomAbbreviation("um");
 		 unitOfMeasureDao.addUnitOfMeasure(unitOfMeasure);			//DB Access
+		 //New Unit Of Measure
+		 UnitOfMeasure unitOfMeasureAngle = new UnitOfMeasure();
+		 unitOfMeasureAngle.setUomName("o");
+		 unitOfMeasureAngle.setUomAbbreviation("grades");
+		 unitOfMeasureDao.addUnitOfMeasure(unitOfMeasureAngle);			//DB Access
+		 //Not a measure
+		 UnitOfMeasure noMeasure = new UnitOfMeasure();
+		 noMeasure.setUomName("NA");
+		 noMeasure.setUomAbbreviation("NA");
+		 unitOfMeasureDao.addUnitOfMeasure(noMeasure);			//DB Access
 		 
-		 //New Experiment Fields
-		 ExperimentField serialNumberField = new ExperimentField();
-		 serialNumberField.setExpFieldType("String");
-		 serialNumberField.setExpFieldName("Serial Number");
-		 serialNumberField.setExpFieldIsActive(true);
-		 serialNumberField.setExpFieldIsKey(true);
-		 serialNumberField.setExperiment(firstExperiment);
-		 experimentFieldDao.addExperimentField(serialNumberField);	//DB Access
+		 addNewField("moduleSerialNumber", "varchar(24)", "moduleSerialNumber",true,true,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("fpbcSerialNumber", "varchar(24)", "fpbcSerialNumber",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("dieId", "varchar(24)", "dieId",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("waferId", "varchar(24)", "waferId",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("enId", "varchar(24)", "enId",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("workOrder", "varchar(24)", "workOrder",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("dateTime", "datetime", "dateTime",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("memsToMagnetOutlineX", "float", "memsToMagnetOutlineX",true,false,unitOfMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("memsToMagnetOutlineY", "float", "memsToMagnetOutlineY",true,false,unitOfMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("angle", "float", "angle",true,false,unitOfMeasureAngle,firstExperiment,experimentFieldDao);
+		 addNewField("testResult", "varchar(24)", "testResult",true,false,noMeasure,firstExperiment,experimentFieldDao);
 		 
-		 ExperimentField voltageField = new ExperimentField();
-		 voltageField.setExpFieldType("String");
-		 voltageField.setExpFieldName("Device Voltage");
-		 voltageField.setExpFieldIsActive(true);
-		 voltageField.setExpFieldIsKey(false);
-		 voltageField.setUnitOfMeasure(unitOfMeasure);
-		 voltageField.setExperiment(firstExperiment);
-		 experimentFieldDao.addExperimentField(voltageField);	//DB Access
-
+		 
 
 		 //New Experiment Image
 		 ExperimentImage experimentImage = new ExperimentImage();
@@ -224,49 +213,10 @@ public class Test {
 		 experimentImage.setExperiment(firstExperiment);
 		 experimentImageDao.addExperimentImage(experimentImage);
 		 
-		 //New Experiment Measure
-		 ExperimentMeasure experimentMeasure = new ExperimentMeasure();
-		 experimentMeasure.setExpMeasureComment("This is a comment for the first Experiment Measure");
-		 experimentMeasure.setCreatedBy(bringITUser);
-		 experimentMeasure.setCreatedDate(new Date());
-		 experimentMeasure.setLastModifiedBy(bringITUser);
-		 experimentMeasure.setModifiedDate(new Date());
-		 experimentMeasureDao.addExperimentMeasure(experimentMeasure);
-		 
-		 //Experiment Measure Field Value for Serial Number
-		 ExperimentMeasureFieldValue serialNumberFieldValue = new ExperimentMeasureFieldValue();
-		 serialNumberFieldValue.setExperimentMeasure(experimentMeasure);
-		 serialNumberFieldValue.setExperimentField(serialNumberField);
-		 serialNumberFieldValue.setExpMeasureValue("SN123456");
-		 experimentMeasureFieldValueDao.addExperimentMeasureFieldValue(serialNumberFieldValue);
-		 
-		 //Experiment Measure Field Value for Voltaje
-		 ExperimentMeasureFieldValue voltajeFieldValue = new ExperimentMeasureFieldValue();
-		 voltajeFieldValue.setExperimentMeasure(experimentMeasure);
-		 voltajeFieldValue.setExperimentField(serialNumberField);
-		 voltajeFieldValue.setExpMeasureValue("5.5");
-		 experimentMeasureFieldValueDao.addExperimentMeasureFieldValue(voltajeFieldValue);
-		 
-		 //Experiment Measure Field Value Update for Voltaje
-		 ExperimentMeasureFieldValueUpdateLog voltajeFieldValueUpdateLog = new ExperimentMeasureFieldValueUpdateLog();
-		 voltajeFieldValueUpdateLog.setExperimentMeasureFieldValue(voltajeFieldValue);
-		 voltajeFieldValueUpdateLog.setExpMeasureOldValue(voltajeFieldValue.getExpMeasureValue());
-		 voltajeFieldValueUpdateLog.setExpMeasureOldCreatedDate(experimentMeasure.getModifiedDate());
-		 voltajeFieldValueUpdateLog.setExpMeasureNewValue("6.5");
-		 voltajeFieldValueUpdateLog.setExpMeasureNewCreatedDate(new Date());
-		 voltajeFieldValueUpdateLog.setCreatedBy(bringITUser);
-		 experimentMeasureFieldValueUpdateLogDao.addExperimentMeasureFieldValueUpdateLog(voltajeFieldValueUpdateLog);
-		 
-		 //Update Parent Entities
-		 experimentMeasure.setLastModifiedBy(voltajeFieldValueUpdateLog.getCreatedBy());
-		 experimentMeasure.setModifiedDate(voltajeFieldValueUpdateLog.getExpMeasureNewCreatedDate());
-		 experimentMeasureDao.updateExperimentMeasure(experimentMeasure);
-		 
-		 voltajeFieldValue.setExpMeasureValue(voltajeFieldValueUpdateLog.getExpMeasureNewValue());
-		 experimentMeasureFieldValueDao.updateExperimentMeasureFieldValue(voltajeFieldValue);
-		 
 		 return true;
-	 }
 
+		 
+		
+	 }
 
 }

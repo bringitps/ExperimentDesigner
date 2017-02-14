@@ -9,10 +9,11 @@ import org.hibernate.Transaction;
 
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.dal.HibernateUtil;
+import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
 public class SysUserDao {
 
-	private String dialectXmlFile = "mssql-hibernate.cfg.xml";
+	private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
 	
 	public void addSysUser(SysUser sysUser) {
 

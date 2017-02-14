@@ -20,6 +20,9 @@ public class Experiment {
 	@Column(name="ExpId")
 	private Integer expId;
 
+	@Column(name="ExpDbTableNameId")
+	private String expDbTableNameId;
+	
 	@Column(name="ExpIsActive")
 	private boolean expIsActive;
 	
@@ -55,6 +58,14 @@ public class Experiment {
 		this.expId = expId;
 	}
 
+	public String getExpDbTableNameId() {
+		return expDbTableNameId;
+	}
+
+
+	public void setExpDbTableNameId(String expDbTableNameId) {
+		this.expDbTableNameId = expDbTableNameId;
+	}
 
 	public boolean isExpIsActive() {
 		return expIsActive;

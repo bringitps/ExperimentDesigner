@@ -9,10 +9,11 @@ import org.hibernate.Transaction;
 
 import com.bringit.experiment.bll.UnitOfMeasure;
 import com.bringit.experiment.dal.HibernateUtil;
+import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
 public class UnitOfMeasureDao {
 
-	private String dialectXmlFile = "mssql-hibernate.cfg.xml";
+	private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
 	
 	public void addUnitOfMeasure(UnitOfMeasure unitOfMeasure) {
 

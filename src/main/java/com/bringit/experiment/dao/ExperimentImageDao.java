@@ -9,10 +9,11 @@ import org.hibernate.Transaction;
 
 import com.bringit.experiment.bll.ExperimentImage;
 import com.bringit.experiment.dal.HibernateUtil;
+import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
 public class ExperimentImageDao {
 
-	private String dialectXmlFile = "mssql-hibernate.cfg.xml";
+	private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
 	
 	public void addExperimentImage(ExperimentImage experimentImage) {
 

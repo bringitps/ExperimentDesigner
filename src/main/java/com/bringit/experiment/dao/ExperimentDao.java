@@ -1,18 +1,25 @@
 package com.bringit.experiment.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Mappings;
+import org.hibernate.mapping.RootClass;
 
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.dal.HibernateUtil;
+import com.bringit.experiment.util.Config;
+import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
 public class ExperimentDao {
 
-	private String dialectXmlFile = "mssql-hibernate.cfg.xml";
+	private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
 	
 	public void addExperiment(Experiment exp) {
 
@@ -125,5 +132,46 @@ public class ExperimentDao {
         }
         return exp;
     }
-	
+    
+    public boolean updateDBDataTable(Experiment experiment)
+    {
+    	String query = null;
+    	boolean successfulExecution = true;
+    	
+		Config configuration = new Config();
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			query = " IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='" + experiment.getExpDbTableNameId() + "' AND xtype='U') ";
+			query += " CREATE TABLE " + experiment.getExpDbTableNameId();
+			query += " (RecordId int IDENTITY(1,1) NOT NULL PRIMARY KEY,";
+			query += " Comments varchar(1000) ,";
+			query += " CreatedBy int ,";
+			query += " LastModifiedBy int ,";
+			query += " CreatedDate datetime ,";
+			query += " LastModifiedDate datetime ,";
+			query += " FOREIGN KEY (CreatedBy) REFERENCES SysUser(UserId), ";
+			query += " FOREIGN KEY (LastModifiedBy) REFERENCES SysUser(UserId));";
+		}
+    	else
+    		return false;
+
+		Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        
+        try {
+            trns = session.beginTransaction();
+            session.createSQLQuery(query).executeUpdate();
+            session.getTransaction().commit();
+        } catch (RuntimeException e) {
+            if (trns != null) {
+                trns.rollback();
+            }
+            successfulExecution = false;
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+		return successfulExecution;
+    }
 }

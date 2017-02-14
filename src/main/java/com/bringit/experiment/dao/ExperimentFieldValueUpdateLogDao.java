@@ -7,21 +7,22 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.ExperimentMeasureFieldValue;
+import com.bringit.experiment.bll.ExperimentFieldValueUpdateLog;
 import com.bringit.experiment.dal.HibernateUtil;
+import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
-public class ExperimentMeasureFieldValueDao {
+public class ExperimentFieldValueUpdateLogDao {
 
-	private String dialectXmlFile = "mssql-hibernate.cfg.xml";
+	private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
 	
-	public void addExperimentMeasureFieldValue(ExperimentMeasureFieldValue experimentMeasureFieldValue) {
+	public void addExperimentFieldValueUpdateLog(ExperimentFieldValueUpdateLog experimentFieldValueUpdateLog) {
 
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
-            session.save(experimentMeasureFieldValue);
+            session.save(experimentFieldValueUpdateLog);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -34,13 +35,13 @@ public class ExperimentMeasureFieldValueDao {
         }
     }
 
-    public void deleteExperimentMeasureFieldValue(int experimentMeasureFieldValueId) {
+    public void deleteExperimentFieldValueUpdateLog(int experimentFieldValueUpdateLogId) {
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            ExperimentMeasureFieldValue experimentMeasureFieldValue = (ExperimentMeasureFieldValue)session.load(ExperimentMeasureFieldValue.class, new Integer(experimentMeasureFieldValueId));
-            session.delete(experimentMeasureFieldValue);
+            ExperimentFieldValueUpdateLog experimentFieldValueUpdateLog = (ExperimentFieldValueUpdateLog)session.load(ExperimentFieldValueUpdateLog.class, new Integer(experimentFieldValueUpdateLogId));
+            session.delete(experimentFieldValueUpdateLog);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -53,12 +54,12 @@ public class ExperimentMeasureFieldValueDao {
         }
     }
 
-    public void updateExperimentMeasureFieldValue(ExperimentMeasureFieldValue experimentMeasureFieldValue) {
+    public void updateExperimentFieldValueUpdateLog(ExperimentFieldValueUpdateLog experimentFieldValueUpdateLog) {
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            session.update(experimentMeasureFieldValue);
+            session.update(experimentFieldValueUpdateLog);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -72,40 +73,40 @@ public class ExperimentMeasureFieldValueDao {
     }
 
     @SuppressWarnings({ "unchecked", "unused" })
-	public List<ExperimentMeasureFieldValue> getAllExperimentMeasureFieldValues() {
-        List<ExperimentMeasureFieldValue> experimentMeasureFieldValues = new ArrayList<ExperimentMeasureFieldValue>();
+	public List<ExperimentFieldValueUpdateLog> getAllExperimentFieldValueUpdateLogs() {
+        List<ExperimentFieldValueUpdateLog> experimentFieldValueUpdateLogs = new ArrayList<ExperimentFieldValueUpdateLog>();
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            experimentMeasureFieldValues = session.createQuery("from ExperimentMeasureFieldValue").list();
+            experimentFieldValueUpdateLogs = session.createQuery("from ExperimentFieldValueUpdateLog").list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return experimentMeasureFieldValues;
+        return experimentFieldValueUpdateLogs;
     }
 
     @SuppressWarnings("unused")
-	public ExperimentMeasureFieldValue getExperimentMeasureFieldValueById(int experimentMeasureFieldValueId) {
-    	ExperimentMeasureFieldValue experimentMeasureFieldValue = null;
+	public ExperimentFieldValueUpdateLog getExperimentFieldValueUpdateLogById(int expFieldValueUpdateLogId) {
+    	ExperimentFieldValueUpdateLog experimentFieldValueUpdateLog = null;
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from ExperimentMeasureFieldValue where ExpMeasureFieldValueId = :id";
+            String queryString = "from ExperimentMeasureFieldValueUpdateLog where ExpFieldValueUpdateLogId = :id";
             Query query = session.createQuery(queryString);
-            query.setInteger("id", experimentMeasureFieldValueId);
-            experimentMeasureFieldValue = (ExperimentMeasureFieldValue) query.uniqueResult();
+            query.setInteger("id", expFieldValueUpdateLogId);
+            experimentFieldValueUpdateLog = (ExperimentFieldValueUpdateLog) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return experimentMeasureFieldValue;
+        return experimentFieldValueUpdateLog;
     }
 	
 }

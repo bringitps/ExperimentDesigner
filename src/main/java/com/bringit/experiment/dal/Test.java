@@ -72,7 +72,7 @@ public class Test {
 		 SysUserDao sysUserDao = new SysUserDao();
 		 ExperimentDao experimentDao = new ExperimentDao();
 		 ExperimentFieldDao experimentFieldDao = new ExperimentFieldDao();
-		 //ExecuteQueryDao executeQueryDao = new ExecuteQueryDao();
+		 ExecuteQueryDao executeQueryDao = new ExecuteQueryDao();
 		 UnitOfMeasureDao unitOfMeasureDao = new UnitOfMeasureDao();
 		 
 		//New User 
@@ -83,6 +83,7 @@ public class Test {
 		 
 		 //New Experiment
 		 Experiment firstExperiment = new Experiment();
+		 firstExperiment.setExpDbTableNameId("mems_to_magnet_assembly");
 		 firstExperiment.setExpName("MEMS_TO_MAGNET_ASSEMBLY");
 		 firstExperiment.setExpIsActive(true);
 		 firstExperiment.setExpComments("This is the experiment for MEMs to Magnet Assembly");
@@ -109,18 +110,28 @@ public class Test {
 		 noMeasure.setUomAbbreviation("NA");
 		 unitOfMeasureDao.addUnitOfMeasure(noMeasure);			//DB Access
 		 
+		 addNewField("moduleSerialNumber", "varchar(24)", "moduleSerialNumber",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("fpbcSerialNumber", "varchar(24)", "fpbcSerialNumber",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("dieId", "varchar(24)", "dieId",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("waferId", "varchar(24)", "waferId",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("enId", "varchar(24)", "enId",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("workOrder", "varchar(24)", "workOrder",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("date_Time", "datetime", "date_Time",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("memsToMagnetOutlineX", "float", "memsToMagnetOutlineX",true,false,unitOfMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("memsToMagnetOutlineY", "float", "memsToMagnetOutlineY",true,false,unitOfMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("angle", "float", "angle",true,false,unitOfMeasureAngle,firstExperiment,experimentFieldDao);
+		 addNewField("testResult", "varchar(24)", "testResult",true,false,noMeasure,firstExperiment,experimentFieldDao);
 		
-		 /*
+		 
 		 List<ExperimentField> fields = experimentFieldDao.getActiveExperimentFields(firstExperiment);
-		 String createTable = "CREATE TABLE "+firstExperiment.getExpName()+"(";
+		 String createTable = "CREATE TABLE "+firstExperiment.getExpDbTableNameId()+"(";
 		 for (ExperimentField experimentField : fields) {
 			 createTable += experimentField.getExpFieldName() + " " + experimentField.getExpFieldType() + " " + (experimentField.isExpFieldIsKey() ? "PRIMARY KEY NOT NULL," : ",");
 		 }
 		 createTable +=");";
 
 		 executeQueryDao.executeQuery(createTable);
-		 */
-		 
+
 		 //Read a sample XML and load it into Values table;
 		 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample.xml");
 		 ExperimentParser parser = new ExperimentParser();

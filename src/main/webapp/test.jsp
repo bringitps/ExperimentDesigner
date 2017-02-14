@@ -6,10 +6,11 @@
 <%
 
 	//int i=Test.createSysUserTest(); 
-	if(Test.buildDbSchema())  
+	/*if(Test.buildDbSchema())  
 		out.print("DB Schema and Table created.");
 	else
 		out.print("Customer Failed.");
 	//out.print(Test.getPropertyTest());
-  
+  */
+  out.print(Test.buildDbSchemaAndTable());
 %>  

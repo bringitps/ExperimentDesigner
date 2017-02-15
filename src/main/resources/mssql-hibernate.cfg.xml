@@ -33,6 +33,11 @@
         <mapping class="com.bringit.experiment.bll.ExperimentImage" />
         <mapping class="com.bringit.experiment.bll.ExperimentFieldValueUpdateLog" />
         <mapping class="com.bringit.experiment.bll.UnitOfMeasure" />
+        <mapping class="com.bringit.experiment.bll.FilesRepository"/>
+        <mapping class="com.bringit.experiment.bll.JobExecutionRepeat"/>
+        <mapping class="com.bringit.experiment.bll.XmlDataLoadExecutionResult"/>
+        <mapping class="com.bringit.experiment.bll.XmlTemplate"/>
+        <mapping class="com.bringit.experiment.bll.XmlTemplateNode"/>
 
     </session-factory>
 </hibernate-configuration>

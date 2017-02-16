@@ -2,7 +2,7 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
  
  
-	<display-name>Archetype Created Web Application</display-name>
+	<display-name>BringIT - ExpBit</display-name>
  
 	<servlet>
 		<servlet-name>dispatcher</servlet-name>
@@ -12,6 +12,17 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
  
+    <servlet>
+        <servlet-name>Dashboard</servlet-name>
+        <servlet-class>
+            com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+        <init-param>
+            <description>BringIT - ExpBit</description>
+            <param-name>application</param-name>
+            <param-value>com.bringit.experiment.WebApplication</param-value>
+        </init-param>      
+    </servlet>
+    
 	<servlet-mapping>
 		<servlet-name>dispatcher</servlet-name>
 		<url-pattern>/</url-pattern>

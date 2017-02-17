@@ -2275,6 +2275,107 @@ div.v-layout.v-horizontal.v-widget {
  * @group valo-menu
  */
 
+.crud-template .top-bar {
+	background: white;
+	color: #0072C6;
+	padding: 0 18.5px;
+	border-bottom: 0 solid #a6a6a6;
+}
+
+.crud-template .padding {
+	padding: 18.5px;
+}
+
+.crud-template .border {
+	border: 0 solid #a6a6a6;
+}
+
+.crud-template .border-top {
+	border-top: 0 solid #a6a6a6;
+}
+
+.crud-template .border-left {
+	border-left: 0 solid #a6a6a6;
+}
+
+.crud-template .filters {
+	padding: 9.25px;
+}
+
+.crud-template .filters .v-slot {
+	position: relative;
+}
+
+.crud-template .content {
+	position: relative;
+}
+
+.crud-template .list {
+	padding-right: 300px;
+}
+
+.crud-template .inspect {
+	position: absolute;
+	right: 0;
+	top: 0;
+	background: #f2f2f2;
+	width: 300px !important;
+	border-left: 4px solid #e6e6e6;
+}
+
+.crud-template .section {
+	padding: 9.25px;
+}
+
+.crud-template .edit {
+	padding: 9.25px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	border-left: 1px solid #d9d9d9;
+	border-top: 1px solid #d9d9d9;
+}
+
+.crud-template .search {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	border-bottom: 2px solid #0072C6;
+	border-radius: 0;
+	max-width: 350px;
+}
+
+.crud-template .buttons {
+	background: #fff;
+	padding: 9.25px;
+	border-left: 1px solid #d9d9d9;
+}
+
+.crud-template[width-range~="-850px"] .list {
+	height: 50% !important;
+	padding-right: 0;
+}
+
+.crud-template[width-range~="-850px"] .inspect {
+	position: static;
+	height: 50% !important;
+	width: 100% !important;
+	border-top: 4px solid #e6e6e6;
+	border-left: none;
+}
+
+.crud-template[width-range~="-850px"] .section, .crud-template[width-range~="-850px"] .edit {
+	padding: 4.625px;
+}
+
+.crud-template[width-range~="-850px"] .half {
+	width: 50% !important;
+	float: left;
+}
+
+.crud-template[width-range~="-650px"] .half {
+	width: 100% !important;
+}
+
 .valo-metro.v-app, .valo-metro.v-app-loading {
 	font: 300 16px/1.55 "Source Sans Pro", sans-serif;
 	color: #474747;

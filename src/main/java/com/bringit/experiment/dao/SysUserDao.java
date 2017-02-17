@@ -10,6 +10,7 @@ import org.hibernate.Transaction;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.HibernateXmlConfigSupport;
+import com.bringit.experiment.util.PasswordEncrypter;
 
 public class SysUserDao {
 
@@ -17,6 +18,10 @@ public class SysUserDao {
 	
 	public void addSysUser(SysUser sysUser) {
 
+
+    	String encryptedPassword = PasswordEncrypter.encryptPassword(sysUser.getUserPass());
+    	sysUser.setUserPass(encryptedPassword);
+    	
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         
@@ -115,9 +120,9 @@ public class SysUserDao {
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from SysUser where UserName = :user";
+            String queryString = "from SysUser where UserName = :UserName";
             Query query = session.createQuery(queryString);
-            query.setString("user", userName);
+            query.setString("UserName", userName);
             sysUser = (SysUser) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -128,4 +133,27 @@ public class SysUserDao {
         return sysUser;
     }
 	
+    @SuppressWarnings("unused")
+	public SysUser getUserByUserNameAndPassword(String userName, String password) {
+    	
+    	String encryptedPassword = PasswordEncrypter.encryptPassword(password);
+    	
+        SysUser sysUser = null;
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            String queryString = "from SysUser where UserName = :UserName and UserPass =:EncryptedPassword";
+            Query query = session.createQuery(queryString);
+            query.setString("UserName", userName);
+            query.setString("EncryptedPassword", encryptedPassword);
+            sysUser = (SysUser) query.uniqueResult();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return sysUser;
+    }
 }

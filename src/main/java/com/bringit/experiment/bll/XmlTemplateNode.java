@@ -17,6 +17,9 @@ public class XmlTemplateNode {
 	@Column(name="XmlTemplateNodeId")
 	private Integer xmlTemplateNodeId;
 
+	@Column(name="XmlTemplateNodeIsRoot")
+	private boolean xmlTemplateNodeIsRoot;
+	
 	@Column(name="XmlTemplateNodeName")
 	private String xmlTemplateNodeName;
 	
@@ -80,6 +83,14 @@ public class XmlTemplateNode {
 
 	public void setExpField(ExperimentField expField) {
 		this.expField = expField;
+	}
+
+	public boolean isXmlTemplateNodeIsRoot() {
+		return xmlTemplateNodeIsRoot;
+	}
+
+	public void setXmlTemplateNodeIsRoot(boolean xmlTemplateNodeIsRoot) {
+		this.xmlTemplateNodeIsRoot = xmlTemplateNodeIsRoot;
 	}
 	
 	

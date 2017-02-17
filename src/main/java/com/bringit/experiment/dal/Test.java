@@ -4,17 +4,8 @@ import java.io.*;
 import java.util.Date;
 import java.util.List;
 
-import com.bringit.experiment.bll.Experiment;
-import com.bringit.experiment.bll.ExperimentField;
-import com.bringit.experiment.bll.ExperimentImage;
-import com.bringit.experiment.bll.SysUser;
-import com.bringit.experiment.bll.UnitOfMeasure;
-import com.bringit.experiment.dao.ExecuteQueryDao;
-import com.bringit.experiment.dao.ExperimentDao;
-import com.bringit.experiment.dao.ExperimentFieldDao;
-import com.bringit.experiment.dao.ExperimentImageDao;
-import com.bringit.experiment.dao.SysUserDao;
-import com.bringit.experiment.dao.UnitOfMeasureDao;
+import com.bringit.experiment.bll.*;
+import com.bringit.experiment.dao.*;
 import com.bringit.experiment.data.ExperimentParser;
 import com.bringit.experiment.data.ResponseObj;
 import com.bringit.experiment.util.Config;
@@ -26,8 +17,12 @@ public class Test {
 		 SysUserDao sysUserDao = new SysUserDao();
 		 ExperimentDao experimentDao = new ExperimentDao();
 		 ExperimentFieldDao experimentFieldDao = new ExperimentFieldDao();
-		 ExecuteQueryDao executeQueryDao = new ExecuteQueryDao();
 		 UnitOfMeasureDao unitOfMeasureDao = new UnitOfMeasureDao();
+		 ExperimentImageDao experimentImageDao = new ExperimentImageDao();
+		 JobExecutionRepeatDao jobDao = new JobExecutionRepeatDao();
+		 FilesRepositoryDao fileRepoDao = new FilesRepositoryDao();
+		 XmlTemplateDao xmlDao = new XmlTemplateDao();
+		 XmlTemplateNodeDao xmlNodeDao = new XmlTemplateNodeDao();
 		 
 		//New User 
 		 SysUser bringITUser = new SysUser();
@@ -47,6 +42,7 @@ public class Test {
 		 firstExperiment.setLastModifiedBy(bringITUser);
 		 experimentDao.addExperiment(firstExperiment);				//DB Access
 		 experimentDao.updateDBDataTable(firstExperiment);
+		 
 		 
 		 //New Unit Of Measure
 		 UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
@@ -75,27 +71,132 @@ public class Test {
 		 addNewField("memsToMagnetOutlineY", "float", "memsToMagnetOutlineY",true,false,unitOfMeasure,firstExperiment,experimentFieldDao);
 		 addNewField("angle", "float", "angle",true,false,unitOfMeasureAngle,firstExperiment,experimentFieldDao);
 		 addNewField("testResult", "varchar(24)", "testResult",true,false,noMeasure,firstExperiment,experimentFieldDao);
-		
-		 /*
-		  *Operation already covered by updateDBDataTable function of ExperimentDao Class
-		 List<ExperimentField> fields = experimentFieldDao.getActiveExperimentFields(firstExperiment);
-		 String createTable = "CREATE TABLE "+firstExperiment.getExpDbTableNameId()+"(";
-		 for (ExperimentField experimentField : fields) {
-			 createTable += experimentField.getExpFieldName() + " " + experimentField.getExpFieldType() + " " + (experimentField.isExpFieldIsKey() ? "PRIMARY KEY NOT NULL," : ",");
-		 }
-		 createTable +=");";
+		 //New Experiment Image
+		 ExperimentImage experimentImage = new ExperimentImage();
+		 experimentImage.setExpImagePath("image.png");
+		 experimentImage.setExperiment(firstExperiment);
+		 experimentImageDao.addExperimentImage(experimentImage);
 
-		 executeQueryDao.executeQuery(createTable);
-		 */
+		 JobExecutionRepeat job = new JobExecutionRepeat();
+		 job.setJobExecRepeatLabel("Pull for MEMs to Magnet Experiment");
+		 job.setJobExecRepeatMilieconds(1800000);//30 min
+		 jobDao.addJobExecutionRepeat(job);
 		 
-		 //Read a sample XML and load it into Values table;
+		 FilesRepository inboundRepo = new FilesRepository();
+		 inboundRepo.setFileRepoIsLocal(false);
+		 inboundRepo.setFileRepoIsSftp(true);
+		 inboundRepo.setFileRepoPath("/Intel/sepa/la/bola");
+		 inboundRepo.setFileRepoHost("fpt.intel.com");
+		 inboundRepo.setFileRepoUser("bringit1");
+		 inboundRepo.setFileRepoPass("br1n61t");
+		 inboundRepo.setCreatedDate(new Date());
+		 inboundRepo.setCreatedBy(bringITUser);
+		 fileRepoDao.addFilesRepository(inboundRepo);
+		 
+		 FilesRepository outbound = new FilesRepository();
+		 outbound.setFileRepoIsLocal(true);
+		 outbound.setFileRepoPath("/Intel/sepa/la/bola");
+		 outbound.setFileRepoHost("localhost");
+		 outbound.setCreatedDate(new Date());
+		 outbound.setCreatedBy(bringITUser);
+		 fileRepoDao.addFilesRepository(outbound);
+		 
+		 FilesRepository exceptionRepo = new FilesRepository();
+		 exceptionRepo.setFileRepoIsLocal(true);
+		 exceptionRepo.setFileRepoPath("/Intel/exception/");
+		 exceptionRepo.setFileRepoHost("localhost");
+		 exceptionRepo.setCreatedDate(new Date());
+		 exceptionRepo.setCreatedBy(bringITUser);
+		 fileRepoDao.addFilesRepository(exceptionRepo);
+		 
+		 XmlTemplate xml = new XmlTemplate();
+		 xml.setXmlTemplateName("MEMs_To_Magnet_Assembly");
+		 xml.setXmlTemplatePrefix("MTM_");
+		 xml.setExceptionFileRepo(exceptionRepo);
+		 xml.setInboundFileRepo(inboundRepo);
+		 xml.setProcessedFileRepo(outbound);
+		 xml.setXmlTemplateComments("Loading sample template for mems to magnet experiments");
+		 xml.setCreatedDate(new Date());
+		 xml.setCreatedBy(bringITUser);
+		 xml.setExperiment(firstExperiment);
+		 
+		 xmlDao.addXmlTemplate(xml);
+		 
+		 //1. map the root element of the xml (assuming all of them will have <Experiment> as the root.
+		 addNewNode(null,true,false,"Experiment",null,xml,xmlNodeDao);
+		 
+		 //2. map the experiment name element (this is not part of the fields but will be used to obtain
+		 // the experiment id and then map the fields from the data tables
+		 addNewNode("Experiment",false,true,"ExperimentName",null,xml,xmlNodeDao);
+		 
+		 //3. Map the experimentResults tag which will contain the set of fields with results
+		 addNewNode("Experiment",false,false,"ExperimentResults",null,xml,xmlNodeDao);
+		 
+		//get active fileds for the experiment
+		 List<ExperimentField> fields = experimentFieldDao.getActiveExperimentFields(firstExperiment); 
+		 for (ExperimentField experimentField : fields) {
+			 switch (experimentField.getExpFieldName()) {
+			case "moduleSerialNumber":
+				addNewNode("ExperimentResults",false,true,"moduleSerialNumber",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				break;
+			case "fpbcSerialNumber":
+				addNewNode("ExperimentResults",false,true,"fpbcSerialNumber",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				break;
+			case "dieId":
+				addNewNode("ExperimentResults",false,true,"dieId",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				break;
+			case "waferId":
+				addNewNode("ExperimentResults",false,true,"waferId",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				break;
+			case "enId":
+				addNewNode("ExperimentResults",false,true,"enId",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				break;
+			case "workOrder":
+				addNewNode("ExperimentResults",false,true,"workOrder",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				break;
+			case "dateTime":
+				addNewNode("ExperimentResults",false,true,"dateTime",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				break;
+			case "memsToMagnetOutlineX":
+				addNewNode("ExperimentResults",false,true,"memsToMagnetOutlineX",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				break;
+			case "memsToMagnetOutlineY":
+				addNewNode("ExperimentResults",false,true,"memsToMagnetOutlineY",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				break;
+			case "angle":
+				addNewNode("ExperimentResults",false,true,"angle",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				break;
+			case "testResult":
+				addNewNode("ExperimentResults",false,true,"testResult",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				break;
+			default:
+				break;
+			}
+			 
+		 }
+		 
+		 
+		 
+		 /*Read a sample XML and load it into Values table;
 		 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample.xml");
 		 ExperimentParser parser = new ExperimentParser();
 		 ResponseObj respObj = parser.parseXML(xmlFile, xmlFile.getName());
 		 
 		 return respObj.getDescription() + respObj.getDetail();
-		 
+		 */
+		 return "Ok, experiment and xml template mapped.";
 	 }
+	private static void addNewNode(String parent, boolean isRoot, boolean isAttr, String tagname, Integer expFieldId,
+			XmlTemplate xml, XmlTemplateNodeDao xmlNodeDao) {
+		 XmlTemplateNode xmlNode = new XmlTemplateNode();
+		 xmlNode.setXmlTemplateNodeName(parent);
+		 xmlNode.setXmlTemplateNodeIsRoot(isRoot);
+		 xmlNode.setXmlTemplateNodeIsAttributeValue(isAttr);
+		 xmlNode.setXmlTemplateNodeAttributeName(tagname);
+		 xmlNode.setXmlTemplate(xml);
+		 xmlNodeDao.addXmlTemplateNode(xmlNode);
+		
+	}
 	public String runTest() {
 			 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample2.xml");
 			 ExperimentParser parser = new ExperimentParser();

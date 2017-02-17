@@ -115,7 +115,7 @@ public class ExperimentFieldDao {
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            experimentFields = session.createQuery("from ExperimentField where ExpId ="+firstExperiment.getExpId()).list();
+            experimentFields = session.createQuery("from ExperimentField where ExpId ="+firstExperiment.getExpId()+" and ExpFieldIsActive='true'").list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {

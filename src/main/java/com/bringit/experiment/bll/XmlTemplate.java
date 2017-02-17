@@ -55,8 +55,16 @@ public class XmlTemplate {
 	private FilesRepository processedFileRepo;
 	
 	@OneToOne
+    @JoinColumn(name="ExceptionFileRepoId", unique=false, updatable=false)
+	private FilesRepository exceptionFileRepo;
+	
+	@OneToOne
     @JoinColumn(name="JobExecRepeatId", unique=false, updatable=false)
 	private JobExecutionRepeat jobExecRepeat;
+	
+	@OneToOne
+    @JoinColumn(name="ExperimentId", unique=false, updatable=false)
+	private Experiment experiment;
 	
 	@OneToOne
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
@@ -184,6 +192,22 @@ public class XmlTemplate {
 
 	public void setLastModifiedBy(SysUser lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
+	}
+
+	public FilesRepository getExceptionFileRepo() {
+		return exceptionFileRepo;
+	}
+
+	public void setExceptionFileRepo(FilesRepository exceptionFileRepo) {
+		this.exceptionFileRepo = exceptionFileRepo;
+	}
+
+	public Experiment getExperiment() {
+		return experiment;
+	}
+
+	public void setExperiment(Experiment experiment) {
+		this.experiment = experiment;
 	}
 
 

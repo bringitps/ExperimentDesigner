@@ -9,7 +9,7 @@
 		<waferId>BB-99</waferId>
 		<enId>EN123</enId>
 		<workOrder>WO12345</workOrder>
-		<date_Time>2017-02-12 02:20:00</date_Time>
+		<dateTime>2017-02-12 02:20:00</dateTime>
 		<memsToMagnetOutlineX>2745</memsToMagnetOutlineX>
 		<memsToMagnetOutlineY>2750</memsToMagnetOutlineY>
 		<angle>48.1</angle>
@@ -22,7 +22,7 @@
 		<waferId>BB-99</waferId>
 		<enId>EN123</enId>
 		<workOrder>WO12345</workOrder>
-		<date_Time>2017-02-12 02:20:30</date_Time>
+		<dateTime>2017-02-12 02:20:30</dateTime>
 		<memsToMagnetOutlineX>2755</memsToMagnetOutlineX>
 		<memsToMagnetOutlineY>2750</memsToMagnetOutlineY>
 		<angle>40.5</angle>
@@ -35,7 +35,7 @@
 		<waferId>BB-99</waferId>
 		<enId>EN123</enId>
 		<workOrder>WO12345</workOrder>
-		<date_Time>2017-02-12 02:25:30</date_Time>
+		<dateTime>2017-02-12 02:25:30</dateTime>
 		<memsToMagnetOutlineX>2755</memsToMagnetOutlineX>
 		<memsToMagnetOutlineY>2750</memsToMagnetOutlineY>
 		<angle>40.5</angle>
@@ -48,7 +48,7 @@
 		<waferId>BB-99</waferId>
 		<enId>EN123</enId>
 		<workOrder>WO12345</workOrder>
-		<date_Time>2017-02-12 02:30:30</date_Time>
+		<dateTime>2017-02-12 02:30:30</dateTime>
 		<memsToMagnetOutlineX>2755</memsToMagnetOutlineX>
 		<memsToMagnetOutlineY>2750</memsToMagnetOutlineY>
 		<angle>40.5</angle>
@@ -61,7 +61,7 @@
 		<waferId>BB-99</waferId>
 		<enId>EN123</enId>
 		<workOrder>WO12345</workOrder>
-		<date_Time>2017-02-12 03:20:30</date_Time>
+		<dateTime>2017-02-12 03:20:30</dateTime>
 		<memsToMagnetOutlineX>2755</memsToMagnetOutlineX>
 		<memsToMagnetOutlineY>2745</memsToMagnetOutlineY>
 		<angle>48.2</angle>

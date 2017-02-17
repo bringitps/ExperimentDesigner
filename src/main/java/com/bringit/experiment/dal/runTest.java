@@ -4,7 +4,7 @@ public class runTest {
 
 	public static void main(String[] args) {
 		Test t = new Test();
-		System.out.println(t.runTest());
+		System.out.println(t.buildDbSchemaAndTable());
 
 	}
 

@@ -20,6 +20,7 @@ import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
@@ -30,6 +31,7 @@ import com.vaadin.ui.VerticalLayout;
 public class WebApplication extends UI {
 
 	private Grid grid = new Grid();
+	
 	
 	private final static String[] views = {"LoginFormDesign"};
 
@@ -47,10 +49,11 @@ public class WebApplication extends UI {
 	{
 		SysUser sysUserSession = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 		final VerticalLayout verticalLayout = new VerticalLayout();
+		
 		HorizontalLayout mainLayout = new HorizontalLayout((sysUserSession != null) ? mainForm : loginForm);
 		if (sysUserSession != null) mainForm.setLoggedUserName(sysUserSession.getUserName());
 				
-		mainLayout.setSpacing(true);
+		//mainLayout.setSpacing(true);
 		mainLayout.setSizeFull();
 
 		verticalLayout.addComponents(mainLayout);
@@ -74,7 +77,7 @@ public class WebApplication extends UI {
 	}
 	
 	@WebServlet(urlPatterns = "/*", name = "WebApplicationServlet", asyncSupported = true)
-	@VaadinServletConfiguration(ui = WebApplication.class, productionMode = true)
+	@VaadinServletConfiguration(ui = WebApplication.class, productionMode = false)
 	public static class WebApplicationServlet extends VaadinServlet {
 	}
 	

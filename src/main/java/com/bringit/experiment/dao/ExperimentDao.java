@@ -149,6 +149,7 @@ public class ExperimentDao {
 			query += " LastModifiedBy int ,";
 			query += " CreatedDate datetime ,";
 			query += " LastModifiedDate datetime ,";
+			query += " FileName varchar(200) ,";
 			query += " FOREIGN KEY (CreatedBy) REFERENCES SysUser(UserId), ";
 			query += " FOREIGN KEY (LastModifiedBy) REFERENCES SysUser(UserId));";
 		}

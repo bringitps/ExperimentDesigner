@@ -33,7 +33,7 @@ public class Test {
 		 //New Experiment
 		 Experiment firstExperiment = new Experiment();
 		 firstExperiment.setExpDbTableNameId("mems_to_magnet_assembly");
-		 firstExperiment.setExpName("MEMS_TO_MAGNET_ASSEMBLY");
+		 firstExperiment.setExpName("MEMs_To_Magnet_Assembly");
 		 firstExperiment.setExpIsActive(true);
 		 firstExperiment.setExpComments("This is the experiment for MEMs to Magnet Assembly");
 		 firstExperiment.setExpInstructions("The instructions should be here..");
@@ -66,7 +66,7 @@ public class Test {
 		 addNewField("waferId", "varchar(24)", "waferId",true,false,noMeasure,firstExperiment,experimentFieldDao);
 		 addNewField("enId", "varchar(24)", "enId",true,false,noMeasure,firstExperiment,experimentFieldDao);
 		 addNewField("workOrder", "varchar(24)", "workOrder",true,false,noMeasure,firstExperiment,experimentFieldDao);
-		 addNewField("date_Time", "datetime", "date_Time",true,false,noMeasure,firstExperiment,experimentFieldDao);
+		 addNewField("date_Time", "datetime", "dateTime",true,false,noMeasure,firstExperiment,experimentFieldDao);
 		 addNewField("memsToMagnetOutlineX", "float", "memsToMagnetOutlineX",true,false,unitOfMeasure,firstExperiment,experimentFieldDao);
 		 addNewField("memsToMagnetOutlineY", "float", "memsToMagnetOutlineY",true,false,unitOfMeasure,firstExperiment,experimentFieldDao);
 		 addNewField("angle", "float", "angle",true,false,unitOfMeasureAngle,firstExperiment,experimentFieldDao);
@@ -123,7 +123,7 @@ public class Test {
 		 xmlDao.addXmlTemplate(xml);
 		 
 		 //1. map the root element of the xml (assuming all of them will have <Experiment> as the root.
-		 addNewNode(null,true,false,"Experiment",null,xml,xmlNodeDao);
+		 addNewNode("root",true,false,"Experiment",null,xml,xmlNodeDao);
 		 
 		 //2. map the experiment name element (this is not part of the fields but will be used to obtain
 		 // the experiment id and then map the fields from the data tables
@@ -137,37 +137,37 @@ public class Test {
 		 for (ExperimentField experimentField : fields) {
 			 switch (experimentField.getExpFieldName()) {
 			case "moduleSerialNumber":
-				addNewNode("ExperimentResults",false,true,"moduleSerialNumber",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				addNewNode("ExperimentResults",false,true,"moduleSerialNumber",experimentField,xml,xmlNodeDao);
 				break;
 			case "fpbcSerialNumber":
-				addNewNode("ExperimentResults",false,true,"fpbcSerialNumber",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				addNewNode("ExperimentResults",false,true,"fpbcSerialNumber",experimentField,xml,xmlNodeDao);
 				break;
 			case "dieId":
-				addNewNode("ExperimentResults",false,true,"dieId",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				addNewNode("ExperimentResults",false,true,"dieId",experimentField,xml,xmlNodeDao);
 				break;
 			case "waferId":
-				addNewNode("ExperimentResults",false,true,"waferId",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				addNewNode("ExperimentResults",false,true,"waferId",experimentField,xml,xmlNodeDao);
 				break;
 			case "enId":
-				addNewNode("ExperimentResults",false,true,"enId",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				addNewNode("ExperimentResults",false,true,"enId",experimentField,xml,xmlNodeDao);
 				break;
 			case "workOrder":
-				addNewNode("ExperimentResults",false,true,"workOrder",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				addNewNode("ExperimentResults",false,true,"workOrder",experimentField,xml,xmlNodeDao);
 				break;
 			case "dateTime":
-				addNewNode("ExperimentResults",false,true,"dateTime",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				addNewNode("ExperimentResults",false,true,"dateTime",experimentField,xml,xmlNodeDao);
 				break;
 			case "memsToMagnetOutlineX":
-				addNewNode("ExperimentResults",false,true,"memsToMagnetOutlineX",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				addNewNode("ExperimentResults",false,true,"memsToMagnetOutlineX",experimentField,xml,xmlNodeDao);
 				break;
 			case "memsToMagnetOutlineY":
-				addNewNode("ExperimentResults",false,true,"memsToMagnetOutlineY",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				addNewNode("ExperimentResults",false,true,"memsToMagnetOutlineY",experimentField,xml,xmlNodeDao);
 				break;
 			case "angle":
-				addNewNode("ExperimentResults",false,true,"angle",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				addNewNode("ExperimentResults",false,true,"angle",experimentField,xml,xmlNodeDao);
 				break;
 			case "testResult":
-				addNewNode("ExperimentResults",false,true,"testResult",experimentField.getExpFieldId(),xml,xmlNodeDao);
+				addNewNode("ExperimentResults",false,true,"testResult",experimentField,xml,xmlNodeDao);
 				break;
 			default:
 				break;
@@ -177,30 +177,30 @@ public class Test {
 		 
 		 
 		 
-		 /*Read a sample XML and load it into Values table;
+		 //Read a sample XML and load it into Values table;
 		 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample.xml");
 		 ExperimentParser parser = new ExperimentParser();
-		 ResponseObj respObj = parser.parseXML(xmlFile, xmlFile.getName());
+		 ResponseObj respObj = parser.parseXML(xmlFile, firstExperiment);
 		 
 		 return respObj.getDescription() + respObj.getDetail();
-		 */
-		 return "Ok, experiment and xml template mapped.";
 	 }
-	private static void addNewNode(String parent, boolean isRoot, boolean isAttr, String tagname, Integer expFieldId,
+	private static void addNewNode(String parent, boolean isRoot, boolean isAttr, String tagname, ExperimentField expFieldId,
 			XmlTemplate xml, XmlTemplateNodeDao xmlNodeDao) {
 		 XmlTemplateNode xmlNode = new XmlTemplateNode();
 		 xmlNode.setXmlTemplateNodeName(parent);
 		 xmlNode.setXmlTemplateNodeIsRoot(isRoot);
 		 xmlNode.setXmlTemplateNodeIsAttributeValue(isAttr);
 		 xmlNode.setXmlTemplateNodeAttributeName(tagname);
+		 xmlNode.setExpField(expFieldId);
 		 xmlNode.setXmlTemplate(xml);
 		 xmlNodeDao.addXmlTemplateNode(xmlNode);
 		
 	}
 	public String runTest() {
-			 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample2.xml");
+			 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample.xml");
+			 ExperimentDao dao = new ExperimentDao();
 			 ExperimentParser parser = new ExperimentParser();
-			 ResponseObj respObj = parser.parseXML(xmlFile, xmlFile.getName());
+			 ResponseObj respObj = parser.parseXML(xmlFile, dao.getExperimentById(1));
 			 
 			 return respObj.getDescription() + respObj.getDetail();
 		}

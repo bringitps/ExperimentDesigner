@@ -96,7 +96,26 @@ public class XmlTemplateDao {
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from XmlTemplate where ExpImageId = :id";
+            String queryString = "from XmlTemplate where XmlTemplateId = :id";
+            Query query = session.createQuery(queryString);
+            query.setInteger("id", expId);
+            xmlTemplate = (XmlTemplate) query.uniqueResult();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return xmlTemplate;
+    }
+    
+	public XmlTemplate getXmlTemplateByExperimentId(int expId) {
+    	XmlTemplate xmlTemplate = null;
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            String queryString = "from XmlTemplate where ExperimentId = :id";
             Query query = session.createQuery(queryString);
             query.setInteger("id", expId);
             xmlTemplate = (XmlTemplate) query.uniqueResult();

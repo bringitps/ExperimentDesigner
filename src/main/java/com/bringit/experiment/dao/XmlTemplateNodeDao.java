@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.XmlTemplateNode;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.HibernateXmlConfigSupport;
@@ -96,7 +97,7 @@ public class XmlTemplateNodeDao {
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from XmlTemplateNode where ExpImageId = :id";
+            String queryString = "from XmlTemplateNode where XmlTemplateNodeId = :id";
             Query query = session.createQuery(queryString);
             query.setInteger("id", expId);
             xmlTemplateNode = (XmlTemplateNode) query.uniqueResult();
@@ -108,5 +109,22 @@ public class XmlTemplateNodeDao {
         }
         return xmlTemplateNode;
     }
+
+	public List<XmlTemplateNode> getAllXmlTemplateNodesByTemplateId(int xmlTemplateId) {
+		List<XmlTemplateNode> nodes = new ArrayList<XmlTemplateNode>();
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            nodes = session.createQuery("from XmlTemplateNode where XmlTemplateId ="+xmlTemplateId).list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return nodes;
+	}
+	
 	
 }

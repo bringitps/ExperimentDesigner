@@ -6,6 +6,7 @@ public class runTest {
 		Test t = new Test();
 		System.out.println(t.buildDbSchemaAndTable());
 
+		//System.out.println(t.runTest());
 	}
 
 }

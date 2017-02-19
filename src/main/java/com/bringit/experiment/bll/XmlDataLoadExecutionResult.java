@@ -20,10 +20,13 @@ public class XmlDataLoadExecutionResult {
 	private Integer xmlDataLoadExecId;
 
 	@Column(name="XmlDataLoadExecException")
-	private String xmlDataLoadExecException;
+	private boolean xmlDataLoadExecException;
 	
 	@Column(name="XmlDataLoadExecExceptionDetails")
 	private String xmlDataLoadExecExeptionDetails;
+	
+	@Column(name="XmlDataLoadExecExceptionFile")
+	private String xmlDataLoadExecExeptionFile;
 	
 	@Column(name="XmlDataLoadExecTime")
 	private Date xmlDataLoadExecTime;
@@ -40,11 +43,11 @@ public class XmlDataLoadExecutionResult {
 		this.xmlDataLoadExecId = xmlDataLoadExecId;
 	}
 
-	public String getXmlDataLoadExecException() {
+	public boolean getXmlDataLoadExecException() {
 		return xmlDataLoadExecException;
 	}
 
-	public void setXmlDataLoadExecException(String xmlDataLoadExecException) {
+	public void setXmlDataLoadExecException(boolean xmlDataLoadExecException) {
 		this.xmlDataLoadExecException = xmlDataLoadExecException;
 	}
 
@@ -70,6 +73,14 @@ public class XmlDataLoadExecutionResult {
 
 	public void setXmlTemplate(XmlTemplate xmlTemplate) {
 		this.xmlTemplate = xmlTemplate;
+	}
+
+	public String getXmlDataLoadExecExeptionFile() {
+		return xmlDataLoadExecExeptionFile;
+	}
+
+	public void setXmlDataLoadExecExeptionFile(String xmlDataLoadExecExeptionFile) {
+		this.xmlDataLoadExecExeptionFile = xmlDataLoadExecExeptionFile;
 	}
 
 	

@@ -96,7 +96,7 @@ public class XmlDataLoadExecutionResultDao {
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from XmlDataLoadExecutionResult where ExpImageId = :id";
+            String queryString = "from XmlDataLoadExecutionResult where XmlDataLoadExecId = :id";
             Query query = session.createQuery(queryString);
             query.setInteger("id", expId);
             xmlDataLoadExecutionResult = (XmlDataLoadExecutionResult) query.uniqueResult();

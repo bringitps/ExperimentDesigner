@@ -1,29 +1,22 @@
 package com.bringit.experiment.ui.form;
 
-import java.io.File;
-import java.util.List;
-
-import javax.swing.Icon;
-
 import com.bringit.experiment.WebApplication;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.ui.design.ExperimentManagementDesign;
 import com.bringit.experiment.ui.design.MainFormDesign;
-import com.vaadin.server.ClassResource;
-import com.vaadin.server.FileResource;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.Resource;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.VaadinService;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.MenuBar.Command;
-import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.Notification;
 
+@SuppressWarnings("serial")
 public class MainForm extends MainFormDesign {
 	
+	@SuppressWarnings("unused")
 	private WebApplication webApplication;
 	SysUser sysUserSession = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 	
 	
+	@SuppressWarnings("deprecation")
 	public MainForm(WebApplication webApplication) {
 	    this.webApplication = webApplication;
 
@@ -31,45 +24,28 @@ public class MainForm extends MainFormDesign {
 	    	treeMainMenu.expandItemsRecursively(id);
         }
 	    
-	    mnuSession.getItems().get(0).setIcon(FontAwesome.USER);
-	    mnuSession.getItems().get(0).getChildren().get(0).setIcon(FontAwesome.GEAR);
-	    mnuSession.getItems().get(0).getChildren().get(1).setIcon(FontAwesome.SIGN_OUT);
-	    mnuSession.getItems().get(0).getChildren().get(1).setCommand(signOutCmd);
-	    
-	 // Find the application directory
-	    String basepath = VaadinService.getCurrent()
-	                      .getBaseDirectory().getAbsolutePath();
-
-	    // Image as a file resource
-	    FileResource resource = new FileResource(new File(basepath +
-	                            "/WEB-INF/classes/images/logo_bring_2.png"));
-
-	    // Show the image in the application
-	    Image image = new Image("", resource);
-	    
-	    cssLayTopLeft.addComponent(image);
-	    
-	    //mnuSession.addItem("Quit Drinking", null, null);
-	    
-	    //mnuSession.addItem("Logged User", FontAwesome.USER, logoutCmd);
-	    
-		//this.mnuSession.addItem("", command)
-	    //lblLoginError.setVisible(false);
-	    //btnLogin.setClickShortcut(KeyCode.ENTER);
-	    //btnLogin.addClickListener(e->this.doLogin());
-	    
+	    treeMainMenu.addItemClickListener(new ItemClickEvent.ItemClickListener() 
+	    {
+            public void itemClick(ItemClickEvent event) {
+                if (event.getButton() == ItemClickEvent.BUTTON_LEFT)
+                {
+                	//TO Improve: Save Design Name into Tree Node to be able to use 2 Tree Nodes with same name
+                	//webApplication.showNotification("Item Id:" + event.getItemId().toString(), Notification.TYPE_HUMANIZED_MESSAGE);
+                	setFormContent(event.getItemId().toString());
+                }
+            }
+        });
 	}
-
-
-	MenuBar.Command signOutCmd = new MenuBar.Command() {
-        public void menuSelected(MenuItem selectedItem) {
-        	webApplication.closeUserSession();
-        }
-
-    };
-    
-    public void setLoggedUserName(String loggedUserName)
-    {
-    	mnuSession.getItems().get(0).setText(loggedUserName);
-    }
+	
+	private void setFormContent(String treeItemClickedId)
+	{
+		 switch (treeItemClickedId.toLowerCase()) {
+         case "management":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new ExperimentManagementForm());
+                  	break;
+         default:
+         			break;
+		 }
+	}
 }

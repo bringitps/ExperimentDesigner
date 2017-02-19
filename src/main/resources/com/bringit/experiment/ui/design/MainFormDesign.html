@@ -8,15 +8,9 @@
  <body> 
   <vaadin-horizontal-layout style-name="app-shell" responsive size-full> 
    <vaadin-css-layout style-name="navigation-bar-container" width="250px" height-full> 
-    <vaadin-css-layout style-name="light" size-full> 
-     <vaadin-css-layout style-name="valo-menu-title" width-full height="75px" _id="cssLayTopLeft"></vaadin-css-layout> 
-     <vaadin-css-layout style-name="valo-menu" width-full height="25px" _id="cssLayTopLeftSeparator"> 
-      <vaadin-label style-name="borderless" height="25px" plain-text>
-        BringIT - BitExp 
-      </vaadin-label> 
-     </vaadin-css-layout> 
-     <vaadin-tree id="treeMainMenu" width-full _id="treeMainMenu"> 
-      <node text="Menu" icon="fonticon://FontAwesome/f0c9"> 
+    <vaadin-css-layout style-name="valo-menu" size-full> 
+     <vaadin-tree id="treeMainMenu" item-caption-mode="id" width-full _id="treeMainMenu"> 
+      <node text="BitExp - Menu" icon="fonticon://FontAwesome/f0c9"> 
        <node text="Experiments" icon="fonticon://FontAwesome/f0c3"> 
         <node text="Management" icon="fonticon://FontAwesome/f085"></node> 
         <node text="Data Entry" icon="fonticon://FontAwesome/f044"></node> 
@@ -33,31 +27,7 @@
      </vaadin-tree> 
     </vaadin-css-layout> 
    </vaadin-css-layout> 
-   <vaadin-vertical-layout style-name="content-container" size-full :expand> 
-    <vaadin-horizontal-layout style-name="valo-menu-title" width-full height="75px" _id="layTopRight" :right> 
-     <vaadin-menu-bar id="mnuSession" _id="mnuSession" :bottom :right> 
-      <menu>
-        User Name 
-       <menu>
-         My Account 
-       </menu> 
-       <menu>
-         Logout 
-       </menu> 
-      </menu> 
-     </vaadin-menu-bar> 
-    </vaadin-horizontal-layout> 
-    <vaadin-css-layout style-name="valo-menu" width-full height="25px" _id="cssLayTopLeftSeparator1"></vaadin-css-layout> 
-    <vaadin-css-layout size-full _id="content" :expand> 
-     <vaadin-css-layout style-name="padding-right padding-bottom padding-left" size-full> 
-      <vaadin-css-layout style-name="card" size-full> 
-       <vaadin-label style-name="padded-tabbar" plain-text _id="viewTitle">
-         View title 
-       </vaadin-label> 
-      </vaadin-css-layout> 
-     </vaadin-css-layout> 
-    </vaadin-css-layout> 
-   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout style-name="content-container" id="formContentLayout" size-full _id="formContentLayout" :expand></vaadin-vertical-layout> 
   </vaadin-horizontal-layout>  
  </body>
 </html>

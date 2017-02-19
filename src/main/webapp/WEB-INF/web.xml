@@ -4,16 +4,8 @@
  
 	<display-name>BringIT - ExpBit</display-name>
  
-	<servlet>
-		<servlet-name>dispatcher</servlet-name>
-		<servlet-class>
-			org.springframework.web.servlet.DispatcherServlet
-		</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
- 
     <servlet>
-        <servlet-name>Dashboard</servlet-name>
+        <servlet-name>WebApplication</servlet-name>
         <servlet-class>
             com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
         <init-param>
@@ -22,20 +14,5 @@
             <param-value>com.bringit.experiment.WebApplication</param-value>
         </init-param>      
     </servlet>
-    
-	<servlet-mapping>
-		<servlet-name>dispatcher</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
  
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>/WEB-INF/dispatcher-servlet.xml</param-value>
-	</context-param>
- 
-	<listener>
-		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-	</listener>
 </web-app>

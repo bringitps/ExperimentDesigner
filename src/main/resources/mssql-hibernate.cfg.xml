@@ -11,8 +11,8 @@
         <property name="connection.url">jdbc:sqlserver://localhost:1433;database=ExperimentDesigner</property>  
         <property name="connection.username">sa</property>  
         <property name="connection.password">edgar1987</property>  
-  
-        <!-- JDBC connection pool (use the built-in) -->  
+  		
+  		<!-- JDBC connection pool (use the built-in) -->  
         <property name="connection.pool_size">1</property>  
   
         <!-- SQL dialect -->  
@@ -38,6 +38,8 @@
         <mapping class="com.bringit.experiment.bll.XmlDataLoadExecutionResult"/>
         <mapping class="com.bringit.experiment.bll.XmlTemplate"/>
         <mapping class="com.bringit.experiment.bll.XmlTemplateNode"/>
+        
+        <mapping class="com.bringit.experiment.db.vw.VwExperiment"/>
 
     </session-factory>
 </hibernate-configuration>

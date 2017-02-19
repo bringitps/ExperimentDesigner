@@ -71,6 +71,7 @@ public class WebApplication extends UI {
 		
 		if (sysUserSession != null)
 		{
+			//--- Page Header Layout ---//
 			GridLayout headerGrid = new GridLayout();
 			headerGrid.setRows(1);
 			headerGrid.setColumns(2);

@@ -40,9 +40,13 @@ public class MainForm extends MainFormDesign {
 	private void setFormContent(String treeItemClickedId)
 	{
 		 switch (treeItemClickedId.toLowerCase()) {
-         case "management":  
+         case "manage experiments":  
      				formContentLayout.removeAllComponents();
      				formContentLayout.addComponent(new ExperimentManagementForm());
+                  	break;
+         case "manage xmltemplates":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new XmlTemplateManagementForm());
                   	break;
          default:
          			break;

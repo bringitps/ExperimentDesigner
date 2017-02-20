@@ -19,9 +19,15 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 	public ExperimentManagementForm() {
 		tblExperiments.removeAllColumns();
 		ResultSet experimentViewResults = new DataBaseViewDao().getViewResults("vwExperiment");
-		
+		String test = "";
 		try {
-			tblExperiments.setCaption("Testing: " + experimentViewResults.getFetchSize());
+			
+		    while (experimentViewResults.next()) {
+		      test +=experimentViewResults.getString(1) + ", " + experimentViewResults.getString(2) + ", "
+		          + experimentViewResults.getString(3);
+		    }
+		    System.out.println(test);
+			tblExperiments.setCaption("Testing: " + test);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

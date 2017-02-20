@@ -39,7 +39,6 @@
         <mapping class="com.bringit.experiment.bll.XmlTemplate"/>
         <mapping class="com.bringit.experiment.bll.XmlTemplateNode"/>
         
-        <mapping class="com.bringit.experiment.db.vw.VwExperiment"/>
 
     </session-factory>
 </hibernate-configuration>

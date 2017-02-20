@@ -20,30 +20,10 @@
    </vaadin-horizontal-layout> 
    <vaadin-css-layout style-name="content" size-full :expand> 
     <vaadin-css-layout style-name="list" size-full> 
-     <vaadin-grid size-full _id="tblExperiments"> 
+     <vaadin-table selectable width-full _id="tblExperiments"> 
       <table> 
-       <colgroup> 
-        <col property-id="Experiment" sortable> 
-        <col property-id="Fields Qty" sortable> 
-       </colgroup> 
-       <thead> 
-        <tr default> 
-         <th plain-text>Experiment</th> 
-         <th plain-text>Fields Qty</th> 
-        </tr> 
-       </thead> 
-       <tbody> 
-        <tr> 
-         <td>MEMS</td> 
-         <td>20</td> 
-        </tr> 
-        <tr> 
-         <td>VCSEL</td> 
-         <td>20</td> 
-        </tr> 
-       </tbody> 
       </table> 
-     </vaadin-grid> 
+     </vaadin-table> 
     </vaadin-css-layout> 
     <vaadin-vertical-layout style-name="inspect" size-full> 
      <vaadin-css-layout style-name="edit" width-full height="100.66%" :expand> 

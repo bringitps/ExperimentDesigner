@@ -1,7 +1,5 @@
 package com.bringit.experiment.ui.form;
 
-import java.util.List;
-
 import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.dao.XmlTemplateDao;
 import com.bringit.experiment.ui.design.XmlTemplateDesign;

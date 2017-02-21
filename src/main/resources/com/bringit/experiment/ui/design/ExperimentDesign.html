@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head> 
+ <body> 
+  <vaadin-vertical-layout style-name="crud-template" responsive size-full> 
+   <vaadin-label style-name="valo-menu" plain-text>
+     - Experiment 
+   </vaadin-label> 
+   <vaadin-css-layout style-name="content" width="940px" height="650px" :expand> 
+    <vaadin-vertical-layout style-name="ExperimentCRUDLayout" width="940px" height="650px" _id="crudLayout"> 
+     <vaadin-grid-layout spacing width="940px" margin _id="gridMainData"> 
+      <row> 
+       <column> 
+        <vaadin-text-field caption="Name:" style-name="small" width-full _id="txtExpName"></vaadin-text-field> 
+       </column> 
+       <column> 
+        <vaadin-text-field caption="DB Id:" style-name="small" width-full _id="txtExpDbTableNameId"></vaadin-text-field> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-check-box caption="Active" id="chxActive" _id="chxActive"></vaadin-check-box> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-text-area caption="Instructions:" style-name="small" width-full height="60px" _id="txtExpInstructions"></vaadin-text-area> 
+       </column> 
+       <column> 
+        <vaadin-text-area caption="Comments:" style-name="small" width-full height="60px" _id="txtExpComments"></vaadin-text-area> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-table selectable caption="Experiment Fields" style-name="small" width-full height="320px" _id="tblExperimentFields"> 
+         <table> 
+         </table> 
+        </vaadin-table> 
+       </column> 
+       <column> 
+        <vaadin-table selectable caption="Experiment Images" style-name="small" width-full height="320px" _id="tblExperimentImages"> 
+         <table> 
+         </table> 
+        </vaadin-table> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-grid-layout width-full height="30px" _id="gridAddFields"> 
+         <row> 
+          <column> 
+           <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small friendly" plain-text _id="btnAddField">
+             Add Field 
+           </vaadin-button> 
+          </column> 
+          <column> 
+           <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small danger" plain-text _id="btnDeleteField">
+             Delete Field 
+           </vaadin-button> 
+          </column> 
+         </row> 
+        </vaadin-grid-layout> 
+       </column> 
+       <column> 
+        <vaadin-grid-layout width-full height="30px" _id="gridAddImages"> 
+         <row> 
+          <column> 
+           <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small friendly" plain-text _id="btnAddImage">
+             Add Image 
+           </vaadin-button> 
+          </column> 
+          <column> 
+           <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small danger" plain-text _id="btnDeleteImage">
+             Delete Image 
+           </vaadin-button> 
+          </column> 
+         </row> 
+        </vaadin-grid-layout> 
+       </column> 
+      </row> 
+     </vaadin-grid-layout> 
+    </vaadin-vertical-layout> 
+    <vaadin-horizontal-layout style-name="buttons border-top" spacing width-full height="50px"> 
+     <vaadin-button style-name="small primary" plain-text _id="btnSave" :middle>
+       Save 
+     </vaadin-button> 
+     <vaadin-button style-name="small danger" plain-text _id="btnDelete" :middle :right :expand>
+       Delete 
+     </vaadin-button> 
+    </vaadin-horizontal-layout> 
+   </vaadin-css-layout> 
+  </vaadin-vertical-layout>  
+ </body>
+</html>

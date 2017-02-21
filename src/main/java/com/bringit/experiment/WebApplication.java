@@ -123,6 +123,7 @@ public class WebApplication extends UI {
 		mainLayout.setExpandRatio(contentLayout, 1);
 		contentLayout.setSizeFull();
 		setContent(mainLayout);
+		
 	}
 
 	MenuBar.Command signOutCmd = new MenuBar.Command() {
@@ -143,8 +144,7 @@ public class WebApplication extends UI {
 		VaadinService.getCurrentRequest().getWrappedSession().setAttribute("UserSession", null);
 		buildContent();
 	}
-	
-    
+		
 	@WebServlet(urlPatterns = "/*", name = "WebApplicationServlet", asyncSupported = true)
 	@VaadinServletConfiguration(ui = WebApplication.class, productionMode = false)
 	public static class WebApplicationServlet extends VaadinServlet {

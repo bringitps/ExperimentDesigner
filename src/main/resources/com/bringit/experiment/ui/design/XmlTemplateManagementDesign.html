@@ -6,53 +6,26 @@
   <meta name="vaadin-version" content="7.7.0">
  </head> 
  <body> 
-  <vaadin-absolute-layout> 
-   <vaadin-table selectable size-full _id="tblXmlTemplate" :top="0px" :left="0px"> 
-    <table> 
-     <colgroup> 
-      <col property-id="Project"> 
-      <col property-id="Status"> 
-     </colgroup> 
-     <tbody> 
-      <tr item-id="1"> 
-       <td>Customer Project 1</td> 
-       <td>OK</td> 
-      </tr> 
-      <tr item-id="2"> 
-       <td>Customer Project 2</td> 
-       <td>OK</td> 
-      </tr> 
-      <tr item-id="3"> 
-       <td>Customer Project 3</td> 
-       <td>OK</td> 
-      </tr> 
-      <tr item-id="4"> 
-       <td>Customer Project 4</td> 
-       <td>OK</td> 
-      </tr> 
-      <tr item-id="5"> 
-       <td>Customer Project 5</td> 
-       <td>OK</td> 
-      </tr> 
-      <tr item-id="6"> 
-       <td>Customer Project 6</td> 
-       <td>OK</td> 
-      </tr> 
-      <tr item-id="7"> 
-       <td>Customer Project 7</td> 
-       <td>OK</td> 
-      </tr> 
-      <tr item-id="8"> 
-       <td>Customer Project 8</td> 
-       <td>OK</td> 
-      </tr> 
-      <tr item-id="9"> 
-       <td>Customer Project 9</td> 
-       <td>OK</td> 
-      </tr> 
-     </tbody> 
-    </table> 
-   </vaadin-table> 
-  </vaadin-absolute-layout>  
+  <vaadin-vertical-layout style-name="crud-template" responsive size-full> 
+   <vaadin-label style-name="valo-menu" plain-text>
+     - Xml Template Management 
+   </vaadin-label> 
+   <vaadin-horizontal-layout style-name="top-bar" width-full height="50px"> 
+    <vaadin-horizontal-layout width-full :middle :expand> 
+     <vaadin-text-field icon="fonticon://FontAwesome/f002" input-prompt="Search" style-name="small inline-icon search" width-full _id="search"></vaadin-text-field> 
+    </vaadin-horizontal-layout> 
+    <vaadin-button icon="fonticon://FontAwesome/f067" style-name="borderless" plain-text _id="add" :middle :right>
+      Add new 
+    </vaadin-button> 
+   </vaadin-horizontal-layout> 
+   <vaadin-css-layout style-name="content" size-full :expand> 
+    <vaadin-css-layout style-name="list" size-full> 
+     <vaadin-table selectable style-name="small" size-full _id="tblXmlTemplate"> 
+      <table> 
+      </table> 
+     </vaadin-table> 
+    </vaadin-css-layout> 
+   </vaadin-css-layout> 
+  </vaadin-vertical-layout>  
  </body>
 </html>

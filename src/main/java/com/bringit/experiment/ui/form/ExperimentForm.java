@@ -44,6 +44,63 @@ public class ExperimentForm extends ExperimentDesign {
 		{
 			this.btnDelete.setVisible(false);
 			this.experiment = new Experiment();
+			
+			this.tblExperimentFields.setContainerDataSource(null);
+			this.tblExperimentFields.addContainerProperty("*", CheckBox.class, null);
+			this.tblExperimentFields.addContainerProperty("Name", TextField.class, null);
+			this.tblExperimentFields.addContainerProperty("Key", CheckBox.class, null);
+			this.tblExperimentFields.addContainerProperty("Active", CheckBox.class, null);
+			this.tblExperimentFields.addContainerProperty("DB Id", TextField.class, null);
+			this.tblExperimentFields.addContainerProperty("DB DataType", TextField.class, null);
+			this.tblExperimentFields.addContainerProperty("UoM", ComboBox.class, null);
+			
+			Object[] itemValues = new Object[7];
+			
+			CheckBox chxSelect = new CheckBox();
+			chxSelect.setVisible(false);
+			itemValues[0] = chxSelect;
+			
+			TextField txtFieldName = new TextField();
+			txtFieldName.focus();
+			txtFieldName.addStyleName("small");
+			itemValues[1] = txtFieldName;
+			
+			CheckBox chxIsKey = new CheckBox();
+			chxIsKey.addStyleName("small");
+			itemValues[2] = chxIsKey;
+			
+			CheckBox chxActive = new CheckBox();
+			chxActive.addStyleName("small");
+			chxActive.setValue(true);
+			itemValues[3] = chxActive;
+			
+			
+			TextField txtExpDbFieldNameId = new TextField();
+			txtExpDbFieldNameId.addStyleName("small");
+			itemValues[4] = txtExpDbFieldNameId;
+			
+			TextField txtExpFieldType = new TextField();
+			txtExpFieldType.addStyleName("small");
+			itemValues[5] = txtExpFieldType;
+					
+			ComboBox cbxUnitOfMeasure = new ComboBox("");
+			
+			for(int j=0; j<unitOfMeasures.size(); j++)
+			{
+				cbxUnitOfMeasure.addItem(unitOfMeasures.get(j).getUomId());
+				cbxUnitOfMeasure.setItemCaption(unitOfMeasures.get(j).getUomId(), unitOfMeasures.get(j).getUomAbbreviation());
+				cbxUnitOfMeasure.setWidth(100, Unit.PIXELS);
+			}
+			
+			cbxUnitOfMeasure.setNullSelectionAllowed(false);
+			cbxUnitOfMeasure.setImmediate(true);
+			cbxUnitOfMeasure.addStyleName("small");
+			
+			itemValues[6] = cbxUnitOfMeasure;
+			
+			this.lastNewItemId = this.lastNewItemId - 1;
+			this.tblExperimentFields.addItem(itemValues, this.lastNewItemId);
+			this.tblExperimentFields.select(this.lastNewItemId);
 		}
 		else
 		{
@@ -241,13 +298,15 @@ public class ExperimentForm extends ExperimentDesign {
 		this.experiment.setModifiedDate(new Date());
 		ExperimentDao expDao = new ExperimentDao();
 		
-		if(this.experiment.getExpId() > 0)
+		if(this.experiment.getExpId() != null )
 			expDao.updateExperiment(experiment);
 		else
 		{
-			expDao.addExperiment(experiment);
 			this.experiment.setCreatedBy(sessionUser);
 			this.experiment.setCreatedDate(this.experiment.getModifiedDate());
+			System.out.println(sessionUser);
+			expDao.addExperiment(experiment);
+
 		}
 		
 		expDao.updateDBDataTable(experiment);

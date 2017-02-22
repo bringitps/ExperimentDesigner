@@ -28,7 +28,6 @@ public class LoginForm extends LoginFormDesign {
 			sysAdminUser.setUserId(-1);
 			sysAdminUser.setUserName(txtUsername.getValue());
 			sysAdminUser.setUserPass(txtPassword.getValue());
-		
 			webApplication.createUserSession(sysAdminUser);
 		}
 		else

@@ -5,7 +5,11 @@ import java.sql.ResultSet;
 import com.bringit.experiment.dao.DataBaseViewDao;
 import com.bringit.experiment.ui.design.ExperimentManagementDesign;
 import com.bringit.experiment.util.VaadinControls;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -19,6 +23,7 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 		ResultSet experimentViewResults = new DataBaseViewDao().getViewResults("vwExperiment");
 		VaadinControls.bindDbViewRsToVaadinTable(tblExperiments, experimentViewResults, 1);
 		
+		VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxExperimentViewFilters, experimentViewResults);
 		tblExperiments.addItemClickListener(new ItemClickEvent.ItemClickListener() 
 		    {
 	            public void itemClick(ItemClickEvent event) {
@@ -34,6 +39,14 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 				openExperimentCRUDModalWindow(-1);
 			}
 		});
+		
+		txtSearch.addShortcutListener(new ShortcutListener("Enter Shortcut", ShortcutAction.KeyCode.ENTER, null) {
+			@Override
+			public void handleAction(Object sender, Object target) {
+				filterDbViewResults();
+			}
+			});
+		
 	}
 	
 	public void openExperimentCRUDModalWindow(int ExperimentId)
@@ -60,5 +73,14 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 	{
 		ResultSet experimentViewResults = new DataBaseViewDao().getViewResults("vwExperiment");
 		VaadinControls.bindDbViewRsToVaadinTable(tblExperiments, experimentViewResults, 1);
+	}
+	
+	private void filterDbViewResults()
+	{
+		if(this.cbxExperimentViewFilters.getValue() != null)
+		{
+			ResultSet experimentViewResults = new DataBaseViewDao().getFilteredViewResults("vwExperiment", (String)this.cbxExperimentViewFilters.getValue(), this.txtSearch.getValue());
+			VaadinControls.bindDbViewRsToVaadinTable(tblExperiments, experimentViewResults, 1);
+		}
 	}
 }

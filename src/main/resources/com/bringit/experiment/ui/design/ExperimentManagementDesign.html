@@ -12,9 +12,10 @@
    </vaadin-label> 
    <vaadin-horizontal-layout style-name="top-bar" width-full height="50px"> 
     <vaadin-horizontal-layout width-full :middle :expand> 
-     <vaadin-text-field icon="fonticon://FontAwesome/f002" input-prompt="Search" style-name="small inline-icon search" width-full _id="search"></vaadin-text-field> 
+     <vaadin-text-field icon="fonticon://FontAwesome/f002" input-prompt="Search" style-name="small inline-icon search" width-full _id="txtSearch"></vaadin-text-field> 
     </vaadin-horizontal-layout> 
-    <vaadin-button icon="fonticon://FontAwesome/f067" style-name="borderless" id="btnAddExperiment" plain-text _id="btnAddExperiment" :middle :right>
+    <vaadin-combo-box style-name="small" _id="cbxExperimentViewFilters" :middle></vaadin-combo-box> 
+    <vaadin-button icon="fonticon://FontAwesome/f067" style-name="primary small" id="btnAddExperiment" plain-text _id="btnAddExperiment" :middle :right>
       Add new 
     </vaadin-button> 
    </vaadin-horizontal-layout> 

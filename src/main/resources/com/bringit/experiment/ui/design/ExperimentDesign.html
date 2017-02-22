@@ -15,10 +15,10 @@
      <vaadin-grid-layout spacing width="940px" margin _id="gridMainData"> 
       <row> 
        <column> 
-        <vaadin-text-field caption="Name:" style-name="small" width-full _id="txtExpName"></vaadin-text-field> 
+        <vaadin-text-field required-error="This field is mandatory." caption="Name:" required style-name="small" width-full _id="txtExpName"></vaadin-text-field> 
        </column> 
        <column> 
-        <vaadin-text-field caption="DB Id:" style-name="small" width-full _id="txtExpDbTableNameId"></vaadin-text-field> 
+        <vaadin-text-field required-error="This field is mandatory." caption="DB Id:" required style-name="small" width-full _id="txtExpDbTableNameId"></vaadin-text-field> 
        </column> 
       </row> 
       <row> 
@@ -36,29 +36,20 @@
       </row> 
       <row> 
        <column> 
-        <vaadin-table selectable caption="Experiment Fields" style-name="small" immediate width-full height="320px" _id="tblExperimentFields"> 
-         <table> 
-         </table> 
-        </vaadin-table> 
-       </column> 
-       <column> 
-        <vaadin-table selectable caption="Experiment Images" style-name="small" width-full height="320px" _id="tblExperimentImages"> 
-         <table> 
-         </table> 
-        </vaadin-table> 
-       </column> 
-      </row> 
-      <row> 
-       <column> 
         <vaadin-grid-layout width-full height="30px" _id="gridAddFields"> 
          <row> 
+          <column> 
+           <vaadin-label style-name="small" size-auto plain-text _id="lblExperimentFields" :middle>
+             Experiment Fields 
+           </vaadin-label> 
+          </column> 
           <column> 
            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small friendly" plain-text _id="btnAddField">
              Add Field 
            </vaadin-button> 
           </column> 
           <column> 
-           <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small danger" plain-text _id="btnDeleteField">
+           <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="small danger" plain-text _id="btnDeleteField">
              Delete Field 
            </vaadin-button> 
           </column> 
@@ -69,12 +60,17 @@
         <vaadin-grid-layout width-full height="30px" _id="gridAddImages"> 
          <row> 
           <column> 
+           <vaadin-label style-name="small" size-auto plain-text _id="lblExperimentImages" :middle>
+             Experiment Images 
+           </vaadin-label> 
+          </column> 
+          <column> 
            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small friendly" plain-text _id="btnAddImage">
              Add Image 
            </vaadin-button> 
           </column> 
           <column> 
-           <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small danger" plain-text _id="btnDeleteImage">
+           <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="small danger" plain-text _id="btnDeleteImage">
              Delete Image 
            </vaadin-button> 
           </column> 
@@ -82,19 +78,51 @@
         </vaadin-grid-layout> 
        </column> 
       </row> 
+      <row> 
+       <column> 
+        <vaadin-table selectable style-name="small" immediate width-full height="320px" _id="tblExperimentFields"> 
+         <table> 
+         </table> 
+        </vaadin-table> 
+       </column> 
+       <column> 
+        <vaadin-table selectable style-name="small" width-full height="320px" _id="tblExperimentImages"> 
+         <table> 
+         </table> 
+        </vaadin-table> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-grid-layout width-full height="50px" _id="gridExperimentButtons"> 
+         <row> 
+          <column> 
+           <vaadin-grid-layout width-full height="50px" _id="gridFormButtons"> 
+            <row> 
+             <column> 
+              <vaadin-button style-name="small primary" plain-text _id="btnSave">
+                Save 
+              </vaadin-button> 
+             </column> 
+             <column> 
+              <vaadin-button style-name="small" plain-text _id="btnCancel">
+                Cancel 
+              </vaadin-button> 
+             </column> 
+            </row> 
+           </vaadin-grid-layout> 
+          </column> 
+         </row> 
+        </vaadin-grid-layout> 
+       </column> 
+       <column> 
+        <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="small danger" plain-text _id="btnDelete" :right>
+          Delete Experiment 
+        </vaadin-button> 
+       </column> 
+      </row> 
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
-    <vaadin-horizontal-layout style-name="buttons border-top" spacing width-full height="50px"> 
-     <vaadin-button style-name="small primary" plain-text _id="btnSave" :middle>
-       Save 
-     </vaadin-button> 
-     <vaadin-button style-name="small" plain-text _id="btnCancel" :middle>
-       Cancel 
-     </vaadin-button> 
-     <vaadin-button style-name="small danger" plain-text _id="btnDelete" :middle :right :expand>
-       Delete 
-     </vaadin-button> 
-    </vaadin-horizontal-layout> 
    </vaadin-css-layout> 
   </vaadin-vertical-layout>  
  </body>

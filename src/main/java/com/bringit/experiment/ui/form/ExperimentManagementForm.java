@@ -9,6 +9,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Window.CloseEvent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
@@ -44,6 +45,20 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 		 experimentCRUDModalWindow.setWidth(940, Unit.PIXELS);
 		 experimentCRUDModalWindow.setHeight(760, Unit.PIXELS);
 		 experimentCRUDModalWindow.center();
+		 experimentCRUDModalWindow.addCloseListener(new Window.CloseListener() {
+			
+			@Override
+			public void windowClose(CloseEvent e) {
+				// TODO Auto-generated method stub
+				reloadExperimentDbViewResults();
+			}
+		});
 		 this.getUI().addWindow(experimentCRUDModalWindow);
     }
+	
+	private void reloadExperimentDbViewResults()
+	{
+		ResultSet experimentViewResults = new DataBaseViewDao().getViewResults("vwExperiment");
+		VaadinControls.bindDbViewRsToVaadinTable(tblExperiments, experimentViewResults, 1);
+	}
 }

@@ -25,20 +25,21 @@ import com.vaadin.ui.declarative.Design;
 public class ExperimentDesign extends VerticalLayout {
 	protected VerticalLayout crudLayout;
 	protected GridLayout gridMainData;
+	protected TextField txtExpName;
 	protected TextField txtExpDbTableNameId;
 	protected CheckBox chxActive;
 	protected TextArea txtExpInstructions;
-	protected TextField txtExpName;
 	protected TextArea txtExpComments;
 	protected Table tblExperimentFields;
+	protected Table tblExperimentImages;
 	protected GridLayout gridAddFields;
 	protected Button btnAddField;
 	protected Button btnDeleteField;
 	protected GridLayout gridAddImages;
 	protected Button btnAddImage;
 	protected Button btnDeleteImage;
-	protected Table tblExperimentImages;
 	protected Button btnSave;
+	protected Button btnCancel;
 	protected Button btnDelete;
 
 	public ExperimentDesign() {

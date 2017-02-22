@@ -123,7 +123,6 @@ public class WebApplication extends UI {
 		mainLayout.setExpandRatio(contentLayout, 1);
 		contentLayout.setSizeFull();
 		setContent(mainLayout);
-		
 	}
 
 	MenuBar.Command signOutCmd = new MenuBar.Command() {
@@ -139,9 +138,11 @@ public class WebApplication extends UI {
 		buildContent();
 	}
 	
+	
 	public void closeUserSession()
 	{
 		VaadinService.getCurrentRequest().getWrappedSession().setAttribute("UserSession", null);
+		mainForm = new MainForm(this);
 		buildContent();
 	}
 		

@@ -78,8 +78,8 @@ public class Test {
 		 experimentImageDao.addExperimentImage(experimentImage);
 
 		 JobExecutionRepeat job = new JobExecutionRepeat();
-		 job.setJobExecRepeatLabel("Pull for MEMs to Magnet Experiment");
-		 job.setJobExecRepeatMilieconds(1800000);//30 min
+		 job.setJobExecRepeatName("Pull for MEMs to Magnet Experiment");
+		 job.setJobExecRepeatMilliseconds(1800000);//30 min
 		 jobDao.addJobExecutionRepeat(job);
 		 
 		 FilesRepository inboundRepo = new FilesRepository();

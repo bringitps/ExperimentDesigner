@@ -22,6 +22,9 @@ public class XmlTemplate {
 	@Column(name="XmlTemplateName")
 	private String xmlTemplateName;
 	
+	@Column(name="XmlTemplateLoopNodeName")
+	private String xmlTemplateLoopNodeName;
+	
 	@Column(name="XmlTemplateComments")
 	private String xmlTemplateComments;
 	
@@ -88,6 +91,14 @@ public class XmlTemplate {
 
 	public void setXmlTemplateName(String xmlTemplateName) {
 		this.xmlTemplateName = xmlTemplateName;
+	}
+
+	public String getXmlTemplateLoopNodeName() {
+		return xmlTemplateLoopNodeName;
+	}
+
+	public void setXmlTemplateLoopNodeName(String xmlTemplateLoopNodeName) {
+		this.xmlTemplateLoopNodeName = xmlTemplateLoopNodeName;
 	}
 
 	public String getXmlTemplateComments() {

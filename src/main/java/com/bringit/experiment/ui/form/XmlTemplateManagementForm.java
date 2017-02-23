@@ -38,7 +38,7 @@ public class XmlTemplateManagementForm extends XmlTemplateManagementDesign  {
 	{
 		 Window experimentCRUDModalWindow = new Window("Xml Template");
 		 experimentCRUDModalWindow.setModal(true);
-		 experimentCRUDModalWindow.setResizable(true);
+		 experimentCRUDModalWindow.setResizable(false);
 		 experimentCRUDModalWindow.setContent(new XmlTemplateForm(xmlTemplateId));
 		 experimentCRUDModalWindow.setWidth(940, Unit.PIXELS);
 		 experimentCRUDModalWindow.setHeight(760, Unit.PIXELS);

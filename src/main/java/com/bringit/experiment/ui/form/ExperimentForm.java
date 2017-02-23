@@ -63,6 +63,7 @@ public class ExperimentForm extends ExperimentDesign {
 		this.tblExperimentFields.addContainerProperty("DB Id", TextField.class, null);
 		this.tblExperimentFields.addContainerProperty("DB DataType", ComboBox.class, null);
 		this.tblExperimentFields.addContainerProperty("UoM", ComboBox.class, null);
+		this.tblExperimentFields.setPageLength(0);
 		
 		this.txtExpDbTableNameId.addValidator(new Validator() {
 
@@ -157,6 +158,8 @@ public class ExperimentForm extends ExperimentDesign {
 		    }
 			
 			this.tblExperimentFields.setEditable(true);
+			this.tblExperimentFields.setPageLength(0);
+			
 		}
 		btnAddField.addClickListener(new Button.ClickListener() {
 			
@@ -211,6 +214,7 @@ public class ExperimentForm extends ExperimentDesign {
 		itemValues[0] = chxSelect;
 		
 		TextField txtFieldName = new TextField();
+		txtFieldName.setImmediate(true);
 		txtFieldName.focus();
 		txtFieldName.addStyleName("small");
 		txtFieldName.setRequired(true);
@@ -278,6 +282,8 @@ public class ExperimentForm extends ExperimentDesign {
 		this.lastNewItemId = this.lastNewItemId - 1;
 		this.tblExperimentFields.addItem(itemValues, this.lastNewItemId);
 		this.tblExperimentFields.select(this.lastNewItemId);
+		this.tblExperimentFields.setPageLength(0);
+		
 	}
 	
 	private void removeExperimentFieldItem()
@@ -294,19 +300,6 @@ public class ExperimentForm extends ExperimentDesign {
 		boolean validateDuplicateDbTableNameResult = validateDuplicateDbTableName();
 		boolean validateDuplicatedDbNameFieldsResult = validateDuplicatedDbNameFields();
 		
-		if(itemIds.size() <= 0)
-			this.getUI().showNotification("Experiment must contain at least 1 Experiment Field", Type.WARNING_MESSAGE);
-		else if(!validateReqFieldsResult)
-			this.getUI().showNotification("Please fill in all required Fields", Type.WARNING_MESSAGE);
-		else if(!validateDbNameFieldsResult)
-			this.getUI().showNotification("Only AlphaNumeric and Underscores are allowed for DB Element Names", Type.WARNING_MESSAGE);
-		else if(!validateDuplicatedDbNameFieldsResult)
-			this.getUI().showNotification("Experiment Field DB Ids must be unique.", Type.WARNING_MESSAGE);
-		else if(!validateDuplicateDbTableNameResult)
-		{
-			this.getUI().showNotification("DB Table Name already exists.", Type.WARNING_MESSAGE);
-			this.txtExpDbTableNameId.selectAll();
-		}
 		
 		//---Validate Required Fields---//
 		if(itemIds.size() > 0 && validateReqFieldsResult && validateDbNameFieldsResult && validateDuplicateDbTableNameResult && validateDuplicatedDbNameFieldsResult)
@@ -369,6 +362,22 @@ public class ExperimentForm extends ExperimentDesign {
 			}
 		
 			closeModalWindow();
+		}
+		else
+		{
+			if(itemIds.size() <= 0)
+				this.getUI().showNotification("Experiment must contain at least 1 Experiment Field", Type.WARNING_MESSAGE);
+			else if(!validateReqFieldsResult)
+				this.getUI().showNotification("Please fill in all required Fields", Type.WARNING_MESSAGE);
+			else if(!validateDbNameFieldsResult)
+				this.getUI().showNotification("Only AlphaNumeric and Underscores are allowed for DB Element Names", Type.WARNING_MESSAGE);
+			else if(!validateDuplicatedDbNameFieldsResult)
+				this.getUI().showNotification("Experiment Field DB Ids must be unique.", Type.WARNING_MESSAGE);
+			else if(!validateDuplicateDbTableNameResult)
+			{
+				this.getUI().showNotification("DB Table Name already exists.", Type.WARNING_MESSAGE);
+				this.txtExpDbTableNameId.selectAll();
+			}
 		}
     }
 	

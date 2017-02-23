@@ -144,7 +144,8 @@ public class ExperimentFieldDao {
         }
         return experimentField;
     }
-
+    
+    
     @SuppressWarnings({ "unchecked", "unused" })
 	public List<ExperimentField> getAllExperimentFieldsByExperiment(Experiment experiment) {
         List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
@@ -161,7 +162,23 @@ public class ExperimentFieldDao {
         }
         return experimentFields;
     }
-    
+
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<ExperimentField> getAllExperimentFieldsByUnitOfMeasureId(int UnitOfMeasureId) {
+        List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            experimentFields = session.createQuery("from ExperimentField where UomId = :id").setInteger("id", UnitOfMeasureId).list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return experimentFields;
+    }
     
     public boolean updateDBDataTableField(ExperimentField experimentField)
     {

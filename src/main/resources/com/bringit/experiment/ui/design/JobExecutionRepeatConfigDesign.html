@@ -6,28 +6,36 @@
   <meta name="vaadin-version" content="7.7.0">
  </head> 
  <body> 
-  <vaadin-vertical-layout style-name="crud-template" responsive size-full> 
-   <vaadin-label style-name="valo-menu" plain-text>
-     - Experiments Management 
+  <vaadin-vertical-layout size-full> 
+   <vaadin-label style-name="valo-menu" plain-text _id="lblFormTitle">
+     - Job Execution Repeat 
    </vaadin-label> 
-   <vaadin-horizontal-layout style-name="top-bar" width-full height="50px"> 
+   <vaadin-horizontal-layout style-name="top-bar" width-full height="60px"> 
     <vaadin-horizontal-layout width-full :middle :expand> 
      <vaadin-text-field icon="fonticon://FontAwesome/f002" input-prompt="Search" style-name="small inline-icon search" width-full _id="txtSearch"></vaadin-text-field> 
     </vaadin-horizontal-layout> 
-    <vaadin-combo-box style-name="small" _id="cbxExperimentViewFilters" :middle></vaadin-combo-box> 
+    <vaadin-combo-box style-name="small" _id="cbxJobExecRepeatFilters" :middle></vaadin-combo-box> 
+    <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="primary small" id="btnAddExperiment" plain-text _id="btnSave" :middle :right>
+      Save 
+    </vaadin-button> 
    </vaadin-horizontal-layout> 
-   <vaadin-grid-layout width="100px" height="40px" _id="gridButtons"> 
+   <vaadin-grid-layout width-full height="40px" _id="gridButtons"> 
     <row> 
      <column> 
-      <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small friendly" id="btnAddExperiment" plain-text _id="btnAddExperiment">
-        Add new 
+      <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small friendly" plain-text _id="btnAddJobExecRepeat">
+        Add Job Execution Repeat 
+      </vaadin-button> 
+     </column> 
+     <column> 
+      <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="small danger" plain-text _id="btnDeleteJobExecRepeat" :right>
+        Delete Job Execution Repeat 
       </vaadin-button> 
      </column> 
     </row> 
    </vaadin-grid-layout> 
    <vaadin-css-layout style-name="content" size-full :expand> 
     <vaadin-css-layout style-name="list" size-full> 
-     <vaadin-table selectable style-name="small" size-full _id="tblExperiments"> 
+     <vaadin-table selectable style-name="small" size-full _id="tblJobExecutionRepeat"> 
       <table> 
       </table> 
      </vaadin-table> 

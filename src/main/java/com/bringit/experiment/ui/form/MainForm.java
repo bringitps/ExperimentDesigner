@@ -48,6 +48,18 @@ public class MainForm extends MainFormDesign {
      				formContentLayout.removeAllComponents();
      				formContentLayout.addComponent(new XmlTemplateManagementForm());
                   	break;
+         case "unit of measures":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new UnitOfMeasureConfigForm());
+                  	break;
+         case "files repositories":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new FilesRepositoriesConfigForm());
+                  	break;
+         case "job exec repeat":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new JobExecutionRepeatConfigForm());
+                  	break;
          default:
          			break;
 		 }

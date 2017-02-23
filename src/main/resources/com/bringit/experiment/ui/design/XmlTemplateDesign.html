@@ -6,68 +6,100 @@
   <meta name="vaadin-version" content="7.7.0">
  </head> 
  <body> 
-  <vaadin-vertical-layout size-full> 
-   <vaadin-grid-layout spacing id="gridMainData" width-full margin> 
-    <row> 
-     <column> 
-      <vaadin-upload caption="Load Xml File" immediate _id="upXml"></vaadin-upload> 
-     </column> 
-     <column> 
-      <vaadin-label size-auto>
-        Please upload a sample of your XML experiment results, this should be a small 
-       <br> file containing at least one set of results so you can map the fields appropriately. 
-      </vaadin-label> 
-     </column> 
-    </row> 
-    <row> 
-     <column> 
-      <vaadin-text-field caption="Name:" required style-name="small" _id="txtXmlTName"></vaadin-text-field> 
-     </column> 
-     <column> 
-      <vaadin-text-field caption="Prefix:" style-name="small" width-full _id="txtXmlTPrefix"></vaadin-text-field> 
-     </column> 
-    </row> 
-    <row> 
-     <column> 
-      <vaadin-combo-box caption="Experiment:" required style-name="small" width-full _id="comboXmlTExperiment"></vaadin-combo-box> 
-     </column> 
-     <column> 
-      <vaadin-text-field caption="Comments:" style-name="small" width-full _id="txtXmlTComments"></vaadin-text-field> 
-     </column> 
-    </row> 
-    <row> 
-     <column> 
-      <vaadin-date-field caption="Start Execution Date:" id="dateXmlTstart" style-name="small" width-full></vaadin-date-field> 
-     </column> 
-     <column> 
-      <vaadin-date-field caption="Finish Execution Date:" id="endXmlTstart" style-name="small" width-full></vaadin-date-field> 
-     </column> 
-    </row> 
-    <row> 
-     <column> 
-      <vaadin-combo-box caption="Inbound File Repository:" required style-name="small" width-full _id="comboXmlTinRepo"></vaadin-combo-box> 
-     </column> 
-     <column> 
-      <vaadin-combo-box caption="Processed File Repository" required style-name="small" width-full _id="comboXmloutRepo"></vaadin-combo-box> 
-     </column> 
-    </row> 
-    <row> 
-     <column> 
-      <vaadin-combo-box caption="Exception File Repository:" required style-name="small" width-full _id="comboXmlTerrRepo"></vaadin-combo-box> 
-     </column> 
-     <column> 
-      <vaadin-combo-box caption="Job Scheduler:" required style-name="small" width-full _id="comboXmljobScheduler"></vaadin-combo-box> 
-     </column> 
-    </row> 
-    <row> 
-     <column colspan="2"> 
-      <vaadin-table selectable caption="XmlTemplate Nodes" style-name="small" immediate width-full height="320px" _id="tblXmlNodes"> 
-       <table> 
-       </table> 
-      </vaadin-table> 
-     </column> 
-    </row> 
-   </vaadin-grid-layout> 
+  <vaadin-vertical-layout> 
+   <vaadin-label style-name="valo-menu" plain-text>
+     - Xml Template 
+   </vaadin-label> 
+   <vaadin-vertical-layout margin> 
+    <vaadin-grid-layout width-full height="30px"> 
+     <row> 
+      <column> 
+       <vaadin-grid-layout width="100px" height="30px"> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="small primary" plain-text _id="btnSave">
+            Save 
+          </vaadin-button> 
+         </column> 
+         <column> 
+          <vaadin-button style-name="small" plain-text _id="btnCancel">
+            Cancel 
+          </vaadin-button> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout size-auto> 
+    <vaadin-grid-layout spacing id="gridMainData" width-full margin> 
+     <row> 
+      <column> 
+       <vaadin-text-field caption="Name:" required style-name="small" _id="txtXmlTName"></vaadin-text-field> 
+      </column> 
+      <column> 
+       <vaadin-combo-box caption="Experiment:" required style-name="small" width-full _id="comboXmlTExperiment"></vaadin-combo-box> 
+      </column> 
+     </row> 
+     <row> 
+      <column> 
+       <vaadin-upload caption="Load Xml File" immediate _id="upXml"></vaadin-upload> 
+      </column> 
+      <column> 
+       <vaadin-label size-auto>
+         Please upload a sample of your XML experiment results, this should be a small 
+        <br> file containing at least one set of results so you can map the fields appropriately. 
+       </vaadin-label> 
+      </column> 
+     </row> 
+     <row> 
+      <column> 
+       <vaadin-text-field caption="Prefix:" style-name="small" width-full _id="txtXmlTPrefix"></vaadin-text-field> 
+      </column> 
+      <column> 
+       <vaadin-text-field caption="Comments:" style-name="small" width-full _id="txtXmlTComments"></vaadin-text-field> 
+      </column> 
+     </row> 
+     <row> 
+      <column> 
+       <vaadin-date-field caption="Start Execution Date:" id="dateXmlTstart" style-name="small" width-full></vaadin-date-field> 
+      </column> 
+      <column> 
+       <vaadin-date-field caption="Finish Execution Date:" id="endXmlTstart" style-name="small" width-full></vaadin-date-field> 
+      </column> 
+     </row> 
+     <row> 
+      <column> 
+       <vaadin-combo-box caption="Inbound File Repository:" required style-name="small" width-full _id="comboXmlTinRepo"></vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-combo-box caption="Processed File Repository" required style-name="small" width-full _id="comboXmloutRepo"></vaadin-combo-box> 
+      </column> 
+     </row> 
+     <row> 
+      <column> 
+       <vaadin-combo-box caption="Exception File Repository:" required style-name="small" width-full _id="comboXmlTerrRepo"></vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-combo-box caption="Job Scheduler:" required style-name="small" width-full _id="comboXmljobScheduler"></vaadin-combo-box> 
+      </column> 
+     </row> 
+     <row> 
+      <column colspan="2"> 
+       <vaadin-table selectable caption="XmlTemplate Nodes" style-name="small" immediate width-full height="320px" _id="tblXmlNodes"> 
+        <table> 
+        </table> 
+       </vaadin-table> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout margin> 
+    <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="small danger" plain-text _id="btnDelete" :right>
+      Delete Xml Template 
+    </vaadin-button> 
+   </vaadin-vertical-layout> 
   </vaadin-vertical-layout>  
  </body>
 </html>

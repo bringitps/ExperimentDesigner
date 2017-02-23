@@ -348,7 +348,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		for(int j=0; j<jobs.size(); j++)
 		{
 			this.comboXmljobScheduler.addItem(jobs.get(j).getJobExecRepeatId());
-			this.comboXmljobScheduler.setItemCaption(jobs.get(j).getJobExecRepeatId(), jobs.get(j).getJobExecRepeatLabel());
+			this.comboXmljobScheduler.setItemCaption(jobs.get(j).getJobExecRepeatId(), jobs.get(j).getJobExecRepeatName());
 			this.comboXmljobScheduler.setWidth(100, Unit.PIXELS);
 		}
 		

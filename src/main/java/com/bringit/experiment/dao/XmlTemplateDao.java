@@ -128,4 +128,38 @@ public class XmlTemplateDao {
         return xmlTemplate;
     }
 	
+	 @SuppressWarnings({ "unchecked", "unused" })
+		public List<XmlTemplate> getXmlTemplatesByFileRepoId(int fileRepoId)  {
+	        List<XmlTemplate> xmlTemplates = new ArrayList<XmlTemplate>();
+	        Transaction trns = null;
+	        Session session = HibernateUtil.openSession(dialectXmlFile);
+	        try {
+	            trns = session.beginTransaction();
+	            xmlTemplates = session.createQuery("from XmlTemplate where InboundFileRepoId = :id or ProcessedFileRepoId = :id or ExceptionFileRepoId = :id").setInteger("id", fileRepoId).list();
+	        } catch (RuntimeException e) {
+	            e.printStackTrace();
+	        } finally {
+	            session.flush();
+	            session.close();
+	        }
+	        return xmlTemplates;
+	    }
+
+	 @SuppressWarnings({ "unchecked", "unused" })
+		public List<XmlTemplate> getXmlTemplatesByJobExecRepeatId(int jobExecRepeatId)  {
+	        List<XmlTemplate> xmlTemplates = new ArrayList<XmlTemplate>();
+	        Transaction trns = null;
+	        Session session = HibernateUtil.openSession(dialectXmlFile);
+	        try {
+	            trns = session.beginTransaction();
+	            xmlTemplates = session.createQuery("from XmlTemplate where JobExecRepeatId = :id").setInteger("id", jobExecRepeatId).list();
+	        } catch (RuntimeException e) {
+	            e.printStackTrace();
+	        } finally {
+	            session.flush();
+	            session.close();
+	        }
+	        return xmlTemplates;
+	    }
+	
 }

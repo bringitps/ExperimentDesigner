@@ -19,6 +19,9 @@ public class FilesRepository {
 	@Column(name="FileRepoId")
 	private Integer fileRepoId;
 
+	@Column(name="FileRepoName")
+	private String fileRepoName;
+	
 	@Column(name="FileRepoIsLocal")
 	private boolean fileRepoIsLocal;
 	
@@ -65,6 +68,14 @@ public class FilesRepository {
 		this.fileRepoId = fileRepoId;
 	}
 
+	public String getFileRepoName() {
+		return fileRepoName;
+	}
+	
+	public void setFileRepoName(String fileRepoName) {
+		this.fileRepoName = fileRepoName;
+	}
+	
 	public boolean isFileRepoIsLocal() {
 		return fileRepoIsLocal;
 	}

@@ -15,11 +15,11 @@ public class JobExecutionRepeat {
 	@Column(name="JobExecRepeatId")
 	private Integer jobExecRepeatId;
 
-	@Column(name="JobExecRepeatLabel")
-	private String JobExecRepeatLabel;
+	@Column(name="JobExecRepeatName")
+	private String JobExecRepeatName;
 	
-	@Column(name="JobExecRepeatMilieconds")
-	private int jobExecRepeatMilieconds;
+	@Column(name="JobExecRepeatMilliseconds")
+	private int jobExecRepeatMilliseconds;
 
 	public Integer getJobExecRepeatId() {
 		return jobExecRepeatId;
@@ -29,20 +29,20 @@ public class JobExecutionRepeat {
 		this.jobExecRepeatId = jobExecRepeatId;
 	}
 
-	public String getJobExecRepeatLabel() {
-		return JobExecRepeatLabel;
+	public String getJobExecRepeatName() {
+		return JobExecRepeatName;
 	}
 
-	public void setJobExecRepeatLabel(String jobExecRepeatLabel) {
-		JobExecRepeatLabel = jobExecRepeatLabel;
+	public void setJobExecRepeatName(String jobExecRepeatName) {
+		JobExecRepeatName = jobExecRepeatName;
 	}
 
-	public int getJobExecRepeatMilieconds() {
-		return jobExecRepeatMilieconds;
+	public int getJobExecRepeatMilliseconds() {
+		return jobExecRepeatMilliseconds;
 	}
 
-	public void setJobExecRepeatMilieconds(int jobExecRepeatMilieconds) {
-		this.jobExecRepeatMilieconds = jobExecRepeatMilieconds;
+	public void setJobExecRepeatMilliseconds(int jobExecRepeatMilliseconds) {
+		this.jobExecRepeatMilliseconds = jobExecRepeatMilliseconds;
 	}
 	
 	

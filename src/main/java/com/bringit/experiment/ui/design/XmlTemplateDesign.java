@@ -24,10 +24,10 @@ import com.vaadin.ui.declarative.Design;
 public class XmlTemplateDesign extends VerticalLayout {
 	protected Button btnSave;
 	protected Button btnCancel;
-	protected Upload upXml;
 	protected TextField txtXmlTName;
-	protected TextField txtXmlTPrefix;
 	protected ComboBox comboXmlTExperiment;
+	protected Upload upXml;
+	protected TextField txtXmlTPrefix;
 	protected TextField txtXmlTComments;
 	protected ComboBox comboXmlTinRepo;
 	protected ComboBox comboXmloutRepo;

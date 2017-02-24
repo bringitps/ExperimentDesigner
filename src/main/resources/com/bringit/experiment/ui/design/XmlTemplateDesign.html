@@ -33,7 +33,7 @@
     </vaadin-grid-layout> 
    </vaadin-vertical-layout> 
    <vaadin-vertical-layout size-auto> 
-    <vaadin-grid-layout spacing id="gridMainData" width-full margin> 
+    <vaadin-grid-layout spacing id="gridMainData" width="1237.84%" margin> 
      <row> 
       <column> 
        <vaadin-text-field caption="Name:" required style-name="small" _id="txtXmlTName"></vaadin-text-field> 
@@ -47,9 +47,8 @@
        <vaadin-upload caption="Load Xml File" immediate _id="upXml"></vaadin-upload> 
       </column> 
       <column> 
-       <vaadin-label size-auto>
-         Please upload a sample of your XML experiment results, this should be a small 
-        <br> file containing at least one set of results so you can map the fields appropriately. 
+       <vaadin-label size-auto :middle>
+         Please upload a sample of your XML experiment results. 
        </vaadin-label> 
       </column> 
      </row> 

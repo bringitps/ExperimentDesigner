@@ -94,6 +94,23 @@ public class ExperimentDao {
         }
         return experiments;
     }
+    
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<Experiment> getActiveExperiments() {
+        List<Experiment> experiments = new ArrayList<Experiment>();
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            experiments = session.createQuery("from Experiment where ExpIsActive = 'true'").list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return experiments;
+    }
 
     @SuppressWarnings("unused")
 	public Experiment getExperimentById(int expId) {

@@ -74,7 +74,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		if(xmlId == -1) //New
 		{
 			uploadFile();
-			
+			this.btnDelete.setVisible(false);
 			this.xmlt = new XmlTemplate();
 			fillCombos();
 			//we disable all the components until an experiment is selected
@@ -94,18 +94,21 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			xmlt = new XmlTemplateDao().getXmlTemplateById(xmlId);
 			this.txtXmlTName.setValue(xmlt.getXmlTemplateName());
 			this.comboXmlTExperiment.setValue(xmlt.getExperiment().getExpId());
+			this.comboXmlTExperiment.setEnabled(false);
 			//this.comboXmljobScheduler.setValue(xmlt.getJobExecRepeat().getJobExecRepeatId());
 			this.comboXmlTinRepo.setValue(xmlt.getInboundFileRepo().getFileRepoId());
-			//this.comboXmloutRepo.setValue(xmlt.getProcessedFileRepo().getFileRepoId());
-			//this.comboXmlTerrRepo.setValue(xmlt.getExceptionFileRepo().getFileRepoId());
+			this.comboXmloutRepo.setValue(xmlt.getProcessedFileRepo().getFileRepoId());
+			this.comboXmlTerrRepo.setValue(xmlt.getExceptionFileRepo().getFileRepoId());
 			this.txtXmlTComments.setValue(xmlt.getXmlTemplateComments());
 			this.txtXmlTPrefix.setValue(xmlt.getXmlTemplatePrefix());
+			this.startXmlTstart.setValue(xmlt.getXmlTemplateExecStartDate());
+			this.endXmlTstart.setValue(xmlt.getXmlTemplateExecEndDate());
 			
 			this.xmlNodes = new XmlTemplateNodeDao().getAllXmlTemplateNodesByTemplateId(xmlt.getXmlTemplateId());
 			 
 			this.tblXmlNodes.setContainerDataSource(null);
 			this.tblXmlNodes.addContainerProperty("*", CheckBox.class, null);
-			this.tblXmlNodes.addContainerProperty("Parent", TextField.class, null);
+			this.tblXmlNodes.addContainerProperty("ParentNode", TextField.class, null);
 			this.tblXmlNodes.addContainerProperty("IsRoot", CheckBox.class, null);
 			this.tblXmlNodes.addContainerProperty("IsField", CheckBox.class, null);
 			this.tblXmlNodes.addContainerProperty("Experiment Field", ComboBox.class, null);
@@ -114,7 +117,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.expFields = new ExperimentFieldDao().getActiveExperimentFields(xmlt.getExperiment());
 			
 			Object[] itemValues = new Object[6];
-			for(int i=0; i<this.expFields.size(); i++)
+			for(int i=0; i<this.xmlNodes.size(); i++)
 			{		
 				CheckBox chxSelect = new CheckBox();
 				chxSelect.setVisible(false);
@@ -142,7 +145,6 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 					{
 						cbxExpFields.addItem(expFields.get(j).getExpFieldId());
 						cbxExpFields.setItemCaption(expFields.get(j).getExpFieldId(), expFields.get(j).getExpFieldName());
-						cbxExpFields.setWidth(100, Unit.PIXELS);
 					}
 					if(this.xmlNodes.get(i).getExpField()!=null){
 						cbxExpFields.setValue(this.xmlNodes.get(i).getExpField().getExpFieldId());
@@ -151,7 +153,20 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 					cbxExpFields.setImmediate(true);
 					cbxExpFields.addStyleName("small");
 				}else{
-					cbxExpFields.setEnabled(false);
+					if(!this.xmlNodes.get(i).getXmlTemplateNodeName().equals("ExperimentResults"))
+						cbxExpFields.setEnabled(false);
+					else
+						for(int j=0; j<expFields.size(); j++)
+						{
+							cbxExpFields.addItem(expFields.get(j).getExpFieldId());
+							cbxExpFields.setItemCaption(expFields.get(j).getExpFieldId(), expFields.get(j).getExpFieldName());
+						}
+						if(this.xmlNodes.get(i).getExpField()!=null){
+							cbxExpFields.setValue(this.xmlNodes.get(i).getExpField().getExpFieldId());
+						}
+						cbxExpFields.setNullSelectionAllowed(false);
+						cbxExpFields.setImmediate(true);
+						cbxExpFields.addStyleName("small");
 				}
 				
 				itemValues[4] = cbxExpFields;
@@ -193,10 +208,6 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				closeModalWindow();
 			}
 
-			private void closeModalWindow() {
-				// TODO Auto-generated method stub
-				
-			}
 
 		});
 		btnDelete.addClickListener(new Button.ClickListener() {
@@ -209,14 +220,19 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		});
 		
 	}
+	private void closeModalWindow()
+	{
+		//Close Parent Modal Window
+		((Window)this.getParent()).close();
+	}
 	@SuppressWarnings("deprecation")
 	protected void onSave() {
 		Collection itemIds = this.tblXmlNodes.getContainerDataSource().getItemIds();
-
+		boolean validateReqFieldsResult = validateRequiredFields();
 		
 		
 		//---Validate Required Fields---//
-		if(itemIds.size() > 0 )
+		if(itemIds.size() > 0 && validateReqFieldsResult )
 		{
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			
@@ -225,13 +241,14 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.xmlt.setXmlTemplateName(this.txtXmlTName.getValue());
 			this.xmlt.setXmlTemplatePrefix(this.txtXmlTPrefix.getValue());
 			this.xmlt.setXmlTemplateComments(this.txtXmlTComments.getValue());
-			//this.xmlt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmlTerrRepo.getValue()));
+			this.xmlt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmlTerrRepo.getValue()));
 			this.xmlt.setProcessedFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmloutRepo.getValue()));
 			this.xmlt.setInboundFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmlTinRepo.getValue()));
 			//this.xmlt.setJobExecRepeat(new JobExecutionRepeatDao().getJobExecutionRepeatById((int) this.comboXmljobScheduler.getValue()));
 			this.xmlt.setLastModifiedBy(sessionUser);
 			this.xmlt.setModifiedDate(new Date());
-			
+			this.xmlt.setXmlTemplateExecStartDate(this.startXmlTstart.getValue());
+			this.xmlt.setXmlTemplateExecEndDate(this.endXmlTstart.getValue());
 			if(this.xmlt.getXmlTemplateId() != null )
 				new XmlTemplateDao().updateXmlTemplate(xmlt);
 			else
@@ -252,11 +269,6 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				Item tblRowItem = this.tblXmlNodes.getContainerDataSource().getItem(itemId);
 				
 				XmlTemplateNode xmlNode = new XmlTemplateNode();
-				this.tblXmlNodes.addContainerProperty("Parent", TextField.class, null);
-				this.tblXmlNodes.addContainerProperty("IsRoot", CheckBox.class, null);
-				this.tblXmlNodes.addContainerProperty("IsField", CheckBox.class, null);
-				this.tblXmlNodes.addContainerProperty("Experiment Field", ComboBox.class, null);
-				this.tblXmlNodes.addContainerProperty("Xml Node Name", TextField.class, null);
 				xmlNode.setXmlTemplateNodeName(((TextField)(tblRowItem.getItemProperty("ParentNode").getValue())).getValue());
 				xmlNode.setXmlTemplateNodeIsRoot(((CheckBox)(tblRowItem.getItemProperty("IsRoot").getValue())).getValue());
 				xmlNode.setXmlTemplateNodeIsAttributeValue(((CheckBox)(tblRowItem.getItemProperty("IsField").getValue())).getValue());				
@@ -282,13 +294,32 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		}
 		else
 		{
-			this.getUI().showNotification("XmlTemplate has no XmlTemplateNodes", Type.WARNING_MESSAGE);
+			if(itemIds.size() <= 0)
+				this.getUI().showNotification("There are no xml nodes mapped on your XmlTemplate", Type.WARNING_MESSAGE);
+			else if(!validateReqFieldsResult)
+				this.getUI().showNotification("Please fill in all required Fields", Type.WARNING_MESSAGE);
 		}
 	}
-	private void closeModalWindow()
+	private boolean validateRequiredFields()
 	{
-		//Close Parent Modal Window
-		((Window)this.getParent()).close();
+		if(!this.txtXmlTName.isValid()) return false;
+		if(!this.txtXmlTPrefix.isValid()) return false;
+		if(!((ComboBox)(this.comboXmloutRepo)).isValid()) return false;
+		if(!((ComboBox)(this.comboXmlTerrRepo)).isValid()) return false;
+		if(!((ComboBox)(this.comboXmlTinRepo)).isValid()) return false;
+		if(!((ComboBox)(this.comboXmlTExperiment)).isValid()) return false;
+		
+		Collection itemIds = this.tblXmlNodes.getContainerDataSource().getItemIds();
+		
+		for (Object itemIdObj : itemIds) 
+		{	
+			int itemId = (int)itemIdObj;
+			Item tblRowItem = this.tblXmlNodes.getContainerDataSource().getItem(itemId);
+			if(!((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).isValid()) return false;
+			
+		}
+		
+		return true;
 	}
 	@SuppressWarnings("deprecation")
 	private void uploadFile() {
@@ -394,7 +425,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				{
 					cbxExpFields.addItem(expFields.get(j).getExpFieldId());
 					cbxExpFields.setItemCaption(expFields.get(j).getExpFieldId(), expFields.get(j).getExpFieldName());
-					cbxExpFields.setWidth(100, Unit.PIXELS);
+					//cbxExpFields.setWidth(100, Unit.PIXELS);
 				}
 				
 				cbxExpFields.setNullSelectionAllowed(false);
@@ -425,7 +456,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		{
 			this.comboXmlTExperiment.addItem(experiments.get(j).getExpId());
 			this.comboXmlTExperiment.setItemCaption(experiments.get(j).getExpId(), experiments.get(j).getExpName());
-			this.comboXmlTExperiment.setWidth(100, Unit.PIXELS);
+			//this.comboXmlTExperiment.setWidth(100, Unit.PIXELS);
 		}
 		
 		this.comboXmlTExperiment.setNullSelectionAllowed(false);
@@ -437,15 +468,15 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		{
 			this.comboXmlTinRepo.addItem(repos.get(j).getFileRepoId());
 			this.comboXmlTinRepo.setItemCaption(repos.get(j).getFileRepoId(), repos.get(j).getFileRepoHost()+":"+repos.get(j).getFileRepoPath());
-			this.comboXmlTinRepo.setWidth(100, Unit.PIXELS);
+			//this.comboXmlTinRepo.setWidth(100, Unit.PIXELS);
 			
 			this.comboXmloutRepo.addItem(repos.get(j).getFileRepoId());
 			this.comboXmloutRepo.setItemCaption(repos.get(j).getFileRepoId(), repos.get(j).getFileRepoHost()+":"+repos.get(j).getFileRepoPath());
-			this.comboXmloutRepo.setWidth(100, Unit.PIXELS);
+			//this.comboXmloutRepo.setWidth(100, Unit.PIXELS);
 			
 			this.comboXmlTerrRepo.addItem(repos.get(j).getFileRepoId());
 			this.comboXmlTerrRepo.setItemCaption(repos.get(j).getFileRepoId(), repos.get(j).getFileRepoHost()+":"+repos.get(j).getFileRepoPath());
-			this.comboXmlTerrRepo.setWidth(100, Unit.PIXELS);
+			//this.comboXmlTerrRepo.setWidth(100, Unit.PIXELS);
 		}
 		
 		this.comboXmlTinRepo.setNullSelectionAllowed(false);
@@ -465,7 +496,6 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		{
 			this.comboXmljobScheduler.addItem(jobs.get(j).getJobExecRepeatId());
 			this.comboXmljobScheduler.setItemCaption(jobs.get(j).getJobExecRepeatId(), jobs.get(j).getJobExecRepeatName());
-			this.comboXmljobScheduler.setWidth(100, Unit.PIXELS);
 		}
 		
 		this.comboXmljobScheduler.setNullSelectionAllowed(false);
@@ -474,8 +504,16 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		
 	}
 	private void onDelete()
-	{
-//TODO
+	{	 
+		int xmlTemplateId = this.xmlt.getXmlTemplateId();	
+		XmlTemplateNodeDao xmlNodeDao = new XmlTemplateNodeDao();
+		this.xmlNodes = xmlNodeDao.getAllXmlTemplateNodesByTemplateId(xmlTemplateId);
+		for (XmlTemplateNode node : xmlNodes) {
+			xmlNodeDao.deleteXmlTemplateNode(node.getXmlTemplateNodeId());
+		}
+		XmlTemplateDao xmlDao = new XmlTemplateDao();
+		xmlDao.deleteXmlTemplate(xmlTemplateId);
+		closeModalWindow();
     }
 	
 }

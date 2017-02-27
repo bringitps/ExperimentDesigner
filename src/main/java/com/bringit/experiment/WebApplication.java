@@ -6,9 +6,15 @@ import java.util.Arrays;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpSession;
 
+import com.bringit.experiment.bll.JobExecutionRepeat;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.dao.ExecuteQueryDao;
+import com.bringit.experiment.dao.JobExecutionRepeatDao;
+import com.bringit.experiment.dao.SysUserDao;
 import com.bringit.experiment.ui.form.LoginForm;
 import com.bringit.experiment.ui.form.MainForm;
+import com.bringit.experiment.util.Config;
+import com.bringit.experiment.util.PasswordEncrypter;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
@@ -34,6 +40,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -71,6 +78,7 @@ public class WebApplication extends UI {
 		
 		if (sysUserSession != null)
 		{
+			
 			//--- Page Header Layout ---//
 			GridLayout headerGrid = new GridLayout();
 			headerGrid.setRows(1);
@@ -109,6 +117,64 @@ public class WebApplication extends UI {
 		}
 		else
 		{
+			//--- Check if it's a first time launching the system ---//
+			if(new SysUserDao().getAllSysUsers().size() <= 0)
+			{
+				SysUser rootUser = new SysUser();
+				rootUser.setUserName("root");
+				rootUser.setUserPass("1234");
+				
+				new SysUserDao().addSysUser(rootUser);
+
+				Config configuration = new Config();
+				if(configuration.getProperty("dbms").equals("sqlserver"))
+				{
+					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwExperiment_STMT.sql");
+					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwXmlTemplate_STMT.sql");
+				}
+				
+				JobExecutionRepeat jobExecRepeat15min = new JobExecutionRepeat();
+				jobExecRepeat15min.setJobExecRepeatName("15 minutes");
+				jobExecRepeat15min.setJobExecRepeatMilliseconds(90000);
+				new JobExecutionRepeatDao().addJobExecutionRepeat(jobExecRepeat15min);
+			
+				JobExecutionRepeat jobExecRepeat30min = new JobExecutionRepeat();
+				jobExecRepeat30min.setJobExecRepeatName("30 minutes");
+				jobExecRepeat30min.setJobExecRepeatMilliseconds(1800000);
+				new JobExecutionRepeatDao().addJobExecutionRepeat(jobExecRepeat30min);
+			
+				JobExecutionRepeat jobExecRepeat45min = new JobExecutionRepeat();
+				jobExecRepeat45min.setJobExecRepeatName("45 minutes");
+				jobExecRepeat45min.setJobExecRepeatMilliseconds(2700000);
+				new JobExecutionRepeatDao().addJobExecutionRepeat(jobExecRepeat45min);
+			
+				JobExecutionRepeat jobExecRepeat1hr = new JobExecutionRepeat();
+				jobExecRepeat1hr.setJobExecRepeatName("1 hour");
+				jobExecRepeat1hr.setJobExecRepeatMilliseconds(3600000);
+				new JobExecutionRepeatDao().addJobExecutionRepeat(jobExecRepeat1hr);
+			
+				JobExecutionRepeat jobExecRepeat2hrs = new JobExecutionRepeat();
+				jobExecRepeat2hrs.setJobExecRepeatName("2 hours");
+				jobExecRepeat2hrs.setJobExecRepeatMilliseconds(7200000);
+				new JobExecutionRepeatDao().addJobExecutionRepeat(jobExecRepeat2hrs);
+			
+				JobExecutionRepeat jobExecRepeat5hrs = new JobExecutionRepeat();
+				jobExecRepeat5hrs.setJobExecRepeatName("5 hours");
+				jobExecRepeat5hrs.setJobExecRepeatMilliseconds(18000000);
+				new JobExecutionRepeatDao().addJobExecutionRepeat(jobExecRepeat5hrs);
+			
+				JobExecutionRepeat jobExecRepeat12hrs = new JobExecutionRepeat();
+				jobExecRepeat12hrs.setJobExecRepeatName("12 hours");
+				jobExecRepeat12hrs.setJobExecRepeatMilliseconds(43200000);
+				new JobExecutionRepeatDao().addJobExecutionRepeat(jobExecRepeat12hrs);
+			
+				JobExecutionRepeat jobExecRepeat24hrs = new JobExecutionRepeat();
+				jobExecRepeat24hrs.setJobExecRepeatName("24 hours");
+				jobExecRepeat24hrs.setJobExecRepeatMilliseconds(86400000);
+				new JobExecutionRepeatDao().addJobExecutionRepeat(jobExecRepeat24hrs);
+				
+			}
+			
 			GridLayout headerGrid = new GridLayout();
 			headerGrid.setRows(1);
 			headerGrid.setColumns(1);

@@ -76,7 +76,7 @@ public class ExperimentForm extends ExperimentDesign {
 		
 		if(experimentId == -1) //New Experiment
 		{
-			this.chxActive.setValue(false);
+			this.chxActive.setValue(true);
 			this.btnDelete.setEnabled(false);
 			this.experiment = new Experiment();
 		}
@@ -86,6 +86,7 @@ public class ExperimentForm extends ExperimentDesign {
 			this.experiment = new ExperimentDao().getExperimentById(experimentId);
 			this.txtExpName.setValue(this.experiment.getExpName());
 			this.txtExpDbTableNameId.setValue(this.experiment.getExpDbTableNameId());
+			this.txtExpDbTableNameId.setEnabled(false);
 			this.chxActive.setValue(this.experiment.isExpIsActive());
 			this.txtExpInstructions.setValue(this.experiment.getExpInstructions());
 			this.txtExpComments.setValue(this.experiment.getExpComments());
@@ -426,7 +427,7 @@ public class ExperimentForm extends ExperimentDesign {
 		for(int i=0; i<savedExperiments.size(); i++)
 		{
 			if(this.txtExpDbTableNameId.getValue().equals(savedExperiments.get(i).getExpDbTableNameId()) && 
-					this.experiment.getExpId() == savedExperiments.get(i).getExpId())
+					this.experiment.getExpId() != savedExperiments.get(i).getExpId())
 			return false;
 		}
 		return true;

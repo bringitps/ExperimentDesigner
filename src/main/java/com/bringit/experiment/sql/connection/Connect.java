@@ -5,17 +5,25 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import com.bringit.experiment.util.Config;
+
 public class Connect {
 	
 	public static Connection getConnection(String dbhost,String dbport, String dbname, String usr, String pwd){
 	    Connection conn = null;
+		Config configuration = new Config();
 	    
 	    try {
-	    	Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-	        String dbURL = "jdbc:sqlserver://"+dbhost+":"+dbport+";databaseName="+dbname;
-	        String user = usr;
-	        String pass = pwd;
-	        conn = DriverManager.getConnection(dbURL, user, pass);
+	    	
+	    		if(configuration.getProperty("dbms").equals("sqlserver"))
+	    		{
+			
+	    			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+	    			String dbURL = "jdbc:sqlserver://"+dbhost+":"+dbport+";databaseName="+dbname;
+	    			String user = usr;
+	    			String pass = pwd;
+	    			conn = DriverManager.getConnection(dbURL, user, pass);
+	    		}
 	
 	    } catch (SQLException ex) {
 	        ex.printStackTrace();

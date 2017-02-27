@@ -20,6 +20,7 @@ public class LoginForm extends LoginFormDesign {
 
 	private void doLogin() {
 
+		/*
 		//Root Password
 		if(txtUsername.getValue().equals("sys_admin") && txtPassword.getValue().equals("br1n61T2oI7"))
 		{
@@ -31,13 +32,13 @@ public class LoginForm extends LoginFormDesign {
 			webApplication.createUserSession(sysAdminUser);
 		}
 		else
-		{
+		{*/
 			SysUser loggedUser = new SysUserDao().getUserByUserNameAndPassword(txtUsername.getValue(), txtPassword.getValue());
 			if(loggedUser != null)
 				webApplication.createUserSession(loggedUser);
 			else
 				lblLoginError.setVisible(true);
-		}
+		//}
 	}
 	
 }

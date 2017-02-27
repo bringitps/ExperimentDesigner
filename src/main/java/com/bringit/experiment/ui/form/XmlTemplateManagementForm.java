@@ -16,7 +16,10 @@ public class XmlTemplateManagementForm extends XmlTemplateManagementDesign  {
 	
 	public XmlTemplateManagementForm() {
 		ResultSet vwXmlTemplateResults = new DataBaseViewDao().getViewResults("vwXmlTemplate");
-		VaadinControls.bindDbViewRsToVaadinTable(tblXmlTemplate, vwXmlTemplateResults, 1);
+		if(vwXmlTemplateResults != null)
+		{
+			VaadinControls.bindDbViewRsToVaadinTable(tblXmlTemplate, vwXmlTemplateResults, 1);
+		}
 		
 		tblXmlTemplate.addItemClickListener(new ItemClickEvent.ItemClickListener() 
 	    {

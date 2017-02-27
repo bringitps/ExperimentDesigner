@@ -21,9 +21,13 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 	
 	public ExperimentManagementForm() {
 		ResultSet experimentViewResults = new DataBaseViewDao().getViewResults("vwExperiment");
-		VaadinControls.bindDbViewRsToVaadinTable(tblExperiments, experimentViewResults, 1);
 		
-		VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxExperimentViewFilters, experimentViewResults);
+		if(experimentViewResults != null)
+		{
+			VaadinControls.bindDbViewRsToVaadinTable(tblExperiments, experimentViewResults, 1);
+			VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxExperimentViewFilters, experimentViewResults);
+		}
+		
 		tblExperiments.addItemClickListener(new ItemClickEvent.ItemClickListener() 
 		    {
 	            public void itemClick(ItemClickEvent event) {
@@ -72,7 +76,8 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 	private void reloadExperimentDbViewResults()
 	{
 		ResultSet experimentViewResults = new DataBaseViewDao().getViewResults("vwExperiment");
-		VaadinControls.bindDbViewRsToVaadinTable(tblExperiments, experimentViewResults, 1);
+		if(experimentViewResults != null)
+			VaadinControls.bindDbViewRsToVaadinTable(tblExperiments, experimentViewResults, 1);
 	}
 	
 	private void filterDbViewResults()
@@ -80,7 +85,9 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 		if(this.cbxExperimentViewFilters.getValue() != null)
 		{
 			ResultSet experimentViewResults = new DataBaseViewDao().getFilteredViewResults("vwExperiment", (String)this.cbxExperimentViewFilters.getValue(), this.txtSearch.getValue());
-			VaadinControls.bindDbViewRsToVaadinTable(tblExperiments, experimentViewResults, 1);
+
+			if(experimentViewResults != null)
+				VaadinControls.bindDbViewRsToVaadinTable(tblExperiments, experimentViewResults, 1);
 		}
 	}
 }

@@ -4,12 +4,16 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
+import com.bringit.experiment.bll.CsvTemplate;
+import com.bringit.experiment.bll.CsvTemplateColumns;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.XmlDataLoadExecutionResult;
 import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.bll.XmlTemplateNode;
+import com.bringit.experiment.dao.CsvTemplateColumnsDao;
+import com.bringit.experiment.dao.CsvTemplateDao;
 import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
@@ -19,16 +23,82 @@ import com.bringit.experiment.dao.XmlTemplateDao;
 import com.bringit.experiment.dao.XmlTemplateNodeDao;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
+import com.opencsv.CSVReader;
 
 
 public class ExperimentParser {
 
+	public ResponseObj parseCSV(File csvFile,Experiment exp){
+    	ResponseObj respObj = new ResponseObj();
+    	respObj.setCode(0);
+    	respObj.setDescription("Csv Loaded Successfully");
+        CSVReader reader = null;
+        try {
+        	if(exp != null){
+        		if(csvFile != null){
+        			String filename = csvFile.getName();
+        			int expId = exp.getExpId();
+        			String expName = exp.getExpName();
+        			//Verify if there is a template and nodes for the experiment.
+        			CsvTemplateDao templateDao = new CsvTemplateDao();
+        			CsvTemplateColumnsDao nodeDao = new CsvTemplateColumnsDao();
+        			CsvTemplate template = templateDao.getCsvTemplateByExperimentId(expId);
+        			if (template != null){
+        				//get the nodes:
+        				List<CsvTemplateColumns> columns = nodeDao.getAllCsvTemplateColumnssByTemplateId(template.getCsvTemplateId());
+        				if(columns != null){
+				        	SysUserDao sysUserDao = new SysUserDao();
+				        	SysUser user = sysUserDao.getUserByUserName("bit_seko");
+	        				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        		            reader = new CSVReader(new FileReader(csvFile));
+        		            // we assume the first line is the header
+        		            String[] header = reader.readNext();
+        		            
+        		            String colName = "";
+        		            ArrayList<ArrayList> arr = new ArrayList<ArrayList>();
+        		            
+        		            for (CsvTemplateColumns column : columns) {
+        		            	ArrayList maping = new ArrayList();
+        		            	maping.add( Arrays.asList(header).indexOf(column.getCsvTemplateColumnName()));
+        		            	maping.add( column.getExpField().getExpDbFieldNameId());
+        		            	arr.add(maping);
+							}
+        		            String[] line;
+        		            String insertQry = "INSERT INTO "+exp.getExpDbTableNameId()+" (";
+        		            String valuesQry = " VALUES (";
+        		            for (int i = 0; i < arr.size(); i++) {
+								insertQry+=(String) arr.get(i).get(1)+",";
+							}
+        		            insertQry+="CreatedBy,CreatedDate,FileName)";
+        		            
+        		            while ((line = reader.readNext()) != null) {
+            		            for (int i = 0; i < arr.size(); i++) {
+    								valuesQry+= line[(int) arr.get(i).get(0)]+",";
+    							}
+            		            valuesQry+="'"+user.getUserId()+"','"+df.format(new Date())+"','"+filename+"'),(";
+        		            }
+        		            System.out.println(insertQry+valuesQry);
+        				}//no columns
+        			}//no template
+        		}//No csv file
+        	}//noExperiment
+        	
+        			
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    	return respObj;
+	}
     public ResponseObj parseXML(File xmlFile, Experiment exp) {
     	ResponseObj respObj = new ResponseObj();
     	respObj.setCode(0);

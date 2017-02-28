@@ -32,8 +32,8 @@ public class ExperimentDesign extends VerticalLayout {
 	protected CheckBox chxActive;
 	protected TextArea txtExpInstructions;
 	protected TextArea txtExpComments;
-	protected Button btnDeleteField;
 	protected Button btnAddField;
+	protected Button btnDeleteField;
 	protected Table tblExperimentFields;
 	protected Button btnAddImage;
 	protected Button btnDeleteImage;

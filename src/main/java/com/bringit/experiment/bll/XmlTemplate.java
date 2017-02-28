@@ -19,6 +19,9 @@ public class XmlTemplate {
 	@Column(name="XmlTemplateId")
 	private Integer xmlTemplateId;
 
+	@Column(name="XmlTemplateIsActive")
+	private boolean xmlTemplateIsActive;
+
 	@Column(name="XmlTemplateName")
 	private String xmlTemplateName;
 	
@@ -47,23 +50,23 @@ public class XmlTemplate {
 	private Date modifiedDate;
 	
 	@OneToOne
-    @JoinColumn(name="InboundFileRepoId", unique=false, updatable=false)
+    @JoinColumn(name="InboundFileRepoId", unique=false, updatable=true)
 	private FilesRepository inboundFileRepo;
 	
 	@OneToOne
-    @JoinColumn(name="ProcessedFileRepoId", unique=false, updatable=false)
+    @JoinColumn(name="ProcessedFileRepoId", unique=false, updatable=true)
 	private FilesRepository processedFileRepo;
 	
 	@OneToOne
-    @JoinColumn(name="ExceptionFileRepoId", unique=false, updatable=false)
+    @JoinColumn(name="ExceptionFileRepoId", unique=false, updatable=true)
 	private FilesRepository exceptionFileRepo;
 	
 	@OneToOne
-    @JoinColumn(name="JobExecRepeatId", unique=false, updatable=false)
+    @JoinColumn(name="JobExecRepeatId", unique=false, updatable=true)
 	private JobExecutionRepeat jobExecRepeat;
 	
 	@OneToOne
-    @JoinColumn(name="ExperimentId", unique=false, updatable=false)
+    @JoinColumn(name="ExperimentId", unique=false, updatable=true)
 	private Experiment experiment;
 	
 	@OneToOne
@@ -80,6 +83,14 @@ public class XmlTemplate {
 
 	public void setXmlTemplateId(Integer xmlTemplateId) {
 		this.xmlTemplateId = xmlTemplateId;
+	}
+
+	public boolean isXmlTemplateIsActive() {
+		return xmlTemplateIsActive;
+	}
+
+	public void setXmlTemplateIsActive(boolean xmlTemplateIsActive) {
+		this.xmlTemplateIsActive = xmlTemplateIsActive;
 	}
 
 	public String getXmlTemplateName() {

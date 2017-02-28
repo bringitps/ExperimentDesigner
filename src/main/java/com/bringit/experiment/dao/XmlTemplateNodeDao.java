@@ -91,7 +91,7 @@ public class XmlTemplateNodeDao {
     }
 
     @SuppressWarnings("unused")
-	public XmlTemplateNode getXmlTemplateNodeById(int expId) {
+	public XmlTemplateNode getXmlTemplateNodeById(int xmlTemplateNodeId) {
     	XmlTemplateNode xmlTemplateNode = null;
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
@@ -99,7 +99,7 @@ public class XmlTemplateNodeDao {
             trns = session.beginTransaction();
             String queryString = "from XmlTemplateNode where XmlTemplateNodeId = :id";
             Query query = session.createQuery(queryString);
-            query.setInteger("id", expId);
+            query.setInteger("id", xmlTemplateNodeId);
             xmlTemplateNode = (XmlTemplateNode) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();

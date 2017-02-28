@@ -188,9 +188,9 @@ public class Test {
 			XmlTemplate xml, XmlTemplateNodeDao xmlNodeDao) {
 		 XmlTemplateNode xmlNode = new XmlTemplateNode();
 		 xmlNode.setXmlTemplateNodeName(parent);
-		 xmlNode.setXmlTemplateNodeIsRoot(isRoot);
-		 xmlNode.setXmlTemplateNodeIsAttributeValue(isAttr);
-		 xmlNode.setXmlTemplateNodeAttributeName(tagname);
+		 //xmlNode.setXmlTemplateNodeIsRoot(isRoot);
+		 //xmlNode.setXmlTemplateNodeIsAttributeValue(isAttr);
+		 //xmlNode.setXmlTemplateNodeAttributeName(tagname);
 		 xmlNode.setExpField(expFieldId);
 		 xmlNode.setXmlTemplate(xml);
 		 xmlNodeDao.addXmlTemplateNode(xmlNode);

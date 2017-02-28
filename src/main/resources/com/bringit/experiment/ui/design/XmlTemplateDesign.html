@@ -37,20 +37,18 @@
      <vaadin-grid-layout spacing id="gridMainData" width="940px" margin> 
       <row> 
        <column> 
-        <vaadin-text-field caption="Name:" required style-name="small" width-full _id="txtXmlTName"></vaadin-text-field> 
+        <vaadin-combo-box caption="Experiment:" required style-name="small" width-full _id="comboXmlTExperiment"></vaadin-combo-box> 
        </column> 
        <column> 
-        <vaadin-combo-box caption="Experiment:" required style-name="small" width-full _id="comboXmlTExperiment"></vaadin-combo-box> 
+        <vaadin-upload caption="Load Xml Layout File" immediate width-full _id="upXml"></vaadin-upload> 
        </column> 
       </row> 
       <row> 
        <column> 
-        <vaadin-upload caption="Load Xml File" immediate width-full _id="upXml"></vaadin-upload> 
+        <vaadin-check-box caption="Active" _id="chxActive"></vaadin-check-box> 
        </column> 
        <column> 
-        <vaadin-label :middle>
-          Please upload a sample of your XML experiment results. 
-        </vaadin-label> 
+        <vaadin-text-field caption="Name:" required style-name="small" width-full _id="txtXmlTName"></vaadin-text-field> 
        </column> 
       </row> 
       <row> 
@@ -63,10 +61,10 @@
       </row> 
       <row> 
        <column> 
-        <vaadin-date-field caption="Start Execution Date:" _id="startXmlTstart" style-name="small" width-full></vaadin-date-field> 
+        <vaadin-date-field caption="Start Execution Date:" style-name="small" width-full _id="startXmlTstart"></vaadin-date-field> 
        </column> 
        <column> 
-        <vaadin-date-field caption="Finish Execution Date:" _id="endXmlTstart" style-name="small" width-full></vaadin-date-field> 
+        <vaadin-date-field caption="Finish Execution Date:" style-name="small" width-full _id="endXmlTstart"></vaadin-date-field> 
        </column> 
       </row> 
       <row> 
@@ -82,14 +80,14 @@
         <vaadin-combo-box caption="Exception File Repository:" required style-name="small" width-full _id="comboXmlTerrRepo"></vaadin-combo-box> 
        </column> 
        <column> 
-        <vaadin-combo-box caption="Job Scheduler:" style-name="small" width-full _id="comboXmljobScheduler"></vaadin-combo-box> 
+        <vaadin-combo-box caption="Job Execution Repeat:" style-name="small" width-full _id="comboXmljobScheduler"></vaadin-combo-box> 
        </column> 
       </row> 
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
    </vaadin-vertical-layout> 
    <vaadin-vertical-layout width="940px" margin> 
-    <vaadin-table selectable caption="XmlTemplate Nodes" style-name="small" immediate width-full height="440px" _id="tblXmlNodes"> 
+    <vaadin-table selectable caption="XmlTemplate Nodes" style-name="tiny" immediate width-full height="440px" _id="tblXmlNodes"> 
      <table> 
      </table> 
     </vaadin-table> 

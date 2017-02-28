@@ -148,10 +148,13 @@ public class ExperimentForm extends ExperimentDesign {
 					cbxUnitOfMeasure.setWidth(100, Unit.PIXELS);
 				}
 				
-				cbxUnitOfMeasure.setValue(this.experimentFields.get(i).getUnitOfMeasure().getUomId());
-				cbxUnitOfMeasure.setNullSelectionAllowed(false);
-				cbxUnitOfMeasure.setImmediate(true);
-				cbxUnitOfMeasure.addStyleName("small");
+				if(this.experimentFields.get(i).getUnitOfMeasure() != null)
+				{
+					cbxUnitOfMeasure.setValue(this.experimentFields.get(i).getUnitOfMeasure().getUomId());
+					//cbxUnitOfMeasure.setNullSelectionAllowed(false);
+					cbxUnitOfMeasure.setImmediate(true);
+					cbxUnitOfMeasure.addStyleName("small");
+				}
 				
 				itemValues[6] = cbxUnitOfMeasure;
 				
@@ -272,10 +275,10 @@ public class ExperimentForm extends ExperimentDesign {
 			cbxUnitOfMeasure.setWidth(100, Unit.PIXELS);
 		}
 		
-		cbxUnitOfMeasure.setNullSelectionAllowed(false);
+		//cbxUnitOfMeasure.setNullSelectionAllowed(false);
 		cbxUnitOfMeasure.setImmediate(true);
-		cbxUnitOfMeasure.setRequired(true);
-		cbxUnitOfMeasure.setRequiredError("This field is mandatory");
+		//cbxUnitOfMeasure.setRequired(true);
+		//cbxUnitOfMeasure.setRequiredError("This field is mandatory");
 		cbxUnitOfMeasure.addStyleName("small");
 		
 		itemValues[6] = cbxUnitOfMeasure;
@@ -345,10 +348,14 @@ public class ExperimentForm extends ExperimentDesign {
 				experimentField.setExpDbFieldNameId(((TextField)(tblRowItem.getItemProperty("DB Id").getValue())).getValue());
 				experimentField.setExpFieldType((String)((ComboBox)(tblRowItem.getItemProperty("DB DataType").getValue())).getValue());
 				
-				UnitOfMeasure selectedUnitOfMeasure = new UnitOfMeasure();
-				selectedUnitOfMeasure.setUomId((int)((ComboBox)(tblRowItem.getItemProperty("UoM").getValue())).getValue());
-				experimentField.setUnitOfMeasure(selectedUnitOfMeasure);
-	
+
+				if(((ComboBox)(tblRowItem.getItemProperty("UoM").getValue())).getValue() != null && !((ComboBox)(tblRowItem.getItemProperty("UoM").getValue())).getValue().toString().isEmpty())
+				{
+					UnitOfMeasure selectedUnitOfMeasure = new UnitOfMeasure();
+					selectedUnitOfMeasure.setUomId((int)((ComboBox)(tblRowItem.getItemProperty("UoM").getValue())).getValue());
+					experimentField.setUnitOfMeasure(selectedUnitOfMeasure);
+				}
+				
 				experimentField.setExperiment(experiment);
 				
 				if(itemId > 0)
@@ -384,8 +391,6 @@ public class ExperimentForm extends ExperimentDesign {
 	
 	private void onDelete()
 	{
-		PopupView pop = new PopupView();
-	
 		this.experiment.setExpIsActive(false);
 		SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 		this.experiment.setLastModifiedBy(sessionUser);
@@ -413,9 +418,7 @@ public class ExperimentForm extends ExperimentDesign {
 			Item tblRowItem = this.tblExperimentFields.getContainerDataSource().getItem(itemId);
 			
 			if(!((TextField)(tblRowItem.getItemProperty("Name").getValue())).isValid()) return false;
-			if(!((ComboBox)(tblRowItem.getItemProperty("DB DataType").getValue())).isValid()) return false;
-			if(!((ComboBox)(tblRowItem.getItemProperty("UoM").getValue())).isValid()) return false;
-			
+			if(!((ComboBox)(tblRowItem.getItemProperty("DB DataType").getValue())).isValid()) return false;			
 		}
 		
 		return true;

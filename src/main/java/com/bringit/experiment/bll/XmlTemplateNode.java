@@ -16,25 +16,22 @@ public class XmlTemplateNode {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="XmlTemplateNodeId")
 	private Integer xmlTemplateNodeId;
-
-	@Column(name="XmlTemplateNodeIsRoot")
-	private boolean xmlTemplateNodeIsRoot;
 	
 	@Column(name="XmlTemplateNodeName")
 	private String xmlTemplateNodeName;
-	
-	@Column(name="XmlTemplateNodeIsAttributeValue")
-	private boolean xmlTemplateNodeIsAttributeValue;
-	
-	@Column(name="XmlTemplateNodeAttributeName")
-	private String xmlTemplateNodeAttributeName;
+
+	@Column(name="XmlTemplateNodeIsLoop")
+	private boolean xmlTemplateNodeIsLoop;
+
+	@Column(name="XmlTemplateNodeIsAttribute")
+	private boolean xmlTemplateNodeIsAttribute;
 	
 	@OneToOne
-    @JoinColumn(name="XmlTemplateId", unique=false, updatable=false)
+    @JoinColumn(name="XmlTemplateId", unique=false, updatable=true)
 	private XmlTemplate xmlTemplate;
 	
 	@OneToOne
-    @JoinColumn(name="ExpFieldId", unique=false, updatable=false)
+    @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
 	private ExperimentField expField;
 
 	public Integer getXmlTemplateNodeId() {
@@ -53,20 +50,20 @@ public class XmlTemplateNode {
 		this.xmlTemplateNodeName = xmlTemplateNodeName;
 	}
 
-	public boolean isXmlTemplateNodeIsAttributeValue() {
-		return xmlTemplateNodeIsAttributeValue;
+	public boolean isXmlTemplateNodeIsLoop() {
+		return xmlTemplateNodeIsLoop;
 	}
 
-	public void setXmlTemplateNodeIsAttributeValue(boolean xmlTemplateNodeIsAttributeValue) {
-		this.xmlTemplateNodeIsAttributeValue = xmlTemplateNodeIsAttributeValue;
+	public void setXmlTemplateNodeIsLoop(boolean xmlTemplateNodeIsLoop) {
+		this.xmlTemplateNodeIsLoop = xmlTemplateNodeIsLoop;
 	}
 
-	public String getXmlTemplateNodeAttributeName() {
-		return xmlTemplateNodeAttributeName;
+	public boolean isXmlTemplateNodeIsAttribute() {
+		return xmlTemplateNodeIsAttribute;
 	}
 
-	public void setXmlTemplateNodeAttributeName(String xmlTemplateNodeAttributeName) {
-		this.xmlTemplateNodeAttributeName = xmlTemplateNodeAttributeName;
+	public void setXmlTemplateNodeIsAttribute(boolean xmlTemplateNodeIsAttribute) {
+		this.xmlTemplateNodeIsAttribute = xmlTemplateNodeIsAttribute;
 	}
 
 	public XmlTemplate getXmlTemplate() {
@@ -83,16 +80,6 @@ public class XmlTemplateNode {
 
 	public void setExpField(ExperimentField expField) {
 		this.expField = expField;
-	}
-
-	public boolean isXmlTemplateNodeIsRoot() {
-		return xmlTemplateNodeIsRoot;
-	}
-
-	public void setXmlTemplateNodeIsRoot(boolean xmlTemplateNodeIsRoot) {
-		this.xmlTemplateNodeIsRoot = xmlTemplateNodeIsRoot;
-	}
-	
-	
+	}	
 	
 }

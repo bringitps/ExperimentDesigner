@@ -33,7 +33,7 @@ public class ExperimentFieldValueUpdateLog {
 	private Date expNewCreatedDate;
 	
 	@OneToOne
-    @JoinColumn(name="ExpFieldId", unique=false, updatable=false)
+    @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
 	private ExperimentField experimentField;
 
 	@Column(name="DbExperimentDataTableRecordId")

@@ -33,11 +33,11 @@ public class ExperimentField {
 	private String expFieldType;
 	
 	@OneToOne
-    @JoinColumn(name="ExpId", unique=false, updatable=false)
+    @JoinColumn(name="ExpId", unique=false, updatable=true)
 	private Experiment experiment;
 
 	@OneToOne
-    @JoinColumn(name="UomId", unique=false, updatable=false)
+    @JoinColumn(name="UomId", unique=false, updatable=true)
 	private UnitOfMeasure unitOfMeasure;
 
 	

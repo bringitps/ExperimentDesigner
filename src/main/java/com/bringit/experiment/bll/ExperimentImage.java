@@ -26,7 +26,7 @@ public class ExperimentImage {
 	private Blob expImageBase64;
 	
 	@OneToOne
-    @JoinColumn(name="ExpId", unique=false, updatable=false)
+    @JoinColumn(name="ExpId", unique=false, updatable=true)
 	private Experiment experiment;
 
 	

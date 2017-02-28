@@ -32,7 +32,7 @@ public class XmlDataLoadExecutionResult {
 	private Date xmlDataLoadExecTime;
 
 	@OneToOne
-    @JoinColumn(name="XmlTemplateId", unique=false, updatable=false)
+    @JoinColumn(name="XmlTemplateId", unique=false, updatable=true)
 	private XmlTemplate xmlTemplate;
 
 	public Integer getXmlDataLoadExecId() {

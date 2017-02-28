@@ -32,11 +32,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import com.opencsv.CSVReader;
+//import com.opencsv.CSVReader;
 
 
 public class ExperimentParser {
-
+	/*
 	public ResponseObj parseCSV(File csvFile,Experiment exp){
     	ResponseObj respObj = new ResponseObj();
     	respObj.setCode(0);
@@ -99,6 +99,7 @@ public class ExperimentParser {
         }
     	return respObj;
 	}
+	*/
     public ResponseObj parseXML(File xmlFile, Experiment exp) {
     	ResponseObj respObj = new ResponseObj();
     	respObj.setCode(0);
@@ -153,7 +154,7 @@ public class ExperimentParser {
 						        		 				if (i==0){
 								        					query +=nod.getExpField().getExpDbFieldNameId()+",";
 								        				}
-							        					String fieldValue = xmlExpResultNode.getChild(nod.getXmlTemplateNodeAttributeName())!= null ? xmlExpResultNode.getChild(nod.getXmlTemplateNodeAttributeName()).getValue() : null;
+							        					String fieldValue = "";// xmlExpResultNode.getChild(nod.getXmlTemplateNodeAttributeName())!= null ? xmlExpResultNode.getChild(nod.getXmlTemplateNodeAttributeName()).getValue() : null;
 							        					String fieldType = nod.getExpField().getExpFieldType();
 							        					qryValues += fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? fieldValue+"," : "'"+fieldValue+"',";
 						        					}

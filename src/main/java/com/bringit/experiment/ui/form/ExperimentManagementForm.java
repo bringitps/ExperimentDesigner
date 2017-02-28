@@ -75,7 +75,12 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 	
 	private void reloadExperimentDbViewResults()
 	{
-		ResultSet experimentViewResults = new DataBaseViewDao().getViewResults("vwExperiment");
+		ResultSet experimentViewResults = null;
+		if(this.cbxExperimentViewFilters.getValue() != null)
+			experimentViewResults = new DataBaseViewDao().getFilteredViewResults("vwExperiment", (String)this.cbxExperimentViewFilters.getValue(), this.txtSearch.getValue());
+		else
+			experimentViewResults = new DataBaseViewDao().getFilteredViewResults("vwExperiment", (String)this.cbxExperimentViewFilters.getValue(), this.txtSearch.getValue());
+		
 		if(experimentViewResults != null)
 			VaadinControls.bindDbViewRsToVaadinTable(tblExperiments, experimentViewResults, 1);
 	}

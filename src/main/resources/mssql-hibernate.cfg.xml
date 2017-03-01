@@ -38,6 +38,9 @@
         <mapping class="com.bringit.experiment.bll.XmlDataLoadExecutionResult"/>
         <mapping class="com.bringit.experiment.bll.XmlTemplate"/>
         <mapping class="com.bringit.experiment.bll.XmlTemplateNode"/>
+        <mapping class="com.bringit.experiment.bll.CsvTemplate"/>
+        <mapping class="com.bringit.experiment.bll.CsvTemplateColumns"/>
+         <mapping class="com.bringit.experiment.bll.CsvDataLoadExecutionResult"/>
         
 
     </session-factory>

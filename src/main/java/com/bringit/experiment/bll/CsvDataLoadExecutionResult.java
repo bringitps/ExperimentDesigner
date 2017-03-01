@@ -32,6 +32,10 @@ public class CsvDataLoadExecutionResult {
 	private Date csvDataLoadExecTime;
 
 	@OneToOne
+    @JoinColumn(name="DataFileId", unique=false, updatable=true)
+	private DataFile dataFile;
+	
+	@OneToOne
     @JoinColumn(name="CsvTemplateId", unique=false, updatable=true)
 	private CsvTemplate csvTemplate;
 
@@ -65,6 +69,14 @@ public class CsvDataLoadExecutionResult {
 
 	public void setCsvDataLoadExecTime(Date csvDataLoadExecTime) {
 		this.csvDataLoadExecTime = csvDataLoadExecTime;
+	}
+
+	public DataFile getDataFile() {
+		return dataFile;
+	}
+
+	public void setDataFile(DataFile dataFile) {
+		this.dataFile = dataFile;
 	}
 
 	public CsvTemplate getCsvTemplate() {

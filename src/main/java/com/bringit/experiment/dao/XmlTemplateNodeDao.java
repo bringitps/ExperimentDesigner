@@ -125,6 +125,38 @@ public class XmlTemplateNodeDao {
         }
         return nodes;
 	}
+
+	public XmlTemplateNode getLoopXmlTemplateNodeByTemplateId(Integer xmlTemplateId) {
+		List<XmlTemplateNode> nodes = new ArrayList<XmlTemplateNode>();
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            nodes = session.createQuery("from XmlTemplateNode where XmlTemplateId ="+xmlTemplateId+ " and XmlTemplateNodeIsLoop = 'true'").list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return nodes.get(0);
+	}
+
+	public List<XmlTemplateNode> getMappedXmlTemplateNodesByTemplateId(Integer xmlTemplateId) {
+		List<XmlTemplateNode> nodes = new ArrayList<XmlTemplateNode>();
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            nodes = session.createQuery("from XmlTemplateNode where XmlTemplateId ="+xmlTemplateId+ " and ExpFieldId is not null").list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return nodes;
+	}
 	
 	
 }

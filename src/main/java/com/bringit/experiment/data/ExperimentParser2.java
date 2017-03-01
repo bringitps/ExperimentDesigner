@@ -21,7 +21,7 @@ import java.util.List;
 
 public class ExperimentParser2 {
 
-    public ResponseObj parseXML(File xmlFile, String filename) {
+    public ResponseObj parseXML(InputStream xmlFile, String filename) {
     	ResponseObj respObj = new ResponseObj();
     	respObj.setCode(0);
     	respObj.setDescription("Xml Loaded Successfully");

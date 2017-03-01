@@ -3,7 +3,9 @@
  
  
 	<display-name>BringIT - ExpBit</display-name>
- 
+    <listener>
+        <listener-class>com.bringit.experiment.remote.RemoteFileListener</listener-class>
+    </listener>
     <servlet>
         <servlet-name>WebApplication</servlet-name>
         <servlet-class>

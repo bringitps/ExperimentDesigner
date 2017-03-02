@@ -60,6 +60,10 @@ public class MainForm extends MainFormDesign {
      				formContentLayout.removeAllComponents();
      				formContentLayout.addComponent(new JobExecutionRepeatConfigForm());
                   	break;
+         case "xml data file loads":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new XmlDataFileLoadForm());
+                  	break;                  	
          default:
          			break;
 		 }

@@ -110,14 +110,16 @@ public class DataFileDao {
     }
     
     @SuppressWarnings("unused")
-	public DataFile getExperimentByName(String dataFileName) {
+	public DataFile getDataFileByName(String dataFileName) {
     	DataFile dataFile = null;
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String query = "from DataFile where DataFileName ='"+dataFileName.trim();
-            dataFile = (DataFile) (session.createQuery(query).list()).get(0);
+            String queryStr = "from DataFile where DataFileName ='"+dataFileName.trim()+"'";
+            Query query = session.createQuery(queryStr);
+            if(query.list() != null && query.list().size() > 0)
+            	dataFile = (DataFile) (query.list()).get(0);
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {

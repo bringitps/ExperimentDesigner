@@ -89,8 +89,25 @@ public class XmlTemplateDao {
         return xmlTemplates;
     }
 
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<XmlTemplate> getAllActiveXmlTemplates() {
+        List<XmlTemplate> xmlTemplates = new ArrayList<XmlTemplate>();
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            xmlTemplates = session.createQuery("from XmlTemplate where XmlTemplateIsActive = 1").list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return xmlTemplates;
+    }
+
     @SuppressWarnings("unused")
-	public XmlTemplate getXmlTemplateById(int expId) {
+	public XmlTemplate getXmlTemplateById(int xmlTemplateId) {
     	XmlTemplate xmlTemplate = null;
         Transaction trns = null;
         Session session = HibernateUtil.openSession(dialectXmlFile);
@@ -98,7 +115,7 @@ public class XmlTemplateDao {
             trns = session.beginTransaction();
             String queryString = "from XmlTemplate where XmlTemplateId = :id";
             Query query = session.createQuery(queryString);
-            query.setInteger("id", expId);
+            query.setInteger("id", xmlTemplateId);
             xmlTemplate = (XmlTemplate) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();

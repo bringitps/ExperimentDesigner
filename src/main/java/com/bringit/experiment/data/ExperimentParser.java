@@ -3,6 +3,7 @@ package com.bringit.experiment.data;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.w3c.dom.NodeList;
 
 import com.bringit.experiment.bll.CsvDataLoadExecutionResult;
 import com.bringit.experiment.bll.CsvTemplate;
@@ -23,22 +24,32 @@ import com.bringit.experiment.dao.SysUserDao;
 import com.bringit.experiment.dao.XmlDataLoadExecutionResultDao;
 import com.bringit.experiment.dao.XmlTemplateDao;
 import com.bringit.experiment.dao.XmlTemplateNodeDao;
+import com.vaadin.ui.Upload.Receiver;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import com.opencsv.CSVReader;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+//import com.opencsv.CSVReader;
+import javax.xml.xpath.XPathFactory;
 
 
 public class ExperimentParser {
-
+	
+	/*
 	public ResponseObj parseCSV(File csvFile,Experiment exp){
     	ResponseObj respObj = new ResponseObj();
     	respObj.setCode(0);
@@ -163,8 +174,144 @@ public class ExperimentParser {
     		return respObj;
         }
 	}
+	*/
 
-    public ResponseObj parseXML(File xmlFile, Experiment exp) {
+	public ResponseObj parseXmlDocument(String fileName, org.w3c.dom.Document xmlDocument, XmlTemplate xmlTemplate)
+	{
+		ResponseObj respObj = new ResponseObj();
+    	respObj.setCode(0);
+    	respObj.setDescription("Xml Loaded Successfully");
+		
+		//Run Validations
+    	//1) All Xml nodes mapped to Experiment Field must exist in Xml Document to Load
+    	XmlTemplateNodeDao xmlTemplateNodeDao = new XmlTemplateNodeDao();
+    	List<XmlTemplateNode> xmlTemplateNodes = xmlTemplateNodeDao.getMappedXmlTemplateNodesByTemplateId(xmlTemplate.getXmlTemplateId());
+		
+		for(int i=0; i<xmlTemplateNodes.size(); i++)
+		{
+			if(xmlTemplateNodes.get(i).getExpField() != null || xmlTemplateNodes.get(i).isXmlTemplateNodeIsLoop())
+			{
+				String xmlNodeSlashFormat = "/" + xmlTemplateNodes.get(i).getXmlTemplateNodeName().replaceAll("<", "/").replaceAll(">", "").replaceAll("\n", "").replaceAll("\t", "").replaceAll(" ", "");
+
+			     //Pending to consider when value is passed as Attribute
+				
+				 XPath xPath = XPathFactory.newInstance().newXPath();
+			     XPathExpression xPathExpression = null;
+			     try 
+			     {
+			    	 xPathExpression = xPath.compile(xmlNodeSlashFormat);
+			     } catch (XPathExpressionException e) 
+			     {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+			     }
+			     
+			     Object resultObj = null;
+				
+			     try 
+			     {
+					resultObj = xPathExpression.evaluate(xmlDocument, XPathConstants.NODESET);
+			     } catch (XPathExpressionException e) 
+			     {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+			     }
+
+			     NodeList xmlNodesFound = (NodeList)resultObj;
+			     
+			     if(xmlNodesFound.getLength() <= 0)
+			     {
+			    	respObj.setCode(104);
+             		respObj.setDescription("Mapped XML Node was not found in XML File. Node: "+xmlTemplateNodes.get(i).getXmlTemplateNodeName());
+             		respObj.setDetail("Mapped XML Node Not Found");
+	        		return respObj;
+			     }
+			     /*for (int j = 0; j < nodes.getLength(); j++) {
+			            System.out.println("nodes: "+ nodes.item(j).getNodeValue()); 
+			     }*/
+ 			}
+		}
+
+    	//2) Load Global Values (Not included by Loop)
+		List<String> expDBFieldIdMatrix = new ArrayList<String>();
+		List<String> xmlGlobalValuesMatrix = new ArrayList<String>();
+		
+		String loopXmlNodeFullName = xmlTemplateNodeDao.getLoopXmlTemplateNodeByTemplateId(xmlTemplate.getXmlTemplateId()).getXmlTemplateNodeName();
+		String loopXmlNodeSlashFormat = "/" + loopXmlNodeFullName.replaceAll("<", "/").replaceAll(">", "").replaceAll("\n", "").replaceAll("\t", "").replaceAll(" ", "");
+		
+		for(int i=0; i<xmlTemplateNodes.size(); i++)
+		{
+			if(xmlTemplateNodes.get(i).getExpField() != null)
+			{
+				String xmlNodeSlashFormat = "/" + xmlTemplateNodes.get(i).getXmlTemplateNodeName().replaceAll("<", "/").replaceAll(">", "").replaceAll("\n", "").replaceAll("\t", "").replaceAll(" ", "");
+			
+				if(!xmlNodeSlashFormat.startsWith(loopXmlNodeSlashFormat))
+				{
+					expDBFieldIdMatrix.add(xmlTemplateNodes.get(i).getExpField().getExpDbFieldNameId());
+					
+					 XPath xPath = XPathFactory.newInstance().newXPath();
+				     XPathExpression xPathExpression = null;
+				     try 
+				     {
+				    	 xPathExpression = xPath.compile(xmlNodeSlashFormat);
+				     } catch (XPathExpressionException e) 
+				     {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+				     }
+				     
+				     Object resultObj = null;
+					
+				     try 
+				     {
+						resultObj = xPathExpression.evaluate(xmlDocument, XPathConstants.NODESET);
+				     } catch (XPathExpressionException e) 
+				     {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+				     }
+
+				     NodeList xmlNodesFound = (NodeList)resultObj;
+					
+				     if(!xmlTemplateNodes.get(i).isXmlTemplateNodeIsAttribute())
+				    	 xmlGlobalValuesMatrix.add(xmlNodesFound.item(0).getNodeValue());
+				     //else
+				     //Pending to enable when value is passed as Attribute				    	 
+				}
+			}
+    	
+		}
+		
+		
+		//3) Load Loop Node Values
+		
+		class DBFieldValue {
+            
+			private String dbFieldId;
+			private List<String> fieldValues;
+			
+			public String getDbFieldId() {
+				return dbFieldId;
+			}
+			
+			public void setDbFieldId(String dbFieldId) {
+				this.dbFieldId = dbFieldId;
+			}
+			
+			public List<String> getFieldValues() {
+				return fieldValues;
+			}
+			
+			public void setFieldValues(List<String> fieldValues) {
+				this.fieldValues = fieldValues;
+			}
+        };
+		
+		return respObj;
+	}
+
+	
+	public ResponseObj parseXML(File xmlFile, Experiment exp) {
     	ResponseObj respObj = new ResponseObj();
     	respObj.setCode(0);
     	respObj.setDescription("Xml Loaded Successfully");

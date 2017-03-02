@@ -68,10 +68,10 @@ public class runTest {
 		 cols.setExpField(ef);
 		 new CsvTemplateColumnsDao().addCsvTemplateColumns(cols);
 		 
-		 ResponseObj respObj = parser.parseCSV(csvFile, firstExperiment);
+		// ResponseObj respObj = parser.parseCSV(csvFile, firstExperiment);
 		// ResponseObj respObj = parser.parseXML(xmlFile, new ExperimentDao().getExperimentById(1));
 		 
-		 System.out.println(respObj.getDescription() + respObj.getDetail());
+		 //System.out.println(respObj.getDescription() + respObj.getDetail());
 	
 	}
 

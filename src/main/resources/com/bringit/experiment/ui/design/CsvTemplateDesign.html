@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head> 
+ <body> 
+  <vaadin-vertical-layout style-name="crud-template" responsive> 
+   <vaadin-label style-name="valo-menu" plain-text>
+     - Csv Template 
+   </vaadin-label> 
+   <vaadin-vertical-layout margin> 
+    <vaadin-grid-layout width-full height="30px"> 
+     <row> 
+      <column> 
+       <vaadin-grid-layout width="100px" height="30px"> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="small primary" plain-text _id="btnSave">
+            Save 
+          </vaadin-button> 
+         </column> 
+         <column> 
+          <vaadin-button style-name="small" plain-text _id="btnCancel">
+            Cancel 
+          </vaadin-button> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout width-auto height="400px"> 
+    <vaadin-vertical-layout style-name="CsvTemplateCRUDLayout" width="940px" _id="crudLayout"> 
+     <vaadin-grid-layout spacing id="gridMainData" width="940px" margin> 
+      <row> 
+       <column> 
+        <vaadin-combo-box caption="Experiment:" required style-name="small" width-full _id="comboCsvTExperiment"></vaadin-combo-box> 
+       </column> 
+       <column> 
+        <vaadin-upload caption="Load Csv Layout File" immediate width-full _id="upCsv"></vaadin-upload> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-check-box caption="Active" _id="chxActive"></vaadin-check-box> 
+       </column> 
+       <column> 
+        <vaadin-text-field caption="Name:" required style-name="small" width-full _id="txtCsvTName"></vaadin-text-field> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-text-field caption="Prefix:" style-name="small" width-full _id="txtCsvTPrefix"></vaadin-text-field> 
+       </column> 
+       <column> 
+        <vaadin-text-field caption="Comments:" style-name="small" width-full _id="txtCsvTComments"></vaadin-text-field> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-combo-box caption="Inbound File Repository:" required style-name="small" width-full _id="comboCsvTinRepo"></vaadin-combo-box> 
+       </column> 
+       <column> 
+        <vaadin-combo-box caption="Processed File Repository" required style-name="small" width-full _id="comboCsvoutRepo"></vaadin-combo-box> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-combo-box caption="Exception File Repository:" required style-name="small" width-full _id="comboCsvTerrRepo"></vaadin-combo-box> 
+       </column> 
+       <column> 
+        <vaadin-combo-box caption="Job Execution Repeat:" style-name="small" width-full _id="comboCsvjobScheduler"></vaadin-combo-box> 
+       </column> 
+      </row> 
+     </vaadin-grid-layout> 
+    </vaadin-vertical-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout width="940px" margin> 
+    <vaadin-table selectable caption="CsvTemplate Columns" style-name="tiny" immediate width-full height="440px" _id="tblCsvNodes"> 
+     <table> 
+     </table> 
+    </vaadin-table> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout margin> 
+    <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="small danger" plain-text _id="btnDelete" :right>
+      Delete Csv Template 
+    </vaadin-button> 
+   </vaadin-vertical-layout> 
+  </vaadin-vertical-layout>  
+ </body>
+</html>

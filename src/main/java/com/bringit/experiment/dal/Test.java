@@ -180,7 +180,7 @@ public class Test {
 		 //Read a sample XML and load it into Values table;
 		 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample.xml");
 		 ExperimentParser parser = new ExperimentParser();
-		 ResponseObj respObj = parser.parseXML(xmlFile, firstExperiment);
+		 ResponseObj respObj = parser.parseXML(xmlFile, xml);
 		 
 		 return respObj.getDescription() + respObj.getDetail();
 	 }
@@ -198,9 +198,9 @@ public class Test {
 	}
 	public String runTest() {
 			 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample.xml");
-			 ExperimentDao dao = new ExperimentDao();
+			 XmlTemplateDao dao = new XmlTemplateDao();
 			 ExperimentParser parser = new ExperimentParser();
-			 ResponseObj respObj = parser.parseXML(xmlFile, dao.getExperimentById(1));
+			 ResponseObj respObj = parser.parseXML(xmlFile, dao.getXmlTemplateById(1));
 			 
 			 return respObj.getDescription() + respObj.getDetail();
 		}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head> 
+ <body> 
+  <vaadin-vertical-layout style-name="crud-template" responsive> 
+   <vaadin-label style-name="valo-menu" plain-text>
+     - Process Xml Data File 
+   </vaadin-label> 
+   <vaadin-vertical-layout margin> 
+    <vaadin-grid-layout width-full height="30px"> 
+     <row> 
+      <column> 
+       <vaadin-grid-layout width="100px" height="30px"> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f04b" style-name="friendly tiny" plain-text _id="btnRun">
+            Run 
+          </vaadin-button> 
+         </column> 
+         <column> 
+          <vaadin-button style-name="tiny" plain-text _id="btnCancel">
+            Cancel 
+          </vaadin-button> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout size-auto> 
+    <vaadin-vertical-layout style-name="XmlTemplateCRUDLayout" width="940px" _id="crudLayout"> 
+     <vaadin-grid-layout spacing id="gridMainData" width="940px" margin> 
+      <row> 
+       <column> 
+        <vaadin-combo-box caption="Xml Template:" required style-name="small" width-full _id="cbxXmlTemplate"></vaadin-combo-box> 
+       </column> 
+       <column> 
+        <vaadin-upload caption="Load Xml Data File" immediate width-full _id="upXmlDataFile"></vaadin-upload> 
+       </column> 
+      </row> 
+      <row> 
+       <column></column> 
+       <column> 
+        <vaadin-label style-name="tiny" plain-text _id="lblLoadedFile">
+          Loaded File: 
+        </vaadin-label> 
+       </column> 
+      </row> 
+     </vaadin-grid-layout> 
+    </vaadin-vertical-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout width="940px" margin> 
+    <vaadin-text-area caption="Xml Data File Load Process Results..." width-full _id="txtXmlDataFileLoadResults"></vaadin-text-area> 
+   </vaadin-vertical-layout> 
+  </vaadin-vertical-layout>  
+ </body>
+</html>

@@ -32,6 +32,10 @@ public class XmlDataLoadExecutionResult {
 	private Date xmlDataLoadExecTime;
 
 	@OneToOne
+    @JoinColumn(name="DataFileId", unique=false, updatable=true)
+	private DataFile dataFile;
+	
+	@OneToOne
     @JoinColumn(name="XmlTemplateId", unique=false, updatable=true)
 	private XmlTemplate xmlTemplate;
 
@@ -57,6 +61,14 @@ public class XmlDataLoadExecutionResult {
 
 	public void setXmlDataLoadExecExeptionDetails(String xmlDataLoadExecExeptionDetails) {
 		this.xmlDataLoadExecExeptionDetails = xmlDataLoadExecExeptionDetails;
+	}
+
+	public DataFile getDataFile() {
+		return dataFile;
+	}
+
+	public void setDataFile(DataFile dataFile) {
+		this.dataFile = dataFile;
 	}
 
 	public Date getXmlDataLoadExecTime() {

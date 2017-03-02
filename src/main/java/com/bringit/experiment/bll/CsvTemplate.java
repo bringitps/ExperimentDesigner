@@ -33,6 +33,8 @@ public class CsvTemplate {
 	
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
+	@Column(name="CsvTemplateIsActive")
+	private boolean csvTemplateIsActive;
 	
 	@OneToOne
     @JoinColumn(name="InboundFileRepoId", unique=false, updatable=false)
@@ -165,5 +167,15 @@ public class CsvTemplate {
 	public void setLastModifiedBy(SysUser lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
 	}
+
+	public boolean isCsvTemplateIsActive() {
+		return csvTemplateIsActive;
+	}
+
+	public void setCsvTemplateIsActive(boolean csvTemplateIsActive) {
+		this.csvTemplateIsActive = csvTemplateIsActive;
+	}
+
+
 
 }

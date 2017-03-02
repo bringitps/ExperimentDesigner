@@ -431,7 +431,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 	       
 			Element root = xmlDocument.getDocumentElement();
 	        Object rootItem = root.getNodeName();
-	        xmlStringTreeMtx.add(rootItem.toString());
+	        xmlStringTreeMtx.add("<"+rootItem.toString()+">");
 	        xmlIsAttributeTreeMtx.add(false);
 	        addChildrenToStringTree(xmlStringTreeMtx, xmlIsAttributeTreeMtx, root.getChildNodes(), rootItem);
 	        

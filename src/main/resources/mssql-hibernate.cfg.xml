@@ -41,6 +41,7 @@
         <mapping class="com.bringit.experiment.bll.CsvTemplate"/>
         <mapping class="com.bringit.experiment.bll.CsvTemplateColumns"/>
          <mapping class="com.bringit.experiment.bll.CsvDataLoadExecutionResult"/>
+         <mapping class="com.bringit.experiment.bll.DataFile"/>
         
 
     </session-factory>

@@ -48,6 +48,10 @@ public class MainForm extends MainFormDesign {
      				formContentLayout.removeAllComponents();
      				formContentLayout.addComponent(new XmlTemplateManagementForm());
                   	break;
+         case "manage csvtemplates":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new CsvTemplateManagementForm());
+                  	break;
          case "unit of measures":  
      				formContentLayout.removeAllComponents();
      				formContentLayout.addComponent(new UnitOfMeasureConfigForm());

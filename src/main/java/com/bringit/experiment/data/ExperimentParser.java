@@ -47,6 +47,10 @@ public class ExperimentParser {
     	ResponseObj respObj = new ResponseObj();
     	respObj.setCode(0);
     	respObj.setDescription("Csv Loaded Successfully");
+	    respObj.setCsvInsertColumns(null);
+	    respObj.setCsvInsertValues(null);
+	    String csvColumns ="";
+	    List<String> csvValues = new ArrayList<String>();
     	CsvDataLoadExecutionResult csvResult = new CsvDataLoadExecutionResult();
     	CsvDataLoadExecutionResultDao csvResultDao = new CsvDataLoadExecutionResultDao();
         CSVReader reader = null;
@@ -63,14 +67,13 @@ public class ExperimentParser {
 	        				//get the nodes:
 	        				List<CsvTemplateColumns> columns = nodeDao.getAllCsvTemplateColumnssByTemplateId(template.getCsvTemplateId());
 	        				if(columns != null){
-					        	SysUserDao sysUserDao = new SysUserDao();
-					        	SysUser user = sysUserDao.getUserByUserName("bit_seko");
-		        				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					        	//SysUserDao sysUserDao = new SysUserDao();
+					        	//SysUser user = sysUserDao.getUserByUserName("bit_seko");
+		        				//DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	        		            reader = new CSVReader(new FileReader(csvFile));
 	        		            // we assume the first line is the header
 	        		            String[] header = reader.readNext();
-	        		            
-	        		            String colName = "";
+
 	        		            ArrayList<ArrayList> arr = new ArrayList<ArrayList>();
 	        		            
 	        		            for (CsvTemplateColumns column : columns) {
@@ -81,36 +84,44 @@ public class ExperimentParser {
 	        		            	arr.add(maping);
 								}
 	        		            String[] line;
-	        		            String insertQry = "INSERT INTO "+exp.getExpDbTableNameId()+" (";
-	        		            String valuesQry = " VALUES (";
+	        		            //String insertQry = "INSERT INTO "+exp.getExpDbTableNameId()+" (";
+	        		            //String valuesQry = " VALUES (";
 	        		            for (int i = 0; i < arr.size(); i++) {
-									insertQry+=(String) arr.get(i).get(1)+",";
+									//insertQry+=(String) arr.get(i).get(1)+",";
+									csvColumns+=(String) arr.get(i).get(1)+",";
 								}
-	        		           
+	        		           respObj.setCsvInsertColumns(csvColumns.substring(0, csvColumns.length()-1));
+	        		           //System.out.println(csvColumns.substring(0, csvColumns.length()-1));
 	        		            String fieldType = "";
+	        		            
 	        		            while ((line = reader.readNext()) != null) {
+	        		            	String csvValuesLine="";
 	            		            for (int i = 0; i < arr.size(); i++) {
 	            		            	fieldType= (String) arr.get(i).get(2);
 	    								//valuesQry+= line[(int) arr.get(i).get(0)]+",";
-	            		            	valuesQry+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? line[(int) arr.get(i).get(0)]+"," : "'"+line[(int) arr.get(i).get(0)]+"',";
+	            		            	//valuesQry+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? line[(int) arr.get(i).get(0)]+"," : "'"+line[(int) arr.get(i).get(0)]+"',";
+	            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? line[(int) arr.get(i).get(0)]+"," : "'"+line[(int) arr.get(i).get(0)]+"',";
 	    							}
-	            		            valuesQry+="'"+user.getUserId()+"','"+df.format(new Date())+"','"+filename+"'),(";
+	            		            //valuesQry+="'"+user.getUserId()+"','"+df.format(new Date())+"','"+filename+"'),(";
+	            		            csvValues.add(csvValuesLine.substring(0,csvValuesLine.length()-1));
+	            		            respObj.setCsvInsertValues(csvValues);
 	        		            }
+	        		            
 			        			//removing commas
-	        		            insertQry+="CreatedBy,CreatedDate,FileName)";
-	        		            valuesQry = valuesQry.substring(0,valuesQry.length()-2);
-		        				ExecuteQueryDao executeQueryDao = new ExecuteQueryDao();
-		        				System.out.println(insertQry+valuesQry);
-		        				executeQueryDao.executeQuery(insertQry+valuesQry);
+	        		            //insertQry+="CreatedBy,CreatedDate,FileName)";
+	        		            //valuesQry = valuesQry.substring(0,valuesQry.length()-2);
+		        				//ExecuteQueryDao executeQueryDao = new ExecuteQueryDao();
+		        				//System.out.println(insertQry+valuesQry);
+		        				//executeQueryDao.executeQuery(insertQry+valuesQry);
 			        			respObj.setDetail("FileName: "+filename );
 			        			
 			        			//uploading trace and log tables
-	                			csvResult.setCsvDataLoadExecException(false);
-	                			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
-	                			csvResult.setCsvDataLoadExecTime(new Date());
-	                			csvResult.setCsvTemplate(template);
-	                			csvResult.setCsvDataLoadExecExeptionFile(filename);
-	                			csvResultDao.addCsvDataLoadExecutionResult(csvResult);
+	                			//csvResult.setCsvDataLoadExecException(false);
+	                			//csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
+	                			//csvResult.setCsvDataLoadExecTime(new Date());
+	                			//csvResult.setCsvTemplate(template);
+	                			//csvResult.setCsvDataLoadExecExeptionFile(filename);
+	                			//csvResultDao.addCsvDataLoadExecutionResult(csvResult);
 	                			reader.close();
 			        			return respObj;
 	        				}else{

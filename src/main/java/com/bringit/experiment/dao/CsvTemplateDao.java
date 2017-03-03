@@ -161,5 +161,21 @@ public class CsvTemplateDao {
 	        }
 	        return csvTemplates;
 	    }
+
+	public List<CsvTemplate> getAllActiveCsvTemplates() {
+        List<CsvTemplate> csvTemplates = new ArrayList<CsvTemplate>();
+        Transaction trns = null;
+        Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            csvTemplates = session.createQuery("from CsvTemplate where CsvTemplateIsActive='true'").list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return csvTemplates;
+	}
 	
 }

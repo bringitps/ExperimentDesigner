@@ -35,8 +35,8 @@ public class runTest {
 		
 		 Experiment firstExperiment = new Experiment();
 		 ExperimentDao experimentDao =  new ExperimentDao();
-		 firstExperiment.setExpDbTableNameId("mems_to_magnet_assembx");
-		 firstExperiment.setExpName("MEMs_To_Magnet_Assembx");
+		 firstExperiment.setExpDbTableNameId("mems_to_magnet_assemb11");
+		 firstExperiment.setExpName("MEMs_To_Magnet_Assemb11");
 		 firstExperiment.setExpIsActive(true);
 		 firstExperiment.setExpComments("This is the experiment for MEMs to Magnet Assembly for CSV ");
 		 firstExperiment.setExpInstructions("The instructions should be here..");
@@ -54,24 +54,70 @@ public class runTest {
 		 new ExperimentFieldDao().addExperimentField(ef);
 		 new ExperimentFieldDao().updateDBDataTableField(ef);
 		 
+		 ExperimentField ef1 = new ExperimentField();
+		 ef1.setExpDbFieldNameId("fpbcSerialNumber");
+		 ef1.setExperiment(firstExperiment);
+		 ef1.setExpFieldIsActive(true);
+		 ef1.setExpFieldName("fSN");
+		 ef1.setExpFieldType("varchar(10)");
+		 new ExperimentFieldDao().addExperimentField(ef1);
+		 new ExperimentFieldDao().updateDBDataTableField(ef1);
+		 
+		 ExperimentField ef2 = new ExperimentField();
+		 ef2.setExpDbFieldNameId("dieId");
+		 ef2.setExperiment(firstExperiment);
+		 ef2.setExpFieldIsActive(true);
+		 ef2.setExpFieldName("die");
+		 ef2.setExpFieldType("varchar(10)");
+		 new ExperimentFieldDao().addExperimentField(ef2);
+		 new ExperimentFieldDao().updateDBDataTableField(ef2);
+		 
+		 ExperimentField ef3 = new ExperimentField();
+		 ef3.setExpDbFieldNameId("workOrder");
+		 ef3.setExperiment(firstExperiment);
+		 ef3.setExpFieldIsActive(true);
+		 ef3.setExpFieldName("wo");
+		 ef3.setExpFieldType("varchar(10)");
+		 new ExperimentFieldDao().addExperimentField(ef3);
+		 new ExperimentFieldDao().updateDBDataTableField(ef3);
+		 
 		 ExperimentParser parser = new ExperimentParser();
 		 CsvTemplate csvt = new CsvTemplate();
-		 CsvTemplateColumns cols = new CsvTemplateColumns();
-		 csvt.setCsvTemplateName("CsvPinix");
+		 CsvTemplateColumnsDao csvDao = new CsvTemplateColumnsDao();
+		 csvt.setCsvTemplateName("Csv11");
 		 csvt.setExperiment(firstExperiment);
 		 csvt.setCsvTemplateComments("Testing");
 		 csvt.setCsvTemplatePrefix("MEMS");
 		 new CsvTemplateDao().addCsvTemplate(csvt);
 		 
+		 CsvTemplateColumns cols = new CsvTemplateColumns();
 		 cols.setCsvTemplate(csvt);
 		 cols.setCsvTemplateColumnName("moduleSerialNumber");
 		 cols.setExpField(ef);
-		 new CsvTemplateColumnsDao().addCsvTemplateColumns(cols);
+		 csvDao.addCsvTemplateColumns(cols); 
 		 
-		// ResponseObj respObj = parser.parseCSV(csvFile, firstExperiment);
-		// ResponseObj respObj = parser.parseXML(xmlFile, new ExperimentDao().getExperimentById(1));
+		 CsvTemplateColumns cols1 = new CsvTemplateColumns();
+		 cols1.setCsvTemplate(csvt);
+		 cols1.setCsvTemplateColumnName("fpbcSerialNumber");
+		 cols1.setExpField(ef1); 
+		 csvDao.addCsvTemplateColumns(cols1);
 		 
-		 //System.out.println(respObj.getDescription() + respObj.getDetail());
+		 CsvTemplateColumns cols2 = new CsvTemplateColumns();
+		 cols2.setCsvTemplate(csvt);
+		 cols2.setCsvTemplateColumnName("dieId");
+		 cols2.setExpField(ef2);
+		 
+		 csvDao.addCsvTemplateColumns(cols2);
+		 CsvTemplateColumns cols3 = new CsvTemplateColumns();
+		 cols3.setCsvTemplate(csvt);
+		 cols3.setCsvTemplateColumnName("workOrder");
+		 cols3.setExpField(ef3);
+		 csvDao.addCsvTemplateColumns(cols3);
+		 
+		 ResponseObj respObj = parser.parseCSV(csvFile, csvt);
+		 //ResponseObj respObj = parser.parseXML(xmlFile, new ExperimentDao().getExperimentById(1));
+		 
+		 System.out.println(respObj.getDescription() + respObj.getDetail());
 	
 	}
 

@@ -67,7 +67,11 @@ public class MainForm extends MainFormDesign {
          case "xml data file loads":  
      				formContentLayout.removeAllComponents();
      				formContentLayout.addComponent(new XmlDataFileLoadForm());
-                  	break;                  	
+                  	break;   
+         case "csv data file loads":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new CsvDataFileLoadForm());
+                  	break;
          default:
          			break;
 		 }

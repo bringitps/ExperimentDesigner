@@ -46,7 +46,7 @@ import com.vaadin.ui.Window;
 public class CsvTemplateForm extends CsvTemplateDesign {
 
 	private CsvTemplate csvt;
-	private List<CsvTemplateColumns> csvNodes;
+	private List<CsvTemplateColumns> csvCols;
 	private List<FilesRepository> repos =  new FilesRepositoryDao().getAllFilesRepositorys();
 	private List<JobExecutionRepeat> jobs = new JobExecutionRepeatDao().getAllJobExecutionRepeats();
 	private List<Experiment> experiments = new ExperimentDao().getActiveExperiments();
@@ -57,11 +57,11 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	
 	public CsvTemplateForm(int csvId)
 	{
-		this.tblCsvNodes.setContainerDataSource(null);
-		this.tblCsvNodes.addContainerProperty("*", CheckBox.class, null);
-		this.tblCsvNodes.addContainerProperty("Csv Node Name", TextField.class, null);
-		this.tblCsvNodes.addContainerProperty("Experiment Field", ComboBox.class, null);		
-		this.tblCsvNodes.setPageLength(0);
+		this.tblCsvCols.setContainerDataSource(null);
+		this.tblCsvCols.addContainerProperty("*", CheckBox.class, null);
+		this.tblCsvCols.addContainerProperty("Csv Column", TextField.class, null);
+		this.tblCsvCols.addContainerProperty("Experiment Field", ComboBox.class, null);		
+		this.tblCsvCols.setPageLength(0);
 		fillCombos();
 		uploadFile();
 		
@@ -87,11 +87,11 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.txtCsvTComments.setValue(csvt.getCsvTemplateComments());
 			this.txtCsvTPrefix.setValue(csvt.getCsvTemplatePrefix());
 			
-			this.csvNodes = new CsvTemplateColumnsDao().getAllCsvTemplateColumnssByTemplateId(csvt.getCsvTemplateId());
+			this.csvCols = new CsvTemplateColumnsDao().getAllCsvTemplateColumnssByTemplateId(csvt.getCsvTemplateId());
 			this.expFields = new ExperimentFieldDao().getActiveExperimentFields(csvt.getExperiment());
 			
 			Object[] itemValues = new Object[3];
-			for(int i=0; i<this.csvNodes.size(); i++)
+			for(int i=0; i<this.csvCols.size(); i++)
 			{		
 				
 				CheckBox chxSelect = new CheckBox();
@@ -99,7 +99,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				itemValues[0] = chxSelect;
 				
 				TextField txtCsvColName = new TextField();
-				txtCsvColName.setValue(this.csvNodes.get(i).getCsvTemplateColumnName());
+				txtCsvColName.setValue(this.csvCols.get(i).getCsvTemplateColumnName());
 				txtCsvColName.setReadOnly(true);
 				txtCsvColName.addStyleName("tiny");
 				txtCsvColName.setWidth(100, Unit.PERCENTAGE);
@@ -115,11 +115,11 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				
 				cbxExpFields.setNullSelectionAllowed(false);
 				cbxExpFields.addStyleName("tiny");
-				if(this.csvNodes.get(i).getExpField() != null)
-					cbxExpFields.setValue(this.csvNodes.get(i).getExpField().getExpFieldId());
+				if(this.csvCols.get(i).getExpField() != null)
+					cbxExpFields.setValue(this.csvCols.get(i).getExpField().getExpFieldId());
 				itemValues[2] = cbxExpFields;
 				
-				this.tblCsvNodes.addItem(itemValues, this.csvNodes.get(i).getCsvTemplateColumnId());
+				this.tblCsvCols.addItem(itemValues, this.csvCols.get(i).getCsvTemplateColumnId());
 			}
 	
 		}
@@ -169,7 +169,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	
 	@SuppressWarnings("deprecation")
 	protected void onSave() {
-		Collection itemIds = this.tblCsvNodes.getContainerDataSource().getItemIds();
+		Collection itemIds = this.tblCsvCols.getContainerDataSource().getItemIds();
 		boolean validateReqFieldsResult = validateRequiredFields();		
 		
 		//---Validate Required Fields---//
@@ -197,43 +197,41 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				new CsvTemplateDao().addCsvTemplate(csvt);
 			}
 			
-			
-			//Save CsvTemplateNodes
 
-			CsvTemplateColumnsDao csvTempNodeDao = new CsvTemplateColumnsDao();
+			CsvTemplateColumnsDao csvTempColsDao = new CsvTemplateColumnsDao();
 			
 			//Remove deprecated CsvTemplateNodes
 			if(this.csvt.getCsvTemplateId() != null && dbIdOfCsvTemplateNodeItemsToDelete.size() > 0)
 			{
 				for(int i=0; i<dbIdOfCsvTemplateNodeItemsToDelete.size(); i++)
-					csvTempNodeDao.deleteCsvTemplateColumns(dbIdOfCsvTemplateNodeItemsToDelete.get(i));
+					csvTempColsDao.deleteCsvTemplateColumns(dbIdOfCsvTemplateNodeItemsToDelete.get(i));
 			}
 			
 			for (Object itemIdObj : itemIds) 
 			{
 				
 				int itemId = (int)itemIdObj;
-				Item tblRowItem = this.tblCsvNodes.getContainerDataSource().getItem(itemId);
+				Item tblRowItem = this.tblCsvCols.getContainerDataSource().getItem(itemId);
 				
-				CsvTemplateColumns csvNode = new CsvTemplateColumns();
-				csvNode.setCsvTemplateColumnName(((TextField)(tblRowItem.getItemProperty("Csv Node Name").getValue())).getValue());			
-				csvNode.setCsvTemplate(csvt);
+				CsvTemplateColumns csvColumn = new CsvTemplateColumns();
+				csvColumn.setCsvTemplateColumnName(((TextField)(tblRowItem.getItemProperty("Csv Column").getValue())).getValue());			
+				csvColumn.setCsvTemplate(csvt);
 				
 				if(((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue() != null){
 				
 					ExperimentField selectedExpField = new ExperimentField();
 					selectedExpField.setExpFieldId((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue());
 
-					csvNode.setExpField(selectedExpField);
+					csvColumn.setExpField(selectedExpField);
 				}
 				if(itemId > 0)
 				{
-					csvNode.setCsvTemplateColumnId(itemId);
+					csvColumn.setCsvTemplateColumnId(itemId);
 					
-					csvTempNodeDao.updateCsvTemplateColumns(csvNode);
+					csvTempColsDao.updateCsvTemplateColumns(csvColumn);
 				}
 				else
-					csvTempNodeDao.addCsvTemplateColumns(csvNode);
+					csvTempColsDao.addCsvTemplateColumns(csvColumn);
 				
 			}
 			
@@ -244,7 +242,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		else
 		{
 			if(itemIds.size() <= 0)
-				this.getUI().showNotification("There are no csv nodes mapped on your CsvTemplate", Type.WARNING_MESSAGE);
+				this.getUI().showNotification("There are no csv columns mapped on your CsvTemplate", Type.WARNING_MESSAGE);
 			else if(!validateReqFieldsResult)
 				this.getUI().showNotification("Please fill in all required Fields", Type.WARNING_MESSAGE);
 		}
@@ -316,7 +314,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		this.comboCsvoutRepo.setEnabled(b);
 		this.comboCsvTerrRepo.setEnabled(b);
 		this.comboCsvTinRepo.setEnabled(b);
-		this.tblCsvNodes.setEnabled(b);
+		this.tblCsvCols.setEnabled(b);
 		this.upCsv.setEnabled(b);
 		this.comboCsvjobScheduler.setEnabled(b);
 	}
@@ -327,7 +325,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		{
 			//Remove deprecated Nodes from UI and store Ids to delete from DB at saving
 			int loopNodeCnt = 0;
-			Collection itemIds = this.tblCsvNodes.getContainerDataSource().getItemIds();
+			Collection itemIds = this.tblCsvCols.getContainerDataSource().getItemIds();
 			
 			for (Object itemIdObj : itemIds) 
 			{	
@@ -336,11 +334,11 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 					dbIdOfCsvTemplateNodeItemsToDelete.add(itemId);
 			}			
 			
-			this.tblCsvNodes.setContainerDataSource(null);
-			this.tblCsvNodes.addContainerProperty("*", CheckBox.class, null);
-			this.tblCsvNodes.addContainerProperty("Csv Node Name", TextField.class, null);
-			this.tblCsvNodes.addContainerProperty("Experiment Field", ComboBox.class, null);		
-			this.tblCsvNodes.setPageLength(0);
+			this.tblCsvCols.setContainerDataSource(null);
+			this.tblCsvCols.addContainerProperty("*", CheckBox.class, null);
+			this.tblCsvCols.addContainerProperty("Csv Column", TextField.class, null);
+			this.tblCsvCols.addContainerProperty("Experiment Field", ComboBox.class, null);		
+			this.tblCsvCols.setPageLength(0);
 			
 		}
 		
@@ -376,7 +374,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			itemValues[2] = cbxExpFields;
 			
 			this.lastNewItemId = this.lastNewItemId - 1;
-			this.tblCsvNodes.addItem(itemValues, this.lastNewItemId);
+			this.tblCsvCols.addItem(itemValues, this.lastNewItemId);
 			
 		}
 		

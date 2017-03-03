@@ -117,7 +117,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 					cbxExpFields.setWidth(100, Unit.PERCENTAGE);
 				}
 				
-				cbxExpFields.setNullSelectionAllowed(false);
+				cbxExpFields.setNullSelectionAllowed(true);
 				cbxExpFields.addStyleName("tiny");
 				if(this.csvCols.get(i).getExpField() != null)
 					cbxExpFields.setValue(this.csvCols.get(i).getExpField().getExpFieldId());
@@ -185,6 +185,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			//Save template
 			this.csvt.setExperiment(new ExperimentDao().getExperimentById((int) this.comboCsvTExperiment.getValue()));
 			this.csvt.setCsvTemplateName(this.txtCsvTName.getValue());
+			this.csvt.setCsvTemplateIsActive(this.chxActive.getValue());
 			this.csvt.setCsvTemplatePrefix(this.txtCsvTPrefix.getValue());
 			this.csvt.setCsvTemplateComments(this.txtCsvTComments.getValue());
 			this.csvt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvTerrRepo.getValue()));
@@ -407,7 +408,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				cbxExpFields.setWidth(100, Unit.PERCENTAGE);
 			}
 			
-			cbxExpFields.setNullSelectionAllowed(false);
+			cbxExpFields.setNullSelectionAllowed(true);
 			cbxExpFields.addStyleName("tiny");
 			itemValues[2] = cbxExpFields;
 			

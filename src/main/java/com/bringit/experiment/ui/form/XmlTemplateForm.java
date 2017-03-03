@@ -216,9 +216,9 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			
 			//Save template
-			this.xmlt.setXmlTemplateIsActive(this.chxActive.getValue());
 			this.xmlt.setExperiment(new ExperimentDao().getExperimentById((int) this.comboXmlTExperiment.getValue()));
 			this.xmlt.setXmlTemplateName(this.txtXmlTName.getValue());
+			this.xmlt.setXmlTemplateIsActive(this.chxActive.getValue());
 			this.xmlt.setXmlTemplatePrefix(this.txtXmlTPrefix.getValue());
 			this.xmlt.setXmlTemplateComments(this.txtXmlTComments.getValue());
 			this.xmlt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmlTerrRepo.getValue()));

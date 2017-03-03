@@ -1,13 +1,13 @@
 CREATE VIEW vwCsvTemplate as
-SELECT  dbo.CsvTemplate.CsvTemplateId AS 'Id',
- dbo.CsvTemplate.CsvTemplateName AS 'Name',
- Experiment.ExpName as 'Experiment Name', Experiment.ExpDbTableNameId AS 'Table Name',
+SELECT  CsvTemplate.CsvTemplateId AS 'Id',
+ CsvTemplate.CsvTemplateName AS 'Name',
+ Experiment.ExpName as 'Experiment Name',
                CreatedByUser.UserName AS 'CreatedBy', Job.JobExecRepeatName AS 'Job',
-                dbo.CsvTemplate.CreatedDate, dbo.CsvTemplate.ModifiedDate, 
+                CsvTemplate.CreatedDate, CsvTemplate.ModifiedDate, 
               InFileRepo.FileRepoHost, InFileRepo.FileRepoPath
-FROM     dbo.CsvTemplate LEFT OUTER JOIN
-               dbo.FilesRepository AS InFileRepo ON dbo.CsvTemplate.InboundFileRepoId = InFileRepo.FileRepoId LEFT OUTER JOIN
-               dbo.SysUser AS CreatedByUser ON dbo.CsvTemplate.CreatedBy = CreatedByUser.UserId LEFT OUTER JOIN
-               dbo.Experiment AS Experiment ON dbo.CsvTemplate.ExperimentId = Experiment.ExpId LEFT OUTER JOIN
-               dbo.JobExecutionRepeat AS Job ON dbo.CsvTemplate.JobExecRepeatId = Job.JobExecRepeatId
+FROM     CsvTemplate LEFT OUTER JOIN
+               FilesRepository AS InFileRepo ON CsvTemplate.InboundFileRepoId = InFileRepo.FileRepoId LEFT OUTER JOIN
+               SysUser AS CreatedByUser ON CsvTemplate.CreatedBy = CreatedByUser.UserId LEFT OUTER JOIN
+               Experiment AS Experiment ON CsvTemplate.ExperimentId = Experiment.ExpId LEFT OUTER JOIN
+               JobExecutionRepeat AS Job ON CsvTemplate.JobExecRepeatId = Job.JobExecRepeatId
                WHERE CsvTemplate.CsvTemplateIsActive = 1;

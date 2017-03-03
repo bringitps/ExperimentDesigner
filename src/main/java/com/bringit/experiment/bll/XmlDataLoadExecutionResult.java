@@ -25,9 +25,6 @@ public class XmlDataLoadExecutionResult {
 	@Column(name="XmlDataLoadExecExceptionDetails")
 	private String xmlDataLoadExecExeptionDetails;
 	
-	@Column(name="XmlDataLoadExecExceptionFile")
-	private String xmlDataLoadExecExeptionFile;
-	
 	@Column(name="XmlDataLoadExecTime")
 	private Date xmlDataLoadExecTime;
 
@@ -86,14 +83,5 @@ public class XmlDataLoadExecutionResult {
 	public void setXmlTemplate(XmlTemplate xmlTemplate) {
 		this.xmlTemplate = xmlTemplate;
 	}
-
-	public String getXmlDataLoadExecExeptionFile() {
-		return xmlDataLoadExecExeptionFile;
-	}
-
-	public void setXmlDataLoadExecExeptionFile(String xmlDataLoadExecExeptionFile) {
-		this.xmlDataLoadExecExeptionFile = xmlDataLoadExecExeptionFile;
-	}
-
 	
 }

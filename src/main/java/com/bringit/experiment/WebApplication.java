@@ -15,6 +15,7 @@ import com.bringit.experiment.ui.form.LoginForm;
 import com.bringit.experiment.ui.form.MainForm;
 import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.PasswordEncrypter;
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
@@ -46,6 +47,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 @Theme("valo")
+@Push
 public class WebApplication extends UI {
 
 	private Grid grid = new Grid();

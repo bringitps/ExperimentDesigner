@@ -164,11 +164,12 @@ public class ExperimentDao {
 			query += " Comments varchar(1000) ,";
 			query += " CreatedBy int ,";
 			query += " LastModifiedBy int ,";
+			query += " DataFileId int ,";
 			query += " CreatedDate datetime ,";
 			query += " LastModifiedDate datetime ,";
-			query += " FileName varchar(200) ,";
 			query += " FOREIGN KEY (CreatedBy) REFERENCES SysUser(UserId), ";
-			query += " FOREIGN KEY (LastModifiedBy) REFERENCES SysUser(UserId));";
+			query += " FOREIGN KEY (LastModifiedBy) REFERENCES SysUser(UserId), ";
+			query += " FOREIGN KEY (DataFileId) REFERENCES DataFile(DataFileId));";
 		}
     	else
     		return false;

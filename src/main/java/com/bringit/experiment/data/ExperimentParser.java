@@ -3,6 +3,7 @@ package com.bringit.experiment.data;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.bringit.experiment.bll.CsvDataLoadExecutionResult;
@@ -16,23 +17,16 @@ import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.bll.XmlTemplateNode;
 import com.bringit.experiment.dao.CsvDataLoadExecutionResultDao;
 import com.bringit.experiment.dao.CsvTemplateColumnsDao;
-import com.bringit.experiment.dao.CsvTemplateDao;
 import com.bringit.experiment.dao.ExecuteQueryDao;
-import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.SysUserDao;
 import com.bringit.experiment.dao.XmlDataLoadExecutionResultDao;
 import com.bringit.experiment.dao.XmlTemplateDao;
 import com.bringit.experiment.dao.XmlTemplateNodeDao;
 import com.opencsv.CSVReader;
-import com.vaadin.ui.Upload.Receiver;
-
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -177,11 +171,57 @@ public class ExperimentParser {
 
 	public ResponseObj parseXmlDocument(String fileName, org.w3c.dom.Document xmlDocument, XmlTemplate xmlTemplate)
 	{
+		
+		class DBFieldValues {
+            
+			private List<String> fieldValues;
+			
+			public DBFieldValues()
+			{
+				this.fieldValues = new ArrayList<String>();
+			}
+			
+			public List<String> getFieldValues() {
+				return fieldValues;
+			}
+			
+			public void setFieldValues(List<String> fieldValues) {
+				this.fieldValues = fieldValues;
+			}
+			
+			public void attachFieldValue(String fieldValue)
+			{
+				this.fieldValues.add(fieldValue);
+			}
+        };
+		
 		ResponseObj respObj = new ResponseObj();
     	respObj.setCode(0);
     	respObj.setDescription("Xml Loaded Successfully");
+    	respObj.setCsvInsertColumns(null);
+    	respObj.setCsvInsertValues(null);
 		
-		//Run Validations
+		
+    	//XRef Table between ExpFieldDBId, XmlNode, IsAttribute and NodeValues
+    	List<String> xRefFieldDBId = new ArrayList<String>();
+    	List<String> xRefXmlNodeSlashFormat = new ArrayList<String>();
+    	List<Boolean> xRefXmlNodeIsAttribute = new ArrayList<Boolean>();
+    	List<String> xRefXmlNodeAttributeName= new ArrayList<String>();
+    	List<DBFieldValues> xRefDBFieldValues = new ArrayList<DBFieldValues>();
+    	
+		ExperimentFieldDao experimentFieldDao = new ExperimentFieldDao();
+		List<ExperimentField> experimentFields = experimentFieldDao.getActiveExperimentFields(xmlTemplate.getExperiment());
+		
+		for(int i=0; experimentFields!= null && i<experimentFields.size(); i++)
+		{
+			xRefFieldDBId.add(experimentFields.get(i).getExpDbFieldNameId());
+			xRefXmlNodeSlashFormat.add(null);
+			xRefXmlNodeIsAttribute.add(null);
+			xRefXmlNodeAttributeName.add(null);
+			xRefDBFieldValues.add(new DBFieldValues());
+		}
+		
+		//Run Validations and Fill xRef table
     	//1) All Xml nodes mapped to Experiment Field must exist in Xml Document to Load
     	XmlTemplateNodeDao xmlTemplateNodeDao = new XmlTemplateNodeDao();
     	List<XmlTemplateNode> xmlTemplateNodes = xmlTemplateNodeDao.getMappedXmlTemplateNodesByTemplateId(xmlTemplate.getXmlTemplateId());
@@ -191,9 +231,32 @@ public class ExperimentParser {
 			if(xmlTemplateNodes.get(i).getExpField() != null || xmlTemplateNodes.get(i).isXmlTemplateNodeIsLoop())
 			{
 				String xmlNodeSlashFormat = "/" + xmlTemplateNodes.get(i).getXmlTemplateNodeName().replaceAll("<", "/").replaceAll(">", "").replaceAll("\n", "").replaceAll("\t", "").replaceAll(" ", "");
-
-			     //Pending to consider when value is passed as Attribute
+				String attributeName = "";
 				
+				if(xmlTemplateNodes.get(i).isXmlTemplateNodeIsAttribute())
+				{
+					attributeName = (xmlTemplateNodes.get(i).getXmlTemplateNodeName().substring(xmlTemplateNodes.get(i).getXmlTemplateNodeName().lastIndexOf(" ") + 1)).replaceAll(">", "");
+					
+					//Remove Attribute name to find node
+					xmlNodeSlashFormat = xmlTemplateNodes.get(i).getXmlTemplateNodeName().substring(0, xmlTemplateNodes.get(i).getXmlTemplateNodeName().lastIndexOf(" "));
+					xmlNodeSlashFormat = "/" + xmlNodeSlashFormat.replaceAll("<", "/").replaceAll(">", "").replaceAll("\n", "").replaceAll("\t", "").replaceAll(" ", "");
+				
+				}
+				
+				if(!xmlTemplateNodes.get(i).isXmlTemplateNodeIsLoop())
+				{
+					int xRefIndex = xRefFieldDBId.indexOf(xmlTemplateNodes.get(i).getExpField().getExpDbFieldNameId());
+					if(xRefIndex >= 0)
+					{
+						xRefXmlNodeSlashFormat.set(xRefIndex, xmlNodeSlashFormat);
+						xRefXmlNodeIsAttribute.set(xRefIndex, xmlTemplateNodes.get(i).isXmlTemplateNodeIsAttribute());
+						
+						if(xmlTemplateNodes.get(i).isXmlTemplateNodeIsAttribute())
+							xRefXmlNodeAttributeName.set(xRefIndex, attributeName);
+					}
+				}
+					
+			     //Pending to consider when value is passed as Attribute
 				 XPath xPath = XPathFactory.newInstance().newXPath();
 			     XPathExpression xPathExpression = null;
 			     try 
@@ -225,12 +288,35 @@ public class ExperimentParser {
              		respObj.setDetail("Mapped XML Node Not Found");
 	        		return respObj;
 			     }
-			     /*for (int j = 0; j < nodes.getLength(); j++) {
-			            System.out.println("nodes: "+ nodes.item(j).getNodeValue()); 
-			     }*/
+			     else if(xmlTemplateNodes.get(i).isXmlTemplateNodeIsAttribute())
+			     {
+			    	 boolean isAttributeFound = false;
+			    	 for(int j=0; j<xmlNodesFound.getLength(); j++)
+			    	 {
+			    		Node xmlNode = xmlNodesFound.item(i);
+			    		
+			 	    	if(xmlNode instanceof org.w3c.dom.Element) 
+			 	    	{
+			 	    		org.w3c.dom.Element xmlElement = (org.w3c.dom.Element)xmlNode;
+			 	    		if(xmlElement.getAttribute(attributeName) != null)
+			 	    		{
+			 	    			isAttributeFound = true;
+			 	    			break;
+			 	    		}
+			 	    	}			 	    	
+			    	 }
+			    	 
+			    	 if(!isAttributeFound)
+			    	 {
+			    		respObj.setCode(104);
+	             		respObj.setDescription("Mapped XML Node Attribute was not found in XML File. Node Attribute: "+xmlTemplateNodes.get(i).getXmlTemplateNodeName());
+	             		respObj.setDetail("Mapped XML Node Attribute Not Found");
+		        		return respObj;
+			    	}
+			     }
  			}
 		}
-
+		
     	//2) Load Global Values (Not included by Loop)
 		List<String> expDBFieldIdMatrix = new ArrayList<String>();
 		List<String> xmlGlobalValuesMatrix = new ArrayList<String>();
@@ -244,6 +330,17 @@ public class ExperimentParser {
 			{
 				String xmlNodeSlashFormat = "/" + xmlTemplateNodes.get(i).getXmlTemplateNodeName().replaceAll("<", "/").replaceAll(">", "").replaceAll("\n", "").replaceAll("\t", "").replaceAll(" ", "");
 			
+				String attributeName = "";
+				
+				if(xmlTemplateNodes.get(i).isXmlTemplateNodeIsAttribute())
+				{
+					attributeName = (xmlTemplateNodes.get(i).getXmlTemplateNodeName().substring(xmlTemplateNodes.get(i).getXmlTemplateNodeName().lastIndexOf(" ") + 1)).replaceAll(">", "");
+					
+					//Remove Attribute name to find node
+					xmlNodeSlashFormat = xmlTemplateNodes.get(i).getXmlTemplateNodeName().substring(0, xmlTemplateNodes.get(i).getXmlTemplateNodeName().lastIndexOf(" "));
+					xmlNodeSlashFormat = "/" + xmlNodeSlashFormat.replaceAll("<", "/").replaceAll(">", "").replaceAll("\n", "").replaceAll("\t", "").replaceAll(" ", "");
+				}
+				
 				if(!xmlNodeSlashFormat.startsWith(loopXmlNodeSlashFormat))
 				{
 					expDBFieldIdMatrix.add(xmlTemplateNodes.get(i).getExpField().getExpDbFieldNameId());
@@ -273,39 +370,164 @@ public class ExperimentParser {
 				     NodeList xmlNodesFound = (NodeList)resultObj;
 					
 				     if(!xmlTemplateNodes.get(i).isXmlTemplateNodeIsAttribute())
-				    	 xmlGlobalValuesMatrix.add(xmlNodesFound.item(0).getNodeValue());
-				     //else
-				     //Pending to enable when value is passed as Attribute				    	 
+				     {
+				    	 for(int j=0; j<xmlNodesFound.getLength(); j++)
+				    	 {
+				    		if(xmlNodesFound.item(j)!=null  && ((org.w3c.dom.Element)xmlNodesFound.item(j)).getChildNodes().getLength() <= 1 )
+				    		{
+				    			xmlGlobalValuesMatrix.add(xmlNodesFound.item(j).getTextContent().trim());
+				    			break;
+				    		}
+				    	 }
+				     }
+				     else
+				     {
+				    	 //Value Passed as Attribute
+				    	 for(int j=0; j<xmlNodesFound.getLength(); j++)
+				    	 {
+				    		Node xmlNode = xmlNodesFound.item(i);
+				    		
+				 	    	if(xmlNode instanceof org.w3c.dom.Element) 
+				 	    	{
+				 	    		org.w3c.dom.Element xmlElement = (org.w3c.dom.Element)xmlNode;
+				 	    		if(xmlElement.getAttribute(attributeName) != null && xmlElement.getAttribute(attributeName).trim().length() > 0)
+				 	    		{
+				 	    			xmlGlobalValuesMatrix.add(xmlElement.getAttribute(attributeName).trim());
+					    			break;
+				 	    		}
+				 	    	}			 	    	
+				    	 }
+				     }			    	 
 				}
 			}
     	
 		}
 		
+		int totalRecords = 0;
+			
+		//4) Load Loop Node Field Values
 		
-		//3) Load Loop Node Values
+		 XPath xPath = XPathFactory.newInstance().newXPath();
+	     XPathExpression xPathExpression = null;
+	     try 
+	     {
+	    	 xPathExpression = xPath.compile(loopXmlNodeSlashFormat);
+	     } catch (XPathExpressionException e) 
+	     {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+	     }
+	     
+	     Object resultObj = null;
 		
-		class DBFieldValue {
-            
-			private String dbFieldId;
-			private List<String> fieldValues;
-			
-			public String getDbFieldId() {
-				return dbFieldId;
+	     try 
+	     {
+			resultObj = xPathExpression.evaluate(xmlDocument, XPathConstants.NODESET);
+	     } catch (XPathExpressionException e) 
+	     {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+	     }
+
+	     NodeList xmlNodesFound = (NodeList)resultObj;
+	     
+	     if(xmlNodesFound != null)
+	    	 totalRecords = xmlNodesFound.getLength();
+	     
+	     for (int i = 0; i < xmlNodesFound.getLength(); i++) 
+	     { 
+	    	Node xmlNode = xmlNodesFound.item(i);
+	    	 
+	    	if(xmlNode instanceof org.w3c.dom.Element) 
+	    	{
+	    		org.w3c.dom.Element xmlLoopElement = (org.w3c.dom.Element)xmlNode;
+	    		
+	    		for(int j = 0; j < xRefFieldDBId.size(); j++ )
+	    		{
+	    			if(xRefXmlNodeSlashFormat.get(j) != null && xRefXmlNodeSlashFormat.get(j).startsWith(loopXmlNodeSlashFormat))
+	    			{
+	    				org.w3c.dom.Element xmlValueElement = xmlLoopElement;
+	    				String nodeNameSlashFormat = xRefXmlNodeSlashFormat.get(j).replace(loopXmlNodeSlashFormat, "");
+
+	    				
+	    				while(nodeNameSlashFormat.contains("/"))
+	    				{
+	    					String[] splitNodes = nodeNameSlashFormat.split("/");
+	    					if(xmlValueElement.getElementsByTagName(splitNodes[1]).item(0) != null)
+	    						xmlValueElement = (org.w3c.dom.Element)xmlValueElement.getElementsByTagName(splitNodes[1]).item(0);
+	    					else
+	    					{
+	    						xmlValueElement = null;
+	    						break;
+	    					}
+	    					nodeNameSlashFormat = nodeNameSlashFormat.substring(splitNodes[0].length()+1);
+	    				}
+	    				
+	    				if(xRefXmlNodeIsAttribute.get(j) != null && xRefXmlNodeIsAttribute.get(j))
+	    				{
+							String attributeName = xRefXmlNodeAttributeName.get(j);
+							if(xmlValueElement.getAttribute(attributeName) != null && xmlValueElement.getAttribute(attributeName).trim().length() > 0)
+								xRefDBFieldValues.get(j).attachFieldValue(xmlValueElement.getAttribute(attributeName).trim());
+							else
+	    						xRefDBFieldValues.get(j).attachFieldValue(null);
+	    				}
+	    				else
+	    				{
+	    					if(xmlValueElement != null && xmlValueElement.getChildNodes().getLength() <= 1 && xmlValueElement.getTextContent() != null)
+	    						xRefDBFieldValues.get(j).attachFieldValue(xmlValueElement.getTextContent().trim());
+	    					else
+	    						xRefDBFieldValues.get(j).attachFieldValue(null);
+	    				}
+	    			}
+	    		}
+	    	 }
+	     }
+	     
+	     
+	     //Load Global Values into XRef Table
+	     for(int i=0; i<expDBFieldIdMatrix.size(); i++)
+	     {
+	    	int xRefIndex = xRefFieldDBId.indexOf(expDBFieldIdMatrix.get(i));
+	    	
+			if(xRefIndex >= 0)
+			{
+				List<String> fieldValues = new ArrayList<String>();
+				for(int j=0; j<totalRecords; j++)
+					fieldValues.add(xmlGlobalValuesMatrix.get(i));
+				xRefDBFieldValues.get(xRefIndex).setFieldValues(fieldValues);
 			}
-			
-			public void setDbFieldId(String dbFieldId) {
-				this.dbFieldId = dbFieldId;
-			}
-			
-			public List<String> getFieldValues() {
-				return fieldValues;
-			}
-			
-			public void setFieldValues(List<String> fieldValues) {
-				this.fieldValues = fieldValues;
-			}
-        };
-		
+	     }
+
+	     //Build CSV Insert Columns
+	     String csvInsertColumns = ""; 
+	     
+	     for(int i=0; i<xRefFieldDBId.size(); i++)
+	     {
+	    	 csvInsertColumns += xRefFieldDBId.get(i).toString();
+	    	 if(xRefFieldDBId.size() > (i+1))
+	    		 csvInsertColumns += ",";
+	     }
+
+	     //Build CSV Insert Values
+	     List<String> csvInsertValues = new ArrayList<String>();
+	     for(int i=0; i<totalRecords; i++)
+	     {
+	    	 String csvInsertColumnValues = "";
+	    	 for(int j=0; j<xRefDBFieldValues.size(); j++)
+		     {
+	    		 if(xRefDBFieldValues.get(j).getFieldValues() != null && xRefDBFieldValues.get(j).getFieldValues().size() > 0 && xRefDBFieldValues.get(j).getFieldValues().get(i) != null)
+	    			csvInsertColumnValues += "'" + xRefDBFieldValues.get(j).getFieldValues().get(i).toString() + "'";
+	    		 else
+	    			csvInsertColumnValues += "null";
+		    	
+	    		 if(xRefFieldDBId.size() > (j+1))
+	    			 csvInsertColumnValues += ",";
+	         }
+	    	 
+	    	 csvInsertValues.add(csvInsertColumnValues);
+	     }
+	    respObj.setCsvInsertColumns(csvInsertColumns);
+	    respObj.setCsvInsertValues(csvInsertValues);
 		return respObj;
 	}
 
@@ -400,7 +622,7 @@ public class ExperimentParser {
 					        			xmlResult.setXmlDataLoadExecExeptionDetails(respObj.getDescription());
 					        			xmlResult.setXmlDataLoadExecTime(new Date());
 					        			xmlResult.setXmlTemplate(template);
-					        			xmlResult.setXmlDataLoadExecExeptionFile(filename);
+					        			//xmlResult.setXmlDataLoadExecExeptionFile(filename);
 					        			xmlResultDao.addXmlDataLoadExecutionResult(xmlResult);
 					        			return respObj;
 					        		}else{
@@ -412,7 +634,7 @@ public class ExperimentParser {
 					        			xmlResult.setXmlDataLoadExecExeptionDetails(respObj.getDescription());
 					        			xmlResult.setXmlDataLoadExecTime(new Date());
 					        			xmlResult.setXmlTemplate(template);
-					        			xmlResult.setXmlDataLoadExecExeptionFile(filename);
+					        			//xmlResult.setXmlDataLoadExecExeptionFile(filename);
 					        			xmlResultDao.addXmlDataLoadExecutionResult(xmlResult);
 					            		return respObj;         		
 					            	}
@@ -424,7 +646,7 @@ public class ExperimentParser {
 			        			xmlResult.setXmlDataLoadExecException(true);
 			        			xmlResult.setXmlDataLoadExecExeptionDetails(respObj.getDescription());
 			        			xmlResult.setXmlDataLoadExecTime(new Date());
-			        			xmlResult.setXmlDataLoadExecExeptionFile(filename);
+			        			//xmlResult.setXmlDataLoadExecExeptionFile(filename);
 			        			xmlResultDao.addXmlDataLoadExecutionResult(xmlResult);
 	                    		return respObj;  
 	                    	}
@@ -445,7 +667,7 @@ public class ExperimentParser {
 	        			xmlResult.setXmlDataLoadExecException(true);
 	        			xmlResult.setXmlDataLoadExecExeptionDetails(respObj.getDescription());
 	        			xmlResult.setXmlDataLoadExecTime(new Date());
-	        			xmlResult.setXmlDataLoadExecExeptionFile(filename);
+	        			//xmlResult.setXmlDataLoadExecExeptionFile(filename);
 	        			xmlResultDao.addXmlDataLoadExecutionResult(xmlResult);
                 		return respObj;  
                 	}
@@ -559,7 +781,7 @@ public class ExperimentParser {
 					        			xmlResult.setXmlDataLoadExecExeptionDetails(respObj.getDescription());
 					        			xmlResult.setXmlDataLoadExecTime(new Date());
 					        			xmlResult.setXmlTemplate(template);
-					        			xmlResult.setXmlDataLoadExecExeptionFile(filename);
+					        			//xmlResult.setXmlDataLoadExecExeptionFile(filename);
 					        			xmlResultDao.addXmlDataLoadExecutionResult(xmlResult);
 					        			return respObj;
 					        		}else{
@@ -571,7 +793,7 @@ public class ExperimentParser {
 					        			xmlResult.setXmlDataLoadExecExeptionDetails(respObj.getDescription());
 					        			xmlResult.setXmlDataLoadExecTime(new Date());
 					        			xmlResult.setXmlTemplate(template);
-					        			xmlResult.setXmlDataLoadExecExeptionFile(filename);
+					        			//xmlResult.setXmlDataLoadExecExeptionFile(filename);
 					        			xmlResultDao.addXmlDataLoadExecutionResult(xmlResult);
 					            		return respObj;         		
 					            	}
@@ -583,7 +805,7 @@ public class ExperimentParser {
 				        			xmlResult.setXmlDataLoadExecExeptionDetails(respObj.getDescription());
 				        			xmlResult.setXmlDataLoadExecTime(new Date());
 				        			xmlResult.setXmlTemplate(template);
-				        			xmlResult.setXmlDataLoadExecExeptionFile(filename);
+				        			//xmlResult.setXmlDataLoadExecExeptionFile(filename);
 				        			xmlResultDao.addXmlDataLoadExecutionResult(xmlResult);
 				            		return respObj;
 				            	}
@@ -595,7 +817,7 @@ public class ExperimentParser {
 		        			xmlResult.setXmlDataLoadExecException(true);
 		        			xmlResult.setXmlDataLoadExecExeptionDetails(respObj.getDescription());
 		        			xmlResult.setXmlDataLoadExecTime(new Date());
-		        			xmlResult.setXmlDataLoadExecExeptionFile(filename);
+		        			//xmlResult.setXmlDataLoadExecExeptionFile(filename);
 		        			xmlResultDao.addXmlDataLoadExecutionResult(xmlResult);
                     		return respObj;  
                     	}
@@ -606,7 +828,7 @@ public class ExperimentParser {
 	        			xmlResult.setXmlDataLoadExecException(true);
 	        			xmlResult.setXmlDataLoadExecExeptionDetails(respObj.getDescription());
 	        			xmlResult.setXmlDataLoadExecTime(new Date());
-	        			xmlResult.setXmlDataLoadExecExeptionFile(filename);
+	        			//xmlResult.setXmlDataLoadExecExeptionFile(filename);
 	        			xmlResultDao.addXmlDataLoadExecutionResult(xmlResult);
                 		return respObj;  
                 	}

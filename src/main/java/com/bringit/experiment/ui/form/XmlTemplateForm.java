@@ -148,7 +148,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 					cbxExpFields.setWidth(100, Unit.PERCENTAGE);
 				}
 				
-				cbxExpFields.setNullSelectionAllowed(false);
+				//cbxExpFields.setNullSelectionAllowed(false);
 				cbxExpFields.addStyleName("tiny");
 				if(this.xmlNodes.get(i).getExpField() != null)
 					cbxExpFields.setValue(this.xmlNodes.get(i).getExpField().getExpFieldId());
@@ -214,6 +214,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			
 			//Save template
+			this.xmlt.setXmlTemplateIsActive(this.chxActive.getValue());
 			this.xmlt.setExperiment(new ExperimentDao().getExperimentById((int) this.comboXmlTExperiment.getValue()));
 			this.xmlt.setXmlTemplateName(this.txtXmlTName.getValue());
 			this.xmlt.setXmlTemplatePrefix(this.txtXmlTPrefix.getValue());
@@ -466,7 +467,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				cbxExpFields.setWidth(100, Unit.PERCENTAGE);
 			}
 			
-			cbxExpFields.setNullSelectionAllowed(false);
+			//cbxExpFields.setNullSelectionAllowed(false);
 			cbxExpFields.addStyleName("tiny");
 			itemValues[4] = cbxExpFields;
 			

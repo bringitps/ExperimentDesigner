@@ -17,6 +17,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.bringit.experiment.remote.RemoteFileUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -227,13 +228,17 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.xmlt.setModifiedDate(new Date());
 			this.xmlt.setXmlTemplateExecStartDate(this.startXmlTstart.getValue());
 			this.xmlt.setXmlTemplateExecEndDate(this.endXmlTstart.getValue());
-			if(this.xmlt.getXmlTemplateId() != null )
+			if(this.xmlt.getXmlTemplateId() != null ) {
 				new XmlTemplateDao().updateXmlTemplate(xmlt);
-			else
-			{
+				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
+				remoteFileUtil.updateJob(Integer.toString(xmlt.getXmlTemplateId()), xmlt);
+			} else {
 				this.xmlt.setCreatedBy(sessionUser);
 				this.xmlt.setCreatedDate(this.xmlt.getModifiedDate());
 				new XmlTemplateDao().addXmlTemplate(xmlt);
+				XmlTemplate xmltWithId = new XmlTemplateDao().getXmlTemplateByExperimentId(xmlt.getExperiment().getExpId());
+				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
+				remoteFileUtil.updateJob(Integer.toString(xmltWithId.getXmlTemplateId()), xmltWithId);
 			}
 			
 			
@@ -539,6 +544,8 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		this.xmlt.setModifiedDate(new Date());
 		XmlTemplateDao xmlDao = new XmlTemplateDao();
 		xmlDao.updateXmlTemplate(xmlt);
+		RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
+		remoteFileUtil.cancelJob(Integer.toString(xmlt.getXmlTemplateId()));
 		closeModalWindow();
 		
 		/*

@@ -17,12 +17,12 @@
        <vaadin-grid-layout width="100px" height="30px"> 
         <row> 
          <column> 
-          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="small primary" plain-text _id="btnSave">
+          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="tiny primary" plain-text _id="btnSave">
             Save 
           </vaadin-button> 
          </column> 
          <column> 
-          <vaadin-button style-name="small" plain-text _id="btnCancel">
+          <vaadin-button style-name="tiny" plain-text _id="btnCancel">
             Cancel 
           </vaadin-button> 
          </column> 
@@ -69,18 +69,23 @@
       </row> 
       <row> 
        <column> 
-        <vaadin-combo-box caption="Inbound File Repository:" required style-name="small" width-full _id="comboXmlTinRepo"></vaadin-combo-box> 
+        <vaadin-combo-box caption="Start Execution Hour:" required style-name="small" width-full _id="cbxStartHour"></vaadin-combo-box> 
        </column> 
        <column> 
-        <vaadin-combo-box caption="Processed File Repository" required style-name="small" width-full _id="comboXmloutRepo"></vaadin-combo-box> 
+        <vaadin-combo-box caption="Job Execution Repeat:" style-name="small" width-full _id="comboXmljobScheduler"></vaadin-combo-box> 
        </column> 
       </row> 
       <row> 
        <column> 
-        <vaadin-combo-box caption="Exception File Repository:" required style-name="small" width-full _id="comboXmlTerrRepo"></vaadin-combo-box> 
+        <vaadin-combo-box caption="Inbound File Repository:" required style-name="small" width-full _id="comboXmlTinRepo"></vaadin-combo-box> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-combo-box caption="Processed File Repository" required style-name="small" width-full _id="comboXmloutRepo"></vaadin-combo-box> 
        </column> 
        <column> 
-        <vaadin-combo-box caption="Job Execution Repeat:" style-name="small" width-full _id="comboXmljobScheduler"></vaadin-combo-box> 
+        <vaadin-combo-box caption="Exception File Repository:" required style-name="small" width-full _id="comboXmlTerrRepo"></vaadin-combo-box> 
        </column> 
       </row> 
      </vaadin-grid-layout> 

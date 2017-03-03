@@ -1,8 +1,13 @@
 package com.bringit.experiment.remote;
 
+import com.bringit.experiment.bll.DataFile;
 import com.bringit.experiment.bll.FilesRepository;
+import com.bringit.experiment.bll.XmlDataLoadExecutionResult;
 import com.bringit.experiment.bll.XmlTemplate;
-
+import com.bringit.experiment.dao.BatchExperimentRecordsInsertDao;
+import com.bringit.experiment.dao.DataFileDao;
+import com.bringit.experiment.dao.XmlDataLoadExecutionResultDao;
+import com.bringit.experiment.data.ExperimentParser;
 import com.bringit.experiment.data.ExperimentParser2;
 import com.bringit.experiment.data.ResponseObj;
 import com.bringit.experiment.util.FTPUtil;
@@ -17,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,8 +52,38 @@ public class RemoteXmlJob implements Job {
                     InputStream is = sftp.secureGetFile(filesRepository.getFileRepoPath()+"/"+file.getFilename());
                     if (is != null) {
                         System.out.println("Received Input file and passing to parser: "+file.getFilename());
+                        //--  Data File --//
+                        /*
+                        DataFile dataFile = new DataFile();
+            			dataFile.setDataFileIsXml(true);
+            			dataFile.setDataFileIsCsv(false);
+            			dataFile.setDataFileName(file.getFilename());
+            			new DataFileDao().addDataFile(dataFile);
+                        */
+                        
                         boolean isSuccess = processFile(is, jobData, file.getFilename());
+                        //Split in 2 tasks
+                        //1)Parsing & Validation                  new ExperimentParser().parseXmlDocument(xmlDocument, xmlTemplate)
+                        //2)Batch Insert new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(parseXmlResponse.getCsvInsertColumns(), parseXmlResponse.getCsvInsertValues(), sessionUser, dataFile, xmlTemplate.getExperiment(), insertBatchSize);
+                       
+                        
+                        //-- Store Execution Result --//
+                        /*
+                        XmlDataLoadExecutionResult xmlDataLoadExecResult = new XmlDataLoadExecutionResult();
+    					xmlDataLoadExecResult.setDataFile(dataFile);
+    					xmlDataLoadExecResult.setXmlDataLoadExecException(false);
+    					xmlDataLoadExecResult.setXmlDataLoadExecTime(new Date());
+    					xmlDataLoadExecResult.setXmlTemplate(xmlTemplate);
+    					new XmlDataLoadExecutionResultDao().addXmlDataLoadExecutionResult(xmlDataLoadExecResult);
+    					*/
+                        
+                        
+                        //-- Final Step --//
+                        //a) Move file to Destination Repo
+                        //b) Update Data File Repo dataFile.setFileRepoId();                        
+                        
                         if (isSuccess) {
+                        	
                             // Send file to outbound
                             moveFileToRepo(outboundRepo, is, file.getFilename());
                             sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());

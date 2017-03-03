@@ -21,6 +21,7 @@ import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.FilesRepositoryDao;
 import com.bringit.experiment.dao.JobExecutionRepeatDao;
+import com.bringit.experiment.dao.XmlTemplateNodeDao;
 import com.bringit.experiment.dao.CsvTemplateColumnsDao;
 import com.bringit.experiment.dao.CsvTemplateDao;
 import com.bringit.experiment.ui.design.CsvTemplateDesign;
@@ -86,6 +87,9 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			if(csvt.getExceptionFileRepo() != null) this.comboCsvTerrRepo.setValue(csvt.getExceptionFileRepo().getFileRepoId());
 			this.txtCsvTComments.setValue(csvt.getCsvTemplateComments());
 			this.txtCsvTPrefix.setValue(csvt.getCsvTemplatePrefix());
+			this.dtCsvTstart.setValue(csvt.getCsvTemplateExecStartDate());
+			this.dtCsvTend.setValue(csvt.getCsvTemplateExecEndDate());
+			this.cbxStartHour.setValue(csvt.getCsvTemplateExecStartHour());
 			
 			this.csvCols = new CsvTemplateColumnsDao().getAllCsvTemplateColumnssByTemplateId(csvt.getCsvTemplateId());
 			this.expFields = new ExperimentFieldDao().getActiveExperimentFields(csvt.getExperiment());
@@ -109,7 +113,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				for(int j=0; j<expFields.size(); j++)
 				{
 					cbxExpFields.addItem(expFields.get(j).getExpFieldId());
-					cbxExpFields.setItemCaption(expFields.get(j).getExpFieldId(), expFields.get(j).getExpFieldName());
+					cbxExpFields.setItemCaption(expFields.get(j).getExpFieldId(), expFields.get(j).getExpFieldName() + " [ " + expFields.get(j).getExpFieldType() + " ]");
 					cbxExpFields.setWidth(100, Unit.PERCENTAGE);
 				}
 				
@@ -171,9 +175,10 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	protected void onSave() {
 		Collection itemIds = this.tblCsvCols.getContainerDataSource().getItemIds();
 		boolean validateReqFieldsResult = validateRequiredFields();		
+		boolean validateNonRepeatedExperimentFieldsResult = validateNonRepeatedExperimentFields();
 		
 		//---Validate Required Fields---//
-		if(itemIds.size() > 0 && validateReqFieldsResult)
+		if(itemIds.size() > 0 && validateReqFieldsResult && validateNonRepeatedExperimentFieldsResult)
 		{
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			
@@ -185,9 +190,15 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.csvt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvTerrRepo.getValue()));
 			this.csvt.setProcessedFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvoutRepo.getValue()));
 			this.csvt.setInboundFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvTinRepo.getValue()));
-			this.csvt.setJobExecRepeat(new JobExecutionRepeatDao().getJobExecutionRepeatById((int) this.comboCsvjobScheduler.getValue()));
+		
+			if(this.comboCsvjobScheduler.getValue()!=null) 
+				this.csvt.setJobExecRepeat(new JobExecutionRepeatDao().getJobExecutionRepeatById((int) this.comboCsvjobScheduler.getValue()));
 			this.csvt.setLastModifiedBy(sessionUser);
 			this.csvt.setModifiedDate(new Date());
+			this.csvt.setCsvTemplateExecStartDate(this.dtCsvTstart.getValue());
+			this.csvt.setCsvTemplateExecEndDate(this.dtCsvTend.getValue());
+			this.csvt.setCsvTemplateExecStartHour((int) this.cbxStartHour.getValue());
+			
 			if(this.csvt.getCsvTemplateId() != null )
 				new CsvTemplateDao().updateCsvTemplate(csvt);
 			else
@@ -245,6 +256,9 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				this.getUI().showNotification("There are no csv columns mapped on your CsvTemplate", Type.WARNING_MESSAGE);
 			else if(!validateReqFieldsResult)
 				this.getUI().showNotification("Please fill in all required Fields", Type.WARNING_MESSAGE);
+			else if(!validateNonRepeatedExperimentFieldsResult)
+				this.getUI().showNotification("You can not map 1 Experiment Field to 2 or more CSV Columns.", Type.WARNING_MESSAGE);
+		
 		}
 	}
 	
@@ -256,11 +270,34 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		if(!((ComboBox)(this.comboCsvTerrRepo)).isValid()) return false;
 		if(!((ComboBox)(this.comboCsvTinRepo)).isValid()) return false;
 		if(!((ComboBox)(this.comboCsvTExperiment)).isValid()) return false;
+		if(!((ComboBox)(this.cbxStartHour)).isValid()) return false;
 		
 		return true;
 	}
 	
 
+	private boolean validateNonRepeatedExperimentFields()
+	{
+		List<Integer> selectedExpFields = new ArrayList<Integer>();
+		
+		Collection itemIds = this.tblCsvCols.getContainerDataSource().getItemIds();
+		
+		for (Object itemIdObj : itemIds) 
+		{	
+			int itemId = (int)itemIdObj;
+			Item tblRowItem = this.tblCsvCols.getContainerDataSource().getItem(itemId);
+			
+			if(((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue() != null)
+			{
+				if(selectedExpFields.indexOf(((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue())) > -1)
+					return false;
+				else
+					selectedExpFields.add(((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue()));
+			}
+		}
+		return true;
+	}
+	
 	@SuppressWarnings("deprecation")
 	private void uploadFile() {
 
@@ -317,6 +354,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		this.tblCsvCols.setEnabled(b);
 		this.upCsv.setEnabled(b);
 		this.comboCsvjobScheduler.setEnabled(b);
+		this.cbxStartHour.setEnabled(b);
 	}
 	
 	private void fillNodes(String[] columns) {
@@ -365,7 +403,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			for(int j=0; j<expFields.size(); j++)
 			{
 				cbxExpFields.addItem(expFields.get(j).getExpFieldId());
-				cbxExpFields.setItemCaption(expFields.get(j).getExpFieldId(), expFields.get(j).getExpFieldName());
+				cbxExpFields.setItemCaption(expFields.get(j).getExpFieldId(), expFields.get(j).getExpFieldName() + " [ " + expFields.get(j).getExpFieldType() + " ]");
 				cbxExpFields.setWidth(100, Unit.PERCENTAGE);
 			}
 			
@@ -431,6 +469,14 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		this.comboCsvjobScheduler.setNullSelectionAllowed(true);
 		this.comboCsvjobScheduler.setImmediate(true);
 		this.comboCsvjobScheduler.addStyleName("small");
+		
+		//Hour Execution Start
+		this.cbxStartHour.setNullSelectionAllowed(false);
+		for(int i=0; i<24; i++)
+		{
+			this.cbxStartHour.addItem(i);
+			this.cbxStartHour.setItemCaption(i, (i<10 ? "0" :"") + i + ":00");
+		}
 		
 	}
 	private void onDelete()

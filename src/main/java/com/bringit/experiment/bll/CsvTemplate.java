@@ -19,6 +19,9 @@ public class CsvTemplate {
 	@Column(name="CsvTemplateId")
 	private Integer csvTemplateId;
 
+	@Column(name="CsvTemplateIsActive")
+	private boolean csvTemplateIsActive;
+	
 	@Column(name="CsvTemplateName")
 	private String CsvTemplateName;
 	
@@ -27,14 +30,21 @@ public class CsvTemplate {
 	
 	@Column(name="CsvTemplatePrefix")
 	private String csvTemplatePrefix;
+
+	@Column(name="CsvTemplateExecStartDate")
+	private Date csvTemplateExecStartDate;
+	
+	@Column(name="CsvTemplateExecStartHour")
+	private int csvTemplateExecStartHour;
+	
+	@Column(name="CsvTemplateExecEndDate")
+	private Date csvTemplateExecEndDate;
 	
 	@Column(name="CreatedDate")
 	private Date createdDate;
 	
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
-	@Column(name="CsvTemplateIsActive")
-	private boolean csvTemplateIsActive;
 	
 	@OneToOne
     @JoinColumn(name="InboundFileRepoId", unique=false, updatable=false)
@@ -94,6 +104,30 @@ public class CsvTemplate {
 
 	public void setCsvTemplatePrefix(String csvTemplatePrefix) {
 		this.csvTemplatePrefix = csvTemplatePrefix;
+	}
+
+	public Date getCsvTemplateExecStartDate() {
+		return csvTemplateExecStartDate;
+	}
+
+	public void setCsvTemplateExecStartDate(Date csvTemplateExecStartDate) {
+		this.csvTemplateExecStartDate = csvTemplateExecStartDate;
+	}
+
+	public int getCsvTemplateExecStartHour() {
+		return csvTemplateExecStartHour;
+	}
+
+	public void setCsvTemplateExecStartHour(int csvTemplateExecStartHour) {
+		this.csvTemplateExecStartHour = csvTemplateExecStartHour;
+	}
+
+	public Date getCsvTemplateExecEndDate() {
+		return csvTemplateExecEndDate;
+	}
+
+	public void setCsvTemplateExecEndDate(Date csvTemplateExecEndDate) {
+		this.csvTemplateExecEndDate = csvTemplateExecEndDate;
 	}
 
 	public Date getCreatedDate() {

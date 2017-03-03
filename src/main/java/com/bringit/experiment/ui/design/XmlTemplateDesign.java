@@ -28,17 +28,18 @@ public class XmlTemplateDesign extends VerticalLayout {
 	protected Button btnCancel;
 	protected VerticalLayout crudLayout;
 	protected ComboBox comboXmlTExperiment;
+	protected Upload upXml;
+	protected CheckBox chxActive;
+	protected TextField txtXmlTName;
 	protected TextField txtXmlTPrefix;
 	protected TextField txtXmlTComments;
 	protected DateField startXmlTstart;
 	protected DateField endXmlTstart;
-	protected ComboBox comboXmlTinRepo;
 	protected ComboBox comboXmloutRepo;
 	protected ComboBox comboXmlTerrRepo;
+	protected ComboBox comboXmlTinRepo;
 	protected ComboBox comboXmljobScheduler;
-	protected TextField txtXmlTName;
-	protected Upload upXml;
-	protected CheckBox chxActive;
+	protected ComboBox cbxStartHour;
 	protected Table tblXmlNodes;
 	protected Button btnDelete;
 

@@ -82,7 +82,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		this.tblXmlNodes.addContainerProperty("Xml Node Name", TextArea.class, null);
 		this.tblXmlNodes.addContainerProperty("Is Loop Node", CheckBox.class, null);
 		this.tblXmlNodes.addContainerProperty("Is Attribute", CheckBox.class, null);
-		this.tblXmlNodes.addContainerProperty("Experiment Field", ComboBox.class, null);		
+		this.tblXmlNodes.addContainerProperty("Experiment Field", ComboBox.class, null);
 		this.tblXmlNodes.setPageLength(0);
 		fillCombos();
 		uploadFile();
@@ -113,6 +113,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			
 			this.xmlNodes = new XmlTemplateNodeDao().getAllXmlTemplateNodesByTemplateId(xmlt.getXmlTemplateId());
 			this.expFields = new ExperimentFieldDao().getActiveExperimentFields(xmlt.getExperiment());
+			this.cbxStartHour.setValue(xmlt.getXmlTemplateExecStartHour());
 			
 			Object[] itemValues = new Object[5];
 			for(int i=0; i<this.xmlNodes.size(); i++)
@@ -145,7 +146,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				for(int j=0; j<expFields.size(); j++)
 				{
 					cbxExpFields.addItem(expFields.get(j).getExpFieldId());
-					cbxExpFields.setItemCaption(expFields.get(j).getExpFieldId(), expFields.get(j).getExpFieldName());
+					cbxExpFields.setItemCaption(expFields.get(j).getExpFieldId(), expFields.get(j).getExpFieldName() + " [ " + expFields.get(j).getExpFieldType() + " ]");
 					cbxExpFields.setWidth(100, Unit.PERCENTAGE);
 				}
 				
@@ -154,7 +155,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				if(this.xmlNodes.get(i).getExpField() != null)
 					cbxExpFields.setValue(this.xmlNodes.get(i).getExpField().getExpFieldId());
 				itemValues[4] = cbxExpFields;
-				
+								
 				this.tblXmlNodes.addItem(itemValues, this.xmlNodes.get(i).getXmlTemplateNodeId());
 			}
 	
@@ -208,9 +209,9 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		Collection itemIds = this.tblXmlNodes.getContainerDataSource().getItemIds();
 		boolean validateReqFieldsResult = validateRequiredFields();
 		boolean validateUniqueLoopNodeResult = validateUniqueLoopNode();		
-		
+		boolean validateNonRepeatedExperimentFieldsResult = validateNonRepeatedExperimentFields();
 		//---Validate Required Fields---//
-		if(itemIds.size() > 0 && validateReqFieldsResult && validateUniqueLoopNodeResult)
+		if(itemIds.size() > 0 && validateReqFieldsResult && validateUniqueLoopNodeResult && validateNonRepeatedExperimentFieldsResult)
 		{
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			
@@ -223,11 +224,15 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.xmlt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmlTerrRepo.getValue()));
 			this.xmlt.setProcessedFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmloutRepo.getValue()));
 			this.xmlt.setInboundFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmlTinRepo.getValue()));
-			this.xmlt.setJobExecRepeat(new JobExecutionRepeatDao().getJobExecutionRepeatById((int) this.comboXmljobScheduler.getValue()));
+			
+			if(this.comboXmljobScheduler.getValue()!=null) 
+				this.xmlt.setJobExecRepeat(new JobExecutionRepeatDao().getJobExecutionRepeatById((int) this.comboXmljobScheduler.getValue()));
+			
 			this.xmlt.setLastModifiedBy(sessionUser);
 			this.xmlt.setModifiedDate(new Date());
 			this.xmlt.setXmlTemplateExecStartDate(this.startXmlTstart.getValue());
 			this.xmlt.setXmlTemplateExecEndDate(this.endXmlTstart.getValue());
+			this.xmlt.setXmlTemplateExecStartHour((int) this.cbxStartHour.getValue());
 			if(this.xmlt.getXmlTemplateId() != null ) {
 				new XmlTemplateDao().updateXmlTemplate(xmlt);
 			/*	RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
@@ -238,7 +243,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				new XmlTemplateDao().addXmlTemplate(xmlt);
 				/*XmlTemplate xmltWithId = new XmlTemplateDao().getXmlTemplateByExperimentId(xmlt.getExperiment().getExpId());
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
-				remoteFileUtil.updateJob(Integer.toString(xmltWithId.getXmlTemplateId()), xmltWithId);*/
+				NullPointer --> remoteFileUtil.updateJob(Integer.toString(xmltWithId.getXmlTemplateId()), xmltWithId);*/
 			}
 			
 			//Save XmlTemplateNodes
@@ -268,9 +273,6 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				
 					ExperimentField selectedExpField = new ExperimentField();
 					selectedExpField.setExpFieldId((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue());
-				
-					//System.out.println("Selected CBX Exp Field: " + (int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue());
-					
 					xmlNode.setExpField(selectedExpField);
 				}
 				if(itemId > 0)
@@ -296,7 +298,8 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				this.getUI().showNotification("Please fill in all required Fields", Type.WARNING_MESSAGE);
 			else if(!validateUniqueLoopNodeResult)
 				this.getUI().showNotification("Only 1 Loop Node is allowed", Type.WARNING_MESSAGE);
-			
+			else if(!validateNonRepeatedExperimentFieldsResult)
+				this.getUI().showNotification("You can not map 1 Experiment Field to 2 or more Xml Node Value/Attribute.", Type.WARNING_MESSAGE);
 		}
 	}
 	
@@ -308,7 +311,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		if(!((ComboBox)(this.comboXmlTerrRepo)).isValid()) return false;
 		if(!((ComboBox)(this.comboXmlTinRepo)).isValid()) return false;
 		if(!((ComboBox)(this.comboXmlTExperiment)).isValid()) return false;
-		
+		if(!((ComboBox)(this.cbxStartHour)).isValid()) return false;
 		return true;
 	}
 	
@@ -330,6 +333,28 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		
 		return true;
 		
+	}
+	
+	private boolean validateNonRepeatedExperimentFields()
+	{
+		List<Integer> selectedExpFields = new ArrayList<Integer>();
+		
+		Collection itemIds = this.tblXmlNodes.getContainerDataSource().getItemIds();
+		
+		for (Object itemIdObj : itemIds) 
+		{	
+			int itemId = (int)itemIdObj;
+			Item tblRowItem = this.tblXmlNodes.getContainerDataSource().getItem(itemId);
+			
+			if(((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue() != null)
+			{
+				if(selectedExpFields.indexOf(((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue())) > -1)
+					return false;
+				else
+					selectedExpFields.add(((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue()));
+			}
+		}
+		return true;
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -393,6 +418,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		this.tblXmlNodes.setEnabled(b);
 		this.upXml.setEnabled(b);
 		this.comboXmljobScheduler.setEnabled(b);
+		this.cbxStartHour.setEnabled(b);
 	}
 	
 	private void fillNodes() {
@@ -415,7 +441,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.tblXmlNodes.addContainerProperty("Xml Node Name", TextArea.class, null);
 			this.tblXmlNodes.addContainerProperty("Is Loop Node", CheckBox.class, null);
 			this.tblXmlNodes.addContainerProperty("Is Attribute", CheckBox.class, null);
-			this.tblXmlNodes.addContainerProperty("Experiment Field", ComboBox.class, null);		
+			this.tblXmlNodes.addContainerProperty("Experiment Field", ComboBox.class, null);
 			this.tblXmlNodes.setPageLength(0);
 			
 		}
@@ -467,14 +493,14 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			for(int j=0; j<expFields.size(); j++)
 			{
 				cbxExpFields.addItem(expFields.get(j).getExpFieldId());
-				cbxExpFields.setItemCaption(expFields.get(j).getExpFieldId(), expFields.get(j).getExpFieldName());
+				cbxExpFields.setItemCaption(expFields.get(j).getExpFieldId(), expFields.get(j).getExpFieldName() + " [ " + expFields.get(j).getExpFieldType() + " ]");
 				cbxExpFields.setWidth(100, Unit.PERCENTAGE);
 			}
 			
 			//cbxExpFields.setNullSelectionAllowed(false);
 			cbxExpFields.addStyleName("tiny");
 			itemValues[4] = cbxExpFields;
-			
+
 			this.lastNewItemId = this.lastNewItemId - 1;
 			this.tblXmlNodes.addItem(itemValues, this.lastNewItemId);
 			
@@ -533,6 +559,14 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		this.comboXmljobScheduler.setNullSelectionAllowed(true);
 		this.comboXmljobScheduler.setImmediate(true);
 		this.comboXmljobScheduler.addStyleName("small");
+		
+		//Hour Execution Start
+		this.cbxStartHour.setNullSelectionAllowed(false);
+		for(int i=0; i<24; i++)
+		{
+			this.cbxStartHour.addItem(i);
+			this.cbxStartHour.setItemCaption(i, (i<10 ? "0" :"") + i + ":00");
+		}
 		
 	}
 	private void onDelete()

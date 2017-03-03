@@ -233,8 +233,15 @@ public class ExperimentForm extends ExperimentDesign {
             public void validate(Object value) throws InvalidValueException {
                 if(!StringUtils.isAlphanumeric(((String) value).replaceAll("_", "")))
                     throw new InvalidValueException("Only AlphaNumeric and Underscores are allowed for DB Names");
+                else
+                {
+                	String dbFieldIdName = ((String) value);
+                	if(dbFieldIdName.toLowerCase().equals("recordid") || dbFieldIdName.toLowerCase().equals("comments") || dbFieldIdName.toLowerCase().equals("createdby")
+						 || dbFieldIdName.toLowerCase().equals("lastmodifiedby") || dbFieldIdName.toLowerCase().equals("datafileid")
+						 || dbFieldIdName.toLowerCase().equals("createddate") || dbFieldIdName.toLowerCase().equals("lastmodifieddate")) 
+                    throw new InvalidValueException("'RecordId', 'Comments', 'CreatedBy', 'LastModifiedBy', 'DataFileId', 'CreatedDate', 'LastModifiedDate' are Non-Eligible for Experiment Field DB Ids.");
+                }
             }
-            
         });
 		
 		itemValues[3] = txtExpDbFieldNameId;
@@ -289,10 +296,10 @@ public class ExperimentForm extends ExperimentDesign {
 		boolean validateDbNameFieldsResult = validateDbNameFields();
 		boolean validateDuplicateDbTableNameResult = validateDuplicateDbTableName();
 		boolean validateDuplicatedDbNameFieldsResult = validateDuplicatedDbNameFields();
-		
+		boolean validateRestrictedDbTableFieldsResult = validateRestrictedDbTableFields();
 		
 		//---Validate Required Fields---//
-		if(itemIds.size() > 0 && validateReqFieldsResult && validateDbNameFieldsResult && validateDuplicateDbTableNameResult && validateDuplicatedDbNameFieldsResult)
+		if(itemIds.size() > 0 && validateReqFieldsResult && validateDbNameFieldsResult && validateDuplicateDbTableNameResult && validateDuplicatedDbNameFieldsResult && validateRestrictedDbTableFieldsResult )
 		{
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			
@@ -371,6 +378,8 @@ public class ExperimentForm extends ExperimentDesign {
 				this.getUI().showNotification("DB Table Name already exists.", Type.WARNING_MESSAGE);
 				this.txtExpDbTableNameId.selectAll();
 			}
+			else if(!validateRestrictedDbTableFieldsResult)
+				this.getUI().showNotification("'RecordId', 'Comments', 'CreatedBy', 'LastModifiedBy', 'DataFileId', 'CreatedDate', 'LastModifiedDate' are Non-Eligible for Experiment Field DB Ids.", Type.WARNING_MESSAGE);
 		}
     }
 	
@@ -475,6 +484,27 @@ public class ExperimentForm extends ExperimentDesign {
 		return true;
 	}
 	
-	
+	private boolean validateRestrictedDbTableFields()
+	{
+		Collection itemIds = this.tblExperimentFields.getContainerDataSource().getItemIds();
+		
+		for (Object itemIdObj : itemIds) 
+		{	
+			int itemId = (int)itemIdObj;
+			if(itemId < 0)
+			{
+				Item tblRowItem = this.tblExperimentFields.getContainerDataSource().getItem(itemId);
+					
+				String dbFieldIdName = ((TextField)(tblRowItem.getItemProperty("DB Id").getValue())).getValue();
+
+				if(dbFieldIdName.toLowerCase().equals("recordid") || dbFieldIdName.toLowerCase().equals("comments") || dbFieldIdName.toLowerCase().equals("createdby")
+					 || dbFieldIdName.toLowerCase().equals("lastmodifiedby") || dbFieldIdName.toLowerCase().equals("datafileid")
+					 || dbFieldIdName.toLowerCase().equals("createddate") || dbFieldIdName.toLowerCase().equals("lastmodifieddate")) 
+                	return false;				
+			}
+		}
+		
+		return true;
+	}
 	
 }

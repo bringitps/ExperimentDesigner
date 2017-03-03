@@ -17,12 +17,12 @@
        <vaadin-grid-layout width="100px" height="30px"> 
         <row> 
          <column> 
-          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="small primary" plain-text _id="btnSave">
+          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="tiny primary" plain-text _id="btnSave">
             Save 
           </vaadin-button> 
          </column> 
          <column> 
-          <vaadin-button style-name="small" plain-text _id="btnCancel">
+          <vaadin-button style-name="tiny" plain-text _id="btnCancel">
             Cancel 
           </vaadin-button> 
          </column> 
@@ -32,7 +32,7 @@
      </row> 
     </vaadin-grid-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-vertical-layout width-auto height="400px"> 
+   <vaadin-vertical-layout width-auto height="500px"> 
     <vaadin-vertical-layout style-name="CsvTemplateCRUDLayout" width="940px" _id="crudLayout"> 
      <vaadin-grid-layout spacing id="gridMainData" width="940px" margin> 
       <row> 
@@ -61,18 +61,31 @@
       </row> 
       <row> 
        <column> 
-        <vaadin-combo-box caption="Inbound File Repository:" required style-name="small" width-full _id="comboCsvTinRepo"></vaadin-combo-box> 
+        <vaadin-date-field caption="Start Execution Date:" style-name="small" width-full _id="dtCsvTstart"></vaadin-date-field> 
        </column> 
        <column> 
-        <vaadin-combo-box caption="Processed File Repository" required style-name="small" width-full _id="comboCsvoutRepo"></vaadin-combo-box> 
+        <vaadin-date-field caption="Finish Execution Date:" style-name="small" width-full _id="dtCsvTend"></vaadin-date-field> 
        </column> 
       </row> 
       <row> 
        <column> 
-        <vaadin-combo-box caption="Exception File Repository:" required style-name="small" width-full _id="comboCsvTerrRepo"></vaadin-combo-box> 
+        <vaadin-combo-box caption="Start Execution Hour:" required style-name="small" width-full _id="cbxStartHour"></vaadin-combo-box> 
        </column> 
        <column> 
         <vaadin-combo-box caption="Job Execution Repeat:" style-name="small" width-full _id="comboCsvjobScheduler"></vaadin-combo-box> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-combo-box caption="Inbound File Repository:" required style-name="small" width-full _id="comboCsvTinRepo"></vaadin-combo-box> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-combo-box caption="Processed File Repository" required style-name="small" width-full _id="comboCsvoutRepo"></vaadin-combo-box> 
+       </column> 
+       <column> 
+        <vaadin-combo-box caption="Exception File Repository:" required style-name="small" width-full _id="comboCsvTerrRepo"></vaadin-combo-box> 
        </column> 
       </row> 
      </vaadin-grid-layout> 

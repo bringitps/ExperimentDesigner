@@ -171,7 +171,7 @@ public class ExperimentParser {
 	}
 
 
-	public ResponseObj parseXmlDocument(String fileName, Document xmlDocument, XmlTemplate xmlTemplate)
+	public ResponseObj parseXmlDocument(Document xmlDocument, XmlTemplate xmlTemplate)
 	{
 		
 		class DBFieldValues {
@@ -407,7 +407,7 @@ public class ExperimentParser {
 		
 		int totalRecords = 0;
 			
-		//4) Load Loop Node Field Values
+		//3) Load Loop Node Field Values
 		
 		 XPath xPath = XPathFactory.newInstance().newXPath();
 	     XPathExpression xPathExpression = null;

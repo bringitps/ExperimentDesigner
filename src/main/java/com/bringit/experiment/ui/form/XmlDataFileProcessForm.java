@@ -122,7 +122,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 
 			this.txtXmlDataFileLoadResults.setValue(this.txtXmlDataFileLoadResults.getValue() + "Step 1 of 3. Validating & Parsing XML File.\n");
 			xmlTemplate = new XmlTemplateDao().getXmlTemplateById((int)cbxXmlTemplate.getValue());
-			ResponseObj parseXmlResponse = new ExperimentParser().parseXmlDocument(loadedFileName, xmlDocument, xmlTemplate);
+			ResponseObj parseXmlResponse = new ExperimentParser().parseXmlDocument(xmlDocument, xmlTemplate);
 			
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			DataFile dataFile = new DataFile();
@@ -135,8 +135,8 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 			
 			if(parseXmlResponse.getCode() == 0)
 			{
-				this.txtXmlDataFileLoadResults.setValue(this.txtXmlDataFileLoadResults.getValue() + "Step 1 of 1. Result (OK)\n");
-				this.txtXmlDataFileLoadResults.setValue(this.txtXmlDataFileLoadResults.getValue() + "Step 2 of 1. Saving information into Data Warehouse\n");
+				this.txtXmlDataFileLoadResults.setValue(this.txtXmlDataFileLoadResults.getValue() + "Step 1 of 3. Result (OK)\n");
+				this.txtXmlDataFileLoadResults.setValue(this.txtXmlDataFileLoadResults.getValue() + "Step 2 of 3. Saving information into Data Warehouse\n");
 				
 				//Execute Batch Insert
 				

@@ -34,14 +34,11 @@ public class XmlTemplate {
 	@Column(name="XmlTemplateExecStartDate")
 	private Date xmlTemplateExecStartDate;
 	
+	@Column(name="XmlTemplateExecStartHour")
+	private int xmlTemplateExecStartHour;
+	
 	@Column(name="XmlTemplateExecEndDate")
 	private Date xmlTemplateExecEndDate;
-	
-	@Column(name="XmlTemplateExecHours")
-	private int xmlTemplateExecHours;
-	
-	@Column(name="XmlTemplateExecMinutes")
-	private int xmlTemplateExecMinutes;
 	
 	@Column(name="CreatedDate")
 	private Date createdDate;
@@ -134,22 +131,14 @@ public class XmlTemplate {
 		this.xmlTemplateExecEndDate = xmlTemplateExecEndDate;
 	}
 
-	public int getXmlTemplateExecHours() {
-		return xmlTemplateExecHours;
+	public int getXmlTemplateExecStartHour() {
+		return xmlTemplateExecStartHour;
 	}
 
-	public void setXmlTemplateExecHours(int xmlTemplateExecHours) {
-		this.xmlTemplateExecHours = xmlTemplateExecHours;
+	public void setXmlTemplateExecStartHour(int xmlTemplateExecStartHour) {
+		this.xmlTemplateExecStartHour = xmlTemplateExecStartHour;
 	}
-
-	public int getXmlTemplateExecMinutes() {
-		return xmlTemplateExecMinutes;
-	}
-
-	public void setXmlTemplateExecMinutes(int xmlTemplateExecMinutes) {
-		this.xmlTemplateExecMinutes = xmlTemplateExecMinutes;
-	}
-
+	
 	public Date getCreatedDate() {
 		return createdDate;
 	}

@@ -58,7 +58,6 @@ public class ExperimentForm extends ExperimentDesign {
 		this.tblExperimentFields.setContainerDataSource(null);
 		this.tblExperimentFields.addContainerProperty("*", CheckBox.class, null);
 		this.tblExperimentFields.addContainerProperty("Name", TextField.class, null);
-		this.tblExperimentFields.addContainerProperty("Key", CheckBox.class, null);
 		this.tblExperimentFields.addContainerProperty("Active", CheckBox.class, null);
 		this.tblExperimentFields.addContainerProperty("DB Id", TextField.class, null);
 		this.tblExperimentFields.addContainerProperty("DB DataType", ComboBox.class, null);
@@ -93,7 +92,7 @@ public class ExperimentForm extends ExperimentDesign {
 			
 			this.experimentFields = new ExperimentFieldDao().getAllExperimentFieldsByExperiment(this.experiment);
 
-			Object[] itemValues = new Object[7];
+			Object[] itemValues = new Object[6];
 
 			//Loading Child Fields
 			
@@ -110,21 +109,16 @@ public class ExperimentForm extends ExperimentDesign {
 				txtFieldName.addStyleName("small");
 				itemValues[1] = txtFieldName;
 				
-				CheckBox chxIsKey = new CheckBox();
-				chxIsKey.setValue(this.experimentFields.get(i).isExpFieldIsKey() ? true : false);
-				chxIsKey.addStyleName("small");
-				itemValues[2] = chxIsKey;
-				
 				CheckBox chxActive = new CheckBox();
 				chxActive.setValue(this.experimentFields.get(i).isExpFieldIsActive() ? true : false);
 				chxActive.addStyleName("small");
-				itemValues[3] = chxActive;
+				itemValues[2] = chxActive;
 				
 				TextField txtExpDbFieldNameId = new TextField();
 				txtExpDbFieldNameId.setValue(this.experimentFields.get(i).getExpDbFieldNameId());
 				txtExpDbFieldNameId.setEnabled(false);
 				txtExpDbFieldNameId.addStyleName("small");
-				itemValues[4] = txtExpDbFieldNameId;
+				itemValues[3] = txtExpDbFieldNameId;
 				
 				ComboBox cbxFieldType = new ComboBox("");
 				
@@ -137,7 +131,7 @@ public class ExperimentForm extends ExperimentDesign {
 				
 				cbxFieldType.setValue(this.experimentFields.get(i).getExpFieldType());
 				cbxFieldType.setEnabled(false);
-				itemValues[5] = cbxFieldType;
+				itemValues[4] = cbxFieldType;
 				
 				ComboBox cbxUnitOfMeasure = new ComboBox("");
 				
@@ -151,12 +145,11 @@ public class ExperimentForm extends ExperimentDesign {
 				if(this.experimentFields.get(i).getUnitOfMeasure() != null)
 				{
 					cbxUnitOfMeasure.setValue(this.experimentFields.get(i).getUnitOfMeasure().getUomId());
-					//cbxUnitOfMeasure.setNullSelectionAllowed(false);
 					cbxUnitOfMeasure.setImmediate(true);
 					cbxUnitOfMeasure.addStyleName("small");
 				}
 				
-				itemValues[6] = cbxUnitOfMeasure;
+				itemValues[5] = cbxUnitOfMeasure;
 				
 				this.tblExperimentFields.addItem(itemValues, this.experimentFields.get(i).getExpFieldId());
 		    }
@@ -211,7 +204,7 @@ public class ExperimentForm extends ExperimentDesign {
 	
 	private void addField(){
 		
-		Object[] itemValues = new Object[7];
+		Object[] itemValues = new Object[6];
 		
 		CheckBox chxSelect = new CheckBox();
 		chxSelect.setVisible(false);
@@ -225,14 +218,10 @@ public class ExperimentForm extends ExperimentDesign {
 		txtFieldName.setRequiredError("This field is mandatory");
 		itemValues[1] = txtFieldName;
 		
-		CheckBox chxIsKey = new CheckBox();
-		chxIsKey.addStyleName("small");
-		itemValues[2] = chxIsKey;
-		
 		CheckBox chxActive = new CheckBox();
 		chxActive.addStyleName("small");
 		chxActive.setValue(true);
-		itemValues[3] = chxActive;
+		itemValues[2] = chxActive;
 		
 		
 		TextField txtExpDbFieldNameId = new TextField();
@@ -248,7 +237,7 @@ public class ExperimentForm extends ExperimentDesign {
             
         });
 		
-		itemValues[4] = txtExpDbFieldNameId;
+		itemValues[3] = txtExpDbFieldNameId;
 		
 		ComboBox cbxFieldType = new ComboBox("");
 		
@@ -264,7 +253,7 @@ public class ExperimentForm extends ExperimentDesign {
 		cbxFieldType.setRequired(true);
 		cbxFieldType.setRequiredError("This field is mandatory");
 		cbxFieldType.addStyleName("small");
-		itemValues[5] = cbxFieldType;
+		itemValues[4] = cbxFieldType;
 		
 		ComboBox cbxUnitOfMeasure = new ComboBox("");
 		
@@ -275,13 +264,10 @@ public class ExperimentForm extends ExperimentDesign {
 			cbxUnitOfMeasure.setWidth(100, Unit.PIXELS);
 		}
 		
-		//cbxUnitOfMeasure.setNullSelectionAllowed(false);
 		cbxUnitOfMeasure.setImmediate(true);
-		//cbxUnitOfMeasure.setRequired(true);
-		//cbxUnitOfMeasure.setRequiredError("This field is mandatory");
 		cbxUnitOfMeasure.addStyleName("small");
 		
-		itemValues[6] = cbxUnitOfMeasure;
+		itemValues[5] = cbxUnitOfMeasure;
 		
 		this.lastNewItemId = this.lastNewItemId - 1;
 		this.tblExperimentFields.addItem(itemValues, this.lastNewItemId);
@@ -343,7 +329,6 @@ public class ExperimentForm extends ExperimentDesign {
 				
 				ExperimentField experimentField = new ExperimentField();
 				experimentField.setExpFieldName(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
-				experimentField.setExpFieldIsKey(((CheckBox)(tblRowItem.getItemProperty("Key").getValue())).getValue());
 				experimentField.setExpFieldIsActive(((CheckBox)(tblRowItem.getItemProperty("Active").getValue())).getValue());
 				experimentField.setExpDbFieldNameId(((TextField)(tblRowItem.getItemProperty("DB Id").getValue())).getValue());
 				experimentField.setExpFieldType((String)((ComboBox)(tblRowItem.getItemProperty("DB DataType").getValue())).getValue());

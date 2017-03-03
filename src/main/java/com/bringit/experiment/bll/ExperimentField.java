@@ -23,9 +23,6 @@ public class ExperimentField {
 	@Column(name="ExpFieldIsActive")
 	private boolean expFieldIsActive;
 	
-	@Column(name="ExpFieldIsKey")
-	private boolean expFieldIsKey;
-	
 	@Column(name="ExpFieldName")
 	private String expFieldName;
 	
@@ -63,14 +60,6 @@ public class ExperimentField {
 
 	public void setExpFieldIsActive(boolean expFieldIsActive) {
 		this.expFieldIsActive = expFieldIsActive;
-	}
-
-	public boolean isExpFieldIsKey() {
-		return expFieldIsKey;
-	}
-
-	public void setExpFieldIsKey(boolean expFieldIsKey) {
-		this.expFieldIsKey = expFieldIsKey;
 	}
 
 	public String getExpFieldName() {

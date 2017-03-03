@@ -180,9 +180,9 @@ public class Test {
 		 //Read a sample XML and load it into Values table;
 		 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample.xml");
 		 ExperimentParser parser = new ExperimentParser();
-		 ResponseObj respObj = parser.parseXML(xmlFile, xml);
+		 //ResponseObj respObj = parser.parseXML(xmlFile, xml);
 		 
-		 return respObj.getDescription() + respObj.getDetail();
+		 return null;//respObj.getDescription() + respObj.getDetail();
 	 }
 	private static void addNewNode(String parent, boolean isRoot, boolean isAttr, String tagname, ExperimentField expFieldId,
 			XmlTemplate xml, XmlTemplateNodeDao xmlNodeDao) {
@@ -200,9 +200,9 @@ public class Test {
 			 File xmlFile = new File("C:\\Users\\acer\\git\\ExperimentDesigner\\src\\main\\java\\com\\bringit\\experiment\\dal\\xmlSample.xml");
 			 XmlTemplateDao dao = new XmlTemplateDao();
 			 ExperimentParser parser = new ExperimentParser();
-			 ResponseObj respObj = parser.parseXML(xmlFile, dao.getXmlTemplateById(1));
+			 //ResponseObj respObj = parser.parseXML(xmlFile, dao.getXmlTemplateById(1));
 			 
-			 return respObj.getDescription() + respObj.getDetail();
+			 return null;//respObj.getDescription() + respObj.getDetail();
 		}
 		
 
@@ -279,7 +279,6 @@ public class Test {
 		 field.setExpFieldType(type);
 		 field.setExpFieldName(name);
 		 field.setExpFieldIsActive(active);
-		 field.setExpFieldIsKey(isKey);
 		 field.setUnitOfMeasure(uom);
 		 field.setExperiment(exp);
 		 dao.addExperimentField(field);	

@@ -120,7 +120,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 		
 			this.txtXmlDataFileLoadResults.setValue("===Starting Process===\n\n");
 
-			this.txtXmlDataFileLoadResults.setValue(this.txtXmlDataFileLoadResults.getValue() + "Step 1 of 10. Validating & Parsing XML File.\n");
+			this.txtXmlDataFileLoadResults.setValue(this.txtXmlDataFileLoadResults.getValue() + "Step 1 of 3. Validating & Parsing XML File.\n");
 			xmlTemplate = new XmlTemplateDao().getXmlTemplateById((int)cbxXmlTemplate.getValue());
 			ResponseObj parseXmlResponse = new ExperimentParser().parseXmlDocument(loadedFileName, xmlDocument, xmlTemplate);
 			

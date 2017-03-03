@@ -17,7 +17,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.bringit.experiment.remote.RemoteFileUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -37,6 +36,7 @@ import com.bringit.experiment.dao.FilesRepositoryDao;
 import com.bringit.experiment.dao.JobExecutionRepeatDao;
 import com.bringit.experiment.dao.XmlTemplateDao;
 import com.bringit.experiment.dao.XmlTemplateNodeDao;
+import com.bringit.experiment.remote.RemoteFileUtil;
 import com.bringit.experiment.ui.design.XmlTemplateDesign;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -240,7 +240,6 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
 				remoteFileUtil.updateJob(Integer.toString(xmltWithId.getXmlTemplateId()), xmltWithId);
 			}
-			
 			
 			//Save XmlTemplateNodes
 
@@ -544,8 +543,6 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		this.xmlt.setModifiedDate(new Date());
 		XmlTemplateDao xmlDao = new XmlTemplateDao();
 		xmlDao.updateXmlTemplate(xmlt);
-		RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
-		remoteFileUtil.cancelJob(Integer.toString(xmlt.getXmlTemplateId()));
 		closeModalWindow();
 		
 		/*

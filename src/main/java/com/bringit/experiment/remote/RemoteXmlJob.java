@@ -2,27 +2,32 @@ package com.bringit.experiment.remote;
 
 import com.bringit.experiment.bll.DataFile;
 import com.bringit.experiment.bll.FilesRepository;
-import com.bringit.experiment.bll.XmlDataLoadExecutionResult;
+
 import com.bringit.experiment.bll.XmlTemplate;
+
 import com.bringit.experiment.dao.BatchExperimentRecordsInsertDao;
 import com.bringit.experiment.dao.DataFileDao;
-import com.bringit.experiment.dao.XmlDataLoadExecutionResultDao;
 import com.bringit.experiment.data.ExperimentParser;
-import com.bringit.experiment.data.ExperimentParser2;
+
 import com.bringit.experiment.data.ResponseObj;
+import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.FTPUtil;
 
 import com.jcraft.jsch.ChannelSftp;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPFile;
-import org.quartz.*;
 
+import org.quartz.*;
+import org.w3c.dom.Document;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.Date;
+
 import java.util.List;
 
 /**
@@ -53,47 +58,35 @@ public class RemoteXmlJob implements Job {
                     if (is != null) {
                         System.out.println("Received Input file and passing to parser: "+file.getFilename());
                         //--  Data File --//
-                        /*
+
                         DataFile dataFile = new DataFile();
             			dataFile.setDataFileIsXml(true);
             			dataFile.setDataFileIsCsv(false);
             			dataFile.setDataFileName(file.getFilename());
             			new DataFileDao().addDataFile(dataFile);
-                        */
+
+                        dataFile = new DataFileDao().getDataFileByName(file.getFilename());
                         
-                        boolean isSuccess = processFile(is, jobData, file.getFilename());
-                        //Split in 2 tasks
-                        //1)Parsing & Validation                  new ExperimentParser().parseXmlDocument(xmlDocument, xmlTemplate)
-                        //2)Batch Insert new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(parseXmlResponse.getCsvInsertColumns(), parseXmlResponse.getCsvInsertValues(), sessionUser, dataFile, xmlTemplate.getExperiment(), insertBatchSize);
-                       
-                        
-                        //-- Store Execution Result --//
-                        /*
-                        XmlDataLoadExecutionResult xmlDataLoadExecResult = new XmlDataLoadExecutionResult();
-    					xmlDataLoadExecResult.setDataFile(dataFile);
-    					xmlDataLoadExecResult.setXmlDataLoadExecException(false);
-    					xmlDataLoadExecResult.setXmlDataLoadExecTime(new Date());
-    					xmlDataLoadExecResult.setXmlTemplate(xmlTemplate);
-    					new XmlDataLoadExecutionResultDao().addXmlDataLoadExecutionResult(xmlDataLoadExecResult);
-    					*/
-                        
-                        
-                        //-- Final Step --//
-                        //a) Move file to Destination Repo
-                        //b) Update Data File Repo dataFile.setFileRepoId();                        
-                        
-                        if (isSuccess) {
+                        ResponseObj sftpResponse = processFile(is, jobData, file.getFilename(), dataFile);
+
+                        if (0 == sftpResponse.getCode()) {
                         	
                             // Send file to outbound
                             moveFileToRepo(outboundRepo, is, file.getFilename());
                             sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
+
+                            dataFile.setFileRepoId(outboundRepo);
                             System.out.println("Removed file from SFTP server");
                         } else {
                             // Send file to Exception
                             moveFileToRepo(exceptionRepo, is, file.getFilename());
                             sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
+                            dataFile.setFileRepoId(exceptionRepo);
                             System.out.println("Removed file from SFTP server");
                         }
+                        //b) Update Data File Repo dataFile.setFileRepoId();
+                        new DataFileDao().updateDataFile(dataFile);
+
                     } else {
                         sendTransferError(jobData, file.getFilename());
                     }
@@ -110,19 +103,36 @@ public class RemoteXmlJob implements Job {
 
                     InputStream is = ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName());
                     if (is != null) {
+
+                        DataFile dataFile = new DataFile();
+                        dataFile.setDataFileIsXml(true);
+                        dataFile.setDataFileIsCsv(false);
+                        dataFile.setDataFileName(ftpFile.getName());
+                        new DataFileDao().addDataFile(dataFile);
+
+                        dataFile = new DataFileDao().getDataFileByName(ftpFile.getName());
                         System.out.println("Filename : "+ftpFile.getName());
-                        boolean isSuccess = processFile(is, jobData, ftpFile.getName());
-                        if (isSuccess) {
+
+                        ResponseObj ftpResponse = processFile(is, jobData, ftpFile.getName(), dataFile);
+
+                        if (0 == ftpResponse.getCode()) {
                             // Send file to outbound
                             moveFileToRepo(outboundRepo, is, ftpFile.getName());
                             ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+
+                            dataFile.setFileRepoId(outboundRepo);
                             System.out.println("Removed file from FTP server");
                         } else {
                             // Send file to Exception
                             moveFileToRepo(exceptionRepo, is, ftpFile.getName());
                             ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+
+                            dataFile.setFileRepoId(exceptionRepo);
                             System.out.println("Removed file from FTP server");
                         }
+
+                        new DataFileDao().updateDataFile(dataFile);
+
                     } else {
                         sendTransferError(jobData, ftpFile.getName());
                     }
@@ -140,18 +150,34 @@ public class RemoteXmlJob implements Job {
                 try {
                     InputStream is = new FileInputStream(file);
                     System.out.println("Reading input file and passing to parser: "+ file.getName());
-                    boolean isSuccess = processFile(is, jobData, file.getName());
-                    if (isSuccess) {
+
+                    DataFile dataFile = new DataFile();
+                    dataFile.setDataFileIsXml(true);
+                    dataFile.setDataFileIsCsv(false);
+                    dataFile.setDataFileName(file.getName());
+                    new DataFileDao().addDataFile(dataFile);
+
+                    dataFile = new DataFileDao().getDataFileByName(file.getName());
+
+                    ResponseObj localResponse = processFile(is, jobData, file.getName(), dataFile);
+
+                    if (0 == localResponse.getCode()) {
                         // Send file to outbound
                         moveFileToRepo(outboundRepo, is, file.getName());
                         file.delete();
+
+                        dataFile.setFileRepoId(outboundRepo);
                         System.out.println("Removed file from local server");
                     } else {
                         // Send file to Exception
                         moveFileToRepo(exceptionRepo, is, file.getName());
                         file.delete();
+
+                        dataFile.setFileRepoId(exceptionRepo);
                         System.out.println("Removed file from local server");
                     }
+
+                    new DataFileDao().updateDataFile(dataFile);
                 } catch (Exception e) {
                     System.out.println("Error processing local file: "+file.getName());
                 }
@@ -189,28 +215,46 @@ public class RemoteXmlJob implements Job {
 
     }
 
-    private boolean processFile(InputStream is, XmlTemplate xmlTemplate, String filename) {
-        boolean isSuccess = false;
+    private ResponseObj processFile(InputStream is, XmlTemplate xmlTemplate, String filename, DataFile dataFile) {
+
         try {
 
-            ExperimentParser2 parser = new ExperimentParser2();
-            ResponseObj responseObj = parser.parseXML(is, filename);
+            Config config = new Config();
+            String strBatchSize = config.getProperty("batchinsert");
+            int iBatchSize = Integer.parseInt(strBatchSize);
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+            factory.setNamespaceAware(true);
+            factory.setValidating(false);
+
+            DocumentBuilder domBuilder = factory.newDocumentBuilder();
+            Document doc = domBuilder.parse(is);
+            //1)Parsing & Validation
+            ResponseObj responseObj = new ExperimentParser().parseXmlDocument(doc, xmlTemplate);
+
+            //2)Batch Insert
+            ResponseObj batchResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(responseObj.getCsvInsertColumns(),
+                    responseObj.getCsvInsertValues(), null, dataFile, xmlTemplate.getExperiment(), iBatchSize);
+
             System.out.println("Filename : "+filename+" - "+responseObj.getDetail());
+
             if (responseObj.getCode() == 0) {
                 System.out.println("Successfully parsed file: "+filename);
-                isSuccess = true;
+
             } else {
                 sendTransferError(xmlTemplate, filename);
-                isSuccess = false;
             }
+
+            return batchResponse;
 
         } catch (Exception ex) {
             System.out.println("Error parsing file: "+filename);
             sendTransferError(xmlTemplate, filename);
-            isSuccess = false;
+
         }
 
-        return isSuccess;
+        return null;
     }
 
     public void sendTransferError(XmlTemplate xmlTemplate, String filename) {

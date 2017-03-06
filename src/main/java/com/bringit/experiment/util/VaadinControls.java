@@ -72,4 +72,43 @@ public class VaadinControls {
 	    }   
 		
 	}
+	
+	public static void bindDbViewDateFiltersToVaadinComboBox(ComboBox vaadinComboBox, ResultSet dbVwResultSet)
+	{	
+		vaadinComboBox.setContainerDataSource(null);
+		vaadinComboBox.removeAllItems();
+		Config configuration = new Config();
+		
+		ResultSetMetaData dbVwMetaData;
+		try {
+				dbVwMetaData = dbVwResultSet.getMetaData();
+			
+				for(int i=0; i<dbVwMetaData.getColumnCount(); i++)
+				{
+					if(configuration.getProperty("dbms").equals("sqlserver"))
+					{
+						if(dbVwMetaData.getColumnTypeName(i+1).contains("date"))
+						{
+							vaadinComboBox.addItem(dbVwMetaData.getColumnLabel(i+1));
+							vaadinComboBox.setItemCaption(dbVwMetaData.getColumnLabel(i+1), dbVwMetaData.getColumnLabel(i+1));
+
+							if(vaadinComboBox.size() == 1)
+								vaadinComboBox.select(dbVwMetaData.getColumnLabel(i+1));
+							
+							if(dbVwMetaData.getColumnLabel(i+1).toLowerCase().trim().equals("lastmodifieddate"))
+								vaadinComboBox.select(dbVwMetaData.getColumnLabel(i+1));
+						}
+					
+					}
+				}
+				
+			
+			}catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		
+	    }   
+		
+	}
+	
 }

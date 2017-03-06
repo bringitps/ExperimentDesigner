@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head> 
+ <body> 
+  <vaadin-vertical-layout size-full> 
+   <vaadin-label style-name="valo-menu" plain-text _id="lblExperimentTitle">
+     Experiment Data Report 
+   </vaadin-label> 
+   <vaadin-horizontal-layout style-name="top-bar" width-full height="40px"> 
+    <vaadin-horizontal-layout width-full :middle :expand> 
+     <vaadin-text-field icon="fonticon://FontAwesome/f002" input-prompt="Search" style-name="small inline-icon search" width-full _id="txtSearch"></vaadin-text-field> 
+    </vaadin-horizontal-layout> 
+    <vaadin-combo-box style-name="small" _id="cbxExperimentDataReportFilters" :middle></vaadin-combo-box> 
+   </vaadin-horizontal-layout> 
+   <vaadin-horizontal-layout width-full _id="layoutDateFilter"> 
+    <vaadin-grid-layout caption="Date Filters" width="680px" height="30px" _id="gridDateFilters"> 
+     <row> 
+      <column> 
+       <vaadin-check-box _id="chxDateFilters" :middle :center></vaadin-check-box> 
+      </column> 
+      <column> 
+       <vaadin-combo-box style-name="tiny" width="150px" _id="cbxDateFieldsFilter"> 
+        <option>Option 1</option> 
+        <option>Option 2</option> 
+        <option>Option 3</option> 
+       </vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-combo-box style-name="tiny" width="150px" _id="cbxDateFilterOperators"> 
+        <option>Option 1</option> 
+        <option>Option 2</option> 
+        <option>Option 3</option> 
+       </vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter1"></vaadin-popup-date-field> 
+      </column> 
+      <column> 
+       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter2"></vaadin-popup-date-field> 
+      </column> 
+      <column> 
+       <vaadin-button style-name="tiny native" plain-text _id="btnOkDateFilters">
+         OK 
+       </vaadin-button> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-horizontal-layout> 
+   <vaadin-horizontal-layout width-full :right> 
+    <vaadin-button icon="fonticon://FontAwesome/f1c3" style-name="tiny native friendly" height="20px" plain-text _id="btnExportExcel" :right>
+      Export to Excel 
+    </vaadin-button> 
+   </vaadin-horizontal-layout> 
+   <vaadin-css-layout style-name="content" size-full :expand> 
+    <vaadin-css-layout style-name="list" size-full> 
+     <vaadin-table selectable style-name="small" size-full _id="tblExperimentDataReport"> 
+      <table> 
+      </table> 
+     </vaadin-table> 
+    </vaadin-css-layout> 
+   </vaadin-css-layout> 
+  </vaadin-vertical-layout>  
+ </body>
+</html>

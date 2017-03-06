@@ -18,6 +18,7 @@ import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
 public class ExecuteQueryDao {
 
+	/*
 	private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
 	
 	public void executeQuery(String query) {
@@ -39,7 +40,7 @@ public class ExecuteQueryDao {
             session.close();
         }
     }
-	
+	*/
 	public void executeQueryFile(String filePath) {
 
 		ResultSet rs = null;
@@ -71,6 +72,27 @@ public class ExecuteQueryDao {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    }
+	
+	public ResultSet getSqlSelectQueryResults(String sqlSelectQuery)
+	{
+		ResultSet rs = null;
+		Config configuration = new Config();
+		String dbHost = configuration.getProperty("dbhost");
+		String dbPort = configuration.getProperty("dbport");
+		String dbDatabase = configuration.getProperty("dbdatabase");
+		String dbUsername = configuration.getProperty("dbusername");
+		String dbPassword = configuration.getProperty("dbpassword");
+		try {
+			Connection conn = Connect.getConnection(dbHost, dbPort, dbDatabase, dbUsername, dbPassword);
+		    Statement stmt = conn.createStatement();
+		    rs = stmt.executeQuery(sqlSelectQuery);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return rs;
     }
 	
 }

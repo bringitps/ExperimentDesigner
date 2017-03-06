@@ -199,7 +199,7 @@ public class WebApplication extends UI {
         }
 
     };
-    
+
 	public void createUserSession(SysUser sysUser) 
 	{
 		VaadinService.getCurrentRequest().getWrappedSession().setAttribute("UserSession", sysUser);

@@ -94,7 +94,7 @@ public class ExperimentParser2 {
 		        			qryValues = qryValues.substring(0,qryValues.length()-2);
 	        				ExecuteQueryDao executeQueryDao = new ExecuteQueryDao();
 	        				System.err.println(query+qryValues);
-	        				executeQueryDao.executeQuery(query+qryValues);
+	        				//executeQueryDao.executeQuery(query+qryValues);
 		        			respObj.setDetail("FileName: "+filename );
 		        			return respObj;
 		        		}else{

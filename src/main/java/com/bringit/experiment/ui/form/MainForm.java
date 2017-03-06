@@ -72,6 +72,10 @@ public class MainForm extends MainFormDesign {
      				formContentLayout.removeAllComponents();
      				formContentLayout.addComponent(new CsvDataFileLoadForm());
                   	break;
+         case "reports":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new ExperimentDataReportForm(1));
+                  	break;
          default:
          			break;
 		 }

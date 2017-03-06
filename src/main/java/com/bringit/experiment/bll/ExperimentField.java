@@ -2,6 +2,7 @@ package com.bringit.experiment.bll;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,11 +30,11 @@ public class ExperimentField {
 	@Column(name="ExpFieldType")
 	private String expFieldType;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExpId", unique=false, updatable=true)
 	private Experiment experiment;
 
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="UomId", unique=false, updatable=true)
 	private UnitOfMeasure unitOfMeasure;
 

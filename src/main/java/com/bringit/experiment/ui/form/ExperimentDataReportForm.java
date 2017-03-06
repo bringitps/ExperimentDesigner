@@ -175,11 +175,11 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 	{
 		if(this.tblExperimentDataReport.getItemIds() != null)
 		{
-			final ExcelExport excelExport;
-			excelExport = new ExcelExport(tblExperimentDataReport, this.lblExperimentTitle.getValue().trim());
-			excelExport.setExportFileName(this.lblExperimentTitle.getValue().trim() + ".xls");
-			excelExport.setDisplayTotals(false);
-			excelExport.export();
+			final ExcelExport xlsExport;
+			xlsExport = new ExcelExport(tblExperimentDataReport, this.lblExperimentTitle.getValue().trim());
+			xlsExport.setExportFileName(this.lblExperimentTitle.getValue().trim() + ".xls");
+			xlsExport.setDisplayTotals(false);
+			xlsExport.export();
 			
 		}
 	}

@@ -14,7 +14,7 @@ import com.bringit.experiment.util.HibernateXmlConfigSupport;
 public class ExperimentFieldValueUpdateLogDao {
 
 	private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
-	
+		
 	public void addExperimentFieldValueUpdateLog(ExperimentFieldValueUpdateLog experimentFieldValueUpdateLog) {
 
         Transaction trns = null;

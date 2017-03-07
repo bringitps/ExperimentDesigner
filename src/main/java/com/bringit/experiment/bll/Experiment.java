@@ -44,11 +44,11 @@ public class Experiment {
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
 	private SysUser createdBy;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
 	private SysUser lastModifiedBy;
 	

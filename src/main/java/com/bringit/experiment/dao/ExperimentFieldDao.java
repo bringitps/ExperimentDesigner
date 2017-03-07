@@ -3,6 +3,8 @@ package com.bringit.experiment.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -115,7 +117,9 @@ public class ExperimentFieldDao {
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            experimentFields = session.createQuery("from ExperimentField where ExpId ="+firstExperiment.getExpId()+" and ExpFieldIsActive='true'").list();
+            Query query = session.createQuery("from ExperimentField where ExpId ="+firstExperiment.getExpId()+" and ExpFieldIsActive='true'");
+            query.setCacheable(true);
+            experimentFields = query.list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {

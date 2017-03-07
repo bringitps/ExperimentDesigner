@@ -39,9 +39,38 @@ public class ExperimentFieldValueUpdateLog {
 	@Column(name="DbExperimentDataTableRecordId")
 	private Integer dbExperimentDataTableRecordId;
 	
+	@Column(name="DbTableRecordCommentsUpdate")
+	private boolean dbTableRecordCommentsUpdate;
+	
 	@OneToOne
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
 	private SysUser createdBy;
+
+	public ExperimentFieldValueUpdateLog() {
+		this.expFieldValueUpdateId = null;
+		this.expOldValue = null;
+		this.expOldCreatedDate = null;
+		this.expNewValue = null;
+		this.expNewCreatedDate = null;
+		this.experimentField = null;
+		this.dbExperimentDataTableRecordId = null;
+		this.dbTableRecordCommentsUpdate = false;
+		this.createdBy = null;
+	}
+	
+	public ExperimentFieldValueUpdateLog(Integer expFieldValueUpdateId, String expOldValue, Date expOldCreatedDate,
+			String expNewValue, Date expNewCreatedDate, ExperimentField experimentField,
+			Integer dbExperimentDataTableRecordId, boolean dbTableRecordCommentsUpdate, SysUser createdBy) {
+		this.expFieldValueUpdateId = expFieldValueUpdateId;
+		this.expOldValue = expOldValue;
+		this.expOldCreatedDate = expOldCreatedDate;
+		this.expNewValue = expNewValue;
+		this.expNewCreatedDate = expNewCreatedDate;
+		this.experimentField = experimentField;
+		this.dbExperimentDataTableRecordId = dbExperimentDataTableRecordId;
+		this.dbTableRecordCommentsUpdate = dbTableRecordCommentsUpdate;
+		this.createdBy = createdBy;
+	}
 
 	public Integer getExpFieldValueUpdateId() {
 		return expFieldValueUpdateId;
@@ -97,6 +126,14 @@ public class ExperimentFieldValueUpdateLog {
 
 	public void setDbExperimentDataTableRecordId(Integer dbExperimentDataTableRecordId) {
 		this.dbExperimentDataTableRecordId = dbExperimentDataTableRecordId;
+	}
+
+	public boolean isDbTableRecordCommentsUpdate() {
+		return dbTableRecordCommentsUpdate;
+	}
+
+	public void setDbTableRecordCommentsUpdate(boolean dbTableRecordCommentsUpdate) {
+		this.dbTableRecordCommentsUpdate = dbTableRecordCommentsUpdate;
 	}
 
 	public SysUser getCreatedBy() {

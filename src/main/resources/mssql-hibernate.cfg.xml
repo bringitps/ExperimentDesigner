@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE hibernate-configuration PUBLIC
-"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
- 
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
 <hibernate-configuration>
     <session-factory>
         
@@ -16,7 +14,7 @@
         <property name="connection.pool_size">1</property>  
   
         <!-- SQL dialect -->  
-        <property name="dialect">org.hibernate.dialect.SQLServerDialect</property>  
+        <property name="dialect">org.hibernate.dialect.SQLServer2008Dialect</property>  
   
         <!-- Echo all executed SQL to stdout -->  
         <property name="show_sql">true</property>  
@@ -42,7 +40,6 @@
         <mapping class="com.bringit.experiment.bll.CsvTemplateColumns"/>
          <mapping class="com.bringit.experiment.bll.CsvDataLoadExecutionResult"/>
          <mapping class="com.bringit.experiment.bll.DataFile"/>
-        
 
     </session-factory>
 </hibernate-configuration>

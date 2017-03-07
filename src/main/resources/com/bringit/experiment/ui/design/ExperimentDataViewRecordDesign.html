@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head> 
+ <body> 
+  <vaadin-vertical-layout> 
+   <vaadin-label style-name="valo-menu" height="25px" plain-text>
+     - Experiment Record Data 
+   </vaadin-label> 
+   <vaadin-vertical-layout margin> 
+    <vaadin-grid-layout width-full height="30px"> 
+     <row> 
+      <column> 
+       <vaadin-grid-layout width="100px" height="30px"> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="tiny primary" plain-text _id="btnSave">
+            Save 
+          </vaadin-button> 
+         </column> 
+         <column> 
+          <vaadin-button style-name="tiny" plain-text _id="btnCancel">
+            Cancel 
+          </vaadin-button> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout spacing margin> 
+    <vaadin-panel caption="Record Data" height="300px" _id="pnlExperimentFields"></vaadin-panel> 
+   </vaadin-vertical-layout> 
+   <vaadin-horizontal-layout spacing width-full margin _id="layoutEditComments"> 
+    <vaadin-text-area caption="Comments:" rows="3" style-name="tiny" width-full _id="txtComments"></vaadin-text-area> 
+   </vaadin-horizontal-layout> 
+  </vaadin-vertical-layout>  
+ </body>
+</html>

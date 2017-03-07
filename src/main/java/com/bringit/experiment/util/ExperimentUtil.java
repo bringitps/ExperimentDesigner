@@ -7,17 +7,18 @@ import java.util.List;
 
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
+import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.ui.form.ExperimentManagementForm;
 import com.bringit.experiment.ui.form.XmlTemplateManagementForm;
 
 public class ExperimentUtil {
 
-	public static String buildSqlSelectQueryByExperiment(Experiment experiment)
+	public static String buildSqlSelectQueryByExperiment(Experiment experiment, List<ExperimentField> experimentFields)
 	{
 		String sqlSelectQuery = "";
 		Config configuration = new Config();
-		List<ExperimentField> experimentFields = new ExperimentFieldDao().getActiveExperimentFields(experiment);
 		
 		if(configuration.getProperty("dbms").equals("sqlserver"))
 		{
@@ -42,12 +43,11 @@ public class ExperimentUtil {
 		return sqlSelectQuery;
 	}
 	
-	public static String buildFilteredSqlSelectQueryByExperiment(Experiment experiment, String columnName, String filterValue)
+	public static String buildFilteredSqlSelectQueryByExperiment(Experiment experiment, List<ExperimentField> experimentFields, String columnName, String filterValue)
 	{
 
 		String sqlSelectQuery = "";
 		Config configuration = new Config();
-		List<ExperimentField> experimentFields = new ExperimentFieldDao().getActiveExperimentFields(experiment);
 		
 		if(configuration.getProperty("dbms").equals("sqlserver"))
 		{
@@ -74,13 +74,12 @@ public class ExperimentUtil {
 	}
 	
 	
-	public static String buildDateFilteredSqlSelectQueryByExperiment(Experiment experiment, String stringFilterColumnName, String stringFilterValue, String dateFilterColumnName, String dateFilterOperator, Date dateFilterValue1, Date dateFilterValue2)
+	public static String buildDateFilteredSqlSelectQueryByExperiment(Experiment experiment, List<ExperimentField> experimentFields, String stringFilterColumnName, String stringFilterValue, String dateFilterColumnName, String dateFilterOperator, Date dateFilterValue1, Date dateFilterValue2)
 	{
 
 	    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String sqlSelectQuery = "";
 		Config configuration = new Config();
-		List<ExperimentField> experimentFields = new ExperimentFieldDao().getActiveExperimentFields(experiment);
 		
 		if(configuration.getProperty("dbms").equals("sqlserver"))
 		{
@@ -140,6 +139,62 @@ public class ExperimentUtil {
 				sqlSelectQuery += " AND \"" + stringFilterColumnName + "\"  LIKE '%" + stringFilterValue + "%'";
 			
 			sqlSelectQuery += " ORDER BY \"" + dateFilterColumnName + "\" DESC;";
+			    	
+		}
+		else
+			return null;
+		
+		return sqlSelectQuery;
+	}
+
+	
+	public static String buildEqualsFilteredSqlSelectQueryByExperiment(Experiment experiment, List<ExperimentField> experimentFields, String columnName, String filterValue)
+	{
+
+		String sqlSelectQuery = "";
+		Config configuration = new Config();
+		
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			sqlSelectQuery = "SELECT * FROM ( SELECT " + experiment.getExpDbTableNameId() + ".RecordId AS Id,";
+			for(int i=0; experimentFields != null && i<experimentFields.size(); i++)
+				sqlSelectQuery +=  experiment.getExpDbTableNameId() + "." + experimentFields.get(i).getExpDbFieldNameId() + " AS '" + experimentFields.get(i).getExpFieldName() + "',";
+			
+			sqlSelectQuery += experiment.getExpDbTableNameId() + ".Comments AS Comments," + experiment.getExpDbTableNameId() + ".CreatedDate AS CreatedDate, ";
+			sqlSelectQuery += experiment.getExpDbTableNameId() + ".LastModifiedDate AS LastModifiedDate, CreatedByUser.UserName AS CreatedBy, LastModifiedByUser.UserName AS LastModifiedBy, ";
+			sqlSelectQuery += " DataFile.DataFileName AS FileName, CONCAT(FileRepo.FileRepoHost, FileRepo.FileRepoPath) AS Location ";
+			sqlSelectQuery += " FROM " + experiment.getExpDbTableNameId();
+			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS CreatedByUser ON " + experiment.getExpDbTableNameId() + ".CreatedBy = CreatedByUser.UserId ";
+			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS LastModifiedByUser ON " + experiment.getExpDbTableNameId() + ".LastModifiedBy = CreatedByUser.UserId ";
+			sqlSelectQuery += " LEFT OUTER JOIN DataFile AS DataFile ON " + experiment.getExpDbTableNameId() + ".DataFileId = DataFile.DataFileId ";
+			sqlSelectQuery += " LEFT OUTER JOIN FilesRepository AS FileRepo ON DataFile.FileRepoId = FileRepo.FileRepoId ) AS ExperimentDataTable";
+			sqlSelectQuery += " WHERE \"" + columnName + "\"  = '" + filterValue + "'";
+			sqlSelectQuery += " ORDER BY LastModifiedDate DESC;"; 
+			    	
+		}
+		else
+			return null;
+		
+		return sqlSelectQuery;
+	}
+
+	public static String buildSqlUpdateQueryByExperiment(Experiment experiment, List<String> experimentFieldIdsXRef, List<String> experimentFieldValuesXRef, String recordId)
+	{
+
+		String sqlSelectQuery = "";
+		Config configuration = new Config();
+		
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			sqlSelectQuery = "UPDATE " + experiment.getExpDbTableNameId() + " SET ";
+			for(int i=0; experimentFieldIdsXRef != null && i<experimentFieldIdsXRef.size(); i++)
+			{
+				sqlSelectQuery +=  experimentFieldIdsXRef.get(i) + " = '" + experimentFieldValuesXRef.get(i) + "'";
+				if((i+1) < experimentFieldIdsXRef.size())
+					sqlSelectQuery += ", ";
+			}
+			
+			sqlSelectQuery += " WHERE \"RecordId\"  = '" + recordId + "';";
 			    	
 		}
 		else

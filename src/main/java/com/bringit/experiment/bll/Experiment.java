@@ -44,6 +44,9 @@ public class Experiment {
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
 	
+	@Column(name="ExpImage")
+	private byte[] expImage;
+	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
 	private SysUser createdBy;
@@ -147,6 +150,16 @@ public class Experiment {
 
 	public void setLastModifiedBy(SysUser lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
+	}
+
+
+	public byte[] getExpImage() {
+		return expImage;
+	}
+
+
+	public void setExpImage(byte[] expImage) {
+		this.expImage = expImage;
 	}
 
 

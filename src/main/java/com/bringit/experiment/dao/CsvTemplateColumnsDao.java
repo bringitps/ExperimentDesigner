@@ -116,7 +116,7 @@ public class CsvTemplateColumnsDao {
         Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            nodes = session.createQuery("from CsvTemplateColumns where CsvTemplateId ="+csvTemplateId).list();
+            nodes = session.createQuery("from CsvTemplateColumns where CsvTemplateId ="+csvTemplateId + " and ExpFieldId is not null").list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {

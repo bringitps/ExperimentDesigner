@@ -41,6 +41,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
 
 import com.vaadin.ui.Upload.Receiver;
+import com.vaadin.ui.Panel;
 
 import com.vaadin.ui.Window;
 
@@ -55,7 +56,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
     private File tempFile;
     private List<ExperimentField> expFields;
 	private List<Integer> dbIdOfCsvTemplateNodeItemsToDelete = new ArrayList<Integer>();
-	
+
 	public CsvTemplateForm(int csvId)
 	{
 		this.tblCsvCols.setContainerDataSource(null);
@@ -212,7 +213,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 
 			CsvTemplateColumnsDao csvTempColsDao = new CsvTemplateColumnsDao();
 			
-			//Remove deprecated CsvTemplateNodes
+			//Remove deprecated CsvTemplateColumns
 			if(this.csvt.getCsvTemplateId() != null && dbIdOfCsvTemplateNodeItemsToDelete.size() > 0)
 			{
 				for(int i=0; i<dbIdOfCsvTemplateNodeItemsToDelete.size(); i++)

@@ -118,7 +118,12 @@ public class runTest {
 		 //ResponseObj respObj = parser.parseXML(xmlFile, new ExperimentDao().getExperimentById(1));
 		 
 		 System.out.println(respObj.getDescription() + respObj.getDetail());
-	
+			//New User 
+		 SysUserDao sysUserDao = new SysUserDao();
+		 SysUser bringITUser = new SysUser();
+		 bringITUser.setUserName("bit_seko");
+		 bringITUser.setUserPass("123456");
+		 sysUserDao.addSysUser(bringITUser); 
 	}
 
 

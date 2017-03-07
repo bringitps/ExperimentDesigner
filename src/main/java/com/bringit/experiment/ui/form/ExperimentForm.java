@@ -1,10 +1,17 @@
 package com.bringit.experiment.ui.form;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.bringit.experiment.bll.Experiment;
@@ -16,6 +23,7 @@ import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.UnitOfMeasureDao;
 import com.bringit.experiment.ui.design.ExperimentDesign;
 import com.bringit.experiment.util.Config;
+import com.opencsv.CSVReader;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Validator;
@@ -26,18 +34,24 @@ import com.vaadin.event.FieldEvents.BlurListener;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.FileResource;
 import com.vaadin.server.Sizeable.Unit;
+import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.Upload;
 import com.vaadin.ui.Window;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.ui.Panel;
 
 public class ExperimentForm extends ExperimentDesign {
 
@@ -45,8 +59,8 @@ public class ExperimentForm extends ExperimentDesign {
 	private List<ExperimentField> experimentFields;
 	List <UnitOfMeasure> unitOfMeasures= new UnitOfMeasureDao().getAllUnitOfMeasures();
 	String[] dbfieldTypes;
-	
 	private int lastNewItemId = 0;
+	private File tempImageFile;
 	
 	public ExperimentForm(int experimentId)
 	{		
@@ -63,7 +77,7 @@ public class ExperimentForm extends ExperimentDesign {
 		this.tblExperimentFields.addContainerProperty("DB DataType", ComboBox.class, null);
 		this.tblExperimentFields.addContainerProperty("UoM", ComboBox.class, null);
 		this.tblExperimentFields.setPageLength(0);
-		
+		uploadImage();
 		this.txtExpDbTableNameId.addValidator(new Validator() {
 
             public void validate(Object value) throws InvalidValueException {
@@ -78,6 +92,7 @@ public class ExperimentForm extends ExperimentDesign {
 			this.chxActive.setValue(true);
 			this.btnDelete.setEnabled(false);
 			this.experiment = new Experiment();
+			imgImage.setVisible(false);
 		}
 		else
 		{
@@ -89,7 +104,26 @@ public class ExperimentForm extends ExperimentDesign {
 			this.chxActive.setValue(this.experiment.isExpIsActive());
 			this.txtExpInstructions.setValue(this.experiment.getExpInstructions());
 			this.txtExpComments.setValue(this.experiment.getExpComments());
-			
+			final byte[] img = this.experiment.getExpImage();
+			try {
+				if (img != null){
+					StreamResource.StreamSource imageSource = new StreamResource.StreamSource() {
+						@Override
+							public InputStream getStream() {
+								return new java.io.ByteArrayInputStream(img);
+							}
+					};
+						StreamResource imageResource = new StreamResource(imageSource, "temp.png");
+						imageResource.setCacheTime(0);
+						imgImage.setSource(imageResource);
+					//FileUtils.writeByteArrayToFile(tempImageFile, this.experiment.getExpImage());
+					//this.imgImage.setSource(new FileResource(tempImageFile));
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			this.experimentFields = new ExperimentFieldDao().getAllExperimentFieldsByExperiment(this.experiment);
 
 			Object[] itemValues = new Object[6];
@@ -202,6 +236,45 @@ public class ExperimentForm extends ExperimentDesign {
 
 	}
 	
+	private void uploadImage() {
+	       class MyReceiver implements Receiver {
+	            //private static final long serialVersionUID = -1276759102490466761L;
+
+	            public OutputStream receiveUpload(String filename, String mimeType) {
+	                // Create upload stream
+	                FileOutputStream fos = null; // Output stream to write to
+	                try {
+	                    // Open the file for writing.
+	                	tempImageFile = File.createTempFile("temp", ".png");
+	                    fos = new FileOutputStream(tempImageFile);
+	                }  catch (IOException e) {
+	      	          e.printStackTrace();
+	    	          return null;
+	                }
+	                return fos; // Return the output stream to write to
+	            }
+	        };
+	        final MyReceiver uploader = new MyReceiver(); 
+	        upImage.setReceiver(uploader);
+	        upImage.addFinishedListener(new Upload.FinishedListener() {
+		        @Override
+		        public void uploadFinished(Upload.FinishedEvent finishedEvent) {
+					try {
+					      // Display the uploaded file in the image panel.
+					      final FileResource imageResource = new FileResource(tempImageFile);
+			                imgImage.setVisible(true);
+			                imgImage.setSource(imageResource);
+		    		
+		    			//tempImageFile.delete();
+					} catch ( Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        }
+		      });
+		
+	}
+
 	private void addField(){
 		
 		Object[] itemValues = new Object[6];
@@ -311,6 +384,7 @@ public class ExperimentForm extends ExperimentDesign {
 			this.experiment.setExpComments(this.txtExpComments.getValue());
 			this.experiment.setLastModifiedBy(sessionUser);
 			this.experiment.setModifiedDate(new Date());
+			this.experiment.setExpImage(new byte[(int) tempImageFile.length()]);
 			ExperimentDao expDao = new ExperimentDao();
 			
 			if(this.experiment.getExpId() != null )
@@ -323,7 +397,6 @@ public class ExperimentForm extends ExperimentDesign {
 			}
 			
 			expDao.updateDBDataTable(experiment);
-			
 			
 			//Save ExperimentFields
 			ExperimentFieldDao expfieldDao = new ExperimentFieldDao();
@@ -360,7 +433,7 @@ public class ExperimentForm extends ExperimentDesign {
 				
 				expfieldDao.updateDBDataTableField(experimentField);
 			}
-		
+			tempImageFile.delete();
 			closeModalWindow();
 		}
 		else

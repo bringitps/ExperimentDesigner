@@ -120,7 +120,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 		
 			this.txtCsvDataFileLoadResults.setValue("===Starting Process===\n\n");
 
-			this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 1 of 3. Validating & Parsing XML File.\n");
+			this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 1 of 3. Validating & Parsing CSV File.\n");
 			csvTemplate = new CsvTemplateDao().getCsvTemplateById((int)cbxCsvTemplate.getValue());
 			ResponseObj parseCsvResponse = new ExperimentParser().parseCSV(tempFile, csvTemplate);
 			tempFile.delete(); // delete the temp file 
@@ -135,8 +135,8 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 			
 			if(parseCsvResponse.getCode() == 0)
 			{
-				this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 1 of 1. Result (OK)\n");
-				this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 2 of 1. Saving information into Data Warehouse\n");
+				this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 1 of 3. Result (OK)\n");
+				this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 2 of 3. Saving information into Data Warehouse\n");
 				
 				//Execute Batch Insert
 				
@@ -257,7 +257,6 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 	
 	private void fillCombos() 
 	{
-		//XML Templates
 		for(int i=0; i<csvTemplates.size(); i++)
 		{
 			cbxCsvTemplate.addItem(csvTemplates.get(i).getCsvTemplateId());

@@ -44,7 +44,7 @@ public class Experiment {
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
 	
-	@Column(name="ExpImage")
+	@Column(name="ExpImage", length = 100000)
 	private byte[] expImage;
 	
 	@OneToOne(fetch=FetchType.LAZY)

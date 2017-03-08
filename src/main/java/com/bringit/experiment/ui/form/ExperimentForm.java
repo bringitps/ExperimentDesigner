@@ -1,6 +1,7 @@
 package com.bringit.experiment.ui.form;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -64,7 +65,7 @@ public class ExperimentForm extends ExperimentDesign {
 	
 	public ExperimentForm(int experimentId)
 	{		
-		
+		 upImage.setButtonCaption("Add Experiment Image");
 		Config configuration = new Config();
 		if(configuration.getProperty("dbms").equals("sqlserver"))
 			dbfieldTypes = configuration.getProperty("sqlserverdatatypes").split(",");
@@ -116,8 +117,6 @@ public class ExperimentForm extends ExperimentDesign {
 						StreamResource imageResource = new StreamResource(imageSource, "temp.png");
 						imageResource.setCacheTime(0);
 						imgImage.setSource(imageResource);
-					//FileUtils.writeByteArrayToFile(tempImageFile, this.experiment.getExpImage());
-					//this.imgImage.setSource(new FileResource(tempImageFile));
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -233,7 +232,24 @@ public class ExperimentForm extends ExperimentDesign {
 				removeExperimentFieldItem();
 			}
 		});
+		btnDeleteImage.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+				removeExperimentImage();
+			}
 
+		});
+
+	}
+
+	private void removeExperimentImage() {
+		this.experiment.setExpImage(new byte[0]);
+		if(tempImageFile != null){
+			tempImageFile.delete();
+		}
+		imgImage.setVisible(false);
 	}
 	
 	private void uploadImage() {
@@ -255,6 +271,7 @@ public class ExperimentForm extends ExperimentDesign {
 	            }
 	        };
 	        final MyReceiver uploader = new MyReceiver(); 
+	       
 	        upImage.setReceiver(uploader);
 	        upImage.addFinishedListener(new Upload.FinishedListener() {
 		        @Override
@@ -384,7 +401,21 @@ public class ExperimentForm extends ExperimentDesign {
 			this.experiment.setExpComments(this.txtExpComments.getValue());
 			this.experiment.setLastModifiedBy(sessionUser);
 			this.experiment.setModifiedDate(new Date());
-			this.experiment.setExpImage(new byte[(int) tempImageFile.length()]);
+
+			if(tempImageFile != null){
+				byte[] imageData = new byte[(int) tempImageFile.length()];
+				 
+				try {
+				    FileInputStream fileInputStream = new FileInputStream(tempImageFile);
+				    fileInputStream.read(imageData);
+				    fileInputStream.close();
+				} catch (Exception e) {
+				    e.printStackTrace();
+				}
+			
+				this.experiment.setExpImage(imageData);
+			}
+
 			ExperimentDao expDao = new ExperimentDao();
 			
 			if(this.experiment.getExpId() != null )
@@ -433,7 +464,10 @@ public class ExperimentForm extends ExperimentDesign {
 				
 				expfieldDao.updateDBDataTableField(experimentField);
 			}
-			tempImageFile.delete();
+			if(tempImageFile!=null){
+				tempImageFile.delete();
+			}
+
 			closeModalWindow();
 		}
 		else

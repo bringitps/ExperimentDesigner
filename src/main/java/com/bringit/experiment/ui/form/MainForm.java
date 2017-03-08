@@ -1,12 +1,20 @@
 package com.bringit.experiment.ui.form;
 
+import java.util.List;
+
 import com.bringit.experiment.WebApplication;
+import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.SysUser;
-import com.bringit.experiment.ui.design.ExperimentManagementDesign;
+import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.ui.design.MainFormDesign;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.Resource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
-import com.vaadin.ui.Notification;
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.ui.AbstractSelect;
 
 @SuppressWarnings("serial")
 public class MainForm extends MainFormDesign {
@@ -19,65 +27,82 @@ public class MainForm extends MainFormDesign {
 	@SuppressWarnings("deprecation")
 	public MainForm(WebApplication webApplication) {
 	    this.webApplication = webApplication;
-
+	    
+	    treeMainMenu.addContainerProperty("isExperimentDataReport", Boolean.class, null);
+	    treeMainMenu.addContainerProperty("experimentId", Integer.class, null);
+		
 	    for (Object id : treeMainMenu.rootItemIds()) {
 	    	treeMainMenu.expandItemsRecursively(id);
-        }
+	    }
+
+	    
+	    List<Experiment> experimentsAvailable = new ExperimentDao().getActiveExperiments();
+	    if(experimentsAvailable != null)
+	    {
+	    	for(int i=0; i<experimentsAvailable.size(); i++)
+	    	{
+	    		Item item = treeMainMenu.addItem(experimentsAvailable.get(i).getExpName());
+	    		item.getItemProperty("isExperimentDataReport").setValue(true);
+	    		item.getItemProperty("experimentId").setValue(experimentsAvailable.get(i).getExpId());
+	    		treeMainMenu.setParent(experimentsAvailable.get(i).getExpName(), "Data");
+	    	}
+	    }
 	    
 	    treeMainMenu.addItemClickListener(new ItemClickEvent.ItemClickListener() 
 	    {
             public void itemClick(ItemClickEvent event) {
                 if (event.getButton() == ItemClickEvent.BUTTON_LEFT)
-                {
-                	//TO Improve: Save Design Name into Tree Node to be able to use 2 Tree Nodes with same name
-                	//webApplication.showNotification("Item Id:" + event.getItemId().toString(), Notification.TYPE_HUMANIZED_MESSAGE);
-                	setFormContent(event.getItemId().toString());
-                }
+                	setFormContent(event.getItemId().toString(), treeMainMenu.getItem(event.getItemId()));
             }
         });
 	}
 	
-	private void setFormContent(String treeItemClickedId)
+	private void setFormContent(String itemClickedText, Item treeItemClicked)
 	{
-		 switch (treeItemClickedId.toLowerCase()) {
-         case "manage experiments":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new ExperimentManagementForm());
-                  	break;
-         case "manage xmltemplates":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new XmlTemplateManagementForm());
-                  	break;
-         case "manage csvtemplates":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new CsvTemplateManagementForm());
-                  	break;
-         case "unit of measures":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new UnitOfMeasureConfigForm());
-                  	break;
-         case "files repositories":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new FilesRepositoriesConfigForm());
-                  	break;
-         case "job exec repeat":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new JobExecutionRepeatConfigForm());
-                  	break;
-         case "xml data file loads":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new XmlDataFileLoadForm());
-                  	break;   
-         case "csv data file loads":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new CsvDataFileLoadForm());
-                  	break;
-         case "reports":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new ExperimentDataReportForm(1));
-                  	break;
-         default:
-         			break;
-		 }
+		if(treeItemClicked.getItemProperty("isExperimentDataReport").getValue() == null)
+    	{
+			 switch (itemClickedText.toLowerCase()) 
+			 {
+			 	case "manage experiments":  
+	     				formContentLayout.removeAllComponents();
+	     				formContentLayout.addComponent(new ExperimentManagementForm());
+	                  	break;
+			 	case "manage xmltemplates":  
+	     				formContentLayout.removeAllComponents();
+	     				formContentLayout.addComponent(new XmlTemplateManagementForm());
+	                  	break;
+			 	case "manage csvtemplates":  
+	     				formContentLayout.removeAllComponents();
+	     				formContentLayout.addComponent(new CsvTemplateManagementForm());
+	                  	break;
+			 	case "unit of measures":  
+	     				formContentLayout.removeAllComponents();
+	     				formContentLayout.addComponent(new UnitOfMeasureConfigForm());
+	                  	break;
+			 	case "files repositories":  
+	     				formContentLayout.removeAllComponents();
+	     				formContentLayout.addComponent(new FilesRepositoriesConfigForm());
+	                  	break;
+			 	case "job exec repeat":  
+	     				formContentLayout.removeAllComponents();
+	     				formContentLayout.addComponent(new JobExecutionRepeatConfigForm());
+	                  	break;
+			 	case "xml data file loads":  
+	     				formContentLayout.removeAllComponents();
+	     				formContentLayout.addComponent(new XmlDataFileLoadForm());
+	                  	break;   
+			 	case "csv data file loads":  
+	     				formContentLayout.removeAllComponents();
+	     				formContentLayout.addComponent(new CsvDataFileLoadForm());
+	                  	break;
+			 	default:
+	         			break;
+			 }
+    	}
+    	else if(treeItemClicked.getItemProperty("experimentId").getValue() != null)
+    	{
+    		formContentLayout.removeAllComponents();
+			formContentLayout.addComponent(new ExperimentDataReportForm((Integer)treeItemClicked.getItemProperty("experimentId").getValue()));
+        }
 	}
 }

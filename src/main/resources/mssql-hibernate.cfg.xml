@@ -23,6 +23,7 @@
         <property name="hbm2ddl.auto">update</property>  
    
         <property name="format_sql">true</property>
+        <property name="hibernate.enable_lazy_load_no_trans">true</property>
         
         <!-- Mapping for Classes using Annotations -->
         <mapping class="com.bringit.experiment.bll.SysUser" />

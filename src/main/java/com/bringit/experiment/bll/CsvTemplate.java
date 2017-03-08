@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,7 +21,7 @@ public class CsvTemplate {
 	private Integer csvTemplateId;
 
 	@Column(name="CsvTemplateIsActive")
-	private boolean csvTemplateIsActive;
+	private Boolean csvTemplateIsActive;
 	
 	@Column(name="CsvTemplateName")
 	private String CsvTemplateName;
@@ -35,7 +36,7 @@ public class CsvTemplate {
 	private Date csvTemplateExecStartDate;
 	
 	@Column(name="CsvTemplateExecStartHour")
-	private int csvTemplateExecStartHour;
+	private Integer csvTemplateExecStartHour;
 	
 	@Column(name="CsvTemplateExecEndDate")
 	private Date csvTemplateExecEndDate;
@@ -46,33 +47,77 @@ public class CsvTemplate {
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="InboundFileRepoId", unique=false, updatable=false)
 	private FilesRepository inboundFileRepo;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ProcessedFileRepoId", unique=false, updatable=false)
 	private FilesRepository processedFileRepo;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExceptionFileRepoId", unique=false, updatable=false)
 	private FilesRepository exceptionFileRepo;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="JobExecRepeatId", unique=false, updatable=false)
 	private JobExecutionRepeat jobExecRepeat;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExperimentId", unique=false, updatable=false)
 	private Experiment experiment;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
 	private SysUser createdBy;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
 	private SysUser lastModifiedBy;
+
+	public CsvTemplate() {
+		this.csvTemplateId = null;
+		this.csvTemplateIsActive = null;
+		this.CsvTemplateName = null;
+		this.csvTemplateComments = null;
+		this.csvTemplatePrefix = null;
+		this.csvTemplateExecStartDate = null;
+		this.csvTemplateExecStartHour = null;
+		this.csvTemplateExecEndDate = null;
+		this.createdDate = null;
+		this.modifiedDate = null;
+		this.inboundFileRepo = null;
+		this.processedFileRepo = null;
+		this.exceptionFileRepo = null;
+		this.jobExecRepeat = null;
+		this.experiment = null;
+		this.createdBy = null;
+		this.lastModifiedBy = null;
+	}
+	
+	public CsvTemplate(Integer csvTemplateId, boolean csvTemplateIsActive, String csvTemplateName,
+			String csvTemplateComments, String csvTemplatePrefix, Date csvTemplateExecStartDate,
+			int csvTemplateExecStartHour, Date csvTemplateExecEndDate, Date createdDate, Date modifiedDate,
+			FilesRepository inboundFileRepo, FilesRepository processedFileRepo, FilesRepository exceptionFileRepo,
+			JobExecutionRepeat jobExecRepeat, Experiment experiment, SysUser createdBy, SysUser lastModifiedBy) {
+		this.csvTemplateId = csvTemplateId;
+		this.csvTemplateIsActive = csvTemplateIsActive;
+		this.CsvTemplateName = csvTemplateName;
+		this.csvTemplateComments = csvTemplateComments;
+		this.csvTemplatePrefix = csvTemplatePrefix;
+		this.csvTemplateExecStartDate = csvTemplateExecStartDate;
+		this.csvTemplateExecStartHour = csvTemplateExecStartHour;
+		this.csvTemplateExecEndDate = csvTemplateExecEndDate;
+		this.createdDate = createdDate;
+		this.modifiedDate = modifiedDate;
+		this.inboundFileRepo = inboundFileRepo;
+		this.processedFileRepo = processedFileRepo;
+		this.exceptionFileRepo = exceptionFileRepo;
+		this.jobExecRepeat = jobExecRepeat;
+		this.experiment = experiment;
+		this.createdBy = createdBy;
+		this.lastModifiedBy = lastModifiedBy;
+	}
 
 	public Integer getCsvTemplateId() {
 		return csvTemplateId;

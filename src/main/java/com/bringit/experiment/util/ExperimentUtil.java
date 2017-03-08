@@ -189,7 +189,13 @@ public class ExperimentUtil {
 			sqlSelectQuery = "UPDATE " + experiment.getExpDbTableNameId() + " SET ";
 			for(int i=0; experimentFieldIdsXRef != null && i<experimentFieldIdsXRef.size(); i++)
 			{
-				sqlSelectQuery +=  experimentFieldIdsXRef.get(i) + " = '" + experimentFieldValuesXRef.get(i) + "'";
+				sqlSelectQuery +=  experimentFieldIdsXRef.get(i) + " = ";
+				
+				if(experimentFieldValuesXRef.get(i) != null)
+					sqlSelectQuery += "'" + experimentFieldValuesXRef.get(i) + "'";
+				else
+					sqlSelectQuery += "null";
+					
 				if((i+1) < experimentFieldIdsXRef.size())
 					sqlSelectQuery += ", ";
 			}
@@ -203,4 +209,21 @@ public class ExperimentUtil {
 		return sqlSelectQuery;
 	}
 
+	public static String buildSqlSelectQueryExperimentChangesLog(String ExperimentId, String dbRecordId)
+	{
+		String sqlSelectQuery = "SELECT CASE ExpFieldValueUpdateLog.DbTableRecordCommentsUpdate WHEN 1 THEN 'Comments' ELSE ExpField.ExpFieldName END AS 'Updated Field', ";
+		sqlSelectQuery += " ExpFieldValueUpdateLog.ExpOldCreatedDate AS 'Previous Modification Date', ";
+		sqlSelectQuery += " ExpFieldValueUpdateLog.ExpOldValue AS 'Previous Value', ";
+		sqlSelectQuery += " ExpFieldValueUpdateLog.ExpNewCreatedDate AS 'New Modification Date', "; 
+		sqlSelectQuery += " ExpFieldValueUpdateLog.ExpNewValue AS 'New Value', ";
+		sqlSelectQuery += " SysUser.UserName AS 'Modified By' ";
+		sqlSelectQuery += " FROM ExperimentMeasureFieldValueUpdateLog AS ExpFieldValueUpdateLog ";
+		sqlSelectQuery += " LEFT JOIN ExperimentField ExpField ON ExpFieldValueUpdateLog.ExpFieldId = ExpField.ExpFieldId ";
+		sqlSelectQuery += " LEFT JOIN Experiment Experiment ON ExpField.ExpId = Experiment.ExpId ";
+		sqlSelectQuery += " LEFT JOIN SysUser SysUser ON  ExpFieldValueUpdateLog.CreatedBy = SysUser.UserId ";
+		sqlSelectQuery += " WHERE Experiment.ExpId = " + ExperimentId + " AND ExpFieldValueUpdateLog.DbExperimentDataTableRecordId = " + dbRecordId;
+		sqlSelectQuery += " ORDER BY ExpFieldValueUpdateLog.ExpNewCreatedDate DESC ";
+		
+		return sqlSelectQuery;
+	}
 }

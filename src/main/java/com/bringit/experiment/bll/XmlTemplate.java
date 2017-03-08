@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,7 +21,7 @@ public class XmlTemplate {
 	private Integer xmlTemplateId;
 
 	@Column(name="XmlTemplateIsActive")
-	private boolean xmlTemplateIsActive;
+	private Boolean xmlTemplateIsActive;
 
 	@Column(name="XmlTemplateName")
 	private String xmlTemplateName;
@@ -35,7 +36,7 @@ public class XmlTemplate {
 	private Date xmlTemplateExecStartDate;
 	
 	@Column(name="XmlTemplateExecStartHour")
-	private int xmlTemplateExecStartHour;
+	private Integer xmlTemplateExecStartHour;
 	
 	@Column(name="XmlTemplateExecEndDate")
 	private Date xmlTemplateExecEndDate;
@@ -46,33 +47,77 @@ public class XmlTemplate {
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="InboundFileRepoId", unique=false, updatable=true)
 	private FilesRepository inboundFileRepo;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ProcessedFileRepoId", unique=false, updatable=true)
 	private FilesRepository processedFileRepo;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExceptionFileRepoId", unique=false, updatable=true)
 	private FilesRepository exceptionFileRepo;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="JobExecRepeatId", unique=false, updatable=true)
 	private JobExecutionRepeat jobExecRepeat;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExperimentId", unique=false, updatable=true)
 	private Experiment experiment;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
 	private SysUser createdBy;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
 	private SysUser lastModifiedBy;
+
+	public XmlTemplate() {
+		this.xmlTemplateId = null;
+		this.xmlTemplateIsActive = null;
+		this.xmlTemplateName = null;
+		this.xmlTemplateComments = null;
+		this.xmlTemplatePrefix = null;
+		this.xmlTemplateExecStartDate = null;
+		this.xmlTemplateExecStartHour = null;
+		this.xmlTemplateExecEndDate = null;
+		this.createdDate = null;
+		this.modifiedDate = null;
+		this.inboundFileRepo = null;
+		this.processedFileRepo = null;
+		this.exceptionFileRepo = null;
+		this.jobExecRepeat = null;
+		this.experiment = null;
+		this.createdBy = null;
+		this.lastModifiedBy = null;
+	}
+	
+	public XmlTemplate(Integer xmlTemplateId, boolean xmlTemplateIsActive, String xmlTemplateName,
+			String xmlTemplateComments, String xmlTemplatePrefix, Date xmlTemplateExecStartDate,
+			int xmlTemplateExecStartHour, Date xmlTemplateExecEndDate, Date createdDate, Date modifiedDate,
+			FilesRepository inboundFileRepo, FilesRepository processedFileRepo, FilesRepository exceptionFileRepo,
+			JobExecutionRepeat jobExecRepeat, Experiment experiment, SysUser createdBy, SysUser lastModifiedBy) {
+		this.xmlTemplateId = xmlTemplateId;
+		this.xmlTemplateIsActive = xmlTemplateIsActive;
+		this.xmlTemplateName = xmlTemplateName;
+		this.xmlTemplateComments = xmlTemplateComments;
+		this.xmlTemplatePrefix = xmlTemplatePrefix;
+		this.xmlTemplateExecStartDate = xmlTemplateExecStartDate;
+		this.xmlTemplateExecStartHour = xmlTemplateExecStartHour;
+		this.xmlTemplateExecEndDate = xmlTemplateExecEndDate;
+		this.createdDate = createdDate;
+		this.modifiedDate = modifiedDate;
+		this.inboundFileRepo = inboundFileRepo;
+		this.processedFileRepo = processedFileRepo;
+		this.exceptionFileRepo = exceptionFileRepo;
+		this.jobExecRepeat = jobExecRepeat;
+		this.experiment = experiment;
+		this.createdBy = createdBy;
+		this.lastModifiedBy = lastModifiedBy;
+	}
 
 	public Integer getXmlTemplateId() {
 		return xmlTemplateId;

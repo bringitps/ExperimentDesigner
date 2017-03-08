@@ -2,6 +2,7 @@ package com.bringit.experiment.bll;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,18 +22,37 @@ public class XmlTemplateNode {
 	private String xmlTemplateNodeName;
 
 	@Column(name="XmlTemplateNodeIsLoop")
-	private boolean xmlTemplateNodeIsLoop;
+	private Boolean xmlTemplateNodeIsLoop;
 
 	@Column(name="XmlTemplateNodeIsAttribute")
-	private boolean xmlTemplateNodeIsAttribute;
+	private Boolean xmlTemplateNodeIsAttribute;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="XmlTemplateId", unique=false, updatable=true)
 	private XmlTemplate xmlTemplate;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
 	private ExperimentField expField;
+
+	public XmlTemplateNode() {
+		this.xmlTemplateNodeId = null;
+		this.xmlTemplateNodeName = null;
+		this.xmlTemplateNodeIsLoop = null;
+		this.xmlTemplateNodeIsAttribute = null;
+		this.xmlTemplate = null;
+		this.expField = null;
+	}
+	
+	public XmlTemplateNode(Integer xmlTemplateNodeId, String xmlTemplateNodeName, boolean xmlTemplateNodeIsLoop,
+			boolean xmlTemplateNodeIsAttribute, XmlTemplate xmlTemplate, ExperimentField expField) {
+		this.xmlTemplateNodeId = xmlTemplateNodeId;
+		this.xmlTemplateNodeName = xmlTemplateNodeName;
+		this.xmlTemplateNodeIsLoop = xmlTemplateNodeIsLoop;
+		this.xmlTemplateNodeIsAttribute = xmlTemplateNodeIsAttribute;
+		this.xmlTemplate = xmlTemplate;
+		this.expField = expField;
+	}
 
 	public Integer getXmlTemplateNodeId() {
 		return xmlTemplateNodeId;

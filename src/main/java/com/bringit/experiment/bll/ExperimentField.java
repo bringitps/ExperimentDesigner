@@ -10,9 +10,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.BatchSize;
+
 @Entity
 @Table(name="ExperimentField")
 public class ExperimentField {
+	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="ExpFieldId")
@@ -22,7 +25,7 @@ public class ExperimentField {
 	private String expDbFieldNameId;
 	
 	@Column(name="ExpFieldIsActive")
-	private boolean expFieldIsActive;
+	private Boolean expFieldIsActive;
 	
 	@Column(name="ExpFieldName")
 	private String expFieldName;
@@ -38,7 +41,27 @@ public class ExperimentField {
     @JoinColumn(name="UomId", unique=false, updatable=true)
 	private UnitOfMeasure unitOfMeasure;
 
-	
+	public ExperimentField() {
+		this.expFieldId = null;
+		this.expDbFieldNameId = null;
+		this.expFieldIsActive = null;
+		this.expFieldName = null;
+		this.expFieldType = null;
+		this.experiment = null;
+		this.unitOfMeasure = null;
+	}
+
+	public ExperimentField(Integer expFieldId, String expDbFieldNameId, boolean expFieldIsActive, String expFieldName,
+			String expFieldType, Experiment experiment, UnitOfMeasure unitOfMeasure) {
+		this.expFieldId = expFieldId;
+		this.expDbFieldNameId = expDbFieldNameId;
+		this.expFieldIsActive = expFieldIsActive;
+		this.expFieldName = expFieldName;
+		this.expFieldType = expFieldType;
+		this.experiment = experiment;
+		this.unitOfMeasure = unitOfMeasure;
+	}
+
 	public Integer getExpFieldId() {
 		return expFieldId;
 	}

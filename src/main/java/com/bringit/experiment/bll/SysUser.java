@@ -21,6 +21,18 @@ public class SysUser {
 	@Column(name="UserPass")
 	private String UserPass;
 
+	public SysUser() {
+		this.userId = null;
+		this.UserName = null;
+		this.UserPass = null;
+	}
+
+	public SysUser(Integer userId, String userName, String userPass) {
+		this.userId = userId;
+		this.UserName = userName;
+		this.UserPass = userPass;
+	}
+
 	public Integer getUserId() {
 		return userId;
 	}

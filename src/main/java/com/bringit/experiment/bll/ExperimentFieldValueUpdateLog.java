@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,7 +33,7 @@ public class ExperimentFieldValueUpdateLog {
 	@Column(name="ExpNewCreatedDate")
 	private Date expNewCreatedDate;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
 	private ExperimentField experimentField;
 
@@ -40,7 +41,7 @@ public class ExperimentFieldValueUpdateLog {
 	private Integer dbExperimentDataTableRecordId;
 	
 	@Column(name="DbTableRecordCommentsUpdate")
-	private boolean dbTableRecordCommentsUpdate;
+	private Boolean dbTableRecordCommentsUpdate;
 	
 	@OneToOne
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
@@ -54,7 +55,7 @@ public class ExperimentFieldValueUpdateLog {
 		this.expNewCreatedDate = null;
 		this.experimentField = null;
 		this.dbExperimentDataTableRecordId = null;
-		this.dbTableRecordCommentsUpdate = false;
+		this.dbTableRecordCommentsUpdate = null;
 		this.createdBy = null;
 	}
 	

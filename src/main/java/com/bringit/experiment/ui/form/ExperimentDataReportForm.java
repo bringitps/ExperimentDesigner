@@ -5,18 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.vaadin.peter.contextmenu.ContextMenu;
-import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuItemClickEvent;
-import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuItemClickListener;
-import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuOpenedListener;
-import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuOpenedOnComponentEvent;
-import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuOpenedOnTableFooterEvent;
-import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuOpenedOnTableHeaderEvent;
-import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuOpenedOnTableRowEvent;
-import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuOpenedOnTreeItemEvent;
-
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.dao.DataBaseViewDao;
@@ -50,71 +38,14 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 
 	Experiment experiment = new Experiment();
 	List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
-	
-	
-	private final ContextMenuItemClickListener clickListener = new ContextMenuItemClickListener() {
-
-		@Override
-		public void contextMenuItemClicked(ContextMenuItemClickEvent event) {
-			Notification.show(event.getSource().toString());
-			System.out.println("Hello world");
-		}
-	};
-
-	private final ContextMenuOpenedListener.ComponentListener openComponentListener = new ContextMenuOpenedListener.ComponentListener() {
-
-		@Override
-		public void onContextMenuOpenFromComponent(
-				ContextMenuOpenedOnComponentEvent event) {
-			event.getContextMenu().removeAllItems();
-			event.getContextMenu().addItem("Empty space");
-			event.getContextMenu().open(event.getX(), event.getY());
-			System.out.println("Hello world");
-		}
-	};
-
-	private final ContextMenuOpenedListener.TableListener openListener = new ContextMenuOpenedListener.TableListener() {
-
-		@Override
-		public void onContextMenuOpenFromRow(
-				ContextMenuOpenedOnTableRowEvent event) {
-			event.getContextMenu().removeAllItems();
-			event.getContextMenu().addItem("Item " + event.getItemId());
-			System.out.println("Hello world");
-		}
-
-		@Override
-		public void onContextMenuOpenFromHeader(
-				ContextMenuOpenedOnTableHeaderEvent event) {
-			event.getContextMenu().removeAllItems();
-			event.getContextMenu().addItem("Item " + event.getPropertyId());
-			System.out.println("Hello world");
-		}
-
-		@Override
-		public void onContextMenuOpenFromFooter(
-				ContextMenuOpenedOnTableFooterEvent event) {
-			event.getContextMenu().addItem("Item " + event.getPropertyId());
-			System.out.println("Hello world");
-		}
-	};
-
-	private final ContextMenuOpenedListener.TreeListener treeItemListener = new ContextMenuOpenedListener.TreeListener() {
-
-		@Override
-		public void onContextMenuOpenFromTreeItem(
-				ContextMenuOpenedOnTreeItemEvent event) {
-			Notification.show("Tree item clicked " + event.getItemId());
-			System.out.println("Hello world");
-		}
-	};
-	
+	int selectedRecordId = -1;
 	
 	public ExperimentDataReportForm(int experimentId)
 	{
 		experiment = new ExperimentDao().getExperimentById(experimentId);
 		experimentFields = new ExperimentFieldDao().getActiveExperimentFields(experiment);
 		
+		this.lblExperimentTitle.setValue(" -" + experiment.getExpName());
 		String sqlSelectQuery =  ExperimentUtil.buildSqlSelectQueryByExperiment(experiment, experimentFields);
 		ResultSet experimentDataResults = new ExecuteQueryDao().getSqlSelectQueryResults(sqlSelectQuery);
 		if(experimentDataResults != null)
@@ -177,33 +108,27 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 			}
 		
 		});
+	
+		btnViewRecordHistory.addClickListener(new Button.ClickListener() {
+	
+			@Override
+			public void buttonClick(ClickEvent event) {
+				viewSelectedRecordHistory();
+			}
 		
-		/*
+		});
+		
 		tblExperimentDataReport.addItemClickListener(new ItemClickEvent.ItemClickListener() 
 	    {
             public void itemClick(ItemClickEvent event) {
+            	selectedRecordId = Integer.parseInt(event.getItemId().toString());
                 if (event.isDoubleClick())
                 	openDataViewRecordCRUDModalWindow(Integer.parseInt(event.getItemId().toString()));
+                else 
+                	tblExperimentDataReport.select(event.getItemId());
             }
         });
-		*/
-
-		ContextMenu tableContextMenu = new ContextMenu();
-		tableContextMenu.addContextMenuComponentListener(openComponentListener);
-		tableContextMenu.addContextMenuTableListener(openListener);
-		tableContextMenu.addItem("Table test item #1");
 		
-		tableContextMenu.setOpenAutomatically(false);
-		tableContextMenu.setAsTableContextMenu(tblExperimentDataReport);
-		
-		//this.addComponent((Component) tableContextMenu);
-		/*
-		ContextMenu tableContextMenu = new ContextMenu();
-		tableContextMenu.addContextMenuComponentListener(openComponentListener);
-		tableContextMenu.addContextMenuTableListener(openListener);
-		tableContextMenu.addItem("Table test item #1");
-		tableContextMenu.setAsTableContextMenu(tblExperimentDataReport);
-		*/
 	}
 	
 	private void filterExperimentDataResults()
@@ -294,23 +219,39 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 		}
 	}
 	
-	public void openDataViewRecordCRUDModalWindow(int experimentRecordId)
+	private void openDataViewRecordCRUDModalWindow(int experimentRecordId)
 	{
 		 Window dataViewRecordCRUDModalWindow = new Window("View Record");
 		 dataViewRecordCRUDModalWindow.setModal(true);
 		 dataViewRecordCRUDModalWindow.setResizable(false);
 		 dataViewRecordCRUDModalWindow.setContent(new ExperimentDataViewRecordForm(this.experiment, this.experimentFields, experimentRecordId));
 		 dataViewRecordCRUDModalWindow.setWidth(940, Unit.PIXELS);
-		 dataViewRecordCRUDModalWindow.setHeight(760, Unit.PIXELS);
+		 dataViewRecordCRUDModalWindow.setHeight(680, Unit.PIXELS);
 		 dataViewRecordCRUDModalWindow.center();
 		 dataViewRecordCRUDModalWindow.addCloseListener(new Window.CloseListener() {
 			
 			@Override
 			public void windowClose(CloseEvent e) {
 				// TODO Auto-generated method stub
-				//reloadXmlTemplateDbViewResults();
+				filterExperimentDataResults();
 			}
 		});
 		 this.getUI().addWindow(dataViewRecordCRUDModalWindow);
     }
+	
+	private void viewSelectedRecordHistory()
+	{
+		if(this.selectedRecordId == -1)
+			return;
+		
+		Window dataViewRecordChangesHistoryModalWindow = new Window("View Record");
+		dataViewRecordChangesHistoryModalWindow.setModal(true);
+		dataViewRecordChangesHistoryModalWindow.setResizable(false);
+		dataViewRecordChangesHistoryModalWindow.setContent(new ExperimentRecordChangesHistoryForm(this.experiment, this.selectedRecordId));
+		dataViewRecordChangesHistoryModalWindow.setWidth(940, Unit.PIXELS);
+		dataViewRecordChangesHistoryModalWindow.setHeight(480, Unit.PIXELS);
+		dataViewRecordChangesHistoryModalWindow.center();
+		this.getUI().addWindow(dataViewRecordChangesHistoryModalWindow);
+	
+	}
 }

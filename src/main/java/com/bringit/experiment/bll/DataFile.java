@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,25 +22,48 @@ public class DataFile {
 	private Integer dataFileId;
 
 	@Column(name="DataFileIsXml")
-	private boolean dataFileIsXml;
+	private Boolean dataFileIsXml;
 	
 	@Column(name="DataFileIsCsv")
-	private boolean dataFileIsCsv;
+	private Boolean dataFileIsCsv;
 	
 	@Column(name="DataFileName")
 	private String dataFileName;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FileRepoId", unique=false, updatable=true)
 	private FilesRepository fileRepoId;
 
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
 	private SysUser createdBy;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
 	private SysUser lastModifiedBy;
+
+	public DataFile()
+	{
+		this.dataFileId = null;
+		this.dataFileIsXml = null;
+		this.dataFileIsCsv = null;
+		this.dataFileName = null;
+		this.fileRepoId = null;
+		this.createdBy = null;
+		this.lastModifiedBy = null;
+	}
+	
+	public DataFile(Integer dataFileId, boolean dataFileIsXml, boolean dataFileIsCsv, String dataFileName,
+			FilesRepository fileRepoId, SysUser createdBy, SysUser lastModifiedBy) {
+		super();
+		this.dataFileId = dataFileId;
+		this.dataFileIsXml = dataFileIsXml;
+		this.dataFileIsCsv = dataFileIsCsv;
+		this.dataFileName = dataFileName;
+		this.fileRepoId = fileRepoId;
+		this.createdBy = createdBy;
+		this.lastModifiedBy = lastModifiedBy;
+	}
 
 	public Integer getDataFileId() {
 		return dataFileId;

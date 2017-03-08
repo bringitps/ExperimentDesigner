@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,7 +21,7 @@ public class CsvDataLoadExecutionResult {
 	private Integer csvDataLoadExecId;
 
 	@Column(name="CsvDataLoadExecException")
-	private boolean csvDataLoadExecException;
+	private Boolean csvDataLoadExecException;
 	
 	@Column(name="CsvDataLoadExecExceptionDetails")
 	private String csvDataLoadExecExeptionDetails;
@@ -31,13 +32,35 @@ public class CsvDataLoadExecutionResult {
 	@Column(name="CsvDataLoadExecTime")
 	private Date csvDataLoadExecTime;
 
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="DataFileId", unique=false, updatable=true)
 	private DataFile dataFile;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="CsvTemplateId", unique=false, updatable=true)
 	private CsvTemplate csvTemplate;
+
+	public CsvDataLoadExecutionResult() {
+		this.csvDataLoadExecId = null;
+		this.csvDataLoadExecException = null;
+		this.csvDataLoadExecExeptionDetails = null;
+		this.csvDataLoadExecExeptionFile = null;
+		this.csvDataLoadExecTime = null;
+		this.dataFile = null;
+		this.csvTemplate = null;
+	}
+
+	public CsvDataLoadExecutionResult(Integer csvDataLoadExecId, boolean csvDataLoadExecException,
+			String csvDataLoadExecExeptionDetails, String csvDataLoadExecExeptionFile, Date csvDataLoadExecTime,
+			DataFile dataFile, CsvTemplate csvTemplate) {
+		this.csvDataLoadExecId = csvDataLoadExecId;
+		this.csvDataLoadExecException = csvDataLoadExecException;
+		this.csvDataLoadExecExeptionDetails = csvDataLoadExecExeptionDetails;
+		this.csvDataLoadExecExeptionFile = csvDataLoadExecExeptionFile;
+		this.csvDataLoadExecTime = csvDataLoadExecTime;
+		this.dataFile = dataFile;
+		this.csvTemplate = csvTemplate;
+	}
 
 	public Integer getCsvDataLoadExecId() {
 		return csvDataLoadExecId;

@@ -51,9 +51,20 @@
     </vaadin-grid-layout> 
    </vaadin-horizontal-layout> 
    <vaadin-horizontal-layout width-full :right> 
-    <vaadin-button icon="fonticon://FontAwesome/f1c3" style-name="tiny native friendly" height="20px" plain-text _id="btnExportExcel" :right>
-      Export to Excel 
-    </vaadin-button> 
+    <vaadin-grid-layout width-full height="30px"> 
+     <row> 
+      <column> 
+       <vaadin-button icon="fonticon://FontAwesome/f0f6" style-name="tiny native" height="20px" plain-text _id="btnViewRecordHistory">
+         View Record History 
+       </vaadin-button> 
+      </column> 
+      <column> 
+       <vaadin-button icon="fonticon://FontAwesome/f1c3" style-name="tiny native friendly" height="20px" plain-text _id="btnExportExcel" :right>
+         Export to Excel 
+       </vaadin-button> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
    </vaadin-horizontal-layout> 
    <vaadin-css-layout style-name="content" size-full :expand> 
     <vaadin-css-layout style-name="list" size-full> 

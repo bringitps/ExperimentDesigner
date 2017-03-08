@@ -27,7 +27,7 @@ public class Experiment {
 	private String expDbTableNameId;
 	
 	@Column(name="ExpIsActive")
-	private boolean expIsActive;
+	private Boolean expIsActive;
 	
 	@Column(name="ExpName")
 	private String expName;
@@ -54,7 +54,38 @@ public class Experiment {
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
 	private SysUser lastModifiedBy;
-	
+
+
+	public Experiment() {
+		this.expId = null;
+		this.expDbTableNameId = null;
+		this.expIsActive = false;
+		this.expName = null;
+		this.expComments = null;
+		this.expInstructions = null;
+		this.createdDate = null;
+		this.modifiedDate = null;
+		this.expImage = null;
+		this.createdBy = null;
+		this.lastModifiedBy = null;
+	}
+
+	public Experiment(Integer expId, String expDbTableNameId, boolean expIsActive, String expName, String expComments,
+			String expInstructions, Date createdDate, Date modifiedDate, byte[] expImage, SysUser createdBy,
+			SysUser lastModifiedBy) {
+		this.expId = expId;
+		this.expDbTableNameId = expDbTableNameId;
+		this.expIsActive = expIsActive;
+		this.expName = expName;
+		this.expComments = expComments;
+		this.expInstructions = expInstructions;
+		this.createdDate = createdDate;
+		this.modifiedDate = modifiedDate;
+		this.expImage = expImage;
+		this.createdBy = createdBy;
+		this.lastModifiedBy = lastModifiedBy;
+	}
+
 	public Integer getExpId() {
 		return expId;
 	}

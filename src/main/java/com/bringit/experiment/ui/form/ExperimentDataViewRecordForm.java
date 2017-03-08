@@ -64,6 +64,9 @@ public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign
 		this.experiment = experiment;
 		this.experimentFields = experimentFields;
 		
+		this.lblExperimentTitle.setValue(" -" + experiment.getExpName());
+		
+		
 		String sqlSelectQuery = ExperimentUtil.buildEqualsFilteredSqlSelectQueryByExperiment(this.experiment, this.experimentFields, "Id", this.recordId.toString()); 
 		ResultSet experimentDataRecordResults = new ExecuteQueryDao().getSqlSelectQueryResults(sqlSelectQuery);
 		if(experimentDataRecordResults != null)
@@ -129,7 +132,7 @@ public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign
 					dtRecordDateField.setResolution(Resolution.SECOND);
 					
 					int recordColumnValueXRefIndex = recordColumnLabelXRef.indexOf(experimentFields.get(i).getExpFieldName());
-					if( recordColumnValueXRefIndex > -1)
+					if( recordColumnValueXRefIndex > -1 && recordColumnValueXRef.get(recordColumnValueXRefIndex) != null)
 					{
 						DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 						try {
@@ -225,7 +228,7 @@ public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign
 			for(int i=0; i<dtRecordDataFields.size(); i++)
 			{
 				updateRecordDbFieldNameIdXRef.add(dtRecordDataFields.get(i).getId());
-				updateRecordDbFieldValueXRef.add(df.format(dtRecordDataFields.get(i).getValue()));
+				updateRecordDbFieldValueXRef.add(dtRecordDataFields.get(i).getValue() != null ? df.format(dtRecordDataFields.get(i).getValue())  : null);
 				updateRecordColumnLabelXRef.add(dtRecordDataFields.get(i).getCaption().trim());
 			}
 	
@@ -282,9 +285,22 @@ public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign
 				if(!recordColumnLabelXRef.get(i).toString().trim().equals("LastModifiedDate") && !recordColumnLabelXRef.get(i).toString().trim().equals("CreatedDate"))
 				{
 					int updatedDataXRefIndex = updateRecordColumnLabelXRef.indexOf(recordColumnLabelXRef.get(i));
-					if(updatedDataXRefIndex > -1 && !recordColumnValueXRef.get(i).toString().trim().equals(updateRecordDbFieldValueXRef.get(updatedDataXRefIndex)))
-						saveExperimentFieldValueUpdateLog(sessionUser, expFieldXRef.get(i), this.recordId, recordColumnLabelXRef.get(i).toString().trim().equals("Comments"), recordColumnValueXRef.get(i).toString().trim(), 
+					if(updatedDataXRefIndex > -1)
+					{ 
+						if(recordColumnValueXRef.get(i) == null || updateRecordDbFieldValueXRef.get(updatedDataXRefIndex) == null)
+						{
+							if(recordColumnValueXRef.get(i) != updateRecordDbFieldValueXRef.get(updatedDataXRefIndex))
+							{
+								saveExperimentFieldValueUpdateLog(sessionUser, expFieldXRef.get(i), this.recordId, recordColumnLabelXRef.get(i).toString().trim().equals("Comments"), (recordColumnValueXRef.get(i) != null ? recordColumnValueXRef.get(i) : "null"), 
+										lastModifiedDate, (updateRecordDbFieldValueXRef.get(updatedDataXRefIndex) != null ? updateRecordDbFieldValueXRef.get(updatedDataXRefIndex) : "null"), updateDate);			
+							}
+						}
+						else if(!recordColumnValueXRef.get(i).toString().trim().equals(updateRecordDbFieldValueXRef.get(updatedDataXRefIndex)))
+						{
+							saveExperimentFieldValueUpdateLog(sessionUser, expFieldXRef.get(i), this.recordId, recordColumnLabelXRef.get(i).toString().trim().equals("Comments"), recordColumnValueXRef.get(i).toString().trim(), 
 								lastModifiedDate, updateRecordDbFieldValueXRef.get(updatedDataXRefIndex), updateDate);			
+						}
+					}
 				}
 			}
 			

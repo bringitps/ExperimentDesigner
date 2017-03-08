@@ -21,6 +21,18 @@ public class UnitOfMeasure {
 	@Column(name="UomAbbreviation")
 	private String uomAbbreviation;
 
+	public UnitOfMeasure() {
+		this.uomId = null;
+		this.uomName = null;
+		this.uomAbbreviation = null;
+	}
+
+	public UnitOfMeasure(Integer uomId, String uomName, String uomAbbreviation) {
+		this.uomId = uomId;
+		this.uomName = uomName;
+		this.uomAbbreviation = uomAbbreviation;
+	}
+
 	public Integer getUomId() {
 		return uomId;
 	}

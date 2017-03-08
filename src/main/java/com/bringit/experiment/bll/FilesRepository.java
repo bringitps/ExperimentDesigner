@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,13 +24,13 @@ public class FilesRepository {
 	private String fileRepoName;
 	
 	@Column(name="FileRepoIsLocal")
-	private boolean fileRepoIsLocal;
+	private Boolean fileRepoIsLocal;
 	
 	@Column(name="FileRepoIsFtp")
-	private boolean fileRepoIsFtp;
+	private Boolean fileRepoIsFtp;
 	
 	@Column(name="FileRepoIsSftp")
-	private boolean fileRepoIsSftp;
+	private Boolean fileRepoIsSftp;
 	
 	@Column(name="FileRepoPath")
 	private String fileRepoPath;
@@ -52,13 +53,51 @@ public class FilesRepository {
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
 	private SysUser createdBy;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
 	private SysUser lastModifiedBy;
+
+	public FilesRepository() {
+		this.fileRepoId = null;
+		this.fileRepoName = null;
+		this.fileRepoIsLocal = null;
+		this.fileRepoIsFtp = null;
+		this.fileRepoIsSftp = null;
+		this.fileRepoPath = null;
+		this.fileRepoHost = null;
+		this.fileRepoPort = null;
+		this.fileRepoUser = null;
+		this.fileRepoPass = null;
+		this.createdDate = null;
+		this.modifiedDate = null;
+		this.createdBy = null;
+		this.lastModifiedBy = null;
+	}
+
+	
+	
+	public FilesRepository(Integer fileRepoId, String fileRepoName, boolean fileRepoIsLocal, boolean fileRepoIsFtp,
+			boolean fileRepoIsSftp, String fileRepoPath, String fileRepoHost, String fileRepoPort, String fileRepoUser,
+			String fileRepoPass, Date createdDate, Date modifiedDate, SysUser createdBy, SysUser lastModifiedBy) {
+		this.fileRepoId = fileRepoId;
+		this.fileRepoName = fileRepoName;
+		this.fileRepoIsLocal = fileRepoIsLocal;
+		this.fileRepoIsFtp = fileRepoIsFtp;
+		this.fileRepoIsSftp = fileRepoIsSftp;
+		this.fileRepoPath = fileRepoPath;
+		this.fileRepoHost = fileRepoHost;
+		this.fileRepoPort = fileRepoPort;
+		this.fileRepoUser = fileRepoUser;
+		this.fileRepoPass = fileRepoPass;
+		this.createdDate = createdDate;
+		this.modifiedDate = modifiedDate;
+		this.createdBy = createdBy;
+		this.lastModifiedBy = lastModifiedBy;
+	}
 
 	public Integer getFileRepoId() {
 		return fileRepoId;

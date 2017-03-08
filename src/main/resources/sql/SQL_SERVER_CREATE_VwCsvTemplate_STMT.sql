@@ -1,13 +1,11 @@
-CREATE VIEW vwCsvTemplate as
-SELECT  CsvTemplate.CsvTemplateId AS 'Id',
- CsvTemplate.CsvTemplateName AS 'Name',
- Experiment.ExpName as 'Experiment Name',
-               CreatedByUser.UserName AS 'CreatedBy', Job.JobExecRepeatName AS 'Job',
-                CsvTemplate.CreatedDate, CsvTemplate.ModifiedDate, 
-              InFileRepo.FileRepoHost, InFileRepo.FileRepoPath
-FROM     CsvTemplate LEFT OUTER JOIN
-               FilesRepository AS InFileRepo ON CsvTemplate.InboundFileRepoId = InFileRepo.FileRepoId LEFT OUTER JOIN
-               SysUser AS CreatedByUser ON CsvTemplate.CreatedBy = CreatedByUser.UserId LEFT OUTER JOIN
-               Experiment AS Experiment ON CsvTemplate.ExperimentId = Experiment.ExpId LEFT OUTER JOIN
-               JobExecutionRepeat AS Job ON CsvTemplate.JobExecRepeatId = Job.JobExecRepeatId
-               WHERE CsvTemplate.CsvTemplateIsActive = 1;
+CREATE VIEW vwExpFieldValueUpdateLog AS SELECT 
+	   CASE ExpFieldValueUpdateLog.DbTableRecordCommentsUpdate WHEN 1 THEN 'Comments' ELSE ExpField.ExpFieldName END AS 'Updated Field',
+	   ExpFieldValueUpdateLog.ExpOldCreatedDate AS 'Previous Modification Date', 
+	   ExpFieldValueUpdateLog.ExpOldValue AS 'Previous Value',
+	   ExpFieldValueUpdateLog.ExpNewCreatedDate AS 'New Modification Date', 
+	   ExpFieldValueUpdateLog.ExpNewValue AS 'New Value',
+	   SysUser.UserName AS 'Modified By' 
+  FROM ExperimentMeasureFieldValueUpdateLog AS ExpFieldValueUpdateLog
+  LEFT JOIN ExperimentField ExpField ON ExpFieldValueUpdateLog.ExpFieldId = ExpField.ExpFieldId
+  LEFT JOIN Experiment Experiment ON ExpField.ExpId = Experiment.ExpId
+  LEFT JOIN SysUser SysUser ON  ExpFieldValueUpdateLog.CreatedBy = SysUser.UserId;

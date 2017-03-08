@@ -19,7 +19,19 @@ public class JobExecutionRepeat {
 	private String JobExecRepeatName;
 	
 	@Column(name="JobExecRepeatMilliseconds")
-	private int jobExecRepeatMilliseconds;
+	private Integer jobExecRepeatMilliseconds;
+
+	public JobExecutionRepeat() {
+		this.jobExecRepeatId = null;
+		this.JobExecRepeatName = null;
+		this.jobExecRepeatMilliseconds = null;
+	}
+	
+	public JobExecutionRepeat(Integer jobExecRepeatId, String jobExecRepeatName, int jobExecRepeatMilliseconds) {
+		this.jobExecRepeatId = jobExecRepeatId;
+		this.JobExecRepeatName = jobExecRepeatName;
+		this.jobExecRepeatMilliseconds = jobExecRepeatMilliseconds;
+	}
 
 	public Integer getJobExecRepeatId() {
 		return jobExecRepeatId;

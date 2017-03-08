@@ -2,6 +2,7 @@ package com.bringit.experiment.bll;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,13 +22,28 @@ public class CsvTemplateColumns {
 	@Column(name="CsvTemplateColumnName")
 	private String csvTemplateColumnName;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="CsvTemplateId", unique=false, updatable=false)
 	private CsvTemplate csvTemplate;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExpFieldId", unique=false, updatable=false)
 	private ExperimentField expField;
+
+	public CsvTemplateColumns() {
+		this.csvTemplateColumnId = null;
+		this.csvTemplateColumnName = null;
+		this.csvTemplate = null;
+		this.expField = null;
+	}
+	
+	public CsvTemplateColumns(Integer csvTemplateColumnId, String csvTemplateColumnName, CsvTemplate csvTemplate,
+			ExperimentField expField) {
+		this.csvTemplateColumnId = csvTemplateColumnId;
+		this.csvTemplateColumnName = csvTemplateColumnName;
+		this.csvTemplate = csvTemplate;
+		this.expField = expField;
+	}
 
 	public Integer getCsvTemplateColumnId() {
 		return csvTemplateColumnId;

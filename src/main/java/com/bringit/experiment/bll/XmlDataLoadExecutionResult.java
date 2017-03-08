@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,7 +21,7 @@ public class XmlDataLoadExecutionResult {
 	private Integer xmlDataLoadExecId;
 
 	@Column(name="XmlDataLoadExecException")
-	private boolean xmlDataLoadExecException;
+	private Boolean xmlDataLoadExecException;
 	
 	@Column(name="XmlDataLoadExecExceptionDetails")
 	private String xmlDataLoadExecExeptionDetails;
@@ -28,13 +29,34 @@ public class XmlDataLoadExecutionResult {
 	@Column(name="XmlDataLoadExecTime")
 	private Date xmlDataLoadExecTime;
 
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="DataFileId", unique=false, updatable=true)
 	private DataFile dataFile;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="XmlTemplateId", unique=false, updatable=true)
 	private XmlTemplate xmlTemplate;
+
+	
+	public XmlDataLoadExecutionResult() {
+		this.xmlDataLoadExecId = null;
+		this.xmlDataLoadExecException = null;
+		this.xmlDataLoadExecExeptionDetails = null;
+		this.xmlDataLoadExecTime = null;
+		this.dataFile = null;
+		this.xmlTemplate = null;
+	}
+	
+	public XmlDataLoadExecutionResult(Integer xmlDataLoadExecId, boolean xmlDataLoadExecException,
+			String xmlDataLoadExecExeptionDetails, Date xmlDataLoadExecTime, DataFile dataFile,
+			XmlTemplate xmlTemplate) {
+		this.xmlDataLoadExecId = xmlDataLoadExecId;
+		this.xmlDataLoadExecException = xmlDataLoadExecException;
+		this.xmlDataLoadExecExeptionDetails = xmlDataLoadExecExeptionDetails;
+		this.xmlDataLoadExecTime = xmlDataLoadExecTime;
+		this.dataFile = dataFile;
+		this.xmlTemplate = xmlTemplate;
+	}
 
 	public Integer getXmlDataLoadExecId() {
 		return xmlDataLoadExecId;

@@ -162,11 +162,13 @@ public class ExperimentDao {
 			query += " CREATE TABLE " + experiment.getExpDbTableNameId();
 			query += " (RecordId int IDENTITY(1,1) NOT NULL PRIMARY KEY,";
 			query += " Comments varchar(1000) ,";
+			query += " CmId int ,";
 			query += " CreatedBy int ,";
 			query += " LastModifiedBy int ,";
 			query += " DataFileId int ,";
 			query += " CreatedDate datetime ,";
 			query += " LastModifiedDate datetime ,";
+			query += " FOREIGN KEY (CmId) REFERENCES ContractManufacturer(CmId), ";
 			query += " FOREIGN KEY (CreatedBy) REFERENCES SysUser(UserId), ";
 			query += " FOREIGN KEY (LastModifiedBy) REFERENCES SysUser(UserId), ";
 			query += " FOREIGN KEY (DataFileId) REFERENCES DataFile(DataFileId));";

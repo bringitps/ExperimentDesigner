@@ -235,15 +235,15 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.xmlt.setXmlTemplateExecStartHour((int) this.cbxStartHour.getValue());
 			if(this.xmlt.getXmlTemplateId() != null ) {
 				new XmlTemplateDao().updateXmlTemplate(xmlt);
-			/*	RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
-				remoteFileUtil.updateJob(Integer.toString(xmlt.getXmlTemplateId()), xmlt);*/
+				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
+				remoteFileUtil.updateJob(Integer.toString(xmlt.getXmlTemplateId()), xmlt);
 			} else {
 				this.xmlt.setCreatedBy(sessionUser);
 				this.xmlt.setCreatedDate(this.xmlt.getModifiedDate());
 				new XmlTemplateDao().addXmlTemplate(xmlt);
-				/*XmlTemplate xmltWithId = new XmlTemplateDao().getXmlTemplateByExperimentId(xmlt.getExperiment().getExpId());
+				XmlTemplate xmltWithId = new XmlTemplateDao().getXmlTemplateByExperimentId(xmlt.getExperiment().getExpId());
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
-				NullPointer --> remoteFileUtil.updateJob(Integer.toString(xmltWithId.getXmlTemplateId()), xmltWithId);*/
+				remoteFileUtil.updateJob(Integer.toString(xmltWithId.getXmlTemplateId()), xmltWithId);
 			}
 			
 			//Save XmlTemplateNodes

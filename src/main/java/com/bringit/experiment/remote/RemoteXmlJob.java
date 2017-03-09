@@ -14,6 +14,8 @@ import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.FTPUtil;
 
 import com.jcraft.jsch.ChannelSftp;
+import com.vaadin.ui.Notification.Type;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPFile;
@@ -219,6 +221,15 @@ public class RemoteXmlJob implements Job {
 
         try {
 
+        	if(new DataFileDao().getDataFileByName(filename) != null)
+    		{
+        		ResponseObj responseObj = new ResponseObj();
+        		responseObj.setCode(101);
+        		responseObj.setDescription("Data File is already processed. File Name: " + filename);
+        		responseObj.setDetail("Data File is already processed. File Name: " + filename);
+        		return responseObj; 
+    		}
+        	
             Config config = new Config();
             String strBatchSize = config.getProperty("batchinsert");
             int iBatchSize = Integer.parseInt(strBatchSize);

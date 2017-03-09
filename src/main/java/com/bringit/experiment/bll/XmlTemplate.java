@@ -48,6 +48,10 @@ public class XmlTemplate {
 	private Date modifiedDate;
 	
 	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CmId", unique=false, updatable=true)
+	private ContractManufacturer contractManufacturer;
+	
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="InboundFileRepoId", unique=false, updatable=true)
 	private FilesRepository inboundFileRepo;
 	
@@ -86,6 +90,7 @@ public class XmlTemplate {
 		this.xmlTemplateExecEndDate = null;
 		this.createdDate = null;
 		this.modifiedDate = null;
+		this.contractManufacturer = null;
 		this.inboundFileRepo = null;
 		this.processedFileRepo = null;
 		this.exceptionFileRepo = null;
@@ -95,11 +100,13 @@ public class XmlTemplate {
 		this.lastModifiedBy = null;
 	}
 	
-	public XmlTemplate(Integer xmlTemplateId, boolean xmlTemplateIsActive, String xmlTemplateName,
+
+	public XmlTemplate(Integer xmlTemplateId, Boolean xmlTemplateIsActive, String xmlTemplateName,
 			String xmlTemplateComments, String xmlTemplatePrefix, Date xmlTemplateExecStartDate,
-			int xmlTemplateExecStartHour, Date xmlTemplateExecEndDate, Date createdDate, Date modifiedDate,
-			FilesRepository inboundFileRepo, FilesRepository processedFileRepo, FilesRepository exceptionFileRepo,
-			JobExecutionRepeat jobExecRepeat, Experiment experiment, SysUser createdBy, SysUser lastModifiedBy) {
+			Integer xmlTemplateExecStartHour, Date xmlTemplateExecEndDate, Date createdDate, Date modifiedDate,
+			ContractManufacturer contractManufacturer, FilesRepository inboundFileRepo,
+			FilesRepository processedFileRepo, FilesRepository exceptionFileRepo, JobExecutionRepeat jobExecRepeat,
+			Experiment experiment, SysUser createdBy, SysUser lastModifiedBy) {
 		this.xmlTemplateId = xmlTemplateId;
 		this.xmlTemplateIsActive = xmlTemplateIsActive;
 		this.xmlTemplateName = xmlTemplateName;
@@ -110,6 +117,7 @@ public class XmlTemplate {
 		this.xmlTemplateExecEndDate = xmlTemplateExecEndDate;
 		this.createdDate = createdDate;
 		this.modifiedDate = modifiedDate;
+		this.contractManufacturer = contractManufacturer;
 		this.inboundFileRepo = inboundFileRepo;
 		this.processedFileRepo = processedFileRepo;
 		this.exceptionFileRepo = exceptionFileRepo;
@@ -119,6 +127,7 @@ public class XmlTemplate {
 		this.lastModifiedBy = lastModifiedBy;
 	}
 
+
 	public Integer getXmlTemplateId() {
 		return xmlTemplateId;
 	}
@@ -127,11 +136,11 @@ public class XmlTemplate {
 		this.xmlTemplateId = xmlTemplateId;
 	}
 
-	public boolean isXmlTemplateIsActive() {
+	public Boolean isXmlTemplateIsActive() {
 		return xmlTemplateIsActive;
 	}
 
-	public void setXmlTemplateIsActive(boolean xmlTemplateIsActive) {
+	public void setXmlTemplateIsActive(Boolean xmlTemplateIsActive) {
 		this.xmlTemplateIsActive = xmlTemplateIsActive;
 	}
 
@@ -176,11 +185,11 @@ public class XmlTemplate {
 		this.xmlTemplateExecEndDate = xmlTemplateExecEndDate;
 	}
 
-	public int getXmlTemplateExecStartHour() {
+	public Integer getXmlTemplateExecStartHour() {
 		return xmlTemplateExecStartHour;
 	}
 
-	public void setXmlTemplateExecStartHour(int xmlTemplateExecStartHour) {
+	public void setXmlTemplateExecStartHour(Integer xmlTemplateExecStartHour) {
 		this.xmlTemplateExecStartHour = xmlTemplateExecStartHour;
 	}
 	
@@ -198,6 +207,15 @@ public class XmlTemplate {
 
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
+	}
+
+	public ContractManufacturer getContractManufacturer() {
+		return contractManufacturer;
+	}
+
+
+	public void setContractManufacturer(ContractManufacturer contractManufacturer) {
+		this.contractManufacturer = contractManufacturer;
 	}
 
 	public FilesRepository getInboundFileRepo() {

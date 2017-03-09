@@ -17,9 +17,15 @@ import com.bringit.experiment.dao.CsvTemplateColumnsDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.XmlTemplateNodeDao;
 import com.opencsv.CSVReader;
+import com.vaadin.data.Property.ReadOnlyException;
+import com.vaadin.data.util.converter.Converter.ConversionException;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -58,10 +64,7 @@ public class ExperimentParser {
 	        				//get the nodes:
 	        				List<CsvTemplateColumns> columns = nodeDao.getAllCsvTemplateColumnssByTemplateId(template.getCsvTemplateId());
 	        				if(columns != null){
-					        	//SysUserDao sysUserDao = new SysUserDao();
-					        	//SysUser user = sysUserDao.getUserByUserName("bit_seko");
-		        				//DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	        		            reader = new CSVReader(new FileReader(csvFile));
+					        	reader = new CSVReader(new FileReader(csvFile));
 	        		            // we assume the first line is the header
 	        		            String[] header = reader.readNext();
 
@@ -75,46 +78,52 @@ public class ExperimentParser {
 	        		            	arr.add(maping);
 								}
 	        		            String[] line;
-	        		            //String insertQry = "INSERT INTO "+exp.getExpDbTableNameId()+" (";
-	        		            //String valuesQry = " VALUES (";
-	        		            for (int i = 0; i < arr.size(); i++) {
-									//insertQry+=(String) arr.get(i).get(1)+",";
+	        		            for (int i = 0; i < arr.size(); i++) 
 									csvColumns+=(String) arr.get(i).get(1)+",";
-								}
+								
 	        		           respObj.setCsvInsertColumns(csvColumns.substring(0, csvColumns.length()-1));
-	        		           //System.out.println(csvColumns.substring(0, csvColumns.length()-1));
-	        		            String fieldType = "";
-	        		            
+	        		           String fieldType = "";
+
+	        		   			String exceptionRowColumns = "";
+	        		   			int rowCount = 1;
 	        		            while ((line = reader.readNext()) != null) {
 	        		            	String csvValuesLine="";
 	            		            for (int i = 0; i < arr.size(); i++) {
 	            		            	fieldType= (String) arr.get(i).get(2);
-	    								//valuesQry+= line[(int) arr.get(i).get(0)]+",";
-	            		            	//valuesQry+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? line[(int) arr.get(i).get(0)]+"," : "'"+line[(int) arr.get(i).get(0)]+"',";
+	            		            	String fieldValue = line[(int) arr.get(i).get(0)];
+	            		            
+	            		            	if(!validateFieldType(fieldType, fieldValue))
+	            		            		exceptionRowColumns += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Column '" + (String) arr.get(i).get(1) + "' Row #" + rowCount + ".\n";
+	            		            	
+	            		            	
 	            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? line[(int) arr.get(i).get(0)]+"," : "'"+line[(int) arr.get(i).get(0)]+"',";
-	    							}
-	            		            //valuesQry+="'"+user.getUserId()+"','"+df.format(new Date())+"','"+filename+"'),(";
-	            		            csvValues.add(csvValuesLine.substring(0,csvValuesLine.length()-1));
+	            		            }
+	            		            
+	            		            rowCount++;
+            		            	csvValues.add(csvValuesLine.substring(0,csvValuesLine.length()-1));
 	            		            respObj.setCsvInsertValues(csvValues);
 	        		            }
-	        		            
-			        			//removing commas
-	        		            //insertQry+="CreatedBy,CreatedDate,FileName)";
-	        		            //valuesQry = valuesQry.substring(0,valuesQry.length()-2);
-		        				//ExecuteQueryDao executeQueryDao = new ExecuteQueryDao();
-		        				//System.out.println(insertQry+valuesQry);
-		        				//executeQueryDao.executeQuery(insertQry+valuesQry);
-			        			respObj.setDetail("FileName: "+filename );
-			        			
-			        			//uploading trace and log tables
-	                			//csvResult.setCsvDataLoadExecException(false);
-	                			//csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
-	                			//csvResult.setCsvDataLoadExecTime(new Date());
-	                			//csvResult.setCsvTemplate(template);
-	                			//csvResult.setCsvDataLoadExecExeptionFile(filename);
-	                			//csvResultDao.addCsvDataLoadExecutionResult(csvResult);
+	        		
 	                			reader.close();
+
+	                		    if(exceptionRowColumns != "")
+	                		    {
+	                		    	respObj.setCode(104);
+	                	      		respObj.setDescription("Exceptions at casting data. Details: "+exceptionRowColumns);
+	                	      		respObj.setDetail("Exceptions at casting data.");
+	                	      		
+		                			csvResult.setCsvDataLoadExecException(true);
+		                			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
+		                			csvResult.setCsvDataLoadExecTime(new Date());
+		                			csvResult.setCsvDataLoadExecExeptionFile(filename);
+		                			csvResultDao.addCsvDataLoadExecutionResult(csvResult);
+	                	     		
+		                			return respObj;
+	                		    }
+	                			
 			        			return respObj;
+			        			
+			        			
 	        				}else{
 	                    		respObj.setCode(104);
 	                    		respObj.setDescription("There are no COLUMNS associated with the CsvTemplate: "+template.getCsvTemplateName());
@@ -128,7 +137,7 @@ public class ExperimentParser {
 	                    	}
         				}else{
         	        		respObj.setCode(101);
-        	        		respObj.setDescription("Experiment Object recieved is null.");
+        	        		respObj.setDescription("Experiment Object received is null.");
         	        		respObj.setDetail("NullPointerException");
         	    			csvResult.setCsvDataLoadExecException(true);
         	    			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
@@ -206,6 +215,7 @@ public class ExperimentParser {
 		
     	//XRef Table between ExpFieldDBId, XmlNode, IsAttribute and NodeValues
     	List<String> xRefFieldDBId = new ArrayList<String>();
+    	List<String> xRefFieldDBType = new ArrayList<String>();
     	List<String> xRefXmlNodeSlashFormat = new ArrayList<String>();
     	List<Boolean> xRefXmlNodeIsAttribute = new ArrayList<Boolean>();
     	List<String> xRefXmlNodeAttributeName= new ArrayList<String>();
@@ -217,6 +227,7 @@ public class ExperimentParser {
 		for(int i=0; experimentFields!= null && i<experimentFields.size(); i++)
 		{
 			xRefFieldDBId.add(experimentFields.get(i).getExpDbFieldNameId());
+			xRefFieldDBType.add(experimentFields.get(i).getExpFieldType());
 			xRefXmlNodeSlashFormat.add(null);
 			xRefXmlNodeIsAttribute.add(null);
 			xRefXmlNodeAttributeName.add(null);
@@ -376,7 +387,7 @@ public class ExperimentParser {
 				    	 for(int j=0; j<xmlNodesFound.getLength(); j++)
 				    	 {
 				    		if(xmlNodesFound.item(j)!=null  && ((Element)xmlNodesFound.item(j)).getChildNodes().getLength() <= 1 )
-				    		{
+				    		{				    			
 				    			xmlGlobalValuesMatrix.add(xmlNodesFound.item(j).getTextContent().trim());
 				    			break;
 				    		}
@@ -405,6 +416,7 @@ public class ExperimentParser {
     	
 		}
 		
+		String exceptionNodes = "";
 		int totalRecords = 0;
 			
 		//3) Load Loop Node Field Values
@@ -469,14 +481,34 @@ public class ExperimentParser {
 	    				{
 							String attributeName = xRefXmlNodeAttributeName.get(j);
 							if(xmlValueElement.getAttribute(attributeName) != null && xmlValueElement.getAttribute(attributeName).trim().length() > 0)
-								xRefDBFieldValues.get(j).attachFieldValue(xmlValueElement.getAttribute(attributeName).trim());
+							{
+								String fieldType = xRefFieldDBType.get(j);
+								String fieldValue = xmlValueElement.getAttribute(attributeName).trim();
+								boolean isValidData = validateFieldType(fieldType, fieldValue);
+								exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + "\n";
+								
+								if(isValidData)
+									xRefDBFieldValues.get(j).attachFieldValue(xmlValueElement.getAttribute(attributeName).trim());
+								else
+		    						xRefDBFieldValues.get(j).attachFieldValue(null);									
+							}
 							else
 	    						xRefDBFieldValues.get(j).attachFieldValue(null);
 	    				}
 	    				else
 	    				{
 	    					if(xmlValueElement != null && xmlValueElement.getChildNodes().getLength() <= 1 && xmlValueElement.getTextContent() != null)
-	    						xRefDBFieldValues.get(j).attachFieldValue(xmlValueElement.getTextContent().trim());
+	    					{
+	    						String fieldType = xRefFieldDBType.get(j);
+								String fieldValue = xmlValueElement.getTextContent();
+								boolean isValidData = validateFieldType(fieldType, fieldValue);
+								exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + "\n";
+								
+								if(isValidData)		
+									xRefDBFieldValues.get(j).attachFieldValue(xmlValueElement.getTextContent().trim());
+								else
+									xRefDBFieldValues.get(j).attachFieldValue(null);										
+	    					}
 	    					else
 	    						xRefDBFieldValues.get(j).attachFieldValue(null);
 	    				}
@@ -484,7 +516,6 @@ public class ExperimentParser {
 	    		}
 	    	 }
 	     }
-	     
 	     
 	     //Load Global Values into XRef Table
 	     for(int i=0; i<expDBFieldIdMatrix.size(); i++)
@@ -494,12 +525,33 @@ public class ExperimentParser {
 			if(xRefIndex >= 0)
 			{
 				List<String> fieldValues = new ArrayList<String>();
+				boolean isValidData = false;
 				for(int j=0; j<totalRecords; j++)
-					fieldValues.add(xmlGlobalValuesMatrix.get(i));
+				{
+					if(j==0)
+					{
+						String fieldType = xRefFieldDBType.get(j);
+						String fieldValue = xmlGlobalValuesMatrix.get(i);
+						isValidData = validateFieldType(fieldType, fieldValue);
+						exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Global Node '" + xRefXmlNodeSlashFormat.get(j) +"'\n";
+					}
+					if(isValidData)
+						fieldValues.add(xmlGlobalValuesMatrix.get(i));
+					else
+						fieldValues.add(null);
+				}
 				xRefDBFieldValues.get(xRefIndex).setFieldValues(fieldValues);
 			}
 	     }
-
+	     
+	     if(exceptionNodes != "")
+	     {
+	    	respObj.setCode(104);
+      		respObj.setDescription("Exceptions at casting data. Details: "+exceptionNodes);
+      		respObj.setDetail("Exceptions at casting data.");
+     		return respObj;
+	     }
+	     
 	     //Build CSV Insert Columns
 	     String csvInsertColumns = ""; 
 	     
@@ -531,6 +583,54 @@ public class ExperimentParser {
 	    respObj.setCsvInsertColumns(csvInsertColumns);
 	    respObj.setCsvInsertValues(csvInsertValues);
 		return respObj;
+	}
+	
+	private boolean validateFieldType(String fieldType, String fieldValue)
+	{
+		if(fieldType.contains("date"))
+		{
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			try {
+				df.parse(fieldValue);
+			} catch (ReadOnlyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+		} catch (ConversionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}									
+		}
+		else if(fieldType.contains("float") || fieldType.contains("decimal"))
+		{
+			try
+			{
+				Float.parseFloat(fieldValue);
+			}
+			catch(Exception e)
+			{
+				return false;
+			}
+		}
+		else if(fieldType.contains("int"))
+		{
+			try
+			{
+				Integer.parseInt(fieldValue);
+			}
+			catch(Exception e)
+			{
+				return false;
+			}
+		}
+
+		return true;
+		
 	}
 
 }

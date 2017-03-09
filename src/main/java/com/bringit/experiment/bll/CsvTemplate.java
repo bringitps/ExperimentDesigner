@@ -46,6 +46,10 @@ public class CsvTemplate {
 	
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
+
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CmId", unique=false, updatable=true)
+	private ContractManufacturer contractManufacturer;
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="InboundFileRepoId", unique=false, updatable=false)
@@ -86,6 +90,7 @@ public class CsvTemplate {
 		this.csvTemplateExecEndDate = null;
 		this.createdDate = null;
 		this.modifiedDate = null;
+		this.contractManufacturer = null;
 		this.inboundFileRepo = null;
 		this.processedFileRepo = null;
 		this.exceptionFileRepo = null;
@@ -95,14 +100,16 @@ public class CsvTemplate {
 		this.lastModifiedBy = null;
 	}
 	
-	public CsvTemplate(Integer csvTemplateId, boolean csvTemplateIsActive, String csvTemplateName,
+	
+	public CsvTemplate(Integer csvTemplateId, Boolean csvTemplateIsActive, String csvTemplateName,
 			String csvTemplateComments, String csvTemplatePrefix, Date csvTemplateExecStartDate,
-			int csvTemplateExecStartHour, Date csvTemplateExecEndDate, Date createdDate, Date modifiedDate,
-			FilesRepository inboundFileRepo, FilesRepository processedFileRepo, FilesRepository exceptionFileRepo,
-			JobExecutionRepeat jobExecRepeat, Experiment experiment, SysUser createdBy, SysUser lastModifiedBy) {
+			Integer csvTemplateExecStartHour, Date csvTemplateExecEndDate, Date createdDate, Date modifiedDate,
+			ContractManufacturer contractManufacturer, FilesRepository inboundFileRepo,
+			FilesRepository processedFileRepo, FilesRepository exceptionFileRepo, JobExecutionRepeat jobExecRepeat,
+			Experiment experiment, SysUser createdBy, SysUser lastModifiedBy) {
 		this.csvTemplateId = csvTemplateId;
 		this.csvTemplateIsActive = csvTemplateIsActive;
-		this.CsvTemplateName = csvTemplateName;
+		CsvTemplateName = csvTemplateName;
 		this.csvTemplateComments = csvTemplateComments;
 		this.csvTemplatePrefix = csvTemplatePrefix;
 		this.csvTemplateExecStartDate = csvTemplateExecStartDate;
@@ -110,6 +117,7 @@ public class CsvTemplate {
 		this.csvTemplateExecEndDate = csvTemplateExecEndDate;
 		this.createdDate = createdDate;
 		this.modifiedDate = modifiedDate;
+		this.contractManufacturer = contractManufacturer;
 		this.inboundFileRepo = inboundFileRepo;
 		this.processedFileRepo = processedFileRepo;
 		this.exceptionFileRepo = exceptionFileRepo;
@@ -118,6 +126,7 @@ public class CsvTemplate {
 		this.createdBy = createdBy;
 		this.lastModifiedBy = lastModifiedBy;
 	}
+
 
 	public Integer getCsvTemplateId() {
 		return csvTemplateId;
@@ -159,11 +168,11 @@ public class CsvTemplate {
 		this.csvTemplateExecStartDate = csvTemplateExecStartDate;
 	}
 
-	public int getCsvTemplateExecStartHour() {
+	public Integer getCsvTemplateExecStartHour() {
 		return csvTemplateExecStartHour;
 	}
 
-	public void setCsvTemplateExecStartHour(int csvTemplateExecStartHour) {
+	public void setCsvTemplateExecStartHour(Integer csvTemplateExecStartHour) {
 		this.csvTemplateExecStartHour = csvTemplateExecStartHour;
 	}
 
@@ -189,6 +198,15 @@ public class CsvTemplate {
 
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
+	}
+
+	public ContractManufacturer getContractManufacturer() {
+		return contractManufacturer;
+	}
+
+
+	public void setContractManufacturer(ContractManufacturer contractManufacturer) {
+		this.contractManufacturer = contractManufacturer;
 	}
 
 	public FilesRepository getInboundFileRepo() {
@@ -247,11 +265,11 @@ public class CsvTemplate {
 		this.lastModifiedBy = lastModifiedBy;
 	}
 
-	public boolean isCsvTemplateIsActive() {
+	public Boolean isCsvTemplateIsActive() {
 		return csvTemplateIsActive;
 	}
 
-	public void setCsvTemplateIsActive(boolean csvTemplateIsActive) {
+	public void setCsvTemplateIsActive(Boolean csvTemplateIsActive) {
 		this.csvTemplateIsActive = csvTemplateIsActive;
 	}
 

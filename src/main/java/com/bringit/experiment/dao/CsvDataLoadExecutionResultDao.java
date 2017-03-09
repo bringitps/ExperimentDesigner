@@ -18,7 +18,8 @@ public class CsvDataLoadExecutionResultDao {
 	public void addCsvDataLoadExecutionResult(CsvDataLoadExecutionResult csvDataLoadExecutionResult) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -37,7 +38,8 @@ public class CsvDataLoadExecutionResultDao {
 
     public void deleteCsvDataLoadExecutionResult(int csvDataLoadExecutionResultId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             CsvDataLoadExecutionResult csvDataLoadExecutionResult = (CsvDataLoadExecutionResult)session.load(CsvDataLoadExecutionResult.class, new Integer(csvDataLoadExecutionResultId));
@@ -56,7 +58,8 @@ public class CsvDataLoadExecutionResultDao {
 
     public void updateCsvDataLoadExecutionResult(CsvDataLoadExecutionResult csvDataLoadExecutionResult) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(csvDataLoadExecutionResult);
@@ -76,7 +79,8 @@ public class CsvDataLoadExecutionResultDao {
 	public List<CsvDataLoadExecutionResult> getAllCsvDataLoadExecutionResults() {
         List<CsvDataLoadExecutionResult> csvDataLoadExecutionResults = new ArrayList<CsvDataLoadExecutionResult>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             csvDataLoadExecutionResults = session.createQuery("from CsvDataLoadExecutionResult").list();
@@ -93,7 +97,8 @@ public class CsvDataLoadExecutionResultDao {
 	public CsvDataLoadExecutionResult getCsvDataLoadExecutionResultById(int loadId) {
     	CsvDataLoadExecutionResult csvDataLoadExecutionResult = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from CsvDataLoadExecutionResult where CsvDataLoadExecId = :id";

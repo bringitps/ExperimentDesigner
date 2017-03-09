@@ -23,8 +23,21 @@
         <property name="hbm2ddl.auto">update</property>  
    
         <property name="format_sql">true</property>
+   
         <property name="hibernate.enable_lazy_load_no_trans">true</property>
-        
+   		
+   		<property name="hibernate.current_session_context_class">thread</property>		
+		<property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+		
+		<!-- For singleton factory -->
+		<!-- <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</property>
+		-->
+		 
+		<!-- enable second level cache and query cache -->
+		<property name="hibernate.cache.use_second_level_cache">true</property>
+		<property name="hibernate.cache.use_query_cache">true</property>
+ 		<property name="net.sf.ehcache.configurationResourceName">/myehcache.xml</property>
+ 		     
         <!-- Mapping for Classes using Annotations -->
         <mapping class="com.bringit.experiment.bll.SysUser" />
         <mapping class="com.bringit.experiment.bll.Experiment" />
@@ -39,10 +52,10 @@
         <mapping class="com.bringit.experiment.bll.XmlTemplateNode"/>
         <mapping class="com.bringit.experiment.bll.CsvTemplate"/>
         <mapping class="com.bringit.experiment.bll.CsvTemplateColumns"/>
-         <mapping class="com.bringit.experiment.bll.CsvDataLoadExecutionResult"/>
-         <mapping class="com.bringit.experiment.bll.DataFile"/>
-         <mapping class="com.bringit.experiment.bll.TargetReport"/>
-         <mapping class="com.bringit.experiment.bll.TargetField"/>
+        <mapping class="com.bringit.experiment.bll.CsvDataLoadExecutionResult"/>
+        <mapping class="com.bringit.experiment.bll.DataFile"/>
+        <mapping class="com.bringit.experiment.bll.TargetReport"/>
+        <mapping class="com.bringit.experiment.bll.TargetField"/>
          <mapping class="com.bringit.experiment.bll.TargetFieldGroup"/>
          <mapping class="com.bringit.experiment.bll.ContractManufacturer"/>
 

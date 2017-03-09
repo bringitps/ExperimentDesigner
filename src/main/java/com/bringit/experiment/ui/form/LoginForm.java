@@ -47,7 +47,7 @@ public class LoginForm extends LoginFormDesign {
 						webApplication.createUserSession(loggedUser);
 					else
 						//Register user automatically? or give them a point of contact to request access?
-						lblLoginError.setValue("User exists on LDAP, but is not registered to use this app. Please contact Edgar Beltran.");
+						lblLoginError.setValue("User exists on LDAP, but is not registered to use this app. Please contact IT.");
 						lblLoginError.setVisible(true);
 				}
 			} catch (LoginException e) {

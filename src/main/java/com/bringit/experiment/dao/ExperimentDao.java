@@ -1,16 +1,11 @@
 package com.bringit.experiment.dao;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Mappings;
-import org.hibernate.mapping.RootClass;
 
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.dal.HibernateUtil;
@@ -24,7 +19,8 @@ public class ExperimentDao {
 	public void addExperiment(Experiment exp) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -43,7 +39,8 @@ public class ExperimentDao {
 
     public void deleteExperiment(int expId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             Experiment exp = (Experiment)session.load(Experiment.class, new Integer(expId));
@@ -62,7 +59,8 @@ public class ExperimentDao {
 
     public void updateExperiment(Experiment exp) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(exp);
@@ -82,7 +80,8 @@ public class ExperimentDao {
 	public List<Experiment> getAllExperiments() {
         List<Experiment> experiments = new ArrayList<Experiment>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             experiments = session.createQuery("from Experiment").list();
@@ -99,7 +98,8 @@ public class ExperimentDao {
 	public List<Experiment> getActiveExperiments() {
         List<Experiment> experiments = new ArrayList<Experiment>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             experiments = session.createQuery("from Experiment where ExpIsActive = 'true'").list();
@@ -116,7 +116,8 @@ public class ExperimentDao {
 	public Experiment getExperimentById(int expId) {
         Experiment exp = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from Experiment where ExpId = :id";
@@ -136,7 +137,8 @@ public class ExperimentDao {
 	public Experiment getExperimentByName(String expName) {
         Experiment exp = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String query = "from Experiment where ExpName ='"+expName.trim()+ "' and ExpIsActive = 'true'";
@@ -177,7 +179,8 @@ public class ExperimentDao {
     		return false;
 
 		Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();

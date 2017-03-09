@@ -18,7 +18,8 @@ public class CsvTemplateDao {
 	public void addCsvTemplate(CsvTemplate csvTemplate) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -37,7 +38,8 @@ public class CsvTemplateDao {
 
     public void deleteCsvTemplate(int csvTemplateId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             CsvTemplate csvTemplate = (CsvTemplate)session.load(CsvTemplate.class, new Integer(csvTemplateId));
@@ -56,7 +58,8 @@ public class CsvTemplateDao {
 
     public void updateCsvTemplate(CsvTemplate csvTemplate) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(csvTemplate);
@@ -76,7 +79,8 @@ public class CsvTemplateDao {
 	public List<CsvTemplate> getAllCsvTemplates() {
         List<CsvTemplate> csvTemplates = new ArrayList<CsvTemplate>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             csvTemplates = session.createQuery("from CsvTemplate").list();
@@ -93,7 +97,8 @@ public class CsvTemplateDao {
 	public CsvTemplate getCsvTemplateById(int csvId) {
     	CsvTemplate csvTemplate = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from CsvTemplate where CsvTemplateId = :id";
@@ -112,7 +117,8 @@ public class CsvTemplateDao {
 	public CsvTemplate getCsvTemplateByExperimentId(int expId) {
     	CsvTemplate csvTemplate = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from CsvTemplate where ExperimentId = :id";
@@ -132,7 +138,8 @@ public class CsvTemplateDao {
 		public List<CsvTemplate> getCsvTemplatesByFileRepoId(int fileRepoId)  {
 	        List<CsvTemplate> csvTemplates = new ArrayList<CsvTemplate>();
 	        Transaction trns = null;
-	        Session session = HibernateUtil.openSession(dialectXmlFile);
+	        Session session = HibernateUtil.getSessionFactory().openSession();
+			//Session session = HibernateUtil.openSession(dialectXmlFile);
 	        try {
 	            trns = session.beginTransaction();
 	            csvTemplates = session.createQuery("from CsvTemplate where InboundFileRepoId = :id or ProcessedFileRepoId = :id or ExceptionFileRepoId = :id").setInteger("id", fileRepoId).list();
@@ -149,7 +156,8 @@ public class CsvTemplateDao {
 		public List<CsvTemplate> getCsvTemplatesByJobExecRepeatId(int jobExecRepeatId)  {
 	        List<CsvTemplate> csvTemplates = new ArrayList<CsvTemplate>();
 	        Transaction trns = null;
-	        Session session = HibernateUtil.openSession(dialectXmlFile);
+	        Session session = HibernateUtil.getSessionFactory().openSession();
+			//Session session = HibernateUtil.openSession(dialectXmlFile);
 	        try {
 	            trns = session.beginTransaction();
 	            csvTemplates = session.createQuery("from CsvTemplate where JobExecRepeatId = :id").setInteger("id", jobExecRepeatId).list();
@@ -165,7 +173,8 @@ public class CsvTemplateDao {
 	public List<CsvTemplate> getAllActiveCsvTemplates() {
         List<CsvTemplate> csvTemplates = new ArrayList<CsvTemplate>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             csvTemplates = session.createQuery("from CsvTemplate where CsvTemplateIsActive='true'").list();

@@ -19,7 +19,8 @@ public class XmlTemplateNodeDao {
 	public void addXmlTemplateNode(XmlTemplateNode xmlTemplateNode) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -38,7 +39,8 @@ public class XmlTemplateNodeDao {
 
     public void deleteXmlTemplateNode(int xmlTemplateNodeId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             XmlTemplateNode xmlTemplateNode = (XmlTemplateNode)session.load(XmlTemplateNode.class, new Integer(xmlTemplateNodeId));
@@ -57,7 +59,8 @@ public class XmlTemplateNodeDao {
 
     public void updateXmlTemplateNode(XmlTemplateNode xmlTemplateNode) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(xmlTemplateNode);
@@ -77,7 +80,8 @@ public class XmlTemplateNodeDao {
 	public List<XmlTemplateNode> getAllXmlTemplateNodes() {
         List<XmlTemplateNode> xmlTemplateNodes = new ArrayList<XmlTemplateNode>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             xmlTemplateNodes = session.createQuery("from XmlTemplateNode").list();
@@ -94,7 +98,8 @@ public class XmlTemplateNodeDao {
 	public XmlTemplateNode getXmlTemplateNodeById(int xmlTemplateNodeId) {
     	XmlTemplateNode xmlTemplateNode = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from XmlTemplateNode where XmlTemplateNodeId = :id";
@@ -113,7 +118,8 @@ public class XmlTemplateNodeDao {
 	public List<XmlTemplateNode> getAllXmlTemplateNodesByTemplateId(int xmlTemplateId) {
 		List<XmlTemplateNode> nodes = new ArrayList<XmlTemplateNode>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             nodes = session.createQuery("from XmlTemplateNode where XmlTemplateId ="+xmlTemplateId).list();
@@ -129,7 +135,8 @@ public class XmlTemplateNodeDao {
 	public XmlTemplateNode getLoopXmlTemplateNodeByTemplateId(Integer xmlTemplateId) {
 		List<XmlTemplateNode> nodes = new ArrayList<XmlTemplateNode>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             nodes = session.createQuery("from XmlTemplateNode where XmlTemplateId ="+xmlTemplateId+ " and XmlTemplateNodeIsLoop = 'true'").list();
@@ -145,7 +152,8 @@ public class XmlTemplateNodeDao {
 	public List<XmlTemplateNode> getMappedXmlTemplateNodesByTemplateId(Integer xmlTemplateId) {
 		List<XmlTemplateNode> nodes = new ArrayList<XmlTemplateNode>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             nodes = session.createQuery("from XmlTemplateNode where XmlTemplateId ="+xmlTemplateId+ " and ExpFieldId is not null").list();

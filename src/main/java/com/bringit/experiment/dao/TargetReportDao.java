@@ -19,7 +19,8 @@ public class TargetReportDao {
 	public void addTargetReport(TargetReport targetReport) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -38,7 +39,8 @@ public class TargetReportDao {
 
     public void deleteTargetReport(int targetReportId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             TargetReport targetReport = (TargetReport)session.load(TargetReport.class, new Integer(targetReportId));
@@ -57,7 +59,8 @@ public class TargetReportDao {
 
     public void updateTargetReport(TargetReport targetReport) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(targetReport);
@@ -77,7 +80,8 @@ public class TargetReportDao {
 	public List<TargetReport> getAllTargetReports() {
         List<TargetReport> targetReports = new ArrayList<TargetReport>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             targetReports = session.createQuery("from TargetReport").list();
@@ -94,7 +98,8 @@ public class TargetReportDao {
 	public TargetReport getTargetReportById(int targetReportId) {
     	TargetReport targetReport = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from TargetReport where TargetReportId = :id";

@@ -18,7 +18,8 @@ public class ExperimentFieldValueUpdateLogDao {
 	public void addExperimentFieldValueUpdateLog(ExperimentFieldValueUpdateLog experimentFieldValueUpdateLog) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -37,7 +38,8 @@ public class ExperimentFieldValueUpdateLogDao {
 
     public void deleteExperimentFieldValueUpdateLog(int experimentFieldValueUpdateLogId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             ExperimentFieldValueUpdateLog experimentFieldValueUpdateLog = (ExperimentFieldValueUpdateLog)session.load(ExperimentFieldValueUpdateLog.class, new Integer(experimentFieldValueUpdateLogId));
@@ -56,7 +58,8 @@ public class ExperimentFieldValueUpdateLogDao {
 
     public void updateExperimentFieldValueUpdateLog(ExperimentFieldValueUpdateLog experimentFieldValueUpdateLog) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(experimentFieldValueUpdateLog);
@@ -76,7 +79,8 @@ public class ExperimentFieldValueUpdateLogDao {
 	public List<ExperimentFieldValueUpdateLog> getAllExperimentFieldValueUpdateLogs() {
         List<ExperimentFieldValueUpdateLog> experimentFieldValueUpdateLogs = new ArrayList<ExperimentFieldValueUpdateLog>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             experimentFieldValueUpdateLogs = session.createQuery("from ExperimentFieldValueUpdateLog").list();
@@ -93,7 +97,8 @@ public class ExperimentFieldValueUpdateLogDao {
 	public ExperimentFieldValueUpdateLog getExperimentFieldValueUpdateLogById(int expFieldValueUpdateLogId) {
     	ExperimentFieldValueUpdateLog experimentFieldValueUpdateLog = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from ExperimentMeasureFieldValueUpdateLog where ExpFieldValueUpdateLogId = :id";

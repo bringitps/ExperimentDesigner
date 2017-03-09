@@ -23,7 +23,8 @@ public class SysUserDao {
     	sysUser.setUserPass(encryptedPassword);
     	
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -42,7 +43,8 @@ public class SysUserDao {
 
     public void deleteSysUser(int userId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             SysUser sysUser = (SysUser)session.load(SysUser.class, new Integer(userId));
@@ -61,7 +63,8 @@ public class SysUserDao {
 
     public void updateSysUser(SysUser sysUser) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(sysUser);
@@ -81,7 +84,8 @@ public class SysUserDao {
 	public List<SysUser> getAllSysUsers() {
         List<SysUser> sysUsers = new ArrayList<SysUser>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             sysUsers = session.createQuery("from SysUser").list();
@@ -98,7 +102,8 @@ public class SysUserDao {
 	public SysUser getUserById(int userId) {
         SysUser sysUser = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from SysUser where id = :id";
@@ -117,7 +122,8 @@ public class SysUserDao {
 	public SysUser getUserByUserName(String userName) {
         SysUser sysUser = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from SysUser where UserName = :UserName";
@@ -140,7 +146,8 @@ public class SysUserDao {
     	
         SysUser sysUser = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from SysUser where UserName = :UserName and UserPass =:EncryptedPassword";

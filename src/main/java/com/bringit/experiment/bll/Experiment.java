@@ -2,6 +2,7 @@ package com.bringit.experiment.bll;
 
 import java.util.Date;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,10 +13,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.bringit.experiment.dao.SysUserDao;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Table(name="Experiment")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region="entity")
+@Cacheable
 public class Experiment {
 	
 	@Id

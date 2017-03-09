@@ -18,7 +18,8 @@ public class UnitOfMeasureDao {
 	public void addUnitOfMeasure(UnitOfMeasure unitOfMeasure) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -37,7 +38,8 @@ public class UnitOfMeasureDao {
 
     public void deleteUnitOfMeasure(int uomId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             UnitOfMeasure unitOfMeasure = (UnitOfMeasure)session.load(UnitOfMeasure.class, new Integer(uomId));
@@ -56,7 +58,8 @@ public class UnitOfMeasureDao {
 
     public void updateUnitOfMeasure(UnitOfMeasure unitOfMeasure) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(unitOfMeasure);
@@ -76,7 +79,8 @@ public class UnitOfMeasureDao {
 	public List<UnitOfMeasure> getAllUnitOfMeasures() {
         List<UnitOfMeasure> unitOfMeasures = new ArrayList<UnitOfMeasure>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             unitOfMeasures = session.createQuery("from UnitOfMeasure").list();
@@ -93,7 +97,8 @@ public class UnitOfMeasureDao {
 	public UnitOfMeasure getUnitOfMeasureById(int uomId) {
     	UnitOfMeasure unitOfMeasure = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from UnitOfMeasure where UomId = :id";

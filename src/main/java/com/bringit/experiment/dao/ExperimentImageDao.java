@@ -18,7 +18,8 @@ public class ExperimentImageDao {
 	public void addExperimentImage(ExperimentImage experimentImage) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -37,7 +38,8 @@ public class ExperimentImageDao {
 
     public void deleteExperimentImage(int experimentImageId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             ExperimentImage experimentImage = (ExperimentImage)session.load(ExperimentImage.class, new Integer(experimentImageId));
@@ -56,7 +58,8 @@ public class ExperimentImageDao {
 
     public void updateExperimentImage(ExperimentImage experimentImage) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(experimentImage);
@@ -76,7 +79,8 @@ public class ExperimentImageDao {
 	public List<ExperimentImage> getAllExperimentImages() {
         List<ExperimentImage> experimentImages = new ArrayList<ExperimentImage>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             experimentImages = session.createQuery("from ExperimentImage").list();
@@ -93,7 +97,8 @@ public class ExperimentImageDao {
 	public ExperimentImage getExperimentImageById(int expId) {
     	ExperimentImage experimentImage = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from ExperimentImage where ExpImageId = :id";

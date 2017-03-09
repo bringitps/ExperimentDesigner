@@ -3,8 +3,6 @@ package com.bringit.experiment.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -22,7 +20,8 @@ public class ExperimentFieldDao {
 	public void addExperimentField(ExperimentField experimentField) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -41,7 +40,8 @@ public class ExperimentFieldDao {
 
     public void deleteExperimentField(int experimentFieldId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             ExperimentField experimentField = (ExperimentField)session.load(ExperimentField.class, new Integer(experimentFieldId));
@@ -60,7 +60,8 @@ public class ExperimentFieldDao {
 
     public void updateExperimentField(ExperimentField experimentField) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(experimentField);
@@ -80,7 +81,8 @@ public class ExperimentFieldDao {
 	public List<ExperimentField> getAllExperimentFields() {
         List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             experimentFields = session.createQuery("from ExperimentField").list();
@@ -114,7 +116,8 @@ public class ExperimentFieldDao {
 	public List<ExperimentField> getActiveExperimentFields(Experiment firstExperiment) {
 		List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             Query query = session.createQuery("from ExperimentField where ExpId ="+firstExperiment.getExpId()+" and ExpFieldIsActive='true'");
@@ -133,7 +136,8 @@ public class ExperimentFieldDao {
 	public ExperimentField getExperimentFieldById(int experimentFieldId) {
     	ExperimentField experimentField = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from ExperimentField where ExpFieldId = :id";
@@ -154,7 +158,8 @@ public class ExperimentFieldDao {
 	public List<ExperimentField> getAllExperimentFieldsByExperiment(Experiment experiment) {
         List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             experimentFields = session.createQuery("from ExperimentField where ExpId = :id").setInteger("id", experiment.getExpId()).list();
@@ -171,7 +176,8 @@ public class ExperimentFieldDao {
 	public List<ExperimentField> getAllExperimentFieldsByUnitOfMeasureId(int UnitOfMeasureId) {
         List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             experimentFields = session.createQuery("from ExperimentField where UomId = :id").setInteger("id", UnitOfMeasureId).list();
@@ -217,7 +223,8 @@ public class ExperimentFieldDao {
     		return false;
 		
 		Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();

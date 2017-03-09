@@ -161,7 +161,7 @@ public class RemoteFileUtil {
         Long iRepeat = new Long(jobExecutionRepeat.getJobExecRepeatMilliseconds()/1000);
 
         SimpleTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobData.getXmlTemplateId().toString(), TRIGGER_GROUP)
-                .startAt(new Date(jobData.getXmlTemplateExecStartDate().getTime()))
+                .startAt(new Date(jobData.getXmlTemplateExecStartDate().getTime())/*new Date(java.util.Calendar.getInstance().getTimeInMillis() + 60000)*/)
                 .endAt(new Date(jobData.getXmlTemplateExecEndDate().getTime()))
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(iRepeat.intValue())
                         .withRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY)).build();

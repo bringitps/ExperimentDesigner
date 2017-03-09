@@ -18,7 +18,8 @@ public class XmlDataLoadExecutionResultDao {
 	public void addXmlDataLoadExecutionResult(XmlDataLoadExecutionResult xmlDataLoadExecutionResult) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -37,7 +38,8 @@ public class XmlDataLoadExecutionResultDao {
 
     public void deleteXmlDataLoadExecutionResult(int xmlDataLoadExecutionResultId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             XmlDataLoadExecutionResult xmlDataLoadExecutionResult = (XmlDataLoadExecutionResult)session.load(XmlDataLoadExecutionResult.class, new Integer(xmlDataLoadExecutionResultId));
@@ -56,7 +58,8 @@ public class XmlDataLoadExecutionResultDao {
 
     public void updateXmlDataLoadExecutionResult(XmlDataLoadExecutionResult xmlDataLoadExecutionResult) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(xmlDataLoadExecutionResult);
@@ -76,7 +79,8 @@ public class XmlDataLoadExecutionResultDao {
 	public List<XmlDataLoadExecutionResult> getAllXmlDataLoadExecutionResults() {
         List<XmlDataLoadExecutionResult> xmlDataLoadExecutionResults = new ArrayList<XmlDataLoadExecutionResult>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             xmlDataLoadExecutionResults = session.createQuery("from XmlDataLoadExecutionResult").list();
@@ -93,7 +97,8 @@ public class XmlDataLoadExecutionResultDao {
 	public XmlDataLoadExecutionResult getXmlDataLoadExecutionResultById(int expId) {
     	XmlDataLoadExecutionResult xmlDataLoadExecutionResult = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from XmlDataLoadExecutionResult where XmlDataLoadExecId = :id";

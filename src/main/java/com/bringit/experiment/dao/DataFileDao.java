@@ -18,7 +18,8 @@ public class DataFileDao {
 	public void addDataFile(DataFile dataFile) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -37,7 +38,8 @@ public class DataFileDao {
 
     public void deleteDataFile(int dataFileId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             DataFile dataFile = (DataFile)session.load(DataFile.class, new Integer(dataFileId));
@@ -56,7 +58,8 @@ public class DataFileDao {
 
     public void updateDataFile(DataFile dataFile) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//  Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(dataFile);
@@ -76,7 +79,8 @@ public class DataFileDao {
 	public List<DataFile> getAllDataFiles() {
         List<DataFile> dataFiles = new ArrayList<DataFile>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             dataFiles = session.createQuery("from DataFile").list();
@@ -93,7 +97,8 @@ public class DataFileDao {
 	public DataFile getDataFileById(int dataFileId) {
         DataFile dataFile = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from DataFile where DataFileId = :id";
@@ -113,7 +118,8 @@ public class DataFileDao {
 	public DataFile getDataFileByName(String dataFileName) {
     	DataFile dataFile = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryStr = "from DataFile where DataFileName ='"+dataFileName.trim()+"'";

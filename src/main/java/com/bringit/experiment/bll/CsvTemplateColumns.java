@@ -1,5 +1,6 @@
 package com.bringit.experiment.bll;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,8 +11,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
 @Table(name="CsvTemplateColumns")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region="entity")
+@Cacheable
 public class CsvTemplateColumns {
 
 	@Id

@@ -18,7 +18,8 @@ public class TargetFieldDao {
 	public void addTargetField(TargetField targetField) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -37,7 +38,8 @@ public class TargetFieldDao {
 
     public void deleteTargetField(int targetFieldId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             TargetField targetField = (TargetField)session.load(TargetField.class, new Integer(targetFieldId));
@@ -56,7 +58,8 @@ public class TargetFieldDao {
 
     public void updateTargetField(TargetField targetField) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//  Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(targetField);
@@ -76,7 +79,8 @@ public class TargetFieldDao {
 	public List<TargetField> getAllTargetFields() {
         List<TargetField> targetFields = new ArrayList<TargetField>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             targetFields = session.createQuery("from TargetField").list();
@@ -93,7 +97,8 @@ public class TargetFieldDao {
 	public TargetField getTargetFieldById(int targetFieldId) {
     	TargetField targetField = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from TargetField where TargetFieldId = :id";

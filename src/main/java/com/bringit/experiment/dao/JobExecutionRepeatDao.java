@@ -18,7 +18,8 @@ public class JobExecutionRepeatDao {
 	public void addJobExecutionRepeat(JobExecutionRepeat jobExecutionRepeat) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -37,7 +38,8 @@ public class JobExecutionRepeatDao {
 
     public void deleteJobExecutionRepeat(int jobExecutionRepeatId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             JobExecutionRepeat jobExecutionRepeat = (JobExecutionRepeat)session.load(JobExecutionRepeat.class, new Integer(jobExecutionRepeatId));
@@ -56,7 +58,8 @@ public class JobExecutionRepeatDao {
 
     public void updateJobExecutionRepeat(JobExecutionRepeat jobExecutionRepeat) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(jobExecutionRepeat);
@@ -76,7 +79,8 @@ public class JobExecutionRepeatDao {
 	public List<JobExecutionRepeat> getAllJobExecutionRepeats() {
         List<JobExecutionRepeat> jobExecutionRepeats = new ArrayList<JobExecutionRepeat>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             jobExecutionRepeats = session.createQuery("from JobExecutionRepeat").list();
@@ -93,7 +97,8 @@ public class JobExecutionRepeatDao {
 	public JobExecutionRepeat getJobExecutionRepeatById(int jobId) {
     	JobExecutionRepeat jobExecutionRepeat = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from JobExecutionRepeat where JobExecRepeatId = :id";

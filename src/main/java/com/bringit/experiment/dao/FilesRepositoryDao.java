@@ -18,7 +18,8 @@ public class FilesRepositoryDao {
 	public void addFilesRepository(FilesRepository filesRepository) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -37,7 +38,8 @@ public class FilesRepositoryDao {
 
     public void deleteFilesRepository(int filesRepositoryId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             FilesRepository filesRepository = (FilesRepository)session.load(FilesRepository.class, new Integer(filesRepositoryId));
@@ -56,7 +58,8 @@ public class FilesRepositoryDao {
 
     public void updateFilesRepository(FilesRepository filesRepository) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(filesRepository);
@@ -76,7 +79,8 @@ public class FilesRepositoryDao {
 	public List<FilesRepository> getAllFilesRepositorys() {
         List<FilesRepository> filesRepositorys = new ArrayList<FilesRepository>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             filesRepositorys = session.createQuery("from FilesRepository").list();
@@ -93,7 +97,8 @@ public class FilesRepositoryDao {
 	public FilesRepository getFilesRepositoryById(int fileRepoId) {
     	FilesRepository filesRepository = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from FilesRepository where FileRepoId = :id";

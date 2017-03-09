@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import com.bringit.experiment.bll.ContractManufacturer;
@@ -18,8 +19,9 @@ public class ContractManufacturerDao {
 	public void addContractManufacturer(ContractManufacturer contractManufacturer) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
-        
+        //Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//
         try {
             trns = session.beginTransaction();
             session.save(contractManufacturer);
@@ -37,7 +39,8 @@ public class ContractManufacturerDao {
 
     public void deleteContractManufacturer(int contractManufacturerId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             ContractManufacturer contractManufacturer = (ContractManufacturer)session.load(ContractManufacturer.class, new Integer(contractManufacturerId));
@@ -56,7 +59,8 @@ public class ContractManufacturerDao {
 
     public void updateContractManufacturer(ContractManufacturer contractManufacturer) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(contractManufacturer);
@@ -76,7 +80,8 @@ public class ContractManufacturerDao {
 	public List<ContractManufacturer> getAllContractManufacturers() {
         List<ContractManufacturer> contractManufacturers = new ArrayList<ContractManufacturer>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             contractManufacturers = session.createQuery("from ContractManufacturer").list();
@@ -93,7 +98,8 @@ public class ContractManufacturerDao {
 	public ContractManufacturer getContractManufacturerById(int contractManufacturerId) {
     	ContractManufacturer contractManufacturer = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from ContractManufacturer where CmId = :id";

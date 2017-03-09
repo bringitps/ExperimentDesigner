@@ -19,7 +19,8 @@ public class CsvTemplateColumnsDao {
 	public void addCsvTemplateColumns(CsvTemplateColumns csvTemplateColumns) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -38,7 +39,8 @@ public class CsvTemplateColumnsDao {
 
     public void deleteCsvTemplateColumns(int csvTemplateColumnsId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             CsvTemplateColumns csvTemplateColumns = (CsvTemplateColumns)session.load(CsvTemplateColumns.class, new Integer(csvTemplateColumnsId));
@@ -57,7 +59,8 @@ public class CsvTemplateColumnsDao {
 
     public void updateCsvTemplateColumns(CsvTemplateColumns csvTemplateColumns) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(csvTemplateColumns);
@@ -77,7 +80,8 @@ public class CsvTemplateColumnsDao {
 	public List<CsvTemplateColumns> getAllCsvTemplateColumnss() {
         List<CsvTemplateColumns> csvTemplateColumnss = new ArrayList<CsvTemplateColumns>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             csvTemplateColumnss = session.createQuery("from CsvTemplateColumns").list();
@@ -94,7 +98,8 @@ public class CsvTemplateColumnsDao {
 	public CsvTemplateColumns getCsvTemplateColumnsById(int colId) {
     	CsvTemplateColumns csvTemplateColumns = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from CsvTemplateColumns where CsvTemplateColumnsId = :id";
@@ -113,7 +118,8 @@ public class CsvTemplateColumnsDao {
 	public List<CsvTemplateColumns> getAllCsvTemplateColumnssByTemplateId(int csvTemplateId) {
 		List<CsvTemplateColumns> nodes = new ArrayList<CsvTemplateColumns>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             nodes = session.createQuery("from CsvTemplateColumns where CsvTemplateId ="+csvTemplateId + " and ExpFieldId is not null").list();

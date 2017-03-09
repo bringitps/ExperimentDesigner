@@ -18,7 +18,8 @@ public class TargetFieldGroupDao {
 	public void addTargetFieldGroup(TargetFieldGroup targetFieldGroup) {
 
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
@@ -37,7 +38,8 @@ public class TargetFieldGroupDao {
 
     public void deleteTargetFieldGroup(int targetFieldGroupId) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             TargetFieldGroup targetFieldGroup = (TargetFieldGroup)session.load(TargetFieldGroup.class, new Integer(targetFieldGroupId));
@@ -56,7 +58,8 @@ public class TargetFieldGroupDao {
 
     public void updateTargetFieldGroup(TargetFieldGroup targetFieldGroup) {
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(targetFieldGroup);
@@ -76,7 +79,8 @@ public class TargetFieldGroupDao {
 	public List<TargetFieldGroup> getAllTargetFieldGroups() {
         List<TargetFieldGroup> targetFieldGroups = new ArrayList<TargetFieldGroup>();
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             targetFieldGroups = session.createQuery("from TargetFieldGroup").list();
@@ -93,7 +97,8 @@ public class TargetFieldGroupDao {
 	public TargetFieldGroup getTargetFieldGroupById(int targetFieldGroupId) {
     	TargetFieldGroup targetFieldGroup = null;
         Transaction trns = null;
-        Session session = HibernateUtil.openSession(dialectXmlFile);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from TargetFieldGroup where TargetFieldGroupId = :id";

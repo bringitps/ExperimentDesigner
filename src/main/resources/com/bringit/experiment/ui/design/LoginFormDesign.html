@@ -4,52 +4,65 @@
   <meta charset="UTF-8">
   <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
   <meta name="vaadin-version" content="7.7.0">
- </head> 
- <body> 
-  <vaadin-vertical-layout style-name="valo-menu-responsive" height="80%"> 
-   <vaadin-panel icon="fonticon://FontAwesome/f0c0" caption="Login" style-name="borderless-colored" width="360px" height="320px" :middle :center> 
-    <vaadin-grid-layout size-full> 
-     <row></row> 
-     <row></row> 
-     <row> 
-      <column> 
-       <vaadin-label id="lblUser" size-auto plain-text _id="lblUser" :middle :right>
+ </head>
+ <body>
+  <vaadin-vertical-layout style-name="valo-menu-responsive" height="80%">
+   <vaadin-panel icon="fonticon://FontAwesome/f0c0" caption="Login" style-name="borderless-colored" width="360px" height="340px" :middle :center>
+    <vaadin-grid-layout size-full>
+     <row>
+      <column colspan="2" expand="0,2"></column>
+     </row>
+     <row>
+      <column>
+       <vaadin-label id="lblAuth" size-auto plain-text _id="lblAuth" :middle :right>
+         Auth: 
+       </vaadin-label>
+      </column>
+      <column>
+       <vaadin-combo-box required style-name="small" width="198px" height="36px" _id="cbxAuthOption">
+        <option>Windows Authentication</option>
+        <option>Standalone User (UI)</option>
+       </vaadin-combo-box>
+      </column>
+     </row>
+     <row>
+      <column>
+       <vaadin-label id="lblUser" width-auto height="25px" plain-text _id="lblUser" :middle :right>
          Username: 
-       </vaadin-label> 
-      </column> 
-      <column> 
-       <vaadin-text-field id="txtUsername" width="195px" _id="txtUsername" :middle></vaadin-text-field> 
-      </column> 
-     </row> 
-     <row> 
-      <column> 
+       </vaadin-label>
+      </column>
+      <column>
+       <vaadin-text-field id="txtUsername" width="195px" _id="txtUsername" :middle></vaadin-text-field>
+      </column>
+     </row>
+     <row>
+      <column>
        <vaadin-label id="lblPassword" size-auto plain-text _id="lblPassword" :middle :right>
          Password: 
-       </vaadin-label> 
-      </column> 
-      <column> 
-       <vaadin-password-field id="txtPassword" width="195px" _id="txtPassword" :middle></vaadin-password-field> 
-      </column> 
-     </row> 
-     <row> 
-      <column rowspan="4"></column> 
-      <column> 
-       <vaadin-label style-name="failure" id="lblLoginError" width="195px" height="40px" plain-text _id="lblLoginError">
+       </vaadin-label>
+      </column>
+      <column>
+       <vaadin-password-field id="txtPassword" width="195px" _id="txtPassword" :middle></vaadin-password-field>
+      </column>
+     </row>
+     <row>
+      <column colspan="2">
+       <vaadin-label style-name="failure" id="lblLoginError" width="250px" height="40px" plain-text _id="lblLoginError" :middle :center>
          Invalid Information 
-       </vaadin-label> 
-      </column> 
-     </row> 
-     <row> 
-      <column> 
-       <vaadin-button style-name="primary" id="btnLogin" plain-text _id="btnLogin">
+       </vaadin-label>
+      </column>
+     </row>
+     <row>
+      <column colspan="2">
+       <vaadin-button style-name="primary" id="btnLogin" plain-text _id="btnLogin" :center>
          Login 
-       </vaadin-button> 
-      </column> 
-     </row> 
-     <row></row> 
-     <row></row> 
-    </vaadin-grid-layout> 
-   </vaadin-panel> 
-  </vaadin-vertical-layout>  
+       </vaadin-button>
+      </column>
+     </row>
+     <row></row>
+     <row></row>
+    </vaadin-grid-layout>
+   </vaadin-panel>
+  </vaadin-vertical-layout>
  </body>
 </html>

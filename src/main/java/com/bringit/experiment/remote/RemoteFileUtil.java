@@ -9,9 +9,8 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.Calendar;
 
 import static org.quartz.JobBuilder.newJob;
 
@@ -287,9 +286,16 @@ public class RemoteFileUtil {
         // Simple trigger uses seconds for the repeat interval.  We will need to convert our long interval
         // value to an int for setting the trigger.
         Long iRepeat = new Long(jobExecutionRepeat.getJobExecRepeatMilliseconds()/1000);
-
+        int startHour = jobData.getXmlTemplateExecStartHour();
+        System.out.println("Setting trigger with the following hour: "+startHour);
+        java.util.Calendar startCal = java.util.Calendar.getInstance();
+        startCal.setTimeInMillis(jobData.getXmlTemplateExecStartDate().getTime());
+        startCal.set(java.util.Calendar.HOUR_OF_DAY, startHour);
+        startCal.set(java.util.Calendar.MINUTE, 0);
+        startCal.set(Calendar.SECOND, 0);
+        startCal.set(Calendar.MILLISECOND, 0);
         SimpleTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobData.getXmlTemplateId().toString(), XML_TRIGGER_GROUP)
-                .startAt(new Date(jobData.getXmlTemplateExecStartDate().getTime()))
+                .startAt(new Date(startCal.getTimeInMillis()))
                 .endAt(new Date(jobData.getXmlTemplateExecEndDate().getTime()))
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(iRepeat.intValue())
                         .withRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY)).build();

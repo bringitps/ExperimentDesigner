@@ -1,25 +1,19 @@
 package com.bringit.experiment.remote;
 
+import com.bringit.experiment.bll.CsvTemplate;
 import com.bringit.experiment.bll.DataFile;
 import com.bringit.experiment.bll.FilesRepository;
-
 import com.bringit.experiment.bll.XmlTemplate;
-
 import com.bringit.experiment.dao.BatchExperimentRecordsInsertDao;
 import com.bringit.experiment.dao.DataFileDao;
 import com.bringit.experiment.data.ExperimentParser;
-
 import com.bringit.experiment.data.ResponseObj;
 import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.FTPUtil;
-
 import com.jcraft.jsch.ChannelSftp;
-import com.vaadin.ui.Notification.Type;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPFile;
-
 import org.quartz.*;
 import org.w3c.dom.Document;
 
@@ -29,52 +23,49 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-
 import java.util.List;
 
 /**
- * Created by msilay on 2/22/17.
+ * Created by msilay on 3/8/17.
  */
-public class RemoteXmlJob implements Job {
+public class RemoteCsvJob implements Job {
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 
         // pull the JobDetails to get the type of Remote Connection.
         JobDetail jobDetail = jobExecutionContext.getJobDetail();
         JobDataMap jobDataMap = jobDetail.getJobDataMap();
-        XmlTemplate jobData = (XmlTemplate) jobDataMap.get("jobData");
+        CsvTemplate jobData = (CsvTemplate) jobDataMap.get("jobData");
 
         FilesRepository filesRepository = jobData.getInboundFileRepo();
         FilesRepository outboundRepo = jobData.getExceptionFileRepo();
         FilesRepository exceptionRepo = jobData.getExceptionFileRepo();
 
-        System.out.println("Running XML Job");
         if (filesRepository.isFileRepoIsSftp()) {
-            System.out.println("SFTP Repo");
             FTPUtil sftp = new FTPUtil(filesRepository.getFileRepoHost(), Integer.parseInt(filesRepository.getFileRepoPort()),
                     filesRepository.getFileRepoUser(), filesRepository.getFileRepoPass());
 
             List<ChannelSftp.LsEntry> files =  sftp.secureGetFileList(filesRepository.getFileRepoPath());
             for (ChannelSftp.LsEntry file: files) {
 
-                if (file.getFilename().endsWith(".xml")) {
+                if (file.getFilename().endsWith(".csv")) {
                     InputStream is = sftp.secureGetFile(filesRepository.getFileRepoPath()+"/"+file.getFilename());
                     if (is != null) {
                         System.out.println("Received Input file and passing to parser: "+file.getFilename());
                         //--  Data File --//
 
                         DataFile dataFile = new DataFile();
-            			dataFile.setDataFileIsXml(true);
-            			dataFile.setDataFileIsCsv(false);
-            			dataFile.setDataFileName(file.getFilename());
-            			new DataFileDao().addDataFile(dataFile);
+                        dataFile.setDataFileIsXml(true);
+                        dataFile.setDataFileIsCsv(false);
+                        dataFile.setDataFileName(file.getFilename());
+                        new DataFileDao().addDataFile(dataFile);
 
                         dataFile = new DataFileDao().getDataFileByName(file.getFilename());
-                        
+
                         ResponseObj sftpResponse = processFile(is, jobData, file.getFilename(), dataFile);
 
                         if (0 == sftpResponse.getCode()) {
-                        	
+
                             // Send file to outbound
                             moveFileToRepo(outboundRepo, is, file.getFilename());
                             sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
@@ -97,15 +88,14 @@ public class RemoteXmlJob implements Job {
                 }
             }
         } else if  (filesRepository.isFileRepoIsFtp()) {
-            System.out.println("SFTP Repo");
             FTPUtil ftp = new FTPUtil(filesRepository.getFileRepoHost(), Integer.parseInt(filesRepository.getFileRepoPort()),
                     filesRepository.getFileRepoUser(), filesRepository.getFileRepoPass());
 
             FTPFile[] ftpFiles = ftp.simpleGetFileList(filesRepository.getFileRepoPath());
             for (FTPFile ftpFile: ftpFiles) {
 
-                if (ftpFile.getName().endsWith(".xml")) {
-                    System.out.println("FTP FILE: "+ftpFile.getName());
+                if (ftpFile.getName().endsWith(".csv")) {
+
                     InputStream is = ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName());
                     if (is != null) {
 
@@ -117,9 +107,9 @@ public class RemoteXmlJob implements Job {
 
                         dataFile = new DataFileDao().getDataFileByName(ftpFile.getName());
                         System.out.println("Filename : "+ftpFile.getName());
-                        System.out.println("Trying to process file");
+
                         ResponseObj ftpResponse = processFile(is, jobData, ftpFile.getName(), dataFile);
-                        System.out.println("Processed File: "+ftpResponse.getDetail());
+
                         if (0 == ftpResponse.getCode()) {
                             // Send file to outbound
                             moveFileToRepo(outboundRepo, is, ftpFile.getName());
@@ -139,7 +129,6 @@ public class RemoteXmlJob implements Job {
                         new DataFileDao().updateDataFile(dataFile);
 
                     } else {
-                        System.out.println("Null Input Stream");
                         sendTransferError(jobData, ftpFile.getName());
                     }
                 }
@@ -147,9 +136,8 @@ public class RemoteXmlJob implements Job {
 
         } else if (filesRepository.isFileRepoIsLocal()) {
             File dir = new File(filesRepository.getFileRepoPath());
-            String[] extensions = new String[] { "xml" };
-            System.out.println("Getting all .txt and .jsp files in " + filesRepository.getFileRepoPath()
-                    + " including those in subdirectories");
+            String[] extensions = new String[] { "csv" };
+            System.out.println("Getting  all csv files in " + filesRepository.getFileRepoPath());
             List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, false);
             for (File file: files) {
 
@@ -221,36 +209,20 @@ public class RemoteXmlJob implements Job {
 
     }
 
-    private ResponseObj processFile(InputStream is, XmlTemplate xmlTemplate, String filename, DataFile dataFile) {
+    private ResponseObj processFile(InputStream is, CsvTemplate csvTemplate, String filename, DataFile dataFile) {
 
         try {
 
-        	if(new DataFileDao().getDataFileByName(filename) != null)
-    		{
-        		ResponseObj responseObj = new ResponseObj();
-        		responseObj.setCode(101);
-        		responseObj.setDescription("Data File is already processed. File Name: " + filename);
-        		responseObj.setDetail("Data File is already processed. File Name: " + filename);
-        		return responseObj; 
-    		}
-        	
             Config config = new Config();
             String strBatchSize = config.getProperty("batchinsert");
             int iBatchSize = Integer.parseInt(strBatchSize);
 
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-            factory.setNamespaceAware(true);
-            factory.setValidating(false);
-
-            DocumentBuilder domBuilder = factory.newDocumentBuilder();
-            Document doc = domBuilder.parse(is);
             //1)Parsing & Validation
-            ResponseObj responseObj = new ExperimentParser().parseXmlDocument(doc, xmlTemplate);
+            ResponseObj responseObj = new ExperimentParser().parseCSV(is, csvTemplate, filename);
 
             //2)Batch Insert
             ResponseObj batchResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(responseObj.getCsvInsertColumns(),
-                    responseObj.getCsvInsertValues(), null, dataFile, xmlTemplate.getExperiment(), iBatchSize);
+                    responseObj.getCsvInsertValues(), null, dataFile, csvTemplate.getExperiment(), iBatchSize);
 
             System.out.println("Filename : "+filename+" - "+responseObj.getDetail());
 
@@ -258,18 +230,28 @@ public class RemoteXmlJob implements Job {
                 System.out.println("Successfully parsed file: "+filename);
 
             } else {
-                sendTransferError(xmlTemplate, filename);
+                sendTransferError(csvTemplate, filename);
             }
 
             return batchResponse;
 
         } catch (Exception ex) {
             System.out.println("Error parsing file: "+filename);
-            sendTransferError(xmlTemplate, filename);
+            sendTransferError(csvTemplate, filename);
 
         }
 
         return null;
+    }
+
+    public void sendTransferError(CsvTemplate csvTemplate, String filename) {
+        try {
+            // TODO: replace this with the email logic when an error occurs.
+            System.out.println("Error processing file: "+filename);
+        } catch(Exception ex) {
+            System.out.println("Error sending ERROR email: "+ex);
+        }
+
     }
 
     public void sendTransferError(XmlTemplate xmlTemplate, String filename) {

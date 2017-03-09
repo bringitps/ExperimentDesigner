@@ -1,5 +1,7 @@
 package com.bringit.experiment.data;
 
+import com.vaadin.data.Property;
+import org.apache.commons.beanutils.ConversionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,12 +19,8 @@ import com.bringit.experiment.dao.CsvTemplateColumnsDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.XmlTemplateNodeDao;
 import com.opencsv.CSVReader;
-import com.vaadin.data.Property.ReadOnlyException;
-import com.vaadin.data.util.converter.Converter.ConversionException;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,7 +38,21 @@ import javax.xml.xpath.XPathFactory;
 
 public class ExperimentParser {
 	
-	public ResponseObj parseCSV(File csvFile,CsvTemplate template){
+	public ResponseObj parseCSV(File csvFile, CsvTemplate template) {
+		if (csvFile != null) {
+			try {
+				String filename = csvFile.getName();
+				InputStream is = new FileInputStream(csvFile);
+				return parseCSV(is, template, filename);
+			} catch (Exception e) {
+				System.out.println("Error converting CSV File to InputStream: "+e);
+			}
+
+		}
+		return null;
+	}
+
+	public ResponseObj parseCSV(InputStream csvFile, CsvTemplate template, String filename){
     	ResponseObj respObj = new ResponseObj();
     	respObj.setCode(0);
     	respObj.setDescription("Csv Loaded Successfully");
@@ -54,7 +66,7 @@ public class ExperimentParser {
         try {
         	
         		if(csvFile != null){
-        			String filename = csvFile.getName();
+        			//String filename = csvFile.getName();
 
         			//Verify if there is a template and nodes for the experiment.
         			CsvTemplateColumnsDao nodeDao = new CsvTemplateColumnsDao();
@@ -64,7 +76,10 @@ public class ExperimentParser {
 	        				//get the nodes:
 	        				List<CsvTemplateColumns> columns = nodeDao.getAllCsvTemplateColumnssByTemplateId(template.getCsvTemplateId());
 	        				if(columns != null){
-					        	reader = new CSVReader(new FileReader(csvFile));
+					        	//SysUserDao sysUserDao = new SysUserDao();
+					        	//SysUser user = sysUserDao.getUserByUserName("bit_seko");
+		        				//DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	        		            reader = new CSVReader(new InputStreamReader(csvFile));
 	        		            // we assume the first line is the header
 	        		            String[] header = reader.readNext();
 
@@ -78,9 +93,9 @@ public class ExperimentParser {
 	        		            	arr.add(maping);
 								}
 	        		            String[] line;
-	        		            for (int i = 0; i < arr.size(); i++) 
+	        		            for (int i = 0; i < arr.size(); i++)
 									csvColumns+=(String) arr.get(i).get(1)+",";
-								
+
 	        		           respObj.setCsvInsertColumns(csvColumns.substring(0, csvColumns.length()-1));
 	        		           String fieldType = "";
 
@@ -91,19 +106,19 @@ public class ExperimentParser {
 	            		            for (int i = 0; i < arr.size(); i++) {
 	            		            	fieldType= (String) arr.get(i).get(2);
 	            		            	String fieldValue = line[(int) arr.get(i).get(0)];
-	            		            
+
 	            		            	if(!validateFieldType(fieldType, fieldValue))
 	            		            		exceptionRowColumns += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Column '" + (String) arr.get(i).get(1) + "' Row #" + rowCount + ".\n";
-	            		            	
-	            		            	
+
+
 	            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? line[(int) arr.get(i).get(0)]+"," : "'"+line[(int) arr.get(i).get(0)]+"',";
 	            		            }
-	            		            
+
 	            		            rowCount++;
             		            	csvValues.add(csvValuesLine.substring(0,csvValuesLine.length()-1));
 	            		            respObj.setCsvInsertValues(csvValues);
 	        		            }
-	        		
+
 	                			reader.close();
 
 	                		    if(exceptionRowColumns != "")
@@ -111,19 +126,19 @@ public class ExperimentParser {
 	                		    	respObj.setCode(104);
 	                	      		respObj.setDescription("Exceptions at casting data. Details: "+exceptionRowColumns);
 	                	      		respObj.setDetail("Exceptions at casting data.");
-	                	      		
+
 		                			csvResult.setCsvDataLoadExecException(true);
 		                			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
 		                			csvResult.setCsvDataLoadExecTime(new Date());
 		                			csvResult.setCsvDataLoadExecExeptionFile(filename);
 		                			csvResultDao.addCsvDataLoadExecutionResult(csvResult);
-	                	     		
+
 		                			return respObj;
 	                		    }
-	                			
+
 			        			return respObj;
-			        			
-			        			
+
+
 	        				}else{
 	                    		respObj.setCode(104);
 	                    		respObj.setDescription("There are no COLUMNS associated with the CsvTemplate: "+template.getCsvTemplateName());
@@ -387,7 +402,7 @@ public class ExperimentParser {
 				    	 for(int j=0; j<xmlNodesFound.getLength(); j++)
 				    	 {
 				    		if(xmlNodesFound.item(j)!=null  && ((Element)xmlNodesFound.item(j)).getChildNodes().getLength() <= 1 )
-				    		{				    			
+				    		{
 				    			xmlGlobalValuesMatrix.add(xmlNodesFound.item(j).getTextContent().trim());
 				    			break;
 				    		}
@@ -486,11 +501,11 @@ public class ExperimentParser {
 								String fieldValue = xmlValueElement.getAttribute(attributeName).trim();
 								boolean isValidData = validateFieldType(fieldType, fieldValue);
 								exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + "\n";
-								
+
 								if(isValidData)
 									xRefDBFieldValues.get(j).attachFieldValue(xmlValueElement.getAttribute(attributeName).trim());
 								else
-		    						xRefDBFieldValues.get(j).attachFieldValue(null);									
+		    						xRefDBFieldValues.get(j).attachFieldValue(null);
 							}
 							else
 	    						xRefDBFieldValues.get(j).attachFieldValue(null);
@@ -503,11 +518,11 @@ public class ExperimentParser {
 								String fieldValue = xmlValueElement.getTextContent();
 								boolean isValidData = validateFieldType(fieldType, fieldValue);
 								exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + "\n";
-								
-								if(isValidData)		
+
+								if(isValidData)
 									xRefDBFieldValues.get(j).attachFieldValue(xmlValueElement.getTextContent().trim());
 								else
-									xRefDBFieldValues.get(j).attachFieldValue(null);										
+									xRefDBFieldValues.get(j).attachFieldValue(null);
 	    					}
 	    					else
 	    						xRefDBFieldValues.get(j).attachFieldValue(null);
@@ -543,7 +558,7 @@ public class ExperimentParser {
 				xRefDBFieldValues.get(xRefIndex).setFieldValues(fieldValues);
 			}
 	     }
-	     
+
 	     if(exceptionNodes != "")
 	     {
 	    	respObj.setCode(104);
@@ -551,7 +566,7 @@ public class ExperimentParser {
       		respObj.setDetail("Exceptions at casting data.");
      		return respObj;
 	     }
-	     
+
 	     //Build CSV Insert Columns
 	     String csvInsertColumns = ""; 
 	     
@@ -584,7 +599,7 @@ public class ExperimentParser {
 	    respObj.setCsvInsertValues(csvInsertValues);
 		return respObj;
 	}
-	
+
 	private boolean validateFieldType(String fieldType, String fieldValue)
 	{
 		if(fieldType.contains("date"))
@@ -592,7 +607,7 @@ public class ExperimentParser {
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			try {
 				df.parse(fieldValue);
-			} catch (ReadOnlyException e) {
+			} catch (Property.ReadOnlyException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return false;
@@ -604,7 +619,7 @@ public class ExperimentParser {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return false;
-			}									
+			}
 		}
 		else if(fieldType.contains("float") || fieldType.contains("decimal"))
 		{
@@ -630,7 +645,7 @@ public class ExperimentParser {
 		}
 
 		return true;
-		
+
 	}
 
 }

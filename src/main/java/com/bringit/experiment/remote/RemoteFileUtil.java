@@ -235,7 +235,7 @@ public class RemoteFileUtil {
         }
     }
 
-    private List<String> getScheduledJobs() {
+    public List<String> getScheduledJobs() {
         List<String> allJobs = new ArrayList<String>();
         try {
 

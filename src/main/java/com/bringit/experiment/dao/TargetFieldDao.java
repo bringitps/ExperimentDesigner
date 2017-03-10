@@ -7,7 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.TargetField;
+import com.bringit.experiment.bll.TargetColumn;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
@@ -15,7 +15,7 @@ public class TargetFieldDao {
 
 	private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
 	
-	public void addTargetField(TargetField targetField) {
+	public void addTargetColumn(TargetColumn targetColumn) {
 
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
@@ -23,7 +23,7 @@ public class TargetFieldDao {
         
         try {
             trns = session.beginTransaction();
-            session.save(targetField);
+            session.save(targetColumn);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -36,14 +36,14 @@ public class TargetFieldDao {
         }
     }
 
-    public void deleteTargetField(int targetFieldId) {
+    public void deleteTargetColumn(int targetColumnId) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            TargetField targetField = (TargetField)session.load(TargetField.class, new Integer(targetFieldId));
-            session.delete(targetField);
+            TargetColumn targetColumn = (TargetColumn)session.load(TargetColumn.class, new Integer(targetColumnId));
+            session.delete(targetColumn);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -56,13 +56,13 @@ public class TargetFieldDao {
         }
     }
 
-    public void updateTargetField(TargetField targetField) {
+    public void updateTargetColumn(TargetColumn targetColumn) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		//  Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            session.update(targetField);
+            session.update(targetColumn);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -76,35 +76,35 @@ public class TargetFieldDao {
     }
 
     @SuppressWarnings({ "unchecked", "unused" })
-	public List<TargetField> getAllTargetFields() {
-        List<TargetField> targetFields = new ArrayList<TargetField>();
+	public List<TargetColumn> getAllTargetColumns() {
+        List<TargetColumn> targetColumns = new ArrayList<TargetColumn>();
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            targetFields = session.createQuery("from TargetField").list();
+            targetColumns = session.createQuery("from TargetColumn").list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return targetFields;
+        return targetColumns;
     }
 
     @SuppressWarnings("unused")
-	public TargetField getTargetFieldById(int targetFieldId) {
-    	TargetField targetField = null;
+	public TargetColumn getTargetColumnById(int targetColumnId) {
+    	TargetColumn targetField = null;
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from TargetField where TargetFieldId = :id";
+            String queryString = "from TargetColumn where TargetColumnId = :id";
             Query query = session.createQuery(queryString);
-            query.setInteger("id", targetFieldId);
-            targetField = (TargetField) query.uniqueResult();
+            query.setInteger("id", targetColumnId);
+            targetField = (TargetColumn) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {

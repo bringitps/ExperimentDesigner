@@ -55,8 +55,8 @@
         <mapping class="com.bringit.experiment.bll.CsvDataLoadExecutionResult"/>
         <mapping class="com.bringit.experiment.bll.DataFile"/>
         <mapping class="com.bringit.experiment.bll.TargetReport"/>
-        <mapping class="com.bringit.experiment.bll.TargetField"/>
-         <mapping class="com.bringit.experiment.bll.TargetFieldGroup"/>
+        <mapping class="com.bringit.experiment.bll.TargetColumn"/>
+         <mapping class="com.bringit.experiment.bll.TargetColumnGroup"/>
          <mapping class="com.bringit.experiment.bll.ContractManufacturer"/>
 
     </session-factory>

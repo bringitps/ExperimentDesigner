@@ -6,6 +6,7 @@ import com.bringit.experiment.WebApplication;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.dao.ExperimentDao;
+import com.bringit.experiment.remote.RemoteFileUtil;
 import com.bringit.experiment.ui.design.MainFormDesign;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Resource;
@@ -30,6 +31,9 @@ public class MainForm extends MainFormDesign {
 	public MainForm(WebApplication webApplication) {
 	    this.webApplication = webApplication;
 	    
+	    txtScheduledJobsInfo.setValue(RemoteFileUtil.getInstance().getScheduledJobs().toString());
+	    txtScheduledJobsInfo.setVisible(false);
+
 	    treeMainMenu.addContainerProperty("isExperimentDataReport", Boolean.class, null);
 	    treeMainMenu.addContainerProperty("experimentId", Integer.class, null);
 		

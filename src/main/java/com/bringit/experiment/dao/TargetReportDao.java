@@ -7,7 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.TargetField;
+import com.bringit.experiment.bll.TargetColumn;
 import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.HibernateXmlConfigSupport;

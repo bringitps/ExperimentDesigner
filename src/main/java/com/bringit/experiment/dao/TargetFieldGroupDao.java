@@ -7,7 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.TargetFieldGroup;
+import com.bringit.experiment.bll.TargetColumnGroup;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
@@ -15,7 +15,7 @@ public class TargetFieldGroupDao {
 
 	private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
 	
-	public void addTargetFieldGroup(TargetFieldGroup targetFieldGroup) {
+	public void addTargetFieldColumn(TargetColumnGroup targetFieldColumn) {
 
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
@@ -23,7 +23,7 @@ public class TargetFieldGroupDao {
         
         try {
             trns = session.beginTransaction();
-            session.save(targetFieldGroup);
+            session.save(targetFieldColumn);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -36,14 +36,14 @@ public class TargetFieldGroupDao {
         }
     }
 
-    public void deleteTargetFieldGroup(int targetFieldGroupId) {
+    public void deleteTargetColumnGroup(int targetColumnGroupId) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            TargetFieldGroup targetFieldGroup = (TargetFieldGroup)session.load(TargetFieldGroup.class, new Integer(targetFieldGroupId));
-            session.delete(targetFieldGroup);
+            TargetColumnGroup targetColumnGroup = (TargetColumnGroup)session.load(TargetColumnGroup.class, new Integer(targetColumnGroupId));
+            session.delete(targetColumnGroup);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -56,13 +56,13 @@ public class TargetFieldGroupDao {
         }
     }
 
-    public void updateTargetFieldGroup(TargetFieldGroup targetFieldGroup) {
+    public void updateTargetColumnGroup(TargetColumnGroup targetColumnGroup) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            session.update(targetFieldGroup);
+            session.update(targetColumnGroup);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -76,42 +76,42 @@ public class TargetFieldGroupDao {
     }
 
     @SuppressWarnings({ "unchecked", "unused" })
-	public List<TargetFieldGroup> getAllTargetFieldGroups() {
-        List<TargetFieldGroup> targetFieldGroups = new ArrayList<TargetFieldGroup>();
+	public List<TargetColumnGroup> getAllTargetFieldColumns() {
+        List<TargetColumnGroup> targetColumnGroups = new ArrayList<TargetColumnGroup>();
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            targetFieldGroups = session.createQuery("from TargetFieldGroup").list();
+            targetColumnGroups = session.createQuery("from TargetColumnGroup").list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return targetFieldGroups;
+        return targetColumnGroups;
     }
 
     @SuppressWarnings("unused")
-	public TargetFieldGroup getTargetFieldGroupById(int targetFieldGroupId) {
-    	TargetFieldGroup targetFieldGroup = null;
+	public TargetColumnGroup getTargetColumnGroupById(int targetColumnGroupId) {
+    	TargetColumnGroup targetColumnGroup = null;
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from TargetFieldGroup where TargetFieldGroupId = :id";
+            String queryString = "from TargetColumnGroup where TargetColumnGroupId = :id";
             Query query = session.createQuery(queryString);
-            query.setInteger("id", targetFieldGroupId);
-            targetFieldGroup = (TargetFieldGroup) query.uniqueResult();
+            query.setInteger("id", targetColumnGroupId);
+            targetColumnGroup = (TargetColumnGroup) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return targetFieldGroup;
+        return targetColumnGroup;
     }
 
 

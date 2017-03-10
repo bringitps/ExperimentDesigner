@@ -15,18 +15,18 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Table(name="TargetFieldGroup")
+@Table(name="TargetColumnGroup")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region="entity")
 @Cacheable
-public class TargetFieldGroup {
+public class TargetColumnGroup {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="TargetFieldGroupId")
-	private Integer targetFieldGroup;
+	@Column(name="TargetColumnGroupId")
+	private Integer targetColumnGroup;
 
-	@Column(name="TargetFieldGroupName")
-	private String targetFieldGroupName;
+	@Column(name="TargetColumnGroupName")
+	private String targetColumnGroupName;
 	
 
 	@OneToOne(fetch=FetchType.LAZY)
@@ -34,32 +34,32 @@ public class TargetFieldGroup {
 	private TargetReport targetReport;
 
 
-	public TargetFieldGroup() {
-		this.targetFieldGroup = null;
-		this.targetFieldGroupName = null;
+	public TargetColumnGroup() {
+		this.targetColumnGroup = null;
+		this.targetColumnGroupName = null;
 		this.targetReport = null;
 	}
 
-	public TargetFieldGroup(Integer targetFieldGroup, String targetFieldGroupName, TargetReport targetReport) {
-		this.targetFieldGroup = targetFieldGroup;
-		this.targetFieldGroupName = targetFieldGroupName;
+	public TargetColumnGroup(Integer targetColumnGroup, String targetColumnGroupName, TargetReport targetReport) {
+		this.targetColumnGroup = targetColumnGroup;
+		this.targetColumnGroupName = targetColumnGroupName;
 		this.targetReport = targetReport;
 	}
 
-	public Integer getTargetFieldGroup() {
-		return targetFieldGroup;
+	public Integer getTargetColumnGroup() {
+		return targetColumnGroup;
 	}
 
-	public void setTargetFieldGroup(Integer targetFieldGroup) {
-		this.targetFieldGroup = targetFieldGroup;
+	public void setTargetColumnGroup(Integer targetColumnGroup) {
+		this.targetColumnGroup = targetColumnGroup;
 	}
 
-	public String getTargetFieldGroupName() {
-		return targetFieldGroupName;
+	public String getTargetColumnGroupName() {
+		return targetColumnGroupName;
 	}
 
-	public void setTargetFieldGroupName(String targetFieldGroupName) {
-		this.targetFieldGroupName = targetFieldGroupName;
+	public void setTargetColumnGroupName(String targetColumnGroupName) {
+		this.targetColumnGroupName = targetColumnGroupName;
 	}
 
 	public TargetReport getTargetReport() {
@@ -69,6 +69,6 @@ public class TargetFieldGroup {
 	public void setTargetReport(TargetReport targetReport) {
 		this.targetReport = targetReport;
 	}
-	
+
 	
 }

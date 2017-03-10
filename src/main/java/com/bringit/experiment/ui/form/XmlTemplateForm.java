@@ -236,10 +236,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			if(this.xmlt.getXmlTemplateId() != null ) {
 				new XmlTemplateDao().updateXmlTemplate(xmlt);
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
-<<<<<<< HEAD
 				//remoteFileUtil.updateJob(Integer.toString(xmlt.getXmlTemplateId()), xmlt);
-=======
->>>>>>> refs/remotes/origin/master
 				remoteFileUtil.updateJob(xmlt);
 			} else {
 				this.xmlt.setCreatedBy(sessionUser);
@@ -247,12 +244,9 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				new XmlTemplateDao().addXmlTemplate(xmlt);
 				XmlTemplate xmltWithId = new XmlTemplateDao().getXmlTemplateByExperimentId(xmlt.getExperiment().getExpId());
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
-<<<<<<< HEAD
 				//remoteFileUtil.updateJob(Integer.toString(xmltWithId.getXmlTemplateId()), xmltWithId);
-				remoteFileUtil.updateJob(xmlt);
-=======
+				//remoteFileUtil.updateJob(xmlt);
 				remoteFileUtil.updateJob(xmltWithId);
->>>>>>> refs/remotes/origin/master
 			}
 			
 			//Save XmlTemplateNodes

@@ -149,6 +149,11 @@
     	<artifactId>tableexport-for-vaadin</artifactId>
     	<version>1.5.1.4</version>
 	</dependency>
+	<dependency>
+   		<groupId>org.vaadin.addons</groupId>
+   		<artifactId>imageviewer</artifactId>
+   		<version>0.5.1.v7</version>
+	</dependency>
   </dependencies>
   <build>
     <finalName>ExperimentDesigner</finalName>

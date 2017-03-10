@@ -30,8 +30,9 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 
 	public TargetReportBuilderForm()
 	{	
-		VerticalLayout infoFieldGroupLayout = new VerticalLayout();
-		GridLayout gridInfoFieldGroup = new GridLayout();
+		/*
+		VerticalLayout infoColGroupLayout = new VerticalLayout();
+		GridLayout gridInfoColGroup = new GridLayout();
 		gridInfoFieldGroup.setRows(1);
 		gridInfoFieldGroup.setColumns(1);
 		gridInfoFieldGroup.setSizeFull();
@@ -42,6 +43,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		txtInfoFieldGroupName.setValue("Information");
 		txtInfoFieldGroupName.setEnabled(false);
 		txtInfoFieldGroupName.setStyleName("tiny");
+		txtInfoFieldGroupName.setWidth(200, Unit.PIXELS);
 		
 		gridInfoFieldGroup.addComponent(txtInfoFieldGroupName, 0, 0);
 		
@@ -50,7 +52,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		
 		infoFieldGroupLayout.addComponent(gridInfoFieldGroup);
 		tabFieldGroups.addTab(infoFieldGroupLayout).setCaption("Information");
-		
+		*/
 		btnAddFieldGroup.addClickListener(new Button.ClickListener() {
 			
 			@Override
@@ -95,7 +97,9 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			
 			newFieldGroupLayout.addComponent(gridNewFieldGroup);
 			newFieldGroupLayout.setCaption("New Field Group");
-			tabFieldGroups.addTab(newFieldGroupLayout);//.setCaption("New Field Group");
+			tabFieldGroups.addTab(newFieldGroupLayout);
+			
+			//.setCaption("New Field Group");
 			//tabFieldGroups.getSelectedTab().set
 			/*
 			headerGrid.addComponent(imgLogo, 0, 0);

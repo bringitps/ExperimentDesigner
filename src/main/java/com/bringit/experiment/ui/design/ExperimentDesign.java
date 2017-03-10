@@ -38,7 +38,7 @@ public class ExperimentDesign extends VerticalLayout {
 	protected Table tblExperimentFields;
 	protected Upload upImage;
 	protected Button btnDeleteImage;
-	protected VerticalLayout vlViewer;
+	//protected VerticalLayout vlViewer;
 	protected Button btnDelete;
 
 	public ExperimentDesign() {

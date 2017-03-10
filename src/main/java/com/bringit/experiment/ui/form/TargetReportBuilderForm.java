@@ -30,29 +30,29 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 
 	public TargetReportBuilderForm()
 	{	
-		/*
+		
 		VerticalLayout infoColGroupLayout = new VerticalLayout();
 		GridLayout gridInfoColGroup = new GridLayout();
-		gridInfoFieldGroup.setRows(1);
-		gridInfoFieldGroup.setColumns(1);
-		gridInfoFieldGroup.setSizeFull();
+		gridInfoColGroup.setRows(1);
+		gridInfoColGroup.setColumns(1);
+		gridInfoColGroup.setSizeFull();
 		
-		TextField txtInfoFieldGroupName = new TextField();
-		txtInfoFieldGroupName.setCaption("Field Group Name:");
-		txtInfoFieldGroupName.setRequired(true);
-		txtInfoFieldGroupName.setValue("Information");
-		txtInfoFieldGroupName.setEnabled(false);
-		txtInfoFieldGroupName.setStyleName("tiny");
-		txtInfoFieldGroupName.setWidth(200, Unit.PIXELS);
+		TextField txtInfoColGroupName = new TextField();
+		txtInfoColGroupName.setCaption("Field Group Name:");
+		txtInfoColGroupName.setRequired(true);
+		txtInfoColGroupName.setValue("Information");
+		txtInfoColGroupName.setEnabled(false);
+		txtInfoColGroupName.setStyleName("tiny");
+		txtInfoColGroupName.setWidth(200, Unit.PIXELS);
 		
-		gridInfoFieldGroup.addComponent(txtInfoFieldGroupName, 0, 0);
+		gridInfoColGroup.addComponent(txtInfoColGroupName, 0, 0);
 		
-		gridInfoFieldGroup.setMargin(new MarginInfo(true, true, true, true));
-		gridInfoFieldGroup.setSpacing(true);
+		gridInfoColGroup.setMargin(new MarginInfo(true, true, true, true));
+		gridInfoColGroup.setSpacing(true);
 		
-		infoFieldGroupLayout.addComponent(gridInfoFieldGroup);
-		tabFieldGroups.addTab(infoFieldGroupLayout).setCaption("Information");
-		*/
+		infoColGroupLayout.addComponent(gridInfoColGroup);
+		tabFieldGroups.addTab(infoColGroupLayout).setCaption("Information");
+		
 		btnAddFieldGroup.addClickListener(new Button.ClickListener() {
 			
 			@Override

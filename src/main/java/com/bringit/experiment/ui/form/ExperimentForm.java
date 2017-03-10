@@ -81,9 +81,11 @@ public class ExperimentForm extends ExperimentDesign {
 	  private List<StreamResource> imagesStreamResourceList;
 	public ExperimentForm(int experimentId)
 	{		
+		/*
 		this.vlViewer.setSizeFull();
 		this.vlViewer.setMargin(true);
 		this.vlViewer.setSpacing(true);
+		*/
 		
 		upImage.setButtonCaption("Add Experiment Image");
 		Config configuration = new Config();
@@ -291,12 +293,12 @@ public class ExperimentForm extends ExperimentDesign {
             }
         });
 
-        vlViewer.addComponent(imageViewer);
-        vlViewer.setExpandRatio(imageViewer, 1);
+        //vlViewer.addComponent(imageViewer);
+        //vlViewer.setExpandRatio(imageViewer, 1);
 
         Layout ctrls = createControls();
-        vlViewer.addComponent(ctrls);
-        vlViewer.setComponentAlignment(ctrls, Alignment.BOTTOM_CENTER);
+        //vlViewer.addComponent(ctrls);
+        //vlViewer.setComponentAlignment(ctrls, Alignment.BOTTOM_CENTER);
         
        // imageViewer.setCenterImageIndex(1);
         imageViewer.focus();

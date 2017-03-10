@@ -28,8 +28,9 @@ public class LoginFormDesign extends VerticalLayout {
 	protected TextField txtUsername;
 	protected Label lblPassword;
 	protected PasswordField txtPassword;
-	protected Label lblLoginError;
 	protected Button btnLogin;
+	protected Label lblLoginError;
+	protected Label lblSpace;
 
 	public LoginFormDesign() {
 		Design.read(this);

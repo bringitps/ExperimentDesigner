@@ -11,10 +11,12 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Window;
 
 @SuppressWarnings("serial")
 public class MainForm extends MainFormDesign {
@@ -92,9 +94,24 @@ public class MainForm extends MainFormDesign {
 	     				formContentLayout.addComponent(new XmlDataFileLoadForm());
 	                  	break;   
 			 	case "csv data file loads":  
-	     				formContentLayout.removeAllComponents();
-	     				formContentLayout.addComponent(new CsvDataFileLoadForm());
-	                  	break;
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new CsvDataFileLoadForm());
+                  	break;
+			 	case "target report":  
+     				//formContentLayout.removeAllComponents();
+     				//formContentLayout.addComponent(new TargetReportBuilderForm());
+			 		 Window targetReportModalWindow = new Window("Xml Template");
+			 		 targetReportModalWindow.setModal(true);
+			 		 targetReportModalWindow.setResizable(false);
+			 		 targetReportModalWindow.setContent(new TargetReportBuilderForm());
+			 		 targetReportModalWindow.setWidth(940, Unit.PIXELS);
+			 		 targetReportModalWindow.setHeight(760, Unit.PIXELS);
+			 		 targetReportModalWindow.center();
+
+					 this.getUI().addWindow(targetReportModalWindow);
+     				
+     				
+     				break;
 			 	default:
 	         			break;
 			 }

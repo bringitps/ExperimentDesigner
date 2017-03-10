@@ -19,6 +19,7 @@ public class LoginForm extends LoginFormDesign {
 	    btnLogin.setClickShortcut(KeyCode.ENTER);
 	    btnLogin.addClickListener(e->this.doLogin()); 
 	    txtPassword.addFocusListener(e->this.lblLoginError.setVisible(false));
+		cbxAuthOption.select("WINDOWS AUTHENTICATION");
 	}
 
 	private void doLogin() {
@@ -36,7 +37,7 @@ public class LoginForm extends LoginFormDesign {
 		}
 		else
 		{*/
-		String authOption = (String) cbxAuthOption.getValue();
+		String authOption =  cbxAuthOption.getValue() != null ? (String) cbxAuthOption.getValue() : "";
 		if (authOption.toUpperCase().equals("WINDOWS AUTHENTICATION")){
 			ActiveDirectoryAuthentication adAuth = new ActiveDirectoryAuthentication();
 			try {

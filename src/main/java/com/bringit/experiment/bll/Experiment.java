@@ -48,9 +48,6 @@ public class Experiment {
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
 	
-	@Column(name="ExpImage", length = 100000)
-	private byte[] expImage;
-	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
 	private SysUser createdBy;
@@ -69,13 +66,12 @@ public class Experiment {
 		this.expInstructions = null;
 		this.createdDate = null;
 		this.modifiedDate = null;
-		this.expImage = null;
 		this.createdBy = null;
 		this.lastModifiedBy = null;
 	}
 
 	public Experiment(Integer expId, String expDbTableNameId, boolean expIsActive, String expName, String expComments,
-			String expInstructions, Date createdDate, Date modifiedDate, byte[] expImage, SysUser createdBy,
+			String expInstructions, Date createdDate, Date modifiedDate, SysUser createdBy,
 			SysUser lastModifiedBy) {
 		this.expId = expId;
 		this.expDbTableNameId = expDbTableNameId;
@@ -85,7 +81,6 @@ public class Experiment {
 		this.expInstructions = expInstructions;
 		this.createdDate = createdDate;
 		this.modifiedDate = modifiedDate;
-		this.expImage = expImage;
 		this.createdBy = createdBy;
 		this.lastModifiedBy = lastModifiedBy;
 	}
@@ -185,16 +180,6 @@ public class Experiment {
 
 	public void setLastModifiedBy(SysUser lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
-	}
-
-
-	public byte[] getExpImage() {
-		return expImage;
-	}
-
-
-	public void setExpImage(byte[] expImage) {
-		this.expImage = expImage;
 	}
 
 

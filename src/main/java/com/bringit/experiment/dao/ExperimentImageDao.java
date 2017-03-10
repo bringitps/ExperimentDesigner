@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentImage;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.HibernateXmlConfigSupport;
@@ -84,6 +85,24 @@ public class ExperimentImageDao {
         try {
             trns = session.beginTransaction();
             experimentImages = session.createQuery("from ExperimentImage").list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return experimentImages;
+    }
+    
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<ExperimentImage> getAllExperimentImagesByExperiment(Experiment experiment) {
+        List<ExperimentImage> experimentImages = new ArrayList<ExperimentImage>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            experimentImages = session.createQuery("from ExperimentImage where ExpId = :id").setInteger("id", experiment.getExpId()).list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {

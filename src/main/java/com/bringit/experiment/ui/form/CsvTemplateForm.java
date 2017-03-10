@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.rmi.Remote;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -24,6 +25,7 @@ import com.bringit.experiment.dao.JobExecutionRepeatDao;
 import com.bringit.experiment.dao.XmlTemplateNodeDao;
 import com.bringit.experiment.dao.CsvTemplateColumnsDao;
 import com.bringit.experiment.dao.CsvTemplateDao;
+import com.bringit.experiment.remote.RemoteFileUtil;
 import com.bringit.experiment.ui.design.CsvTemplateDesign;
 import com.opencsv.CSVReader;
 import com.vaadin.data.Item;
@@ -201,13 +203,19 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.csvt.setCsvTemplateExecEndDate(this.dtCsvTend.getValue());
 			this.csvt.setCsvTemplateExecStartHour((int) this.cbxStartHour.getValue());
 			
-			if(this.csvt.getCsvTemplateId() != null )
+			if(this.csvt.getCsvTemplateId() != null ) {
 				new CsvTemplateDao().updateCsvTemplate(csvt);
-			else
+				// added logic to schedule the CSV Tempate
+				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
+				remoteFileUtil.updateJob(csvt);
+			} else
 			{
 				this.csvt.setCreatedBy(sessionUser);
 				this.csvt.setCreatedDate(this.csvt.getModifiedDate());
 				new CsvTemplateDao().addCsvTemplate(csvt);
+				CsvTemplate csvTemplateWithId = new CsvTemplateDao().getCsvTemplateByExperimentId(this.csvt.getExperiment().getExpId());
+				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
+				remoteFileUtil.updateJob(csvTemplateWithId);
 			}
 			
 
@@ -489,6 +497,10 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		this.csvt.setModifiedDate(new Date());
 		CsvTemplateDao csvDao = new CsvTemplateDao();
 		csvDao.updateCsvTemplate(csvt);
+
+        RemoteFileUtil rfu = RemoteFileUtil.getInstance();
+        rfu.cancelJob(this.csvt);
+
 		closeModalWindow();
     }
 	

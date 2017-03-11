@@ -33,10 +33,12 @@ public class TargetReportBuilderDesign extends VerticalLayout {
 	protected TextField txtTargetRptDescription;
 	protected CheckBox chxActive;
 	protected ComboBox cbxExperiment;
-	protected Button btnAddFieldGroup;
-	protected Button btnDeleteFieldGroup;
+	protected VerticalLayout colGroupLayout;
+	protected Button btnAddColumnGroup;
+	protected Button btnDeleteColumnGroup;
 	protected HorizontalLayout targetFieldGroupsLayout;
-	protected TabSheet tabFieldGroups;
+	protected TabSheet tabColumnGroups;
+	protected VerticalLayout btnDeleteLayout;
 	protected Button btnDelete;
 
 	public TargetReportBuilderDesign() {

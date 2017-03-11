@@ -107,7 +107,7 @@ public class MainForm extends MainFormDesign {
 			 		 Window targetReportModalWindow = new Window("Xml Template");
 			 		 targetReportModalWindow.setModal(true);
 			 		 targetReportModalWindow.setResizable(false);
-			 		 targetReportModalWindow.setContent(new TargetReportBuilderForm());
+			 		 targetReportModalWindow.setContent(new TargetReportBuilderForm(-1));
 			 		 targetReportModalWindow.setWidth(940, Unit.PIXELS);
 			 		 targetReportModalWindow.setHeight(760, Unit.PIXELS);
 			 		 targetReportModalWindow.center();

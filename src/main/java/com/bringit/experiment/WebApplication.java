@@ -76,7 +76,7 @@ public class WebApplication extends UI {
 	    
 		final VerticalLayout headerLayout = new VerticalLayout();
 		final HorizontalLayout contentLayout = new HorizontalLayout((sysUserSession != null) ? mainForm : loginForm);
-		final VerticalLayout footerLayout = new VerticalLayout(new Label("BringIT | Professional Services"));
+		//final VerticalLayout footerLayout = new VerticalLayout(new Label("BringIT | Professional Services"));
 		
 		if (sysUserSession != null)
 		{
@@ -186,7 +186,7 @@ public class WebApplication extends UI {
 			headerLayout.addComponent(headerGrid);
 		}
 		
-		final VerticalLayout mainLayout = new VerticalLayout(headerLayout, contentLayout, footerLayout);
+		final VerticalLayout mainLayout = new VerticalLayout(headerLayout, contentLayout/*, footerLayout*/);
 		mainLayout.setSizeFull();
 		mainLayout.setExpandRatio(contentLayout, 1);
 		contentLayout.setSizeFull();

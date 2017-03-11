@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
   <meta name="vaadin-version" content="7.7.0">
+  <meta name="package-mapping" content="com_vaadin:com.vaadin">
  </head>
  <body>
   <vaadin-vertical-layout style-name="crud-template" responsive>
@@ -80,7 +81,7 @@
     </vaadin-table>
    </vaadin-vertical-layout>
    <vaadin-vertical-layout width="940px" margin>
-    <vaadin-grid-layout width-full height="540px">
+    <vaadin-grid-layout width-full height="50px">
      <row>
       <column>
        <vaadin-upload style-name="small friendly" immediate _id="upImage"></vaadin-upload>
@@ -91,13 +92,10 @@
        </vaadin-button>
       </column>
      </row>
-     <row></row>
-     <row>
-      <column colspan="2">
-       <vaadin-image width="500px" height="400px" _id="imgImage" :center></vaadin-image>
-      </column>
-     </row>
     </vaadin-grid-layout>
+   </vaadin-vertical-layout>
+   <vaadin-vertical-layout height="410px" margin _id="vlViewer" :middle :center>
+     <vaadin-tab-sheet size-auto _id="tsImages" :middle :center></vaadin-tab-sheet>
    </vaadin-vertical-layout>
    <vaadin-vertical-layout margin>
     <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="small danger" plain-text _id="btnDelete" :right>

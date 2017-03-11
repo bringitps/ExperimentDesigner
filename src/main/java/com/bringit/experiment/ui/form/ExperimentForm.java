@@ -50,11 +50,14 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Embedded;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Upload.Receiver;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.Slider.ValueOutOfBoundsException;
@@ -75,17 +78,16 @@ public class ExperimentForm extends ExperimentDesign {
 	String[] dbfieldTypes;
 	private int lastNewItemId = 0;
 	private File tempImageFile;
-	private ImageViewer imageViewer;
 	  private TextField selectedImage = new TextField();
 	  
 	  private List<StreamResource> imagesStreamResourceList;
 	public ExperimentForm(int experimentId)
 	{		
-		/*
+		
 		this.vlViewer.setSizeFull();
 		this.vlViewer.setMargin(true);
 		this.vlViewer.setSpacing(true);
-		*/
+		this.tsImages.setSizeFull();
 		
 		upImage.setButtonCaption("Add Experiment Image");
 		Config configuration = new Config();
@@ -127,33 +129,9 @@ public class ExperimentForm extends ExperimentDesign {
 			this.chxActive.setValue(this.experiment.isExpIsActive());
 			this.txtExpInstructions.setValue(this.experiment.getExpInstructions());
 			this.txtExpComments.setValue(this.experiment.getExpComments());
-			this.experimentImages = new ExperimentImageDao().getAllExperimentImagesByExperiment(this.experiment);
-			System.out.println("TOTAL OF IMAGES-------"+experimentImages.size());
-			for (ExperimentImage expImg : experimentImages) {
-				final byte[] img = expImg.getExpImage();
-				 
-				try {
-					if (img != null){
-						StreamResource.StreamSource imageSource = new StreamResource.StreamSource() {
-							@Override
-								public InputStream getStream() {
-									return new java.io.ByteArrayInputStream(img);
-								}
-						};
-							StreamResource imageResource = new StreamResource(imageSource, "temp.png");
-							imageResource.setCacheTime(0);
-							imagesStreamResourceList.add(imageResource);
-							//imgImage.setSource(imageResource);
-					}
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			loadImageViewer();
-			/*
-			 
-			*/
+			
+			loadImageTabs();
+
 			this.experimentFields = new ExperimentFieldDao().getAllExperimentFieldsByExperiment(this.experiment);
 
 			Object[] itemValues = new Object[6];
@@ -275,222 +253,36 @@ public class ExperimentForm extends ExperimentDesign {
 
 	}
 
-	private void loadImageViewer() {
-		imageViewer = new ImageViewer();
-        imageViewer.setSizeFull();
-        imageViewer.setImages(imagesStreamResourceList);
-        imageViewer.setAnimationEnabled(false);
-        imageViewer.setSideImageRelativeWidth(0.7f);
-
-        imageViewer.addListener(new ImageViewer.ImageSelectionListener() {
-            public void imageSelected(ImageSelectedEvent e) {
-                if (e.getSelectedImageIndex() >= 0) {
-                    selectedImage.setValue(String.valueOf(e
-                            .getSelectedImageIndex()));
-                } else {
-                    selectedImage.setValue("-");
-                }
-            }
-        });
-
-        //vlViewer.addComponent(imageViewer);
-        //vlViewer.setExpandRatio(imageViewer, 1);
-
-        Layout ctrls = createControls();
-        //vlViewer.addComponent(ctrls);
-        //vlViewer.setComponentAlignment(ctrls, Alignment.BOTTOM_CENTER);
-        
-       // imageViewer.setCenterImageIndex(1);
-        imageViewer.focus();
-		
+	private void loadImageTabs() {
+		this.experimentImages = new ExperimentImageDao().getAllExperimentImagesByExperiment(this.experiment);
+		for (ExperimentImage expImg : experimentImages) {
+			final byte[] img = expImg.getExpImage();
+			String imgName = "ExpImage"+expImg.getExpImageId();
+			 
+			try {
+				if (img != null){
+					StreamResource.StreamSource imageSource = new StreamResource.StreamSource() {
+						@Override
+							public InputStream getStream() {
+								return new java.io.ByteArrayInputStream(img);
+							}
+					};
+						StreamResource imageResource = new StreamResource(imageSource, imgName+".png");
+						imageResource.setCacheTime(0);
+						VerticalLayout tab = new VerticalLayout();
+						Image tabImg = new Image(null,imageResource);
+						tabImg.setWidth("600px");
+						tabImg.setHeight("400px");
+						tab.addComponent(tabImg);
+						tsImages.addTab(tab, imgName);	
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
-    /**
-     * Creates a list of Resources to be shown in the ImageViewer.
-     * 
-     * @return List of Resource instances
-     */
-    private List<Resource> createImageList() {
-        List<Resource> img = new ArrayList<Resource>();
-        for (int i = 1; i < 10; i++) {
-            img.add(new ThemeResource("images/" + i + ".jpg"));
-        }
-        return img;
-    }
-    private Layout createControls() {
-        HorizontalLayout hl = new HorizontalLayout();
-        hl.setSizeUndefined();
-        hl.setMargin(false);
-        hl.setSpacing(true);
 
-        CheckBox c = new CheckBox("HiLite");
-        c.setImmediate(true);
-        c.addValueChangeListener(new Property.ValueChangeListener() {
-            public void valueChange(ValueChangeEvent event) {
-                boolean checked = (Boolean) event.getProperty().getValue();
-                imageViewer.setHiLiteEnabled(checked);
-                imageViewer.focus();
-            }
-        });
-        c.setValue(true);
-        hl.addComponent(c);
-        hl.setComponentAlignment(c, Alignment.BOTTOM_CENTER);
-
-        c = new CheckBox("Animate");
-        c.setImmediate(true);
-        c.addValueChangeListener(new Property.ValueChangeListener() {
-            public void valueChange(ValueChangeEvent event) {
-                boolean checked = (Boolean) event.getProperty().getValue();
-                imageViewer.setAnimationEnabled(checked);
-                imageViewer.focus();
-            }
-        });
-        c.setValue(true);
-        hl.addComponent(c);
-        hl.setComponentAlignment(c, Alignment.BOTTOM_CENTER);
-
-        Slider s = new Slider("Animation duration (ms)");
-        s.setMax(2000);
-        s.setMin(200);
-        s.setImmediate(true);
-        s.setWidth("120px");
-        s.addValueChangeListener(new Property.ValueChangeListener() {
-            public void valueChange(ValueChangeEvent event) {
-                try {
-                    int duration = (int) Math.round((Double) event
-                            .getProperty().getValue());
-                    imageViewer.setAnimationDuration(duration);
-                    imageViewer.focus();
-                } catch (Exception ignored) {
-                }
-            }
-        });
-        try {
-            s.setValue(350d);
-        } catch (ValueOutOfBoundsException e) {
-        }
-        hl.addComponent(s);
-        hl.setComponentAlignment(s, Alignment.BOTTOM_CENTER);
-
-        s = new Slider("Center image width");
-        s.setResolution(2);
-        s.setMax(1);
-        s.setMin(0.1);
-        s.setImmediate(true);
-        s.setWidth("120px");
-        s.addValueChangeListener(new Property.ValueChangeListener() {
-            public void valueChange(ValueChangeEvent event) {
-                try {
-                    double d = (Double) event.getProperty().getValue();
-                    imageViewer.setCenterImageRelativeWidth((float) d);
-                    imageViewer.focus();
-                } catch (Exception ignored) {
-                }
-            }
-        });
-        try {
-            s.setValue(0.55);
-        } catch (ValueOutOfBoundsException e) {
-        }
-        hl.addComponent(s);
-        hl.setComponentAlignment(s, Alignment.BOTTOM_CENTER);
-
-        s = new Slider("Side image count");
-        s.setMax(5);
-        s.setMin(1);
-        s.setImmediate(true);
-        s.setWidth("120px");
-        s.addValueChangeListener(new Property.ValueChangeListener() {
-            public void valueChange(ValueChangeEvent event) {
-                try {
-                    int sideImageCount = (int) Math.round((Double) event
-                            .getProperty().getValue());
-                    imageViewer.setSideImageCount(sideImageCount);
-                    imageViewer.focus();
-                } catch (Exception ignored) {
-                }
-            }
-        });
-        try {
-            s.setValue(2d);
-        } catch (ValueOutOfBoundsException e) {
-        }
-        hl.addComponent(s);
-        hl.setComponentAlignment(s, Alignment.BOTTOM_CENTER);
-
-        s = new Slider("Side image width");
-        s.setResolution(2);
-        s.setMax(0.8);
-        s.setMin(0.5);
-        s.setImmediate(true);
-        s.setWidth("120px");
-        s.addValueChangeListener(new Property.ValueChangeListener() {
-            public void valueChange(ValueChangeEvent event) {
-                try {
-                    double d = (Double) event.getProperty().getValue();
-                    imageViewer.setSideImageRelativeWidth((float) d);
-                    imageViewer.focus();
-                } catch (Exception ignored) {
-                }
-            }
-        });
-        try {
-            s.setValue(0.65);
-        } catch (ValueOutOfBoundsException e) {
-        }
-        hl.addComponent(s);
-        hl.setComponentAlignment(s, Alignment.BOTTOM_CENTER);
-
-        s = new Slider("Horizontal padding");
-        s.setMax(10);
-        s.setMin(0);
-        s.setImmediate(true);
-        s.setWidth("120px");
-        s.addValueChangeListener(new Property.ValueChangeListener() {
-            public void valueChange(ValueChangeEvent event) {
-                try {
-                    double d = (Double) event.getProperty().getValue();
-                    imageViewer.setImageHorizontalPadding((int) Math.round(d));
-                    imageViewer.focus();
-                } catch (Exception ignored) {
-                }
-            }
-        });
-        try {
-            s.setValue(1d);
-        } catch (ValueOutOfBoundsException e) {
-        }
-        hl.addComponent(s);
-        hl.setComponentAlignment(s, Alignment.BOTTOM_CENTER);
-
-        s = new Slider("Vertical padding");
-        s.setMax(10);
-        s.setMin(0);
-        s.setImmediate(true);
-        s.setWidth("120px");
-        s.addValueChangeListener(new Property.ValueChangeListener() {
-            public void valueChange(ValueChangeEvent event) {
-                try {
-                    double d = (Double) event.getProperty().getValue();
-                    imageViewer.setImageVerticalPadding((int) Math.round(d));
-                    imageViewer.focus();
-                } catch (Exception ignored) {
-                }
-            }
-        });
-        try {
-            s.setValue(5d);
-        } catch (ValueOutOfBoundsException e) {
-        }
-        hl.addComponent(s);
-        hl.setComponentAlignment(s, Alignment.BOTTOM_CENTER);
-
-        selectedImage.setWidth("50px");
-        selectedImage.setImmediate(true);
-        hl.addComponent(selectedImage);
-        hl.setComponentAlignment(selectedImage, Alignment.BOTTOM_CENTER);
-
-        return hl;
-    }
     
 	private void removeExperimentImage() {
 		//this.experiment.setExpImage(new byte[0]);
@@ -527,8 +319,20 @@ public class ExperimentForm extends ExperimentDesign {
 					try {
 					      // Display the uploaded file in the image panel.
 					      final FileResource imageResource = new FileResource(tempImageFile);
-			                //imgImage.setVisible(true);
-			                //imgImage.setSource(imageResource);
+							String imgName = tempImageFile.getName();
+							 
+							try {
+										VerticalLayout tab = new VerticalLayout();
+										Image tabImg = new Image(null,imageResource);
+										tabImg.setWidth("600px");
+										tabImg.setHeight("400px");
+										tab.addComponent(tabImg);
+										tsImages.addTab(tab, imgName);
+										//tempImageFile.delete();
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 		    		
 		    			//tempImageFile.delete();
 					} catch ( Exception e) {

@@ -5,6 +5,7 @@ import com.vaadin.annotations.DesignRoot;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
@@ -38,7 +39,8 @@ public class ExperimentDesign extends VerticalLayout {
 	protected Table tblExperimentFields;
 	protected Upload upImage;
 	protected Button btnDeleteImage;
-	//protected VerticalLayout vlViewer;
+	protected VerticalLayout vlViewer;
+	protected TabSheet tsImages;
 	protected Button btnDelete;
 
 	public ExperimentDesign() {

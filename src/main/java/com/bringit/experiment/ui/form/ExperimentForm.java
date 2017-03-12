@@ -10,9 +10,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.vaadin.tepi.imageviewer.ImageViewer;
 import org.vaadin.tepi.imageviewer.ImageViewer.ImageSelectedEvent;
@@ -43,12 +45,14 @@ import com.vaadin.server.FileResource;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.server.StreamResource;
+import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -61,6 +65,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.Slider.ValueOutOfBoundsException;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
@@ -78,6 +83,9 @@ public class ExperimentForm extends ExperimentDesign {
 	String[] dbfieldTypes;
 	private int lastNewItemId = 0;
 	private File tempImageFile;
+	private boolean isNewExperiment = false;
+	List<Integer> imagesToDelete = new ArrayList<Integer>();
+	
 	  private TextField selectedImage = new TextField();
 	  
 	  private List<StreamResource> imagesStreamResourceList;
@@ -114,6 +122,7 @@ public class ExperimentForm extends ExperimentDesign {
 		
 		if(experimentId == -1) //New Experiment
 		{
+			isNewExperiment = true;
 			this.chxActive.setValue(true);
 			this.btnDelete.setEnabled(false);
 			this.experiment = new Experiment();
@@ -269,12 +278,12 @@ public class ExperimentForm extends ExperimentDesign {
 					};
 						StreamResource imageResource = new StreamResource(imageSource, imgName+".png");
 						imageResource.setCacheTime(0);
-						VerticalLayout tab = new VerticalLayout();
+						//VerticalLayout tab = new VerticalLayout();
 						Image tabImg = new Image(null,imageResource);
 						tabImg.setWidth("600px");
 						tabImg.setHeight("400px");
-						tab.addComponent(tabImg);
-						tsImages.addTab(tab, imgName);	
+						//tab.addComponent(tabImg);
+						tsImages.addTab(tabImg, imgName);	
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -289,7 +298,14 @@ public class ExperimentForm extends ExperimentDesign {
 		if(tempImageFile != null){
 			tempImageFile.delete();
 		}
-		//imgImage.setVisible(false);
+		Component c = tsImages.getSelectedTab();
+		if (tsImages.getTab(c).getCaption().substring(0,3).equals("new")){
+			tsImages.removeComponent(c);
+		}else{
+			int imgId = Integer.parseInt(tsImages.getTab(c).getCaption().substring(8));
+			tsImages.removeComponent(c);
+			imagesToDelete.add(imgId);
+		}
 	}
 	
 	private void uploadImage() {
@@ -301,7 +317,7 @@ public class ExperimentForm extends ExperimentDesign {
 	                FileOutputStream fos = null; // Output stream to write to
 	                try {
 	                    // Open the file for writing.
-	                	tempImageFile = File.createTempFile("temp", ".png");
+	                	tempImageFile = File.createTempFile("new", ".png");
 	                    fos = new FileOutputStream(tempImageFile);
 	                }  catch (IOException e) {
 	      	          e.printStackTrace();
@@ -322,12 +338,12 @@ public class ExperimentForm extends ExperimentDesign {
 							String imgName = tempImageFile.getName();
 							 
 							try {
-										VerticalLayout tab = new VerticalLayout();
+										//VerticalLayout tab = new VerticalLayout();
 										Image tabImg = new Image(null,imageResource);
 										tabImg.setWidth("600px");
 										tabImg.setHeight("400px");
-										tab.addComponent(tabImg);
-										tsImages.addTab(tab, imgName);
+										//tab.addComponent(tabImg);
+										tsImages.addTab(tabImg, imgName);
 										//tempImageFile.delete();
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
@@ -453,7 +469,7 @@ public class ExperimentForm extends ExperimentDesign {
 			this.experiment.setExpComments(this.txtExpComments.getValue());
 			this.experiment.setLastModifiedBy(sessionUser);
 			this.experiment.setModifiedDate(new Date());
-
+/*
 			if(tempImageFile != null){
 				byte[] imageData = new byte[(int) tempImageFile.length()];
 				 
@@ -467,7 +483,7 @@ public class ExperimentForm extends ExperimentDesign {
 			
 				//this.experiment.setExpImage(imageData);
 			}
-
+*/
 			ExperimentDao expDao = new ExperimentDao();
 			
 			if(this.experiment.getExpId() != null )
@@ -516,6 +532,7 @@ public class ExperimentForm extends ExperimentDesign {
 				
 				expfieldDao.updateDBDataTableField(experimentField);
 			}
+			saveImages();
 			if(tempImageFile!=null){
 				tempImageFile.delete();
 			}
@@ -542,6 +559,35 @@ public class ExperimentForm extends ExperimentDesign {
 		}
     }
 	
+	private void saveImages() {
+		Iterator<Component> i = tsImages.getComponentIterator();
+		while (i.hasNext()) {
+		    Component c = (Component) i.next();
+		    Tab tab = tsImages.getTab(c);
+		    if (tab.getCaption().substring(0,3).equals("new")) {
+		         Image im = (Image) tab.getComponent();
+		         FileResource imResource = (FileResource) im.getSource();
+		         
+		         try {
+					byte[] bytes = IOUtils.toByteArray(imResource.getStream().getStream());
+					ExperimentImage expImg = new ExperimentImage();
+					expImg.setExperiment(this.experiment);
+					expImg.setExpImage(bytes);
+					new ExperimentImageDao().addExperimentImage(expImg);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		    }
+		}
+		//removingImages 
+		if(imagesToDelete.size()>0){
+			for (int j = 0; j < imagesToDelete.size(); j++) {
+				new ExperimentImageDao().deleteExperimentImage(imagesToDelete.get(j));
+			}
+		}
+	}
+
 	private void onDelete()
 	{
 		this.experiment.setExpIsActive(false);

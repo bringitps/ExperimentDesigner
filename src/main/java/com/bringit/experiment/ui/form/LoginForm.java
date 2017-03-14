@@ -43,13 +43,18 @@ public class LoginForm extends LoginFormDesign {
 			try {
 				if(adAuth.authenticate(txtUsername.getValue(), txtPassword.getValue())){
 					//we need to check if the user is registered to use the app 
-					SysUser loggedUser = new SysUserDao().getUserByUserNameAndPassword(txtUsername.getValue(), txtPassword.getValue());
+					//SysUser loggedUser = new SysUserDao().getUserByUserNameAndPassword(txtUsername.getValue(), txtPassword.getValue());
+					SysUser loggedUser = new SysUserDao().getUserByUserName(txtUsername.getValue());
 					if(loggedUser != null)
 						webApplication.createUserSession(loggedUser);
 					else
+						loggedUser = new SysUser();
+						loggedUser.setActiveDirectoryUser(true);
+						loggedUser.setUserName(txtUsername.getValue());
+						loggedUser.setUserPass("");		
 						//Register user automatically? or give them a point of contact to request access?
-						lblLoginError.setValue("User exists on LDAP, but is not registered to use this app. Please contact IT.");
-						lblLoginError.setVisible(true);
+						//lblLoginError.setValue("User exists on LDAP, but is not registered to use this app. Please contact IT.");
+						//lblLoginError.setVisible(true);
 				}
 			} catch (LoginException e) {
 			    lblLoginError.setValue(e.getMessage());

@@ -7,20 +7,15 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import com.bringit.experiment.bll.ExperimentField;
+import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.UserRole;
 import com.bringit.experiment.dal.HibernateUtil;
-import com.bringit.experiment.util.HibernateXmlConfigSupport;
-import com.bringit.experiment.util.PasswordEncrypter;
 
-public class SysUserDao {
+public class UserRoleDao {
 
-	//private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
-	
-	public void addSysUser(SysUser sysUser) {
-
-
-    	String encryptedPassword = PasswordEncrypter.encryptPassword(sysUser.getUserPass());
-    	sysUser.setUserPass(encryptedPassword);
+	public void addUserRole(UserRole usrRole) {
     	
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
@@ -28,7 +23,7 @@ public class SysUserDao {
         
         try {
             trns = session.beginTransaction();
-            session.save(sysUser);
+            session.save(usrRole);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -41,14 +36,13 @@ public class SysUserDao {
         }
     }
 
-    public void deleteSysUser(int userId) {
+    public void deleteUserRole(int UserRoleId) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            SysUser sysUser = (SysUser)session.load(SysUser.class, new Integer(userId));
-            session.delete(sysUser);
+            UserRole userRole = (UserRole)session.load(UserRole.class, new Integer(UserRoleId));
+            session.delete(userRole);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -61,13 +55,13 @@ public class SysUserDao {
         }
     }
 
-    public void updateSysUser(SysUser sysUser) {
+    public void updateUserRole(UserRole usrRole) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
+
         try {
             trns = session.beginTransaction();
-            session.update(sysUser);
+            session.update(usrRole);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -81,86 +75,93 @@ public class SysUserDao {
     }
 
     @SuppressWarnings({ "unused", "unchecked" })
-	public List<SysUser> getAllSysUsers() {
-        List<SysUser> sysUsers = new ArrayList<SysUser>();
+	public List<UserRole> getAllUserRoles() {
+        List<UserRole> usrRoles = new ArrayList<UserRole>();
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            sysUsers = session.createQuery("from SysUser").list();
+            usrRoles = session.createQuery("from UserRole").list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return sysUsers;
+        return usrRoles;
     }
 
     @SuppressWarnings("unused")
-	public SysUser getUserById(int userId) {
-        SysUser sysUser = null;
+	public UserRole getUserRoleById(int usrRoleId) {
+        UserRole sysRole = null;
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from SysUser where UserId = :id";
+            String queryString = "from UserRole where UserRoleId = :id";
             Query query = session.createQuery(queryString);
-            query.setInteger("id", userId);
-            sysUser = (SysUser) query.uniqueResult();
+            query.setInteger("id", usrRoleId);
+            sysRole = (UserRole) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return sysUser;
+        return sysRole;
     }
     @SuppressWarnings("unused")
-	public SysUser getUserByUserName(String userName) {
-        SysUser sysUser = null;
+	public UserRole getDefaultUserRoleByUserId(int usrRoleId) {
+        UserRole sysRole = null;
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from SysUser where UserName = :UserName";
+            String queryString = "from UserRole where UserRoleId = :id and IsDefaultRole = 1";
             Query query = session.createQuery(queryString);
-            query.setString("UserName", userName);
-            sysUser = (SysUser) query.uniqueResult();
+            query.setInteger("id", usrRoleId);
+            sysRole = (UserRole) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return sysUser;
+        return sysRole;
+    }
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<UserRole> getUserRolesByUser(SysUser user) {
+        List<UserRole> userRoles = new ArrayList<UserRole>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            trns = session.beginTransaction();
+            userRoles = session.createQuery("from UserRole where UserId = :id").setInteger("id", user.getUserId()).list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return userRoles;
+    }
+    
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<UserRole> getUserRolesByRole(SysRole role) {
+        List<UserRole> userRoles = new ArrayList<UserRole>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            trns = session.beginTransaction();
+            userRoles = session.createQuery("from userRoles where RoleId = :id").setInteger("id", role.getRoleId()).list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return userRoles;
     }
 	
-    @SuppressWarnings("unused")
-	public SysUser getUserByUserNameAndPassword(String userName, String password) {
-    	
-    	String encryptedPassword = PasswordEncrypter.encryptPassword(password);
-    	
-        SysUser sysUser = null;
-        Transaction trns = null;
-        Session session = HibernateUtil.getSessionFactory().openSession();
-		// Session session = HibernateUtil.openSession(dialectXmlFile);
-        try {
-            trns = session.beginTransaction();
-            String queryString = "from SysUser where UserName = :UserName and UserPass =:EncryptedPassword";
-            Query query = session.createQuery(queryString);
-            query.setString("UserName", userName);
-            query.setString("EncryptedPassword", encryptedPassword);
-            sysUser = (SysUser) query.uniqueResult();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        } finally {
-            session.flush();
-            session.close();
-        }
-        return sysUser;
-    }
 }

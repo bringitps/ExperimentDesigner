@@ -60,6 +60,8 @@
         <mapping class="com.bringit.experiment.bll.TargetColumn"/>
          <mapping class="com.bringit.experiment.bll.TargetColumnGroup"/>
          <mapping class="com.bringit.experiment.bll.ContractManufacturer"/>
+         <mapping class="com.bringit.experiment.bll.SysRole" />
+         <mapping class="com.bringit.experiment.bll.UserRole" />
 
     </session-factory>
 </hibernate-configuration>

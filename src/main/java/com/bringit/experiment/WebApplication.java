@@ -7,10 +7,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpSession;
 
 import com.bringit.experiment.bll.JobExecutionRepeat;
+import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.UserRole;
 import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.JobExecutionRepeatDao;
+import com.bringit.experiment.dao.SysRoleDao;
 import com.bringit.experiment.dao.SysUserDao;
+import com.bringit.experiment.dao.UserRoleDao;
 import com.bringit.experiment.ui.form.LoginForm;
 import com.bringit.experiment.ui.form.MainForm;
 import com.bringit.experiment.util.Config;
@@ -125,8 +129,30 @@ public class WebApplication extends UI {
 				SysUser rootUser = new SysUser();
 				rootUser.setUserName("root");
 				rootUser.setUserPass("1234");
-				
+				rootUser.setActiveDirectoryUser(false);
 				new SysUserDao().addSysUser(rootUser);
+				
+				SysRole adminRole = new SysRole();
+				adminRole.setRoleName("Administrator");
+				adminRole.setRoleDescription("Users with full access and privileges");
+				
+				SysRole guestRole = new SysRole();
+				guestRole.setRoleName("Guest");
+				guestRole.setRoleDescription("Users with view only access");
+				
+				SysRoleDao roleDao = new SysRoleDao();
+				roleDao.addSysRole(adminRole);
+				roleDao.addSysRole(guestRole);
+				
+				UserRole rootRole = new UserRole();
+				rootRole.setSysRole(adminRole);
+				rootRole.setSysUser(rootUser);
+				rootRole.setDefaultRole(true);
+				new UserRoleDao().addUserRole(rootRole);
+				
+			
+				
+				
 
 				Config configuration = new Config();
 				if(configuration.getProperty("dbms").equals("sqlserver"))

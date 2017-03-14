@@ -26,17 +26,22 @@ public class SysUser {
 	
 	@Column(name="UserPass")
 	private String UserPass;
+	
+	@Column(name="IsActiveDirectoryUser")
+	private boolean isActiveDirectoryUser;
 
 	public SysUser() {
 		this.userId = null;
 		this.UserName = null;
 		this.UserPass = null;
+		this.isActiveDirectoryUser = false;
 	}
 
-	public SysUser(Integer userId, String userName, String userPass) {
+	public SysUser(Integer userId, String userName, String userPass, boolean isActiveDirectoryUser) {
 		this.userId = userId;
 		this.UserName = userName;
 		this.UserPass = userPass;
+		this.isActiveDirectoryUser = isActiveDirectoryUser;
 	}
 
 	public Integer getUserId() {
@@ -61,6 +66,14 @@ public class SysUser {
 
 	public void setUserPass(String userPass) {
 		UserPass = userPass;
+	}
+
+	public boolean isActiveDirectoryUser() {
+		return isActiveDirectoryUser;
+	}
+
+	public void setActiveDirectoryUser(boolean isActiveDirectoryUser) {
+		this.isActiveDirectoryUser = isActiveDirectoryUser;
 	}
 	
 }

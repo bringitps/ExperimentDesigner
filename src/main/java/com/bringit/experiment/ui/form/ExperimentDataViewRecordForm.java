@@ -280,6 +280,9 @@ public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign
 				
 			}
 			
+			//System.out.println("Record Column Labels: " + recordColumnLabelXRef);
+			//System.out.println("Record Column Values: " + recordColumnValueXRef);
+			
 			for(int i=0; i<recordColumnLabelXRef.size(); i++)
 			{
 				if(!recordColumnLabelXRef.get(i).toString().trim().equals("LastModifiedDate") && !recordColumnLabelXRef.get(i).toString().trim().equals("CreatedDate"))
@@ -322,20 +325,17 @@ public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign
 	{
 		if(expField.getExpFieldId() != null || isCommentsFieldUpdate)
 		{
-			ExperimentFieldValueUpdateLog expFieldValueUpdateLog = new ExperimentFieldValueUpdateLog(null, newValue, newDate, newValue, newDate, (expField.getExpFieldId() != null? expField : null), dbExpTableRecordId, isCommentsFieldUpdate, sysUser);
-
-			new ExperimentFieldValueUpdateLogDao().addExperimentFieldValueUpdateLog(expFieldValueUpdateLog);
-			
-			/*ExperimentFieldValueUpdateLog expFieldValueUpdateLog = new ExperimentFieldValueUpdateLog();
+			ExperimentFieldValueUpdateLog expFieldValueUpdateLog = new ExperimentFieldValueUpdateLog();
 			expFieldValueUpdateLog.setCreatedBy(sysUser);
 			if(!isCommentsFieldUpdate) expFieldValueUpdateLog.setExperimentField(expField);
+			expFieldValueUpdateLog.setExperiment(this.experiment);
 			expFieldValueUpdateLog.setDbTableRecordCommentsUpdate(isCommentsFieldUpdate);			
 			expFieldValueUpdateLog.setDbExperimentDataTableRecordId(recordId);
 			expFieldValueUpdateLog.setExpNewCreatedDate(newDate);
-			expFieldValueUpdateLog.setExpNewValue(newValue);
+			expFieldValueUpdateLog.setExpNewValue(newValue != null ? newValue : "");
 			expFieldValueUpdateLog.setExpOldCreatedDate(oldDate);
-			expFieldValueUpdateLog.setExpOldValue(oldValue);
-			new ExperimentFieldValueUpdateLogDao().addExperimentFieldValueUpdateLog(expFieldValueUpdateLog);*/
+			expFieldValueUpdateLog.setExpOldValue(oldValue != null ? oldValue : "");
+			new ExperimentFieldValueUpdateLogDao().addExperimentFieldValueUpdateLog(expFieldValueUpdateLog);
 		}
 	}
 }

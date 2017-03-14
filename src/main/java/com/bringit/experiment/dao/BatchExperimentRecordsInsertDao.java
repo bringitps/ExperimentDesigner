@@ -9,17 +9,27 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import com.bringit.experiment.bll.CsvTemplate;
 import com.bringit.experiment.bll.DataFile;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.data.ResponseObj;
 import com.bringit.experiment.sql.connection.Connect;
 import com.bringit.experiment.util.Config;
 
 public class BatchExperimentRecordsInsertDao {
 
-	public ResponseObj executeExperimentBatchRecordsInsert(String csvInsertColumns, List<String> csvInsertValues, SysUser sysUser, DataFile dataFile, Experiment experiment, int batchSize)
+	public ResponseObj executeExperimentBatchRecordsInsert(String csvInsertColumns, List<String> csvInsertValues, XmlTemplate xmlTemplate, CsvTemplate csvTemplate, SysUser sysUser, DataFile dataFile, Experiment experiment, int batchSize)
 	{
+		Integer contractManufacturerId = null;
+		if(xmlTemplate != null && xmlTemplate.getContractManufacturer() != null)
+			contractManufacturerId = xmlTemplate.getContractManufacturer().getCmId();
+		
+		if(csvTemplate != null && csvTemplate.getContractManufacturer() != null)
+			contractManufacturerId = csvTemplate.getContractManufacturer().getCmId();
+		
+		
 		ResponseObj responseObj = new ResponseObj();
 		responseObj.setCode(0);
 		responseObj.setDescription("");
@@ -43,11 +53,11 @@ public class BatchExperimentRecordsInsertDao {
 					if( (i+1) % batchSize == 0 || (i+1) == csvInsertValues.size())
 					{
 						String sqlQuery = " INSERT INTO " + experiment.getExpDbTableNameId() + " (" + csvInsertColumns 
-								+ ",CreatedBy,lastModifiedBy,CreatedDate,LastModifiedDate,DataFileId) "
+								+ ",CreatedBy,lastModifiedBy,CreatedDate,LastModifiedDate,DataFileId,CmId) "
 								+ " VALUES (" + csvInsertValues.get(i) + ",'" + sysUser.getUserId() + "','" 
 								+ sysUser.getUserId() + "','" +  df.format(new Date()) + "','" +  df.format(new Date()) + "','"
-								+ dataFile.getDataFileId() +"');";
-						//System.out.println(sqlQuery);
+								+ dataFile.getDataFileId() +"'," + (contractManufacturerId != null ? ("'" + contractManufacturerId + "'") : ("NULL") )+");";
+						System.out.println("Query to execute: " + sqlQuery);
 						stmt.addBatch(sqlQuery);
 						stmt.executeBatch();
 						stmt.close();
@@ -60,12 +70,12 @@ public class BatchExperimentRecordsInsertDao {
 					else
 					{
 						String sqlQuery = " INSERT INTO " + experiment.getExpDbTableNameId() + " (" + csvInsertColumns 
-								+ ",CreatedBy,LastModifiedBy,CreatedDate,LastModifiedDate,DataFileId) "
+								+ ",CreatedBy,LastModifiedBy,CreatedDate,LastModifiedDate,DataFileId,CmId) "
 								+ " VALUES (" + csvInsertValues.get(i) + ",'" + sysUser.getUserId() + "','" 
 								+ sysUser.getUserId() + "','" +  df.format(new Date()) + "','" +  df.format(new Date()) + "','"
-								+ dataFile.getDataFileId() +"');";
+								+ dataFile.getDataFileId() +"'," + (contractManufacturerId != null ? ("'" + contractManufacturerId + "'") : ("NULL") )+");";
 						
-						//System.out.println("New Query:" + sqlQuery);
+						System.out.println("New Query:" + sqlQuery);
 						
 						stmt.addBatch(sqlQuery);	
 					}

@@ -52,7 +52,7 @@ public class TargetReportForm extends TargetReportDesign {
 	public void openTargetReportCRUDModalWindow(int targetReportId)
 	{
 
-		Window targetReportModalWindow = new Window("Xml Template");
+		Window targetReportModalWindow = new Window("Target Report Builder");
  		targetReportModalWindow.setModal(true);
  		targetReportModalWindow.setResizable(false);
  		targetReportModalWindow.setContent(new TargetReportBuilderForm(targetReportId));

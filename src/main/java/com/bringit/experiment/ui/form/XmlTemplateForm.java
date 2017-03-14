@@ -23,6 +23,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.bringit.experiment.bll.ContractManufacturer;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.FilesRepository;
@@ -30,6 +31,7 @@ import com.bringit.experiment.bll.JobExecutionRepeat;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.bll.XmlTemplateNode;
+import com.bringit.experiment.dao.ContractManufacturerDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.FilesRepositoryDao;
@@ -69,6 +71,8 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 	private List<FilesRepository> repos =  new FilesRepositoryDao().getAllFilesRepositorys();
 	private List<JobExecutionRepeat> jobs = new JobExecutionRepeatDao().getAllJobExecutionRepeats();
 	private List<Experiment> experiments = new ExperimentDao().getActiveExperiments();
+	private List<ContractManufacturer> contractManufacturers = new ContractManufacturerDao().getAllContractManufacturers();
+	
 	private int lastNewItemId = 0;
     private File tempFile;
     private List<ExperimentField> expFields;
@@ -102,6 +106,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.comboXmlTExperiment.setValue(xmlt.getExperiment().getExpId());
 			this.comboXmlTExperiment.setEnabled(false);
 			this.chxActive.setValue(xmlt.isXmlTemplateIsActive());
+			if(xmlt.getContractManufacturer() != null) this.cbxContractManufacturer.setValue(xmlt.getContractManufacturer().getCmId());
 			if(xmlt.getJobExecRepeat() != null) this.comboXmljobScheduler.setValue(xmlt.getJobExecRepeat().getJobExecRepeatId());
 			if(xmlt.getInboundFileRepo() != null) this.comboXmlTinRepo.setValue(xmlt.getInboundFileRepo().getFileRepoId());
 			if(xmlt.getProcessedFileRepo() != null) this.comboXmloutRepo.setValue(xmlt.getProcessedFileRepo().getFileRepoId());
@@ -224,6 +229,9 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.xmlt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmlTerrRepo.getValue()));
 			this.xmlt.setProcessedFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmloutRepo.getValue()));
 			this.xmlt.setInboundFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmlTinRepo.getValue()));
+			
+			if(this.cbxContractManufacturer.getValue()!=null)
+				this.xmlt.setContractManufacturer(new ContractManufacturerDao().getContractManufacturerById((int) this.cbxContractManufacturer.getValue()));
 			
 			if(this.comboXmljobScheduler.getValue()!=null) 
 				this.xmlt.setJobExecRepeat(new JobExecutionRepeatDao().getJobExecutionRepeatById((int) this.comboXmljobScheduler.getValue()));
@@ -415,6 +423,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		this.txtXmlTName.setEnabled(b);
 		this.txtXmlTComments.setEnabled(b);
 		this.txtXmlTPrefix.setEnabled(b);
+		this.cbxContractManufacturer.setEnabled(b);
 		this.comboXmloutRepo.setEnabled(b);
 		this.comboXmlTerrRepo.setEnabled(b);
 		this.comboXmlTinRepo.setEnabled(b);
@@ -523,6 +532,19 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		this.comboXmlTExperiment.setNullSelectionAllowed(false);
 		this.comboXmlTExperiment.setImmediate(true);
 		this.comboXmlTExperiment.addStyleName("small");
+		
+		//Contract Manufacturer
+		
+		this.cbxContractManufacturer.setNullSelectionAllowed(true);
+		this.cbxContractManufacturer.setImmediate(true);
+		this.cbxContractManufacturer.addStyleName("small");
+		
+		for(int i=0; contractManufacturers!=null && i<contractManufacturers.size(); i++)
+		{
+			this.cbxContractManufacturer.addItem(contractManufacturers.get(i).getCmId());
+			this.cbxContractManufacturer.setItemCaption(contractManufacturers.get(i).getCmId(), contractManufacturers.get(i).getCmName());
+		}
+		
 		
 		//File Repos
 		for(int j=0; j<repos.size(); j++)

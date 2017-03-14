@@ -25,12 +25,12 @@ import com.vaadin.ui.declarative.Design;
 public class ContractManufacturerConfigDesign extends VerticalLayout {
 	protected Label lblFormTitle;
 	protected TextField txtSearch;
-	protected ComboBox cbxJobExecRepeatFilters;
+	protected ComboBox cbxContractManufacturerFilters;
 	protected Button btnSave;
 	protected GridLayout gridButtons;
 	protected Button btnAddJobExecRepeat;
 	protected Button btnDeleteJobExecRepeat;
-	protected Table tblJobExecutionRepeat;
+	protected Table tblContractManufacturer;
 
 	public ContractManufacturerConfigDesign() {
 		Design.read(this);

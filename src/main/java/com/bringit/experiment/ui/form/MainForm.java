@@ -5,7 +5,9 @@ import java.util.List;
 import com.bringit.experiment.WebApplication;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.dao.ExperimentDao;
+import com.bringit.experiment.dao.TargetReportDao;
 import com.bringit.experiment.remote.RemoteFileUtil;
 import com.bringit.experiment.ui.design.MainFormDesign;
 import com.vaadin.event.ItemClickEvent;
@@ -36,11 +38,10 @@ public class MainForm extends MainFormDesign {
 
 	    treeMainMenu.addContainerProperty("isExperimentDataReport", Boolean.class, null);
 	    treeMainMenu.addContainerProperty("experimentId", Integer.class, null);
-		
+	    
 	    for (Object id : treeMainMenu.rootItemIds()) {
 	    	treeMainMenu.expandItemsRecursively(id);
 	    }
-
 	    
 	    List<Experiment> experimentsAvailable = new ExperimentDao().getActiveExperiments();
 	    if(experimentsAvailable != null)
@@ -53,7 +54,22 @@ public class MainForm extends MainFormDesign {
 	    		treeMainMenu.setParent(experimentsAvailable.get(i).getExpName(), "Data");
 	    	}
 	    }
-	    
+
+	    treeMainMenu.addContainerProperty("isTargetReport", Boolean.class, null);
+	    treeMainMenu.addContainerProperty("targetReportId", Integer.class, null);
+		
+	    List<TargetReport> targetReportsAvailable = new TargetReportDao().getAllActiveTargetReports();
+	    if(targetReportsAvailable != null)
+	    {
+	    	for(int i=0; i<targetReportsAvailable.size(); i++)
+	    	{
+	    		Item item = treeMainMenu.addItem(targetReportsAvailable.get(i).getTargetReportName());
+	    		item.getItemProperty("isTargetReport").setValue(true);
+	    		item.getItemProperty("targetReportId").setValue(targetReportsAvailable.get(i).getTargetReportId());
+	    		treeMainMenu.setParent(targetReportsAvailable.get(i).getTargetReportName(), "Target Reports");
+	    	}
+	    }
+	    	    
 	    treeMainMenu.addItemClickListener(new ItemClickEvent.ItemClickListener() 
 	    {
             public void itemClick(ItemClickEvent event) {
@@ -65,7 +81,8 @@ public class MainForm extends MainFormDesign {
 	
 	private void setFormContent(String itemClickedText, Item treeItemClicked)
 	{
-		if(treeItemClicked.getItemProperty("isExperimentDataReport").getValue() == null)
+		if(treeItemClicked.getItemProperty("isExperimentDataReport").getValue() == null 
+				&& treeItemClicked.getItemProperty("isTargetReport").getValue() == null )
     	{
 			 switch (itemClickedText.toLowerCase()) 
 			 {
@@ -105,6 +122,10 @@ public class MainForm extends MainFormDesign {
      				formContentLayout.removeAllComponents();
      				formContentLayout.addComponent(new TargetReportForm());
 			 		break;
+			 	case "contract manufacturers":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new ContractManufacturerConfigForm());
+			 		break;
 			 	default:
 	         			break;
 			 }
@@ -113,6 +134,11 @@ public class MainForm extends MainFormDesign {
     	{
     		formContentLayout.removeAllComponents();
 			formContentLayout.addComponent(new ExperimentDataReportForm((Integer)treeItemClicked.getItemProperty("experimentId").getValue()));
+        }
+    	else if(treeItemClicked.getItemProperty("targetReportId").getValue() != null)
+    	{
+    		formContentLayout.removeAllComponents();
+			formContentLayout.addComponent(new TargetDataReportForm((Integer)treeItemClicked.getItemProperty("targetReportId").getValue()));
         }
 	}
 }

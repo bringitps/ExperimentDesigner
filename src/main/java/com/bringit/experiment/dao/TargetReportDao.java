@@ -118,4 +118,23 @@ public class TargetReportDao {
         return targetReport;
     }
 
+
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<TargetReport> getAllActiveTargetReports() {
+        List<TargetReport> targetReports = new ArrayList<TargetReport>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            targetReports = session.createQuery("from TargetReport where TargetReportIsActive = 'true'").list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return targetReports;
+    }
+    
 }

@@ -2,19 +2,19 @@
 <html>
  <head>
   <meta charset="UTF-8">
-  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;}">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
   <meta name="vaadin-version" content="7.7.0">
  </head> 
-<body> 
+ <body> 
   <vaadin-vertical-layout size-full> 
    <vaadin-label style-name="valo-menu" plain-text _id="lblFormTitle">
-     - Job Execution Repeat 
+     - Contract Manufacturer 
    </vaadin-label> 
    <vaadin-horizontal-layout style-name="top-bar" width-full height="60px"> 
     <vaadin-horizontal-layout width-full :middle :expand> 
      <vaadin-text-field icon="fonticon://FontAwesome/f002" input-prompt="Search" style-name="small inline-icon search" width-full _id="txtSearch"></vaadin-text-field> 
     </vaadin-horizontal-layout> 
-    <vaadin-combo-box style-name="small" _id="cbxJobExecRepeatFilters" :middle></vaadin-combo-box> 
+    <vaadin-combo-box style-name="small" _id="cbxContractManufacturerFilters" :middle></vaadin-combo-box> 
     <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="primary small" id="btnAddExperiment" plain-text _id="btnSave" :middle :right>
       Save 
     </vaadin-button> 
@@ -23,19 +23,19 @@
     <row> 
      <column> 
       <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small friendly" plain-text _id="btnAddJobExecRepeat">
-        Add Job Execution Repeat 
+        Add Contract Manufacturer 
       </vaadin-button> 
      </column> 
      <column> 
       <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="small danger" plain-text _id="btnDeleteJobExecRepeat" :right>
-        Delete Job Execution Repeat 
+        Delete Contract Manufacturer 
       </vaadin-button> 
      </column> 
     </row> 
    </vaadin-grid-layout> 
    <vaadin-css-layout style-name="content" size-full :expand> 
     <vaadin-css-layout style-name="list" size-full> 
-     <vaadin-table selectable style-name="small" size-full _id="tblJobExecutionRepeat"> 
+     <vaadin-table selectable style-name="small" size-full _id="tblContractManufacturer"> 
       <table> 
       </table> 
      </vaadin-table> 

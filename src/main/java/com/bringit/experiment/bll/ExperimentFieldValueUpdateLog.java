@@ -39,15 +39,20 @@ public class ExperimentFieldValueUpdateLog {
 	@Column(name="ExpNewCreatedDate")
 	private Date expNewCreatedDate;
 	
-	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
-	private ExperimentField experimentField;
 
 	@Column(name="DbExperimentDataTableRecordId")
 	private Integer dbExperimentDataTableRecordId;
 	
 	@Column(name="DbTableRecordCommentsUpdate")
 	private Boolean dbTableRecordCommentsUpdate;
+
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="ExpId", unique=false, updatable=true)
+	private Experiment experiment;
+
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
+	private ExperimentField experimentField;
 	
 	@OneToOne
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
@@ -59,6 +64,7 @@ public class ExperimentFieldValueUpdateLog {
 		this.expOldCreatedDate = null;
 		this.expNewValue = null;
 		this.expNewCreatedDate = null;
+		this.experiment = null;
 		this.experimentField = null;
 		this.dbExperimentDataTableRecordId = null;
 		this.dbTableRecordCommentsUpdate = null;
@@ -66,13 +72,14 @@ public class ExperimentFieldValueUpdateLog {
 	}
 	
 	public ExperimentFieldValueUpdateLog(Integer expFieldValueUpdateId, String expOldValue, Date expOldCreatedDate,
-			String expNewValue, Date expNewCreatedDate, ExperimentField experimentField,
+			String expNewValue, Date expNewCreatedDate, Experiment experiment, ExperimentField experimentField,
 			Integer dbExperimentDataTableRecordId, boolean dbTableRecordCommentsUpdate, SysUser createdBy) {
 		this.expFieldValueUpdateId = expFieldValueUpdateId;
 		this.expOldValue = expOldValue;
 		this.expOldCreatedDate = expOldCreatedDate;
 		this.expNewValue = expNewValue;
 		this.expNewCreatedDate = expNewCreatedDate;
+		this.experiment = experiment;
 		this.experimentField = experimentField;
 		this.dbExperimentDataTableRecordId = dbExperimentDataTableRecordId;
 		this.dbTableRecordCommentsUpdate = dbTableRecordCommentsUpdate;
@@ -117,6 +124,14 @@ public class ExperimentFieldValueUpdateLog {
 
 	public void setExpNewCreatedDate(Date expNewCreatedDate) {
 		this.expNewCreatedDate = expNewCreatedDate;
+	}
+
+	public Experiment getExperiment() {
+		return experiment;
+	}
+
+	public void setExperiment(Experiment experiment) {
+		this.experiment = experiment;
 	}
 
 	public ExperimentField getExperimentField() {

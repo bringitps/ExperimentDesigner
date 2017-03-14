@@ -244,7 +244,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 		if(this.selectedRecordId == -1)
 			return;
 		
-		Window dataViewRecordChangesHistoryModalWindow = new Window("View Record");
+		Window dataViewRecordChangesHistoryModalWindow = new Window("View Record History");
 		dataViewRecordChangesHistoryModalWindow.setModal(true);
 		dataViewRecordChangesHistoryModalWindow.setResizable(false);
 		dataViewRecordChangesHistoryModalWindow.setContent(new ExperimentRecordChangesHistoryForm(this.experiment, this.selectedRecordId));

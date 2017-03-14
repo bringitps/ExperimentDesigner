@@ -222,7 +222,7 @@ public class RemoteCsvJob implements Job {
 
             //2)Batch Insert
             ResponseObj batchResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(responseObj.getCsvInsertColumns(),
-                    responseObj.getCsvInsertValues(), null, dataFile, csvTemplate.getExperiment(), iBatchSize);
+                    responseObj.getCsvInsertValues(), null, csvTemplate, null, dataFile, csvTemplate.getExperiment(), iBatchSize);
 
             System.out.println("Filename : "+filename+" - "+responseObj.getDetail());
 

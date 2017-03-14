@@ -16,6 +16,7 @@ import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.FilesRepository;
 import com.bringit.experiment.bll.JobExecutionRepeat;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.ContractManufacturer;
 import com.bringit.experiment.bll.CsvTemplate;
 import com.bringit.experiment.bll.CsvTemplateColumns;
 import com.bringit.experiment.dao.ExperimentDao;
@@ -23,6 +24,7 @@ import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.FilesRepositoryDao;
 import com.bringit.experiment.dao.JobExecutionRepeatDao;
 import com.bringit.experiment.dao.XmlTemplateNodeDao;
+import com.bringit.experiment.dao.ContractManufacturerDao;
 import com.bringit.experiment.dao.CsvTemplateColumnsDao;
 import com.bringit.experiment.dao.CsvTemplateDao;
 import com.bringit.experiment.remote.RemoteFileUtil;
@@ -54,6 +56,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	private List<FilesRepository> repos =  new FilesRepositoryDao().getAllFilesRepositorys();
 	private List<JobExecutionRepeat> jobs = new JobExecutionRepeatDao().getAllJobExecutionRepeats();
 	private List<Experiment> experiments = new ExperimentDao().getActiveExperiments();
+	private List<ContractManufacturer> contractManufacturers = new ContractManufacturerDao().getAllContractManufacturers();
 	private int lastNewItemId = 0;
     private File tempFile;
     private List<ExperimentField> expFields;
@@ -84,6 +87,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.comboCsvTExperiment.setValue(csvt.getExperiment().getExpId());
 			this.comboCsvTExperiment.setEnabled(false);
 			this.chxActive.setValue(csvt.isCsvTemplateIsActive());
+			if(csvt.getContractManufacturer() != null) this.cbxContractManufacturer.setValue(csvt.getContractManufacturer().getCmId());
 			if(csvt.getJobExecRepeat() != null) this.comboCsvjobScheduler.setValue(csvt.getJobExecRepeat().getJobExecRepeatId());
 			if(csvt.getInboundFileRepo() != null) this.comboCsvTinRepo.setValue(csvt.getInboundFileRepo().getFileRepoId());
 			if(csvt.getProcessedFileRepo() != null) this.comboCsvoutRepo.setValue(csvt.getProcessedFileRepo().getFileRepoId());
@@ -191,6 +195,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.csvt.setCsvTemplateIsActive(this.chxActive.getValue());
 			this.csvt.setCsvTemplatePrefix(this.txtCsvTPrefix.getValue());
 			this.csvt.setCsvTemplateComments(this.txtCsvTComments.getValue());
+			this.csvt.setContractManufacturer(new ContractManufacturerDao().getContractManufacturerById((int) this.cbxContractManufacturer.getValue()));
 			this.csvt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvTerrRepo.getValue()));
 			this.csvt.setProcessedFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvoutRepo.getValue()));
 			this.csvt.setInboundFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvTinRepo.getValue()));
@@ -358,6 +363,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		this.txtCsvTName.setEnabled(b);
 		this.txtCsvTComments.setEnabled(b);
 		this.txtCsvTPrefix.setEnabled(b);
+		this.cbxContractManufacturer.setEnabled(b);
 		this.comboCsvoutRepo.setEnabled(b);
 		this.comboCsvTerrRepo.setEnabled(b);
 		this.comboCsvTinRepo.setEnabled(b);
@@ -441,6 +447,19 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		this.comboCsvTExperiment.setImmediate(true);
 		this.comboCsvTExperiment.addStyleName("small");
 		
+		
+		//Contract Manufacturer
+		
+		this.cbxContractManufacturer.setNullSelectionAllowed(true);
+		this.cbxContractManufacturer.setImmediate(true);
+		this.cbxContractManufacturer.addStyleName("small");
+		
+		for(int i=0; contractManufacturers!=null && i<contractManufacturers.size(); i++)
+		{
+			this.cbxContractManufacturer.addItem(contractManufacturers.get(i).getCmId());
+			this.cbxContractManufacturer.setItemCaption(contractManufacturers.get(i).getCmId(), contractManufacturers.get(i).getCmName());
+		}
+		
 		//File Repos
 		for(int j=0; j<repos.size(); j++)
 		{
@@ -456,6 +475,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.comboCsvTerrRepo.setItemCaption(repos.get(j).getFileRepoId(), "(" + repos.get(j).getFileRepoName() + ") " + repos.get(j).getFileRepoHost()+":"+repos.get(j).getFileRepoPath());
 			//this.comboCsvTerrRepo.setWidth(100, Unit.PIXELS);
 		}
+		
 		
 		this.comboCsvTinRepo.setNullSelectionAllowed(true);
 		this.comboCsvTinRepo.setImmediate(true);

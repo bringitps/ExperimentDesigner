@@ -35,11 +35,12 @@ public class XmlTemplateDesign extends VerticalLayout {
 	protected TextField txtXmlTComments;
 	protected DateField startXmlTstart;
 	protected DateField endXmlTstart;
+	protected ComboBox cbxStartHour;
+	protected ComboBox comboXmljobScheduler;
+	protected ComboBox cbxContractManufacturer;
 	protected ComboBox comboXmloutRepo;
 	protected ComboBox comboXmlTerrRepo;
 	protected ComboBox comboXmlTinRepo;
-	protected ComboBox comboXmljobScheduler;
-	protected ComboBox cbxStartHour;
 	protected Table tblXmlNodes;
 	protected Button btnDelete;
 

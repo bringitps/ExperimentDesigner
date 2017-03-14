@@ -30,6 +30,9 @@ public class ContractManufacturer {
 	@Column(name="CmName")
 	private String cmName;
 
+	@Column(name="CmAbbreviation")
+	private String cmAbbreviation;
+	
 	@Column(name="CmDescription")
 	private String cmDescription;
 
@@ -53,6 +56,7 @@ public class ContractManufacturer {
 	public ContractManufacturer() {
 		this.cmId = null;
 		this.cmName = null;
+		this.cmAbbreviation = null;
 		this.cmDescription = null;
 		this.cmEmail = null;
 		this.createdDate = null;
@@ -61,10 +65,11 @@ public class ContractManufacturer {
 		this.lastModifiedBy = null;
 	}
 	
-	public ContractManufacturer(Integer cmId, String cmName, String cmDescription, String cmEmail, Date createdDate,
+	public ContractManufacturer(Integer cmId, String cmName, String cmAbbreviation, String cmDescription, String cmEmail, Date createdDate,
 			Date modifiedDate, SysUser createdBy, SysUser lastModifiedBy) {
 		this.cmId = cmId;
 		this.cmName = cmName;
+		this.cmAbbreviation = cmAbbreviation;
 		this.cmDescription = cmDescription;
 		this.cmEmail = cmEmail;
 		this.createdDate = createdDate;
@@ -87,6 +92,14 @@ public class ContractManufacturer {
 
 	public void setCmName(String cmName) {
 		this.cmName = cmName;
+	}
+
+	public String getCmAbbreviation() {
+		return cmAbbreviation;
+	}
+
+	public void setCmAbbreviation(String cmAbbreviation) {
+		this.cmAbbreviation = cmAbbreviation;
 	}
 
 	public String getCmDescription() {

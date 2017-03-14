@@ -221,9 +221,8 @@ public class ExperimentUtil {
 		sqlSelectQuery += " LEFT JOIN ExperimentField ExpField ON ExpFieldValueUpdateLog.ExpFieldId = ExpField.ExpFieldId ";
 		sqlSelectQuery += " LEFT JOIN Experiment Experiment ON ExpField.ExpId = Experiment.ExpId ";
 		sqlSelectQuery += " LEFT JOIN SysUser SysUser ON  ExpFieldValueUpdateLog.CreatedBy = SysUser.UserId ";
-		sqlSelectQuery += " WHERE Experiment.ExpId = " + ExperimentId + " AND ExpFieldValueUpdateLog.DbExperimentDataTableRecordId = " + dbRecordId;
+		sqlSelectQuery += " WHERE ExpFieldValueUpdateLog.ExpId = " + ExperimentId + " AND ExpFieldValueUpdateLog.DbExperimentDataTableRecordId = " + dbRecordId;
 		sqlSelectQuery += " ORDER BY ExpFieldValueUpdateLog.ExpNewCreatedDate DESC ";
-		
 		return sqlSelectQuery;
 	}
 }

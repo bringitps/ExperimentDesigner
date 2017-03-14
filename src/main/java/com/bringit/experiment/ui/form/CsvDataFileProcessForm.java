@@ -144,7 +144,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 				int insertBatchSize = Integer.parseInt(configuration.getProperty("batchinsert"));
 				
 				ResponseObj batchInsertResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(parseCsvResponse.getCsvInsertColumns(),
-						parseCsvResponse.getCsvInsertValues(), sessionUser, dataFile, csvTemplate.getExperiment(), insertBatchSize);
+						parseCsvResponse.getCsvInsertValues(), null, csvTemplate, sessionUser, dataFile, csvTemplate.getExperiment(), insertBatchSize);
 				
 				if(batchInsertResponse.getCode() == 0)
 				{

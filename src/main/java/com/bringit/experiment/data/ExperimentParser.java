@@ -517,12 +517,14 @@ public class ExperimentParser {
 	    						String fieldType = xRefFieldDBType.get(j);
 								String fieldValue = xmlValueElement.getTextContent();
 								boolean isValidData = validateFieldType(fieldType, fieldValue);
-								exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + "\n";
-
+								
 								if(isValidData)
 									xRefDBFieldValues.get(j).attachFieldValue(xmlValueElement.getTextContent().trim());
 								else
+								{
 									xRefDBFieldValues.get(j).attachFieldValue(null);
+									exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + "\n";
+								}
 	    					}
 	    					else
 	    						xRefDBFieldValues.get(j).attachFieldValue(null);
@@ -548,12 +550,15 @@ public class ExperimentParser {
 						String fieldType = xRefFieldDBType.get(j);
 						String fieldValue = xmlGlobalValuesMatrix.get(i);
 						isValidData = validateFieldType(fieldType, fieldValue);
-						exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Global Node '" + xRefXmlNodeSlashFormat.get(j) +"'\n";
+					
+						if(isValidData)
+							fieldValues.add(xmlGlobalValuesMatrix.get(i));
+						else
+						{
+							fieldValues.add(null);
+							exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Global Node '" + xRefXmlNodeSlashFormat.get(j) +"'\n";
+						}
 					}
-					if(isValidData)
-						fieldValues.add(xmlGlobalValuesMatrix.get(i));
-					else
-						fieldValues.add(null);
 				}
 				xRefDBFieldValues.get(xRefIndex).setFieldValues(fieldValues);
 			}

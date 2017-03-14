@@ -33,13 +33,14 @@ public class CsvTemplateDesign extends VerticalLayout {
 	protected TextField txtCsvTName;
 	protected TextField txtCsvTPrefix;
 	protected TextField txtCsvTComments;
-	protected ComboBox comboCsvjobScheduler;
-	protected ComboBox comboCsvTerrRepo;
-	protected ComboBox comboCsvTinRepo;
-	protected ComboBox comboCsvoutRepo;
-	protected ComboBox cbxStartHour;
 	protected DateField dtCsvTstart;
 	protected DateField dtCsvTend;
+	protected ComboBox cbxStartHour;
+	protected ComboBox comboCsvjobScheduler;
+	protected ComboBox cbxContractManufacturer;
+	protected ComboBox comboCsvoutRepo;
+	protected ComboBox comboCsvTerrRepo;
+	protected ComboBox comboCsvTinRepo;
 	protected Table tblCsvCols;
 	protected Button btnDelete;
 

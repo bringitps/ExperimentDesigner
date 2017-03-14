@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -96,6 +99,52 @@ public class ExecuteQueryDao {
 		return rs;
     }
 	
+	public ResultSet executeStoredProcedure(String spName, List<String> spParameters)
+	{
+		CallableStatement callableStatement = null;
+		ResultSet rs = null;
+
+		Config configuration = new Config();
+		String dbHost = configuration.getProperty("dbhost");
+		String dbPort = configuration.getProperty("dbport");
+		String dbDatabase = configuration.getProperty("dbdatabase");
+		String dbUsername = configuration.getProperty("dbusername");
+		String dbPassword = configuration.getProperty("dbpassword");
+		try {
+			Connection conn = Connect.getConnection(dbHost, dbPort, dbDatabase, dbUsername, dbPassword);
+			
+			String spSqlCall = "";
+			
+			if(configuration.getProperty("dbms").equals("sqlserver"))
+			{
+				spSqlCall = "EXEC " + spName + " ";
+				PreparedStatement ps = conn.prepareStatement(spSqlCall);
+				ps.setEscapeProcessing(true);
+				
+				for(int i=0; spParameters!=null && i<spParameters.size(); i++)		
+				{
+					if((i+1)==spParameters.size())
+						spSqlCall += "?";			
+					else
+						spSqlCall += "?,";				
+				}
+			}
+			PreparedStatement preparedStmt = conn.prepareStatement(spSqlCall);
+			preparedStmt.setEscapeProcessing(true);
+		
+			for(int i=0; spParameters!=null && i<spParameters.size(); i++)		
+				preparedStmt.setString((i+1), spParameters.get(i));
+			
+			rs = preparedStmt.executeQuery();
+			return rs;
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 
 	public ResponseObj executeUpdateQuery(String sqlUpdateQuery)
 	{
@@ -121,5 +170,8 @@ public class ExecuteQueryDao {
 		
 		return responseObj;
     }
+	
+	
+	
 	
 }

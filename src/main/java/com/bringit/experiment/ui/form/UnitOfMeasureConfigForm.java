@@ -1,29 +1,20 @@
 package com.bringit.experiment.ui.form;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.UnitOfMeasure;
-import com.bringit.experiment.dao.DataBaseViewDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.UnitOfMeasureDao;
 import com.bringit.experiment.ui.design.UnitOfMeasureConfigDesign;
-import com.bringit.experiment.util.VaadinControls;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.filter.Like;
-import com.vaadin.data.util.filter.SimpleStringFilter;
-import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification.Type;
 

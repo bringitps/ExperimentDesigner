@@ -250,7 +250,7 @@ public class RemoteXmlJob implements Job {
 
             //2)Batch Insert
             ResponseObj batchResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(responseObj.getCsvInsertColumns(),
-                    responseObj.getCsvInsertValues(), null, dataFile, xmlTemplate.getExperiment(), iBatchSize);
+                    responseObj.getCsvInsertValues(), xmlTemplate, null, null, dataFile, xmlTemplate.getExperiment(), iBatchSize);
 
             System.out.println("Filename : "+filename+" - "+responseObj.getDetail());
 

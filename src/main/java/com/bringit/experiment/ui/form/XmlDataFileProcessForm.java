@@ -144,7 +144,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 				int insertBatchSize = Integer.parseInt(configuration.getProperty("batchinsert"));
 				
 				ResponseObj batchInsertResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(parseXmlResponse.getCsvInsertColumns(),
-						parseXmlResponse.getCsvInsertValues(), sessionUser, dataFile, xmlTemplate.getExperiment(), insertBatchSize);
+						parseXmlResponse.getCsvInsertValues(), xmlTemplate, null, sessionUser, dataFile, xmlTemplate.getExperiment(), insertBatchSize);
 				
 				if(batchInsertResponse.getCode() == 0)
 				{

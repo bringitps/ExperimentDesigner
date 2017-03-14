@@ -86,9 +86,10 @@ public class ExperimentForm extends ExperimentDesign {
 	private boolean isNewExperiment = false;
 	List<Integer> imagesToDelete = new ArrayList<Integer>();
 	
-	  private TextField selectedImage = new TextField();
+	private TextField selectedImage = new TextField();
 	  
-	  private List<StreamResource> imagesStreamResourceList;
+	private List<StreamResource> imagesStreamResourceList;
+	  
 	public ExperimentForm(int experimentId)
 	{		
 		
@@ -291,7 +292,6 @@ public class ExperimentForm extends ExperimentDesign {
 			}
 		}
 	}
-
     
 	private void removeExperimentImage() {
 		//this.experiment.setExpImage(new byte[0]);
@@ -469,21 +469,7 @@ public class ExperimentForm extends ExperimentDesign {
 			this.experiment.setExpComments(this.txtExpComments.getValue());
 			this.experiment.setLastModifiedBy(sessionUser);
 			this.experiment.setModifiedDate(new Date());
-/*
-			if(tempImageFile != null){
-				byte[] imageData = new byte[(int) tempImageFile.length()];
-				 
-				try {
-				    FileInputStream fileInputStream = new FileInputStream(tempImageFile);
-				    fileInputStream.read(imageData);
-				    fileInputStream.close();
-				} catch (Exception e) {
-				    e.printStackTrace();
-				}
-			
-				//this.experiment.setExpImage(imageData);
-			}
-*/
+
 			ExperimentDao expDao = new ExperimentDao();
 			
 			if(this.experiment.getExpId() != null )
@@ -657,7 +643,6 @@ public class ExperimentForm extends ExperimentDesign {
 		
 		return true;
 	}
-	
 
 	private boolean validateDbNameFields()
 	{

@@ -151,6 +151,14 @@ public class TargetReport {
 	public void setLastModifiedBy(SysUser lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
 	}
+
+	@Override
+	public String toString() {
+		return "TargetReport [targetReportId=" + targetReportId + ", targetReportIsActive=" + targetReportIsActive
+				+ ", targetReportName=" + targetReportName + ", targetReportDescription=" + targetReportDescription
+				+ ", experiment=" + experiment + ", createdDate=" + createdDate + ", modifiedDate=" + modifiedDate
+				+ ", createdBy=" + createdBy + ", lastModifiedBy=" + lastModifiedBy + "]";
+	}
 	
 	
 }

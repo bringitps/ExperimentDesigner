@@ -7,23 +7,23 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.TargetColumnGroup;
+import com.bringit.experiment.bll.TargetColumn;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
-public class TargetFieldGroupDao {
+public class TargetColumnDao {
 
 	private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
 	
-	public void addTargetFieldColumn(TargetColumnGroup targetFieldColumn) {
+	public void addTargetColumn(TargetColumn targetColumn) {
 
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         
         try {
             trns = session.beginTransaction();
-            session.save(targetFieldColumn);
+            session.save(targetColumn);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -36,14 +36,14 @@ public class TargetFieldGroupDao {
         }
     }
 
-    public void deleteTargetColumnGroup(int targetColumnGroupId) {
+    public void deleteTargetColumn(int targetColumnId) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            TargetColumnGroup targetColumnGroup = (TargetColumnGroup)session.load(TargetColumnGroup.class, new Integer(targetColumnGroupId));
-            session.delete(targetColumnGroup);
+            TargetColumn targetColumn = (TargetColumn)session.load(TargetColumn.class, new Integer(targetColumnId));
+            session.delete(targetColumn);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -56,13 +56,13 @@ public class TargetFieldGroupDao {
         }
     }
 
-    public void updateTargetColumnGroup(TargetColumnGroup targetColumnGroup) {
+    public void updateTargetColumn(TargetColumn targetColumn) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
+		//  Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            session.update(targetColumnGroup);
+            session.update(targetColumn);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -76,43 +76,59 @@ public class TargetFieldGroupDao {
     }
 
     @SuppressWarnings({ "unchecked", "unused" })
-	public List<TargetColumnGroup> getAllTargetFieldColumns() {
-        List<TargetColumnGroup> targetColumnGroups = new ArrayList<TargetColumnGroup>();
+	public List<TargetColumn> getAllTargetColumns() {
+        List<TargetColumn> targetColumns = new ArrayList<TargetColumn>();
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            targetColumnGroups = session.createQuery("from TargetColumnGroup").list();
+            targetColumns = session.createQuery("from TargetColumn").list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return targetColumnGroups;
+        return targetColumns;
     }
 
     @SuppressWarnings("unused")
-	public TargetColumnGroup getTargetColumnGroupById(int targetColumnGroupId) {
-    	TargetColumnGroup targetColumnGroup = null;
+	public TargetColumn getTargetColumnById(int targetColumnId) {
+    	TargetColumn targetField = null;
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from TargetColumnGroup where TargetColumnGroupId = :id";
+            String queryString = "from TargetColumn where TargetColumnId = :id";
             Query query = session.createQuery(queryString);
-            query.setInteger("id", targetColumnGroupId);
-            targetColumnGroup = (TargetColumnGroup) query.uniqueResult();
+            query.setInteger("id", targetColumnId);
+            targetField = (TargetColumn) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return targetColumnGroup;
+        return targetField;
     }
-
-
+    
+    @SuppressWarnings({ "unchecked", "unused" })
+   	public List<TargetColumn> getTargetColumnsByColGroupById(int targetRptColumnGroupId) {
+           List<TargetColumn> targetColumns = new ArrayList<TargetColumn>();
+           Transaction trns = null;
+           Session session = HibernateUtil.getSessionFactory().openSession();
+   		//Session session = HibernateUtil.openSession(dialectXmlFile);
+           try {
+               trns = session.beginTransaction();
+               targetColumns = session.createQuery("from TargetColumn where TargetColumnGroupId = " + targetRptColumnGroupId + " order by TargetColumnPosition").list();
+           } catch (RuntimeException e) {
+               e.printStackTrace();
+           } finally {
+               session.flush();
+               session.close();
+           }
+           return targetColumns;
+      }
 }

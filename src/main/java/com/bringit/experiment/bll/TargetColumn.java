@@ -27,6 +27,9 @@ public class TargetColumn {
 
 	@Column(name="TargetColumnIsInfo")
 	private Boolean targetColumnIsInfo;
+	
+	@Column(name="TargetColumnPosition")
+	private Integer targetColumnPosition;
 
 	@Column(name="TargetColumnLabel")
 	private String targetColumnLabel;
@@ -54,6 +57,7 @@ public class TargetColumn {
 	public TargetColumn() {
 		this.targetColumnId = null;
 		this.targetColumnIsInfo = null;
+		this.targetColumnPosition = null;
 		this.targetColumnLabel = null;
 		this.targetColumnOffset = null;
 		this.targetColumnGoalValue = null;
@@ -63,11 +67,12 @@ public class TargetColumn {
 		this.targetColumnGroup = null;
 	}
 
-	public TargetColumn(Integer targetColumnId, Boolean targetColumnIsInfo, String targetColumnLabel,
+	public TargetColumn(Integer targetColumnId, Boolean targetColumnIsInfo, Integer targetColumnPosition, String targetColumnLabel,
 			Float targetColumnOffset, Float targetColumnGoalValue, Float targetColumnMinValue,
 			Float targetColumnMaxValue, ExperimentField experimentField, TargetColumnGroup targetColumnGroup) {
 		this.targetColumnId = targetColumnId;
 		this.targetColumnIsInfo = targetColumnIsInfo;
+		this.targetColumnPosition = targetColumnPosition;
 		this.targetColumnLabel = targetColumnLabel;
 		this.targetColumnOffset = targetColumnOffset;
 		this.targetColumnGoalValue = targetColumnGoalValue;
@@ -91,6 +96,14 @@ public class TargetColumn {
 
 	public void setTargetColumnIsInfo(Boolean targetColumnIsInfo) {
 		this.targetColumnIsInfo = targetColumnIsInfo;
+	}
+
+	public Integer getTargetColumnPosition() {
+		return targetColumnPosition;
+	}
+
+	public void setTargetColumnPosition(Integer targetColumnPosition) {
+		this.targetColumnPosition = targetColumnPosition;
 	}
 
 	public String getTargetColumnLabel() {
@@ -147,6 +160,15 @@ public class TargetColumn {
 
 	public void setTargetColumnGroup(TargetColumnGroup targetColumnGroup) {
 		this.targetColumnGroup = targetColumnGroup;
+	}
+
+	@Override
+	public String toString() {
+		return "TargetColumn [targetColumnId=" + targetColumnId + ", targetColumnIsInfo=" + targetColumnIsInfo
+				+ ", targetColumnPosition=" + targetColumnPosition + ", targetColumnLabel=" + targetColumnLabel
+				+ ", targetColumnOffset=" + targetColumnOffset + ", targetColumnGoalValue=" + targetColumnGoalValue
+				+ ", targetColumnMinValue=" + targetColumnMinValue + ", targetColumnMaxValue=" + targetColumnMaxValue
+				+ ", experimentField=" + experimentField + ", targetColumnGroup=" + targetColumnGroup + "]";
 	}
 	
 }

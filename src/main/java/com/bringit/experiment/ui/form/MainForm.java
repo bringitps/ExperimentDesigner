@@ -102,20 +102,9 @@ public class MainForm extends MainFormDesign {
      				formContentLayout.addComponent(new CsvDataFileLoadForm());
                   	break;
 			 	case "target report":  
-     				//formContentLayout.removeAllComponents();
-     				//formContentLayout.addComponent(new TargetReportBuilderForm());
-			 		 Window targetReportModalWindow = new Window("Xml Template");
-			 		 targetReportModalWindow.setModal(true);
-			 		 targetReportModalWindow.setResizable(false);
-			 		 targetReportModalWindow.setContent(new TargetReportBuilderForm(-1));
-			 		 targetReportModalWindow.setWidth(940, Unit.PIXELS);
-			 		 targetReportModalWindow.setHeight(760, Unit.PIXELS);
-			 		 targetReportModalWindow.center();
-
-					 this.getUI().addWindow(targetReportModalWindow);
-     				
-     				
-     				break;
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new TargetReportForm());
+			 		break;
 			 	default:
 	         			break;
 			 }

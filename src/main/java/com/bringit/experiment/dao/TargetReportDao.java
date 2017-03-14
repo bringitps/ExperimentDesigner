@@ -105,6 +105,9 @@ public class TargetReportDao {
             String queryString = "from TargetReport where TargetReportId = :id";
             Query query = session.createQuery(queryString);
             query.setInteger("id", targetReportId);
+
+    		//System.out.println("Target Report Id: " + targetReportId);
+    		
             targetReport = (TargetReport) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();

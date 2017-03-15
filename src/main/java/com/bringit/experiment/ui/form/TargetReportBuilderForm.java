@@ -318,6 +318,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 						targetRptColumn.setTargetColumnIsInfo(true);
 					else
 					{
+						targetRptColumn.setTargetColumnIsInfo(false);
 						targetRptColumn.setTargetColumnOffset(Float.parseFloat(((TextField)(tblRowItem.getItemProperty("Offset").getValue())).getValue()));
 						targetRptColumn.setTargetColumnGoalValue(Float.parseFloat(((TextField)(tblRowItem.getItemProperty("Goal").getValue())).getValue()));
 						targetRptColumn.setTargetColumnMinValue(Float.parseFloat(((TextField)(tblRowItem.getItemProperty("Min").getValue())).getValue()));

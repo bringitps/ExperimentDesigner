@@ -1,7 +1,10 @@
 package com.bringit.experiment.ui.form;
 
 import java.sql.ResultSet;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.bringit.experiment.bll.ContractManufacturer;
@@ -42,6 +45,9 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		cbxDateFieldsFilter.addItem("LastModifiedDate");
 		cbxDateFieldsFilter.setItemCaption("LastModifiedDate", "Last Modified Date");
 
+		cbxDateFieldsFilter.setInvalidAllowed(false);
+		cbxExpFieldFilter.setInvalidAllowed(false);
+		
 		for(int i=0; experimentFields != null &&i<experimentFields.size(); i++)
 		{
 			if(experimentFields.get(i).getExpFieldType().trim().contains("date"))
@@ -65,53 +71,83 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 			cbxContractManufacturer.addItem(contractManufacturers.get(i).getCmId());
 			cbxContractManufacturer.setItemCaption(contractManufacturers.get(i).getCmId(), contractManufacturers.get(i).getCmName());
 		}
+		cbxContractManufacturer.setInvalidAllowed(false);
 		
 		//Call SP with TargetReportId
 		List<String> spParams = new ArrayList<String>();
-		spParams.add(this.targetRpt.getTargetReportId().toString());
-		spParams.add(this.targetRpt.getExperiment().getExpId().toString());
+		spParams.add(targetRpt.getTargetReportId().toString());
+		spParams.add(targetRpt.getExperiment().getExpId().toString());
 		spParams.add("");
 		spParams.add("");
 		spParams.add("");
 		spParams.add("");
 		spParams.add("");
 		spParams.add("");
-		spParams.add("");
-		spParams.add("");
-		spParams.add("");
-		spParams.add("");
-		spParams.add("");
-		
-		/*
-		 * @TargetReportId NVARCHAR(MAX),
-			@ExpId NVARCHAR(MAX),
-			@Date NVARCHAR(MAX),
-			@FDate NVARCHAR(MAX),
-			@TDate NVARCHAR(MAX),
-			@CmV NVARCHAR(MAX),
-			@ExpFieldName NVARCHAR(MAX),
-			@ExpFieldValue NVARCHAR(MAX),
-			@result VARCHAR(MAX) OUTPUT,
-			@Tname NVARCHAR(MAX) OUTPUT,
-			@Query NVARCHAR(MAX) OUTPUT,
-			@result0 VARCHAR(MAX) OUTPUT,
-			@Info VARCHAR(MAX) OUTPUT
-		 */
-		
+				
 		ResultSet spResults = new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spParams);
 		
 		if(spResults != null)
-			VaadinControls.bindDbViewRsToVaadinTable(this.tblTargetDataReport, spResults, 1);
-		/*
-		//executeStoredProcedure
-		//spTargetReportBuilder
+			VaadinControls.bindDbViewRsToVaadinTable(tblTargetDataReport, spResults, 1);
+		
 		this.btnApplyFilters.addClickListener(new Button.ClickListener() {
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				List<String> spParams3 = new ArrayList<String>(); 
-				spParams3.add(txtExpFieldFilter.getValue());
-				ResultSet spResults = new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spParams3);
+				/*
+				 * spTargetReportBuilder 
+			 		@TargetReportId NVARCHAR(MAX),
+					@ExperimentId NVARCHAR(MAX),
+					@DateFieldName NVARCHAR(MAX),
+					@FromDate NVARCHAR(MAX),
+					@ToDate NVARCHAR(MAX),
+					@CmId NVARCHAR(MAX),
+					@ExpFieldName NVARCHAR(MAX),
+					@ExpFieldValue NVARCHAR(MAX)
+				 */
+				
+				String dateFieldName = "";
+				String fromDate = "";
+				String toDate = "";
+				String cmId = "";
+				String expFieldName = "";
+				String expFieldValue = "";
+				
+				if(cbxContractManufacturer.getValue() != null && !cbxContractManufacturer.getValue().toString().isEmpty())
+					cmId = cbxContractManufacturer.getValue().toString().trim();
+				
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					
+				if(cbxDateFieldsFilter.getValue() != null && !cbxDateFieldsFilter.getValue().toString().isEmpty()
+						&& dtFilter1.getValue() != null && dtFilter2.getValue() != null)
+				{
+					dateFieldName = cbxDateFieldsFilter.getValue().toString();
+					fromDate = df.format(dtFilter1.getValue());
+					Date toDate24hours = dtFilter2.getValue();
+					toDate24hours.setHours(23);
+					toDate24hours.setMinutes(59);
+					toDate24hours.setSeconds(59);
+					toDate = df.format(toDate24hours);
+				}
+				
+				if(cbxExpFieldFilter.getValue() != null && !cbxExpFieldFilter.getValue().toString().isEmpty()
+						&& txtExpFieldFilter.getValue() != null && !txtExpFieldFilter.getValue().isEmpty())
+				{
+					expFieldName = cbxExpFieldFilter.getValue().toString();
+					expFieldValue = txtExpFieldFilter.getValue();
+				}
+				
+				//Call SP with TargetReportId
+				List<String> spParams = new ArrayList<String>();
+				spParams.add(targetRpt.getTargetReportId().toString());
+				spParams.add(targetRpt.getExperiment().getExpId().toString());
+				spParams.add(dateFieldName);
+				spParams.add(fromDate);
+				spParams.add(toDate);
+				spParams.add(cmId);
+				spParams.add(expFieldName);
+				spParams.add(expFieldValue);
+						
+				ResultSet spResults = new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spParams);
 				
 				if(spResults != null)
 					VaadinControls.bindDbViewRsToVaadinTable(tblTargetDataReport, spResults, 1);
@@ -119,6 +155,6 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 			}
 
 		});
-		*/
+		
 	}
 }

@@ -69,6 +69,35 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		//Call SP with TargetReportId
 		List<String> spParams = new ArrayList<String>();
 		spParams.add(this.targetRpt.getTargetReportId().toString());
+		spParams.add(this.targetRpt.getExperiment().getExpId().toString());
+		spParams.add("");
+		spParams.add("");
+		spParams.add("");
+		spParams.add("");
+		spParams.add("");
+		spParams.add("");
+		spParams.add("");
+		spParams.add("");
+		spParams.add("");
+		spParams.add("");
+		spParams.add("");
+		
+		/*
+		 * @TargetReportId NVARCHAR(MAX),
+			@ExpId NVARCHAR(MAX),
+			@Date NVARCHAR(MAX),
+			@FDate NVARCHAR(MAX),
+			@TDate NVARCHAR(MAX),
+			@CmV NVARCHAR(MAX),
+			@ExpFieldName NVARCHAR(MAX),
+			@ExpFieldValue NVARCHAR(MAX),
+			@result VARCHAR(MAX) OUTPUT,
+			@Tname NVARCHAR(MAX) OUTPUT,
+			@Query NVARCHAR(MAX) OUTPUT,
+			@result0 VARCHAR(MAX) OUTPUT,
+			@Info VARCHAR(MAX) OUTPUT
+		 */
+		
 		ResultSet spResults = new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spParams);
 		
 		if(spResults != null)

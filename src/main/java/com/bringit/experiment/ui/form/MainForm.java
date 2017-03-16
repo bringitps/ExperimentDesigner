@@ -126,6 +126,10 @@ public class MainForm extends MainFormDesign {
      				formContentLayout.removeAllComponents();
      				formContentLayout.addComponent(new ContractManufacturerConfigForm());
 			 		break;
+			 	case "users":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new UserManagementForm());
+			 		break;
 			 	default:
 	         			break;
 			 }

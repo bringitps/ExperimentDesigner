@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head>
+ <body>
+  <vaadin-vertical-layout style-name="crud-template" responsive size-full>
+   <vaadin-label style-name="valo-menu" plain-text>
+     - User Management 
+   </vaadin-label>
+   <vaadin-horizontal-layout style-name="top-bar" width-full height="50px">
+    <vaadin-horizontal-layout width-full :middle :expand>
+     <vaadin-text-field icon="fonticon://FontAwesome/f002" input-prompt="Search" style-name="small inline-icon search" width-full _id="txtSearch"></vaadin-text-field>
+    </vaadin-horizontal-layout>
+    <vaadin-combo-box style-name="small" _id="cbxUserViewFilters" :middle></vaadin-combo-box>
+   </vaadin-horizontal-layout>
+   <vaadin-grid-layout width="100px" height="40px" _id="gridButtons">
+    <row>
+     <column>
+      <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small friendly" plain-text _id="btnAddUser">
+        Add new 
+      </vaadin-button>
+     </column>
+    </row>
+   </vaadin-grid-layout>
+   <vaadin-css-layout style-name="content" size-full :expand>
+    <vaadin-css-layout style-name="list" size-full>
+     <vaadin-table selectable style-name="small" size-full _id="tblUser">
+      <table></table>
+     </vaadin-table>
+    </vaadin-css-layout>
+   </vaadin-css-layout>
+  </vaadin-vertical-layout>
+ </body>
+</html>

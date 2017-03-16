@@ -14,7 +14,6 @@
             <description>BringIT - ExpBit</description>
             <param-name>application</param-name>
             <param-value>com.bringit.experiment.WebApplication</param-value>
-        </init-param>      
-    </servlet>
- 
+        </init-param> 
+    </servlet> 
 </web-app>

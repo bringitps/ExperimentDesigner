@@ -2,11 +2,12 @@ package com.bringit.experiment.remote;
 
 import com.bringit.experiment.bll.DataFile;
 import com.bringit.experiment.bll.FilesRepository;
-
+import com.bringit.experiment.bll.XmlDataLoadExecutionResult;
 import com.bringit.experiment.bll.XmlTemplate;
 
 import com.bringit.experiment.dao.BatchExperimentRecordsInsertDao;
 import com.bringit.experiment.dao.DataFileDao;
+import com.bringit.experiment.dao.XmlDataLoadExecutionResultDao;
 import com.bringit.experiment.data.ExperimentParser;
 
 import com.bringit.experiment.data.ResponseObj;
@@ -29,7 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -58,12 +59,36 @@ public class RemoteXmlJob implements Job {
             for (ChannelSftp.LsEntry file: files) {
 
                 if (file.getFilename().endsWith(".xml")) {
+                	
                     InputStream is = sftp.secureGetFile(filesRepository.getFileRepoPath()+"/"+file.getFilename());
+                    
+                    
                     if (is != null) {
+                        if(new DataFileDao().getDataFileByName(file.getFilename()) != null)
+                		{           
+                        	DataFile dataFile = new DataFile();
+                        	Date createdDate = new Date();
+                            dataFile.setCreatedDate(createdDate);
+                            dataFile.setLastModifiedDate(createdDate);
+                 			dataFile.setDataFileIsXml(true);
+                 			dataFile.setDataFileIsCsv(false);
+                 			dataFile.setDataFileName(file.getFilename());
+                 			new DataFileDao().addDataFile(dataFile);
+                 			
+                        	moveFileToRepo(exceptionRepo, is, file.getFilename());
+                            dataFile.setFileRepoId(exceptionRepo);
+                        	
+                            saveExecutionResult(dataFile, file.getFilename(), jobData, true, "Data File is already processed. File Name: " + file.getFilename());
+                            return; 
+                		}
+                    	
                         System.out.println("Received Input file and passing to parser: "+file.getFilename());
                         //--  Data File --//
-
+                        
                         DataFile dataFile = new DataFile();
+                    	Date createdDate = new Date();
+                        dataFile.setCreatedDate(createdDate);
+                        dataFile.setLastModifiedDate(createdDate);
             			dataFile.setDataFileIsXml(true);
             			dataFile.setDataFileIsCsv(false);
             			dataFile.setDataFileName(file.getFilename());
@@ -80,12 +105,14 @@ public class RemoteXmlJob implements Job {
                             sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
 
                             dataFile.setFileRepoId(outboundRepo);
+                            saveExecutionResult(dataFile, file.getFilename(), jobData, false, "");
                             System.out.println("Removed file from SFTP server");
                         } else {
                             // Send file to Exception
                             moveFileToRepo(exceptionRepo, is, file.getFilename());
                             sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
                             dataFile.setFileRepoId(exceptionRepo);
+                            saveExecutionResult(dataFile, file.getFilename(), jobData, true, sftpResponse.getDescription());
                             System.out.println("Removed file from SFTP server");
                         }
                         //b) Update Data File Repo dataFile.setFileRepoId();
@@ -97,7 +124,7 @@ public class RemoteXmlJob implements Job {
                 }
             }
         } else if  (filesRepository.isFileRepoIsFtp()) {
-            System.out.println("SFTP Repo");
+            System.out.println("FTP Repo");
             FTPUtil ftp = new FTPUtil(filesRepository.getFileRepoHost(), Integer.parseInt(filesRepository.getFileRepoPort()),
                     filesRepository.getFileRepoUser(), filesRepository.getFileRepoPass());
 
@@ -108,8 +135,29 @@ public class RemoteXmlJob implements Job {
                     System.out.println("FTP FILE: "+ftpFile.getName());
                     InputStream is = ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName());
                     if (is != null) {
-
+                    	
+                    	if(new DataFileDao().getDataFileByName(ftpFile.getName()) != null)
+                		{           
+                        	DataFile dataFile = new DataFile();
+                        	Date createdDate = new Date();
+                            dataFile.setCreatedDate(createdDate);
+                            dataFile.setLastModifiedDate(createdDate);
+                 			dataFile.setDataFileIsXml(true);
+                 			dataFile.setDataFileIsCsv(false);
+                 			dataFile.setDataFileName(ftpFile.getName());
+                 			new DataFileDao().addDataFile(dataFile);
+                 			
+                        	moveFileToRepo(exceptionRepo, is, ftpFile.getName());
+                            dataFile.setFileRepoId(exceptionRepo);
+                        	
+                            saveExecutionResult(dataFile, ftpFile.getName(), jobData, true, "Data File is already processed. File Name: " + ftpFile.getName());
+                            return; 
+                		}
+                    	
                         DataFile dataFile = new DataFile();
+                    	Date createdDate = new Date();
+                        dataFile.setCreatedDate(createdDate);
+                        dataFile.setLastModifiedDate(createdDate);
                         dataFile.setDataFileIsXml(true);
                         dataFile.setDataFileIsCsv(false);
                         dataFile.setDataFileName(ftpFile.getName());
@@ -123,16 +171,18 @@ public class RemoteXmlJob implements Job {
                         if (0 == ftpResponse.getCode()) {
                             // Send file to outbound
                             moveFileToRepo(outboundRepo, is, ftpFile.getName());
-                            ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+                            ftp.deleteFile(ftpFile.getName(),filesRepository.getFileRepoPath());
 
                             dataFile.setFileRepoId(outboundRepo);
+                            saveExecutionResult(dataFile, ftpFile.getName(), jobData, false, "");
                             System.out.println("Removed file from FTP server");
                         } else {
                             // Send file to Exception
                             moveFileToRepo(exceptionRepo, is, ftpFile.getName());
-                            ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+                            ftp.deleteFile(ftpFile.getName(), filesRepository.getFileRepoPath());
 
                             dataFile.setFileRepoId(exceptionRepo);
+                            saveExecutionResult(dataFile, ftpFile.getName(), jobData, true, ftpResponse.getDescription());
                             System.out.println("Removed file from FTP server");
                         }
 
@@ -148,16 +198,36 @@ public class RemoteXmlJob implements Job {
         } else if (filesRepository.isFileRepoIsLocal()) {
             File dir = new File(filesRepository.getFileRepoPath());
             String[] extensions = new String[] { "xml" };
-            System.out.println("Getting all .txt and .jsp files in " + filesRepository.getFileRepoPath()
-                    + " including those in subdirectories");
+            System.out.println("Getting all .xml files in " + filesRepository.getFileRepoPath());
             List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, false);
             for (File file: files) {
 
                 try {
                     InputStream is = new FileInputStream(file);
                     System.out.println("Reading input file and passing to parser: "+ file.getName());
-
+                    
+                    if(new DataFileDao().getDataFileByName(file.getName()) != null)
+            		{           
+                    	DataFile dataFile = new DataFile();
+                    	Date createdDate = new Date();
+                        dataFile.setCreatedDate(createdDate);
+                        dataFile.setLastModifiedDate(createdDate);
+             			dataFile.setDataFileIsXml(true);
+             			dataFile.setDataFileIsCsv(false);
+             			dataFile.setDataFileName(file.getName());
+             			new DataFileDao().addDataFile(dataFile);
+             			
+                    	moveFileToRepo(exceptionRepo, is, file.getName());
+                        dataFile.setFileRepoId(exceptionRepo);
+                    	
+                        saveExecutionResult(dataFile, file.getName(), jobData, true, "Data File is already processed. File Name: " + file.getName());
+                        return; 
+            		}
+                    
                     DataFile dataFile = new DataFile();
+                	Date createdDate = new Date();
+                    dataFile.setCreatedDate(createdDate);
+                    dataFile.setLastModifiedDate(createdDate);
                     dataFile.setDataFileIsXml(true);
                     dataFile.setDataFileIsCsv(false);
                     dataFile.setDataFileName(file.getName());
@@ -173,6 +243,8 @@ public class RemoteXmlJob implements Job {
                         file.delete();
 
                         dataFile.setFileRepoId(outboundRepo);
+                        saveExecutionResult(dataFile, file.getName(), jobData, false, "");
+                        
                         System.out.println("Removed file from local server");
                     } else {
                         // Send file to Exception
@@ -180,6 +252,7 @@ public class RemoteXmlJob implements Job {
                         file.delete();
 
                         dataFile.setFileRepoId(exceptionRepo);
+                        saveExecutionResult(dataFile, file.getName(), jobData, true, localResponse.getDescription());
                         System.out.println("Removed file from local server");
                     }
 
@@ -191,7 +264,7 @@ public class RemoteXmlJob implements Job {
             }
         }
 
-        System.out.println("JOB run...");
+        System.out.println("JOB run..." + new Date());
     }
 
     private void moveFileToRepo(FilesRepository repo, InputStream is, String filename) {
@@ -225,6 +298,7 @@ public class RemoteXmlJob implements Job {
 
         try {
 
+        	/*
         	if(new DataFileDao().getDataFileByName(filename) != null)
     		{
         		ResponseObj responseObj = new ResponseObj();
@@ -233,6 +307,8 @@ public class RemoteXmlJob implements Job {
         		responseObj.setDetail("Data File is already processed. File Name: " + filename);
         		return responseObj; 
     		}
+        	*/
+        	
         	
             Config config = new Config();
             String strBatchSize = config.getProperty("batchinsert");
@@ -264,7 +340,8 @@ public class RemoteXmlJob implements Job {
             return batchResponse;
 
         } catch (Exception ex) {
-            System.out.println("Error parsing file: "+filename);
+        	
+            System.out.println("Error parsing file: "+filename + "\n Ex Details:" + ex);
             sendTransferError(xmlTemplate, filename);
 
         }
@@ -280,5 +357,16 @@ public class RemoteXmlJob implements Job {
             System.out.println("Error sending ERROR email: "+ex);
         }
 
+    }
+    
+    private void saveExecutionResult(DataFile dataFile, String fileName, XmlTemplate xmlTemplate, boolean exception, String exceptionDetails)
+    {
+    	XmlDataLoadExecutionResult xmlDataLoadExecResult = new XmlDataLoadExecutionResult();
+		xmlDataLoadExecResult.setDataFile(dataFile);
+		xmlDataLoadExecResult.setXmlDataLoadExecException(exception);
+		xmlDataLoadExecResult.setXmlDataLoadExecExeptionDetails(exceptionDetails);
+		xmlDataLoadExecResult.setXmlDataLoadExecTime(new Date());
+		xmlDataLoadExecResult.setXmlTemplate(xmlTemplate);
+		new XmlDataLoadExecutionResultDao().addXmlDataLoadExecutionResult(xmlDataLoadExecResult);		
     }
 }

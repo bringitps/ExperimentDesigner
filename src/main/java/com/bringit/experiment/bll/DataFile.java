@@ -43,11 +43,17 @@ public class DataFile {
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
 	private SysUser createdBy;
+
+	@Column(name="CreatedDate")
+	private Date createdDate;
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
 	private SysUser lastModifiedBy;
 
+	@Column(name="LastModifiedDate")
+	private Date lastModifiedDate;
+	
 	public DataFile()
 	{
 		this.dataFileId = null;
@@ -56,11 +62,13 @@ public class DataFile {
 		this.dataFileName = null;
 		this.fileRepoId = null;
 		this.createdBy = null;
+		this.createdDate = null;
 		this.lastModifiedBy = null;
+		this.lastModifiedDate = null;
 	}
 	
 	public DataFile(Integer dataFileId, boolean dataFileIsXml, boolean dataFileIsCsv, String dataFileName,
-			FilesRepository fileRepoId, SysUser createdBy, SysUser lastModifiedBy) {
+			FilesRepository fileRepoId, SysUser createdBy, Date createdDate, SysUser lastModifiedBy, Date lastModifiedDate) {
 		super();
 		this.dataFileId = dataFileId;
 		this.dataFileIsXml = dataFileIsXml;
@@ -68,7 +76,9 @@ public class DataFile {
 		this.dataFileName = dataFileName;
 		this.fileRepoId = fileRepoId;
 		this.createdBy = createdBy;
+		this.createdDate = createdDate;
 		this.lastModifiedBy = lastModifiedBy;
+		this.lastModifiedDate = lastModifiedDate;
 	}
 
 	public Integer getDataFileId() {
@@ -126,4 +136,21 @@ public class DataFile {
 	public void setLastModifiedBy(SysUser lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
 	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public Date getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public void setLastModifiedDate(Date lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+	
 }

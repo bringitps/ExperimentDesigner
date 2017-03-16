@@ -22,6 +22,7 @@ import com.bringit.experiment.util.PasswordEncrypter;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -52,6 +53,7 @@ import com.vaadin.ui.VerticalLayout;
 
 @Theme("valo")
 @Push
+//@Widgetset("AppWidgetset")
 public class WebApplication extends UI {
 
 	private Grid grid = new Grid();
@@ -241,7 +243,7 @@ public class WebApplication extends UI {
 	}
 		
 	@WebServlet(urlPatterns = "/*", name = "WebApplicationServlet", asyncSupported = true)
-	@VaadinServletConfiguration(ui = WebApplication.class, productionMode = false)
+	@VaadinServletConfiguration(ui = WebApplication.class, productionMode = false, widgetset = "com.bringit.experiment.widgetset.VaadinchartsWidgetset")
 	public static class WebApplicationServlet extends VaadinServlet {
 	}
 	

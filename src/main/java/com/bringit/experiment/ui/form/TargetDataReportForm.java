@@ -19,8 +19,11 @@ import com.bringit.experiment.dao.TargetReportDao;
 import com.bringit.experiment.ui.design.TargetDataReportDesign;
 import com.bringit.experiment.util.ExperimentUtil;
 import com.bringit.experiment.util.VaadinControls;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Window.CloseEvent;
 
 public class TargetDataReportForm extends TargetDataReportDesign{
 
@@ -155,6 +158,39 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 			}
 
 		});
+
+		this.btnViewChart.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				openViewChartModalWindow();
+			}
+
+		});
 		
 	}
+	
+	
+	private void openViewChartModalWindow()
+	{
+		 Window viewChartModalWindow = new Window("View Chart");
+		 viewChartModalWindow.setModal(true);
+		 viewChartModalWindow.setResizable(false);
+		 viewChartModalWindow.setContent(new TargetDataChartForm());
+		 viewChartModalWindow.setWidth(940, Unit.PIXELS);
+		 viewChartModalWindow.setHeight(680, Unit.PIXELS);
+		 viewChartModalWindow.center();
+		 viewChartModalWindow.addCloseListener(new Window.CloseListener() {
+			
+			@Override
+			public void windowClose(CloseEvent e) {
+				// TODO Auto-generated method stub
+				//filterExperimentDataResults();
+			}
+		});
+		 this.getUI().addWindow(viewChartModalWindow);
+    }
+	
+
+
 }

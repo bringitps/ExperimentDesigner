@@ -16,8 +16,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.vaadin.tepi.imageviewer.ImageViewer;
-import org.vaadin.tepi.imageviewer.ImageViewer.ImageSelectedEvent;
 
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;

@@ -34,7 +34,7 @@ public class MainForm extends MainFormDesign {
 	    this.webApplication = webApplication;
 	    
 	    txtScheduledJobsInfo.setValue(RemoteFileUtil.getInstance().getScheduledJobs().toString());
-	    txtScheduledJobsInfo.setVisible(false);
+	    //txtScheduledJobsInfo.setVisible(false);
 
 	    treeMainMenu.addContainerProperty("isExperimentDataReport", Boolean.class, null);
 	    treeMainMenu.addContainerProperty("experimentId", Integer.class, null);

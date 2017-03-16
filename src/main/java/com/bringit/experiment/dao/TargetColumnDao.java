@@ -131,4 +131,28 @@ public class TargetColumnDao {
            }
            return targetColumns;
       }
+
+    @SuppressWarnings({ "unchecked", "unused" })
+   	public List<TargetColumn> getTargetColumnsByTargetReportId(int targetRptId) {
+           List<TargetColumn> targetColumns = new ArrayList<TargetColumn>();
+           Transaction trns = null;
+           Session session = HibernateUtil.getSessionFactory().openSession();
+   		//Session session = HibernateUtil.openSession(dialectXmlFile);
+           try {
+               trns = session.beginTransaction();
+               String sqlQuery = " FROM TargetColumn ";
+               sqlQuery += " INNER JOIN TargetColumnGroup ON TargetColumn.TargetColumnGroupId = TargetColumnGroup.TargetColumnGroupId ";
+               sqlQuery += " INNER JOIN TargetReport ON TargetColumnGroup.TargetReportId = TargetReport.TargetReportId ";
+               sqlQuery += " WHERE TargetColumnIsInfo <> 1 AND TargetReport.TargetReportId = " + targetRptId;
+               
+               targetColumns = session.createQuery(sqlQuery).list();
+           } catch (RuntimeException e) {
+               e.printStackTrace();
+           } finally {
+               session.flush();
+               session.close();
+           }
+           return targetColumns;
+      }    
+
 }

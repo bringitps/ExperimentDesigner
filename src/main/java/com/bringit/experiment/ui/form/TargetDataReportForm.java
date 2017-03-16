@@ -173,12 +173,12 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 	
 	private void openViewChartModalWindow()
 	{
-		 Window viewChartModalWindow = new Window("View Chart");
+		 Window viewChartModalWindow = new Window(this.targetRpt.getTargetReportName());
 		 viewChartModalWindow.setModal(true);
 		 viewChartModalWindow.setResizable(false);
-		 viewChartModalWindow.setContent(new TargetDataChartForm());
-		 viewChartModalWindow.setWidth(940, Unit.PIXELS);
-		 viewChartModalWindow.setHeight(680, Unit.PIXELS);
+		 viewChartModalWindow.setContent(new TargetDataChartForm(this.targetRpt, this.experiment, this.experimentFields, this.contractManufacturers, cbxDateFieldsFilter.getValue(), dtFilter1.getValue(), dtFilter2.getValue(), cbxContractManufacturer.getValue(), cbxExpFieldFilter.getValue(), txtExpFieldFilter.getValue()));
+		 viewChartModalWindow.setWidth(90, Unit.PERCENTAGE);
+		 viewChartModalWindow.setHeight(90, Unit.PERCENTAGE);
 		 viewChartModalWindow.center();
 		 viewChartModalWindow.addCloseListener(new Window.CloseListener() {
 			

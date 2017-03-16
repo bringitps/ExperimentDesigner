@@ -323,12 +323,10 @@ public class RemoteXmlJob implements Job {
             Document doc = domBuilder.parse(is);
             //1)Parsing & Validation
             ResponseObj responseObj = new ExperimentParser().parseXmlDocument(doc, xmlTemplate);
-
+            
             //2)Batch Insert
             ResponseObj batchResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(responseObj.getCsvInsertColumns(),
                     responseObj.getCsvInsertValues(), xmlTemplate, null, null, dataFile, xmlTemplate.getExperiment(), iBatchSize);
-
-            System.out.println("Filename : "+filename+" - "+responseObj.getDetail());
 
             if (responseObj.getCode() == 0) {
                 System.out.println("Successfully parsed file: "+filename);
@@ -342,6 +340,7 @@ public class RemoteXmlJob implements Job {
         } catch (Exception ex) {
         	
             System.out.println("Error parsing file: "+filename + "\n Ex Details:" + ex);
+            ex.printStackTrace();
             sendTransferError(xmlTemplate, filename);
 
         }

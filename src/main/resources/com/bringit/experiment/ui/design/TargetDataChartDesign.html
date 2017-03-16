@@ -7,51 +7,70 @@
  </head> 
  <body> 
   <vaadin-vertical-layout size-full> 
-   <vaadin-label style-name="valo-menu" plain-text _id="lblTargetRptTitle">
-     Target Data Report 
-   </vaadin-label> 
-   <vaadin-horizontal-layout width="540px" _id="layoutApplyFilters"> 
-    <vaadin-button icon="fonticon://FontAwesome/f0b0" style-name="tiny native" plain-text _id="btnApplyFilters" :right>
-      Apply Filters 
-    </vaadin-button> 
-   </vaadin-horizontal-layout> 
-   <vaadin-horizontal-layout width-full _id="layoutDateFilter"> 
-    <vaadin-grid-layout caption="Date Range" width="540px" height="30px" _id="gridDateFilters"> 
-     <row> 
-      <column> 
-       <vaadin-combo-box style-name="tiny" _id="cbxDateFieldsFilter"> 
-        <option>Option 1</option> 
-        <option>Option 2</option> 
-        <option>Option 3</option> 
-       </vaadin-combo-box> 
-      </column> 
-      <column> 
-       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter1"></vaadin-popup-date-field> 
-      </column> 
-      <column> 
-       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter2"></vaadin-popup-date-field> 
-      </column> 
-     </row> 
-    </vaadin-grid-layout> 
-   </vaadin-horizontal-layout> 
-   <vaadin-horizontal-layout caption="Experiment Filters" style-name="top-bar" width="540px" height="40px" _id="layoutExpField"> 
-    <vaadin-combo-box style-name="tiny" _id="cbxExpFieldFilter" :middle></vaadin-combo-box> 
-    <vaadin-horizontal-layout width-full :middle :expand> 
-     <vaadin-text-field input-prompt="" style-name="tiny" width="320px" _id="txtExpFieldFilter"></vaadin-text-field> 
-    </vaadin-horizontal-layout> 
-   </vaadin-horizontal-layout> 
-   <vaadin-horizontal-layout caption="Contract Manufacturer" style-name="top-bar" width="540px" height="40px" _id="layoutContractManufacturer"> 
-    <vaadin-combo-box style-name="tiny" _id="cbxContractManufacturer" :middle></vaadin-combo-box> 
-   </vaadin-horizontal-layout> 
-   <vaadin-horizontal-layout width-full :right> 
-    <vaadin-grid-layout width-full height="30px"> 
-     <row> 
-      <column></column> 
-      <column></column> 
-     </row> 
-    </vaadin-grid-layout> 
-   </vaadin-horizontal-layout> 
-   <vaadin-vertical-layout height="300px" _id="layoutChart"></vaadin-vertical-layout> 
+   <vaadin-horizontal-split-panel split-position="30%"> 
+    <vaadin-vertical-layout width="360px"> 
+     <vaadin-horizontal-layout width="350px" height="40px" _id="layoutApplyFilters"> 
+      <vaadin-button icon="fonticon://FontAwesome/f0b0" style-name="tiny native" plain-text _id="btnApplyFilters" :middle :right>
+        Apply Filters 
+      </vaadin-button> 
+     </vaadin-horizontal-layout> 
+     <vaadin-horizontal-layout width="360px" height="40px" _id="layoutDateFilter"> 
+      <vaadin-grid-layout width="350px" height="30px" _id="gridDateFilters"> 
+       <row> 
+        <column> 
+         <vaadin-combo-box input-prompt="" style-name="tiny" width="140px" _id="cbxDateFieldsFilter" :middle></vaadin-combo-box> 
+        </column> 
+        <column> 
+         <vaadin-popup-date-field style-name="tiny" width="100px" _id="dtFilter1" :middle></vaadin-popup-date-field> 
+        </column> 
+        <column> 
+         <vaadin-popup-date-field style-name="tiny" width="100px" _id="dtFilter2" :middle></vaadin-popup-date-field> 
+        </column> 
+       </row> 
+      </vaadin-grid-layout> 
+     </vaadin-horizontal-layout> 
+     <vaadin-horizontal-layout style-name="top-bar tiny" width="340px" height="40px" _id="layoutExpField"> 
+      <vaadin-combo-box input-prompt="Experiment Filters" style-name="tiny" width="140px" _id="cbxExpFieldFilter" :middle></vaadin-combo-box> 
+      <vaadin-horizontal-layout width-full :middle :expand> 
+       <vaadin-text-field input-prompt="" style-name="tiny" width="200px" _id="txtExpFieldFilter" :middle></vaadin-text-field> 
+      </vaadin-horizontal-layout> 
+     </vaadin-horizontal-layout> 
+     <vaadin-horizontal-layout style-name="top-bar" width="340px" height="40px" _id="layoutContractManufacturer"> 
+      <vaadin-combo-box input-prompt="Contract Manufacturer" style-name="tiny" width="140px" _id="cbxContractManufacturer" :middle></vaadin-combo-box> 
+     </vaadin-horizontal-layout> 
+     <vaadin-horizontal-layout width="360px" height="60px" _id="layoutValueX"> 
+      <vaadin-grid-layout width="350px" height="60px" _id="gridValueX"> 
+       <row> 
+        <column> 
+         <vaadin-combo-box caption="Value X" input-prompt="Value X" style-name="tiny" width="140px" _id="cbxValueX" :middle></vaadin-combo-box> 
+        </column> 
+        <column> 
+         <vaadin-text-field caption="Target" enabled="false" style-name="tiny" width="100px" _id="txtTargetValueX" :middle></vaadin-text-field> 
+        </column> 
+        <column> 
+         <vaadin-text-field caption="Offset ±" enabled="false" style-name="tiny" width="100px" _id="txtOffsetValueX" :middle></vaadin-text-field> 
+        </column> 
+       </row> 
+      </vaadin-grid-layout> 
+     </vaadin-horizontal-layout> 
+     <vaadin-horizontal-layout width="360px" height="60px" _id="layoutValueY"> 
+      <vaadin-grid-layout width="350px" height="60px" _id="gridValueY"> 
+       <row> 
+        <column> 
+         <vaadin-combo-box caption="Value Y" input-prompt="Value Y" style-name="tiny" width="140px" _id="cbxValueY" :middle></vaadin-combo-box> 
+        </column> 
+        <column> 
+         <vaadin-text-field caption="Target" enabled="false" style-name="tiny" width="100px" _id="txtTargetValueY" :middle></vaadin-text-field> 
+        </column> 
+        <column> 
+         <vaadin-text-field caption="Offset ±" enabled="false" style-name="tiny" width="100px" _id="txtOffsetValueY" :middle></vaadin-text-field> 
+        </column> 
+       </row> 
+      </vaadin-grid-layout> 
+     </vaadin-horizontal-layout> 
+    </vaadin-vertical-layout> 
+    <vaadin-vertical-layout height="300px" _id="layoutChart"></vaadin-vertical-layout> 
+   </vaadin-horizontal-split-panel> 
   </vaadin-vertical-layout>  
  </body>
 </html>

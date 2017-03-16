@@ -165,7 +165,7 @@ public class WebApplication extends UI {
 				
 				JobExecutionRepeat jobExecRepeat15min = new JobExecutionRepeat();
 				jobExecRepeat15min.setJobExecRepeatName("15 minutes");
-				jobExecRepeat15min.setJobExecRepeatMilliseconds(90000);
+				jobExecRepeat15min.setJobExecRepeatMilliseconds(900000);
 				new JobExecutionRepeatDao().addJobExecutionRepeat(jobExecRepeat15min);
 			
 				JobExecutionRepeat jobExecRepeat30min = new JobExecutionRepeat();

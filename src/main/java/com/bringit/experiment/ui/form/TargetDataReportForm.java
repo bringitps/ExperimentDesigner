@@ -19,6 +19,7 @@ import com.bringit.experiment.dao.TargetReportDao;
 import com.bringit.experiment.ui.design.TargetDataReportDesign;
 import com.bringit.experiment.util.ExperimentUtil;
 import com.bringit.experiment.util.VaadinControls;
+import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Window;
@@ -167,7 +168,15 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 			}
 
 		});
-		
+
+		this.btnExportExcel.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				exportExperimentDataReportToExcel();
+			}
+
+		});
 	}
 	
 	
@@ -191,6 +200,15 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		 this.getUI().addWindow(viewChartModalWindow);
     }
 	
-
-
+	private void exportExperimentDataReportToExcel()
+	{
+		if(tblTargetDataReport.getItemIds() != null)
+		{
+			final ExcelExport xlsExport;
+			xlsExport = new ExcelExport(tblTargetDataReport, targetRpt.getTargetReportName().trim());
+			xlsExport.setExportFileName(targetRpt.getTargetReportName().trim() + ".xls");
+			xlsExport.setDisplayTotals(false);
+			xlsExport.export();
+		}
+	}
 }

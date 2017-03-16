@@ -7,7 +7,7 @@
  </head> 
  <body> 
   <vaadin-vertical-layout size-full> 
-   <vaadin-horizontal-split-panel split-position="30%"> 
+   <vaadin-horizontal-split-panel split-position="360px" _id="splitPanel"> 
     <vaadin-vertical-layout width="360px"> 
      <vaadin-horizontal-layout width="350px" height="40px" _id="layoutApplyFilters"> 
       <vaadin-button icon="fonticon://FontAwesome/f0b0" style-name="tiny native" plain-text _id="btnApplyFilters" :middle :right>
@@ -42,7 +42,7 @@
       <vaadin-grid-layout width="350px" height="60px" _id="gridValueX"> 
        <row> 
         <column> 
-         <vaadin-combo-box caption="Value X" input-prompt="Value X" style-name="tiny" width="140px" _id="cbxValueX" :middle></vaadin-combo-box> 
+         <vaadin-combo-box caption="Target Column X" input-prompt="Target Column X" style-name="tiny" width="140px" _id="cbxValueX" :middle></vaadin-combo-box> 
         </column> 
         <column> 
          <vaadin-text-field caption="Target" enabled="false" style-name="tiny" width="100px" _id="txtTargetValueX" :middle></vaadin-text-field> 
@@ -57,7 +57,7 @@
       <vaadin-grid-layout width="350px" height="60px" _id="gridValueY"> 
        <row> 
         <column> 
-         <vaadin-combo-box caption="Value Y" input-prompt="Value Y" style-name="tiny" width="140px" _id="cbxValueY" :middle></vaadin-combo-box> 
+         <vaadin-combo-box caption="Target Column Y" input-prompt="Target Column Y" style-name="tiny" width="140px" _id="cbxValueY" :middle></vaadin-combo-box> 
         </column> 
         <column> 
          <vaadin-text-field caption="Target" enabled="false" style-name="tiny" width="100px" _id="txtTargetValueY" :middle></vaadin-text-field> 
@@ -68,8 +68,22 @@
        </row> 
       </vaadin-grid-layout> 
      </vaadin-horizontal-layout> 
+     <vaadin-css-layout style-name="content" size-full> 
+      <vaadin-css-layout style-name="list" size-full> 
+       <vaadin-panel size-full> 
+        <vaadin-table selectable caption="Values" style-name="small" size-full _id="tblTargetDataReport"> 
+         <table> 
+         </table> 
+        </vaadin-table> 
+       </vaadin-panel> 
+      </vaadin-css-layout> 
+     </vaadin-css-layout> 
     </vaadin-vertical-layout> 
-    <vaadin-vertical-layout height="300px" _id="layoutChart"></vaadin-vertical-layout> 
+    <vaadin-vertical-layout height="300px" _id="layoutChart"> 
+     <vaadin-label style-name="tiny" size-auto plain-text _id="lblChartInstruction">
+       Please select Target Column "X" and Target Column "Y" to build Target Chart 
+     </vaadin-label> 
+    </vaadin-vertical-layout> 
    </vaadin-horizontal-split-panel> 
   </vaadin-vertical-layout>  
  </body>

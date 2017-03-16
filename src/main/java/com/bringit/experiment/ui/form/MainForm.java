@@ -32,10 +32,7 @@ public class MainForm extends MainFormDesign {
 	@SuppressWarnings("deprecation")
 	public MainForm(WebApplication webApplication) {
 	    this.webApplication = webApplication;
-	    
-	    txtScheduledJobsInfo.setValue(RemoteFileUtil.getInstance().getScheduledJobs().toString());
-	    //txtScheduledJobsInfo.setVisible(false);
-
+	  
 	    treeMainMenu.addContainerProperty("isExperimentDataReport", Boolean.class, null);
 	    treeMainMenu.addContainerProperty("experimentId", Integer.class, null);
 	    

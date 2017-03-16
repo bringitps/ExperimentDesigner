@@ -29,6 +29,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
@@ -46,7 +47,7 @@ public class RemoteXmlJob implements Job {
         XmlTemplate jobData = (XmlTemplate) jobDataMap.get("jobData");
 
         FilesRepository filesRepository = jobData.getInboundFileRepo();
-        FilesRepository outboundRepo = jobData.getExceptionFileRepo();
+        FilesRepository outboundRepo = jobData.getProcessedFileRepo();
         FilesRepository exceptionRepo = jobData.getExceptionFileRepo();
 
         System.out.println("Running XML Job");
@@ -168,9 +169,20 @@ public class RemoteXmlJob implements Job {
                         System.out.println("Trying to process file");
                         ResponseObj ftpResponse = processFile(is, jobData, ftpFile.getName(), dataFile);
                         System.out.println("Processed File: "+ftpResponse.getDetail());
+                        
+                        // original stream has been read.  Need to get a new stream to move file. 
+                        try {
+							is.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                        
+                        InputStream copyStream = ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+                        System.out.println(new Date() + " FTP Response Code: " + ftpResponse.getCode());
                         if (0 == ftpResponse.getCode()) {
                             // Send file to outbound
-                            moveFileToRepo(outboundRepo, is, ftpFile.getName());
+                            moveFileToRepo(outboundRepo, copyStream, ftpFile.getName());
                             ftp.deleteFile(ftpFile.getName(),filesRepository.getFileRepoPath());
 
                             dataFile.setFileRepoId(outboundRepo);
@@ -178,7 +190,7 @@ public class RemoteXmlJob implements Job {
                             System.out.println("Removed file from FTP server");
                         } else {
                             // Send file to Exception
-                            moveFileToRepo(exceptionRepo, is, ftpFile.getName());
+                            moveFileToRepo(exceptionRepo, copyStream, ftpFile.getName());
                             ftp.deleteFile(ftpFile.getName(), filesRepository.getFileRepoPath());
 
                             dataFile.setFileRepoId(exceptionRepo);
@@ -187,7 +199,14 @@ public class RemoteXmlJob implements Job {
                         }
 
                         new DataFileDao().updateDataFile(dataFile);
-
+                        
+                        try {
+							copyStream.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                        
                     } else {
                         System.out.println("Null Input Stream");
                         sendTransferError(jobData, ftpFile.getName());

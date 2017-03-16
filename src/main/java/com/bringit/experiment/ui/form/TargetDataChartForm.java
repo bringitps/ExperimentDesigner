@@ -188,7 +188,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 		if(spResults != null)
 		{	
 			VaadinControls.bindDbViewRsToVaadinTable(tblTargetDataReport, spResults, 1);
-			tblTargetDataReport.setVisibleColumns(new Object[] {cbxValueX.getItemCaption(cbxValueX.getValue()), cbxValueY.getItemCaption(cbxValueY.getValue())});
+			//tblTargetDataReport.setVisibleColumns(new Object[] {cbxValueX.getItemCaption(cbxValueX.getValue()), cbxValueY.getItemCaption(cbxValueY.getValue())});
 			
 			Chart targetChart = new Chart(ChartType.SCATTER);
 			targetChart.setSizeFull();
@@ -260,7 +260,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 			int cnt=1;
 			for (Object itemIdObj : itemIds) 
 			{	
-				//System.out.println(itemIdObj.toString());
+				toolTipBody = "";
 				
 				Item tblRowItem = tblTargetDataReport.getContainerDataSource().getItem(itemIdObj.toString());
 				
@@ -278,6 +278,8 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 						toolTipHeaderY = "<b>" + colYName + " [Y]:</b> " + (String)(tblRowItem.getItemProperty(colYName).getValue());
 						valueY = (String)(tblRowItem.getItemProperty(colYName).getValue()); 
 					}
+					
+					//System.out.println("Column Name: "  + tblColumnHeaders[i].trim()  + "Column Value: " + (String)(tblRowItem.getItemProperty(tblColumnHeaders[i]).getValue()));
 					if(!tblColumnHeaders[i].trim().equals(colXName) && !tblColumnHeaders[i].trim().equals(colYName))
 						toolTipBody +=  tblColumnHeaders[i].trim() + ": " + (String)(tblRowItem.getItemProperty(tblColumnHeaders[i]).getValue()) + "<br>";
 				}
@@ -285,7 +287,6 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 				if(valueX != null && valueY != null && !valueX.isEmpty() && !valueY.isEmpty())
 				{
 					newValue = new DataSeriesItem(Double.parseDouble(valueX), Double.parseDouble(valueY));
-					//newValue = new DataSeriesItem(cnt*1.5, cnt+1.5);
 					newValue.setColor(new SolidColor(Color.BLUE.getCSS()));
 					newValue.setName(toolTipHeaderX+"<br>"+toolTipHeaderY+"<br><br>"+toolTipBody);
 					valuesSeries.add(newValue);
@@ -317,6 +318,8 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 		    targetChartConf.addSeries(valuesSeries);
 		    
 			//--- End: Building Values Points --//
+		    
+		    tblTargetDataReport.setVisibleColumns(new Object[] {cbxValueX.getItemCaption(cbxValueX.getValue()), cbxValueY.getItemCaption(cbxValueY.getValue())});
 			tblTargetDataReport.setVisible(true);
 			lblChartInstruction.setVisible(false);		
 			layoutChart.addComponent(targetChart);

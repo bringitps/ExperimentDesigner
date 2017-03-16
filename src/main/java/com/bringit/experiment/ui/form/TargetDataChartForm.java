@@ -103,7 +103,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 		{
 			List<TargetColumn> targetGroupCols = new TargetColumnDao().getTargetColumnsByColGroupById(targetColumnGroups.get(i).getTargetColumnGroupId());
 			
-			for(int j=0; targetGroupCols!=null && j<targetColumnGroups.size(); j++)
+			for(int j=0; targetGroupCols!=null && j<targetGroupCols.size(); j++)
 				targetColumns.add(targetGroupCols.get(j));
 		}
 		

@@ -232,7 +232,8 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 		if(spResults != null)
 		{	
 			VaadinControls.bindDbViewRsToVaadinTable(tblTargetDataReport, spResults, 1);
-			//tblTargetDataReport.setVisibleColumns(new Object[] {cbxValueX.getItemCaption(cbxValueX.getValue()), cbxValueY.getItemCaption(cbxValueY.getValue())});
+
+			layoutChart.removeAllComponents();
 			
 			Chart targetChart = new Chart(ChartType.SCATTER);
 			targetChart.setSizeFull();

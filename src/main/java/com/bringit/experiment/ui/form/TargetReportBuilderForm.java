@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.bringit.experiment.WebApplication;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.SysUser;
@@ -184,6 +185,9 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		this.targetReport.setLastModifiedBy(sessionUser);
 		this.targetReport.setModifiedDate(new Date());
 		new TargetReportDao().updateTargetReport(this.targetReport);
+
+		WebApplication webApp = (WebApplication)this.getParent().getParent();
+		webApp.reloadMainForm("target report");
 		closeModalWindow();
     }
 	
@@ -208,6 +212,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 	
 	private void onSave()
 	{
+		boolean isNewRecord = false;
 		boolean validateTargetColCntResult = validateTargetColumnCnt();
 		boolean validateReqFieldsResult = validateRequiredFields();
 		boolean validateNumberColsResult = validateNumberColsResult();
@@ -222,7 +227,10 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			if(this.targetReport.getTargetReportId() != null)
 				new TargetReportDao().updateTargetReport(this.targetReport);
 			else
+			{
+				isNewRecord = true;
 				new TargetReportDao().addTargetReport(this.targetReport);
+			}
 			
 			for(int i=0; i<targetRptColGroups.size(); i++)
 			{
@@ -242,7 +250,12 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 					new TargetColumnDao().addTargetColumn(targetRptColumns.get(i));
 			}
 
-			Page.getCurrent().reload();
+			if(isNewRecord)
+			{
+				WebApplication webApp = (WebApplication)this.getParent().getParent();
+				webApp.reloadMainForm("target report");
+			}
+			
 			closeModalWindow();	
 		}
 		else
@@ -319,7 +332,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 					else
 					{
 						targetRptColumn.setTargetColumnIsInfo(false);
-						targetRptColumn.setTargetColumnOffset(Float.parseFloat(((TextField)(tblRowItem.getItemProperty("Offset").getValue())).getValue()));
+						targetRptColumn.setTargetColumnOffset(Float.parseFloat(((TextField)(tblRowItem.getItemProperty("Offset ±").getValue())).getValue()));
 						targetRptColumn.setTargetColumnGoalValue(Float.parseFloat(((TextField)(tblRowItem.getItemProperty("Goal").getValue())).getValue()));
 						targetRptColumn.setTargetColumnMinValue(Float.parseFloat(((TextField)(tblRowItem.getItemProperty("Min").getValue())).getValue()));
 						targetRptColumn.setTargetColumnMaxValue(Float.parseFloat(((TextField)(tblRowItem.getItemProperty("Max").getValue())).getValue()));
@@ -547,7 +560,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			tblTargetReportColumns.addContainerProperty("*", CheckBox.class, null);
 			tblTargetReportColumns.addContainerProperty("Experiment Field", ComboBox.class, null);
 			tblTargetReportColumns.addContainerProperty("Column Label", TextField.class, null);
-			tblTargetReportColumns.addContainerProperty("Offset", TextField.class, null);
+			tblTargetReportColumns.addContainerProperty("Offset ±", TextField.class, null);
 			tblTargetReportColumns.addContainerProperty("Goal", TextField.class, null);
 			tblTargetReportColumns.addContainerProperty("Min", TextField.class, null);
 			tblTargetReportColumns.addContainerProperty("Max", TextField.class, null);
@@ -657,34 +670,61 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
                }
             }
         };
-        
-		TextField txtOffset = new TextField();
-		txtOffset.setRequired(true);
-		txtOffset.setStyleName("tiny");
-		txtOffset.setWidth(65, Unit.PIXELS);
-		txtOffset.addValidator(floatValidator);
-		itemValues[3] = txtOffset;
 
 		TextField txtGoal = new TextField();
 		txtGoal.setRequired(true);
 		txtGoal.setStyleName("tiny");
 		txtGoal.setWidth(65, Unit.PIXELS);
 		txtGoal.addValidator(floatValidator);	
-		itemValues[4] = txtGoal;
+		itemValues[3] = txtGoal;
 		
+		TextField txtOffset = new TextField();
+		txtOffset.setRequired(true);
+		txtOffset.setStyleName("tiny");
+		txtOffset.setWidth(65, Unit.PIXELS);
+		txtOffset.addValidator(floatValidator);
+		itemValues[4] = txtOffset;
+
 		TextField txtMin = new TextField();
-		txtMin.setRequired(true);
+		txtMin.setEnabled(false);
 		txtMin.setStyleName("tiny");
 		txtMin.setWidth(65, Unit.PIXELS);
 		txtMin.addValidator(floatValidator);
 		itemValues[5] = txtMin;
 		
 		TextField txtMax = new TextField();
-		txtMax.setRequired(true);
+		txtMax.setEnabled(false);
 		txtMax.setStyleName("tiny");
 		txtMax.setWidth(65, Unit.PIXELS);
 		txtMax.addValidator(floatValidator);	
 		itemValues[6] = txtMax;
+		
+		txtOffset.addListener(new ValueChangeListener() {
+                @Override
+                public void valueChange(ValueChangeEvent event) {
+                    if(txtGoal.isValid() && txtOffset.isValid())
+                    {	
+                    	Float minValue = Float.parseFloat(txtGoal.getValue()) - Float.parseFloat(txtOffset.getValue());
+                    	txtMin.setValue(minValue.toString());
+                    	Float maxValue = Float.parseFloat(txtGoal.getValue()) + Float.parseFloat(txtOffset.getValue());
+                    	txtMax.setValue(maxValue.toString());
+                    }
+                }
+        });
+		
+
+		txtGoal.addListener(new ValueChangeListener() {
+                @Override
+                public void valueChange(ValueChangeEvent event) {
+                    if(txtGoal.isValid() && txtOffset.isValid())
+                    {	
+                    	Float minValue = Float.parseFloat(txtGoal.getValue()) - Float.parseFloat(txtOffset.getValue());
+                    	txtMin.setValue(minValue.toString());
+                    	Float maxValue = Float.parseFloat(txtGoal.getValue()) + Float.parseFloat(txtOffset.getValue());
+                    	txtMax.setValue(maxValue.toString());
+                    }
+                }
+        });
 		
 		int itemId = -1;
 		
@@ -775,7 +815,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				boolean notEmpty = true;
 				if(!colGroupLayout.getCaption().toLowerCase().equals("information"))
 				{
-					if(((TextField)(tblRowItem.getItemProperty("Offset").getValue())).getValue().isEmpty()) notEmpty = false;
+					if(((TextField)(tblRowItem.getItemProperty("Offset ±").getValue())).getValue().isEmpty()) notEmpty = false;
 					if(((TextField)(tblRowItem.getItemProperty("Goal").getValue())).getValue().isEmpty()) notEmpty = false;
 					if(((TextField)(tblRowItem.getItemProperty("Min").getValue())).getValue().isEmpty()) notEmpty = false;
 					if(((TextField)(tblRowItem.getItemProperty("Max").getValue())).getValue().isEmpty()) notEmpty = false;
@@ -829,7 +869,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				boolean isValid = true;
 				if(!colGroupLayout.getCaption().toLowerCase().equals("information"))
 				{
-					if(!((TextField)(tblRowItem.getItemProperty("Offset").getValue())).isValid()) isValid = false;
+					if(!((TextField)(tblRowItem.getItemProperty("Offset ±").getValue())).isValid()) isValid = false;
 					if(!((TextField)(tblRowItem.getItemProperty("Goal").getValue())).isValid()) isValid = false;
 					if(!((TextField)(tblRowItem.getItemProperty("Min").getValue())).isValid()) isValid = false;
 					if(!((TextField)(tblRowItem.getItemProperty("Max").getValue())).isValid()) isValid = false;

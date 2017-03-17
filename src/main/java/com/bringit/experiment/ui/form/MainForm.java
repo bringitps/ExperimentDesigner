@@ -30,7 +30,7 @@ public class MainForm extends MainFormDesign {
 	
 	
 	@SuppressWarnings("deprecation")
-	public MainForm(WebApplication webApplication) {
+	public MainForm(WebApplication webApplication, String selectedForm) {
 	    this.webApplication = webApplication;
 	  
 	    treeMainMenu.addContainerProperty("isExperimentDataReport", Boolean.class, null);
@@ -74,12 +74,16 @@ public class MainForm extends MainFormDesign {
                 	setFormContent(event.getItemId().toString(), treeMainMenu.getItem(event.getItemId()));
             }
         });
+	    
+	    if(selectedForm != null)
+	    	setFormContent(selectedForm, null);
 	}
+	
 	
 	private void setFormContent(String itemClickedText, Item treeItemClicked)
 	{
-		if(treeItemClicked.getItemProperty("isExperimentDataReport").getValue() == null 
-				&& treeItemClicked.getItemProperty("isTargetReport").getValue() == null )
+		if(treeItemClicked == null || (treeItemClicked.getItemProperty("isExperimentDataReport").getValue() == null 
+				&& treeItemClicked.getItemProperty("isTargetReport").getValue() == null ))
     	{
 			 switch (itemClickedText.toLowerCase()) 
 			 {

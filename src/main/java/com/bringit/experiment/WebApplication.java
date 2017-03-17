@@ -64,7 +64,7 @@ public class WebApplication extends UI {
 	private final static String PKG = "com.bringit.experiment.ui.design.";
 	
 	private LoginForm loginForm = new LoginForm(this);
-	private MainForm mainForm = new MainForm(this);
+	private MainForm mainForm = new MainForm(this, null);
 	
 	@Override
 	protected void init(VaadinRequest vaadinRequest) {
@@ -159,7 +159,12 @@ public class WebApplication extends UI {
 				Config configuration = new Config();
 				if(configuration.getProperty("dbms").equals("sqlserver"))
 				{
+					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_SpTargetReportBuilder_STMT.sql");
+					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwCsvTemplate_STMT.sql");
 					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwExperiment_STMT.sql");
+					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwTargetReport_STMT.sql");
+					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwUser_STMT.sql");
+					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwXmlDataLoadExecutionResult_STMT.sql");
 					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwXmlTemplate_STMT.sql");
 				}
 				
@@ -234,11 +239,16 @@ public class WebApplication extends UI {
 		buildContent();
 	}
 	
+	public void reloadMainForm(String selectedForm)
+	{
+		mainForm = new MainForm(this, selectedForm);
+		buildContent();
+	}
 	
 	public void closeUserSession()
 	{
 		VaadinService.getCurrentRequest().getWrappedSession().setAttribute("UserSession", null);
-		mainForm = new MainForm(this);
+		mainForm = new MainForm(this, null);
 		buildContent();
 	}
 	

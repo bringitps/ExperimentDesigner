@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
+import com.bringit.experiment.WebApplication;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.ExperimentImage;
@@ -448,6 +449,7 @@ public class ExperimentForm extends ExperimentDesign {
 	
 	private void onSave()
 	{
+		boolean isNewRecord = false;
 		Collection itemIds = this.tblExperimentFields.getContainerDataSource().getItemIds();
 		boolean validateReqFieldsResult = validateRequiredFields();
 		boolean validateDbNameFieldsResult = validateDbNameFields();
@@ -478,6 +480,7 @@ public class ExperimentForm extends ExperimentDesign {
 				this.experiment.setCreatedBy(sessionUser);
 				this.experiment.setCreatedDate(this.experiment.getModifiedDate());
 				expDao.addExperiment(experiment);
+				isNewRecord = true;
 			}
 			
 			expDao.updateDBDataTable(experiment);
@@ -521,7 +524,12 @@ public class ExperimentForm extends ExperimentDesign {
 			if(tempImageFile!=null){
 				tempImageFile.delete();
 			}
-			Page.getCurrent().reload();
+			
+			if(isNewRecord)
+			{
+				WebApplication webApp = (WebApplication)this.getParent().getParent();
+				webApp.reloadMainForm("manage experiments");
+			}
 			closeModalWindow();
 		}
 		else
@@ -581,6 +589,8 @@ public class ExperimentForm extends ExperimentDesign {
 		this.experiment.setModifiedDate(new Date());
 		ExperimentDao expDao = new ExperimentDao();
 		expDao.updateExperiment(experiment);
+		WebApplication webApp = (WebApplication)this.getParent().getParent();
+		webApp.reloadMainForm("manage experiments");
 		closeModalWindow();
     }
 	

@@ -1,6 +1,8 @@
 package com.bringit.experiment.ui.form;
 
 import java.sql.ResultSet;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -171,18 +173,60 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 
 	private void buildTargetChart()
 	{
+		/*
+		 * spTargetReportBuilder 
+	 		@TargetReportId NVARCHAR(MAX),
+			@ExperimentId NVARCHAR(MAX),
+			@DateFieldName NVARCHAR(MAX),
+			@FromDate NVARCHAR(MAX),
+			@ToDate NVARCHAR(MAX),
+			@CmId NVARCHAR(MAX),
+			@ExpFieldName NVARCHAR(MAX),
+			@ExpFieldValue NVARCHAR(MAX)
+		 */
+		
+		String dateFieldName = "";
+		String fromDate = "";
+		String toDate = "";
+		String cmId = "";
+		String expFieldName = "";
+		String expFieldValue = "";
+		
+		if(cbxContractManufacturer.getValue() != null && !cbxContractManufacturer.getValue().toString().isEmpty())
+			cmId = cbxContractManufacturer.getValue().toString().trim();
+		
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			
+		if(cbxDateFieldsFilter.getValue() != null && !cbxDateFieldsFilter.getValue().toString().isEmpty()
+				&& dtFilter1.getValue() != null && dtFilter2.getValue() != null)
+		{
+			dateFieldName = cbxDateFieldsFilter.getValue().toString();
+			fromDate = df.format(dtFilter1.getValue());
+			Date toDate24hours = dtFilter2.getValue();
+			toDate24hours.setHours(23);
+			toDate24hours.setMinutes(59);
+			toDate24hours.setSeconds(59);
+			toDate = df.format(toDate24hours);
+		}
+		
+		if(cbxExpFieldFilter.getValue() != null && !cbxExpFieldFilter.getValue().toString().isEmpty()
+				&& txtExpFieldFilter.getValue() != null && !txtExpFieldFilter.getValue().isEmpty())
+		{
+			expFieldName = cbxExpFieldFilter.getValue().toString();
+			expFieldValue = txtExpFieldFilter.getValue();
+		}
 		
 		//Call SP with TargetReportId
 		List<String> spParams = new ArrayList<String>();
 		spParams.add(targetRpt.getTargetReportId().toString());
 		spParams.add(targetRpt.getExperiment().getExpId().toString());
-		spParams.add("");
-		spParams.add("");
-		spParams.add("");
-		spParams.add("");
-		spParams.add("");
-		spParams.add("");
-						
+		spParams.add(dateFieldName);
+		spParams.add(fromDate);
+		spParams.add(toDate);
+		spParams.add(cmId);
+		spParams.add(expFieldName);
+		spParams.add(expFieldValue);
+					
 		ResultSet spResults = new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spParams);
 				
 		if(spResults != null)

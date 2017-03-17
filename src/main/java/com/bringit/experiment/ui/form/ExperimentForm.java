@@ -40,6 +40,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.FileResource;
+import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.server.StreamResource;
@@ -520,7 +521,7 @@ public class ExperimentForm extends ExperimentDesign {
 			if(tempImageFile!=null){
 				tempImageFile.delete();
 			}
-
+			Page.getCurrent().reload();
 			closeModalWindow();
 		}
 		else

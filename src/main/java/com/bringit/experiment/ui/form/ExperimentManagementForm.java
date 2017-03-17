@@ -7,6 +7,8 @@ import com.bringit.experiment.ui.design.ExperimentManagementDesign;
 import com.bringit.experiment.util.VaadinControls;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.server.Page;
+import com.vaadin.server.VaadinService;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -75,6 +77,7 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 	
 	private void reloadExperimentDbViewResults()
 	{
+		//this.getUI().doRefresh(VaadinService.getCurrentRequest());
 		ResultSet experimentViewResults = null;
 		if(this.cbxExperimentViewFilters.getValue() != null)
 			experimentViewResults = new DataBaseViewDao().getFilteredViewResults("vwExperiment", (String)this.cbxExperimentViewFilters.getValue(), this.txtSearch.getValue());

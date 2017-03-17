@@ -241,7 +241,8 @@ public class WebApplication extends UI {
 		mainForm = new MainForm(this);
 		buildContent();
 	}
-		
+	
+	
 	@WebServlet(urlPatterns = "/*", name = "WebApplicationServlet", asyncSupported = true)
 	@VaadinServletConfiguration(ui = WebApplication.class, productionMode = false, widgetset = "com.bringit.experiment.widgetset.VaadinchartsWidgetset")
 	public static class WebApplicationServlet extends VaadinServlet {

@@ -33,6 +33,7 @@ import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.acceptcriteria.AcceptAll;
 import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.MarginInfo;
@@ -109,7 +110,6 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				}
 			}   
 	    });
-		
 		
 		btnSave.addClickListener(new Button.ClickListener() {
 			
@@ -241,8 +241,8 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				else
 					new TargetColumnDao().addTargetColumn(targetRptColumns.get(i));
 			}
-			
-			//System.out.println("Target Report Column: " + targetRptColumns.get(j));
+
+			Page.getCurrent().reload();
 			closeModalWindow();	
 		}
 		else
@@ -434,6 +434,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			tblTargetReportInfoColumns.setSelectable(true);
 			tblTargetReportInfoColumns.setMultiSelect(false);
 			
+
 			
 					
 			btnAddReportColumn.addClickListener(new Button.ClickListener() {
@@ -564,6 +565,11 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			splitTblPanel.addComponent(gridBtnsReportColumns);
 			
 			newColumnGroupLayout.addComponent(splitTblPanel);
+
+			
+			tblTargetReportColumns.setImmediate(true);
+			
+		
 			
 			btnAddColumn.addClickListener(new Button.ClickListener() {
 				
@@ -651,14 +657,14 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
                }
             }
         };
+        
 		TextField txtOffset = new TextField();
 		txtOffset.setRequired(true);
 		txtOffset.setStyleName("tiny");
 		txtOffset.setWidth(65, Unit.PIXELS);
 		txtOffset.addValidator(floatValidator);
-		//txtOffset.setConverter(Float.class);
 		itemValues[3] = txtOffset;
-		
+
 		TextField txtGoal = new TextField();
 		txtGoal.setRequired(true);
 		txtGoal.setStyleName("tiny");
@@ -670,7 +676,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		txtMin.setRequired(true);
 		txtMin.setStyleName("tiny");
 		txtMin.setWidth(65, Unit.PIXELS);
-		txtMin.addValidator(floatValidator);	
+		txtMin.addValidator(floatValidator);
 		itemValues[5] = txtMin;
 		
 		TextField txtMax = new TextField();
@@ -702,7 +708,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		targetReportColumnTable.select(itemId);
 		targetReportColumnTable.setPageLength(0);		
 	}
-
+	
 	private void addInfoColTblItem(Table targetReportColumnTable, TargetColumn targetColumn)
 	{
 		Object[] itemValues = new Object[3];
@@ -836,5 +842,17 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			}
 		}		
 		return true;
+	}
+	
+	private void test(ValueChangeEvent event)
+	{ 
+		Event e = (Event)event;
+		TextField tblTextField = (TextField) e.getComponent();
+		
+		System.out.println("Parent ->" + tblTextField.getValue().toString());
+		/*VerticalLayout colGroupLayout = (VerticalLayout)this.tabColumnGroups.getSelectedTab();
+		HorizontalSplitPanel splitTblPanel = (HorizontalSplitPanel)colGroupLayout.getComponent(1);
+		Table tblTargetReportColumns = (Table)splitTblPanel.getFirstComponent();
+		System.out.println(tblTargetReportColumns.getValue());*/
 	}
 }

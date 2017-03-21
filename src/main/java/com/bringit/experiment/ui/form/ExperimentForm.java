@@ -41,12 +41,13 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.FileResource;
-import com.vaadin.server.Page;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.AbstractSelect.ItemDescriptionGenerator;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -92,10 +93,16 @@ public class ExperimentForm extends ExperimentDesign {
 	  
 	public ExperimentForm(int experimentId)
 	{		
+		expElements.getTab(0).setCaption("Experiment Images");
+		expElements.getTab(0).setIcon(FontAwesome.FILE_IMAGE_O);
+		
+		expElements.getTab(1).setCaption("Experiment Fields");
+		expElements.getTab(1).setIcon(FontAwesome.FILE_TEXT_O);
+		expElements.setSelectedTab(1);
 		
 		this.vlViewer.setSizeFull();
-		this.vlViewer.setMargin(true);
-		this.vlViewer.setSpacing(true);
+		//this.vlViewer.setMargin(true);
+		//this.vlViewer.setSpacing(true);
 		this.tsImages.setSizeFull();
 		
 		upImage.setButtonCaption("Add Experiment Image");
@@ -110,7 +117,7 @@ public class ExperimentForm extends ExperimentDesign {
 		this.tblExperimentFields.addContainerProperty("DB Id", TextField.class, null);
 		this.tblExperimentFields.addContainerProperty("DB DataType", ComboBox.class, null);
 		this.tblExperimentFields.addContainerProperty("UoM", ComboBox.class, null);
-		this.tblExperimentFields.setPageLength(0);
+		
 		uploadImage();
 		this.txtExpDbTableNameId.addValidator(new Validator() {
 
@@ -127,7 +134,7 @@ public class ExperimentForm extends ExperimentDesign {
 			this.chxActive.setValue(true);
 			this.btnDelete.setEnabled(false);
 			this.experiment = new Experiment();
-			//imgImage.setVisible(false);
+			this.tsImages.setCaption("No images found.");
 		}
 		else
 		{
@@ -153,23 +160,26 @@ public class ExperimentForm extends ExperimentDesign {
 				//tblExperimentFields.select(itemId);
 				CheckBox chxSelect = new CheckBox();
 				chxSelect.setVisible(false);
+				chxSelect.setWidth(50, Unit.PIXELS);
 				itemValues[0] = chxSelect;
 				
 				TextField txtFieldName = new TextField();
 				txtFieldName.setValue(this.experimentFields.get(i).getExpFieldName());
 				txtFieldName.setEnabled(false);
-				txtFieldName.addStyleName("small");
+				txtFieldName.addStyleName("tiny");
+				txtFieldName.setWidth(200, Unit.PIXELS);
 				itemValues[1] = txtFieldName;
 				
 				CheckBox chxActive = new CheckBox();
 				chxActive.setValue(this.experimentFields.get(i).isExpFieldIsActive() ? true : false);
-				chxActive.addStyleName("small");
+				chxActive.addStyleName("tiny");
 				itemValues[2] = chxActive;
 				
 				TextField txtExpDbFieldNameId = new TextField();
 				txtExpDbFieldNameId.setValue(this.experimentFields.get(i).getExpDbFieldNameId());
 				txtExpDbFieldNameId.setEnabled(false);
-				txtExpDbFieldNameId.addStyleName("small");
+				txtExpDbFieldNameId.addStyleName("tiny");
+				txtExpDbFieldNameId.setWidth(200, Unit.PIXELS);
 				itemValues[3] = txtExpDbFieldNameId;
 				
 				ComboBox cbxFieldType = new ComboBox("");
@@ -178,11 +188,12 @@ public class ExperimentForm extends ExperimentDesign {
 				{
 					cbxFieldType.addItem(dbfieldTypes[j]);
 					cbxFieldType.setItemCaption(dbfieldTypes[j], dbfieldTypes[j]);
-					cbxFieldType.setWidth(100, Unit.PIXELS);
 				}
 				
 				cbxFieldType.setValue(this.experimentFields.get(i).getExpFieldType());
 				cbxFieldType.setEnabled(false);
+				cbxFieldType.setStyleName("tiny");
+				cbxFieldType.setWidth(150, Unit.PIXELS);
 				itemValues[4] = cbxFieldType;
 				
 				ComboBox cbxUnitOfMeasure = new ComboBox("");
@@ -191,23 +202,23 @@ public class ExperimentForm extends ExperimentDesign {
 				{
 					cbxUnitOfMeasure.addItem(unitOfMeasures.get(j).getUomId());
 					cbxUnitOfMeasure.setItemCaption(unitOfMeasures.get(j).getUomId(), unitOfMeasures.get(j).getUomAbbreviation());
-					cbxUnitOfMeasure.setWidth(100, Unit.PIXELS);
 				}
 				
 				if(this.experimentFields.get(i).getUnitOfMeasure() != null)
 				{
 					cbxUnitOfMeasure.setValue(this.experimentFields.get(i).getUnitOfMeasure().getUomId());
 					cbxUnitOfMeasure.setImmediate(true);
-					cbxUnitOfMeasure.addStyleName("small");
+					cbxUnitOfMeasure.addStyleName("tiny");
 				}
-				
+				cbxUnitOfMeasure.setStyleName("tiny");
+				cbxUnitOfMeasure.setWidth(100, Unit.PIXELS);
 				itemValues[5] = cbxUnitOfMeasure;
 				
 				this.tblExperimentFields.addItem(itemValues, this.experimentFields.get(i).getExpFieldId());
 		    }
 			
 			this.tblExperimentFields.setEditable(true);
-			this.tblExperimentFields.setPageLength(0);
+			this.tblExperimentFields.setPageLength(100);
 			
 		}
 		btnAddField.addClickListener(new Button.ClickListener() {
@@ -265,6 +276,12 @@ public class ExperimentForm extends ExperimentDesign {
 
 	private void loadImageTabs() {
 		this.experimentImages = new ExperimentImageDao().getAllExperimentImagesByExperiment(this.experiment);
+	
+		if(this.experimentImages == null || this.experimentImages.size() <= 0)
+			this.tsImages.setCaption("No images found.");
+		else
+			this.tsImages.setCaption("");
+			
 		for (ExperimentImage expImg : experimentImages) {
 			final byte[] img = expImg.getExpImage();
 			String imgName = "ExpImage"+expImg.getExpImageId();
@@ -279,12 +296,13 @@ public class ExperimentForm extends ExperimentDesign {
 					};
 						StreamResource imageResource = new StreamResource(imageSource, imgName+".png");
 						imageResource.setCacheTime(0);
-						//VerticalLayout tab = new VerticalLayout();
 						Image tabImg = new Image(null,imageResource);
-						tabImg.setWidth("600px");
-						tabImg.setHeight("400px");
-						//tab.addComponent(tabImg);
+						System.out.println("Width:" + tabImg.getWidth() + "\n");
+						System.out.println("Height:" + tabImg.getHeight() + "\n");
+						//tabImg.setWidth("600px");
+						//tabImg.setHeight("400px");
 						tsImages.addTab(tabImg, imgName);	
+						tsImages.setCaption("");
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -338,13 +356,13 @@ public class ExperimentForm extends ExperimentDesign {
 							String imgName = tempImageFile.getName();
 							 
 							try {
-										//VerticalLayout tab = new VerticalLayout();
 										Image tabImg = new Image(null,imageResource);
-										tabImg.setWidth("600px");
-										tabImg.setHeight("400px");
-										//tab.addComponent(tabImg);
-										tsImages.addTab(tabImg, imgName);
-										//tempImageFile.delete();
+										System.out.println("Width:" + tabImg.getWidth() + "\n");
+										System.out.println("Height:" + tabImg.getHeight() + "\n");
+										//tabImg.setWidth("600px");
+										//tabImg.setHeight("400px");
+										tsImages.addTab(tabImg, imgName);	
+										tsImages.setCaption("");
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -366,18 +384,20 @@ public class ExperimentForm extends ExperimentDesign {
 		
 		CheckBox chxSelect = new CheckBox();
 		chxSelect.setVisible(false);
+		chxSelect.setWidth(50, Unit.PIXELS);
 		itemValues[0] = chxSelect;
 		
 		TextField txtFieldName = new TextField();
 		txtFieldName.setImmediate(true);
 		txtFieldName.focus();
-		txtFieldName.addStyleName("small");
+		txtFieldName.addStyleName("tiny");
 		txtFieldName.setRequired(true);
 		txtFieldName.setRequiredError("This field is mandatory");
+		txtFieldName.setWidth(200, Unit.PIXELS);
 		itemValues[1] = txtFieldName;
 		
 		CheckBox chxActive = new CheckBox();
-		chxActive.addStyleName("small");
+		chxActive.addStyleName("tiny");
 		chxActive.setValue(true);
 		itemValues[2] = chxActive;
 		
@@ -385,7 +405,8 @@ public class ExperimentForm extends ExperimentDesign {
 		TextField txtExpDbFieldNameId = new TextField();
 		txtExpDbFieldNameId.setRequired(true);
 		txtExpDbFieldNameId.setRequiredError("This field is mandatory");
-		txtExpDbFieldNameId.addStyleName("small");
+		txtExpDbFieldNameId.addStyleName("tiny");
+		txtExpDbFieldNameId.setWidth(200, Unit.PIXELS);
 		txtExpDbFieldNameId.addValidator(new Validator() {
 
             public void validate(Object value) throws InvalidValueException {
@@ -410,14 +431,14 @@ public class ExperimentForm extends ExperimentDesign {
 		{
 			cbxFieldType.addItem(dbfieldTypes[j]);
 			cbxFieldType.setItemCaption(dbfieldTypes[j], dbfieldTypes[j]);
-			cbxFieldType.setWidth(100, Unit.PIXELS);
 		}
 
 		cbxFieldType.setNullSelectionAllowed(false);
 		cbxFieldType.setImmediate(true);
 		cbxFieldType.setRequired(true);
 		cbxFieldType.setRequiredError("This field is mandatory");
-		cbxFieldType.addStyleName("small");
+		cbxFieldType.addStyleName("tiny");
+		cbxFieldType.setWidth(150, Unit.PIXELS);
 		itemValues[4] = cbxFieldType;
 		
 		ComboBox cbxUnitOfMeasure = new ComboBox("");
@@ -426,18 +447,16 @@ public class ExperimentForm extends ExperimentDesign {
 		{
 			cbxUnitOfMeasure.addItem(unitOfMeasures.get(j).getUomId());
 			cbxUnitOfMeasure.setItemCaption(unitOfMeasures.get(j).getUomId(), unitOfMeasures.get(j).getUomAbbreviation());
-			cbxUnitOfMeasure.setWidth(100, Unit.PIXELS);
 		}
 		
 		cbxUnitOfMeasure.setImmediate(true);
-		cbxUnitOfMeasure.addStyleName("small");
-		
+		cbxUnitOfMeasure.addStyleName("tiny");
+		cbxUnitOfMeasure.setWidth(100, Unit.PIXELS);
 		itemValues[5] = cbxUnitOfMeasure;
 		
 		this.lastNewItemId = this.lastNewItemId - 1;
 		this.tblExperimentFields.addItem(itemValues, this.lastNewItemId);
 		this.tblExperimentFields.select(this.lastNewItemId);
-		this.tblExperimentFields.setPageLength(0);
 		
 	}
 	

@@ -148,7 +148,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				{
 					//Get Ids to Delete
 					//dbIdOfTargetColumnsToDelete
-					//dbIdOfTargetColumnGroupsToDelete
+					dbIdOfTargetColumnGroupsToDelete.add(Integer.parseInt(tabColumnGroups.getSelectedTab().getId()));
 					tabColumnGroups.removeComponent(tabColumnGroups.getSelectedTab());
 				}
 			}
@@ -219,6 +219,35 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		
 		if(validateTargetColCntResult && validateReqFieldsResult && validateNumberColsResult)
 		{
+			//Delete Records from DataBase
+			if(dbIdOfTargetColumnGroupsToDelete.size() > 0)
+			{
+				for(int i=0; i<dbIdOfTargetColumnGroupsToDelete.size(); i++)
+				{
+					if(dbIdOfTargetColumnGroupsToDelete.get(i) > 0)
+					{
+						List<TargetColumn> targetReporColumnsToDelete = new TargetColumnDao().getTargetColumnsByColGroupById(dbIdOfTargetColumnGroupsToDelete.get(i));
+						for(int j=0; targetReporColumnsToDelete != null && j<targetReporColumnsToDelete.size(); j++)
+						{
+							if(dbIdOfTargetColumnsToDelete.indexOf(targetReporColumnsToDelete.get(j).getTargetColumnId()) == -1)
+								dbIdOfTargetColumnsToDelete.add(targetReporColumnsToDelete.get(j).getTargetColumnId());
+						}
+					}
+				}
+			}
+			
+			for(int i=0; i<dbIdOfTargetColumnsToDelete.size(); i++)
+			{
+				if(dbIdOfTargetColumnsToDelete.get(i) > 0)
+					new TargetColumnDao().deleteTargetColumn(dbIdOfTargetColumnsToDelete.get(i));
+			}
+			
+			for(int i=0; i<dbIdOfTargetColumnGroupsToDelete.size(); i++)
+			{
+				if(dbIdOfTargetColumnGroupsToDelete.get(i) > 0)
+					new TargetColumnGroupDao().deleteTargetColumnGroup(dbIdOfTargetColumnGroupsToDelete.get(i));
+			}
+			
 			List<TargetColumnGroup> targetRptColGroups = new ArrayList<TargetColumnGroup>();
 			List<TargetColumn> targetRptColumns = new ArrayList<TargetColumn>();
 			
@@ -463,8 +492,11 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				@Override
 				public void buttonClick(ClickEvent event) {
 
-					if(tblTargetReportInfoColumns.getValue() != null && (int)tblTargetReportInfoColumns.getValue() < 0)
+					if(tblTargetReportInfoColumns.getValue() != null)
+					{
+						dbIdOfTargetColumnsToDelete.add(Integer.parseInt(tblTargetReportInfoColumns.getValue().toString()));
 						tblTargetReportInfoColumns.removeItem((int)tblTargetReportInfoColumns.getValue());
+					}	
 				}
 
 			});
@@ -599,8 +631,11 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				@Override
 				public void buttonClick(ClickEvent event) {
 	
-					if(tblTargetReportColumns.getValue() != null && (int)tblTargetReportColumns.getValue() < 0)
+					if(tblTargetReportColumns.getValue() != null)
+					{
+						dbIdOfTargetColumnsToDelete.add(Integer.parseInt(tblTargetReportColumns.getValue().toString()));
 						tblTargetReportColumns.removeItem((int)tblTargetReportColumns.getValue());
+					}
 				}
 	
 			});
@@ -740,13 +775,13 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		}
 		else
 		{
+			cbxExperimentField.focus();
 			lastNewItemId = lastNewItemId - 1;
 			itemId = lastNewItemId;
 		}
 		
 		targetReportColumnTable.addItem(itemValues, itemId);
 		targetReportColumnTable.select(itemId);
-		targetReportColumnTable.setPageLength(0);		
 	}
 	
 	private void addInfoColTblItem(Table targetReportColumnTable, TargetColumn targetColumn)
@@ -788,13 +823,13 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		}
 		else
 		{
+			cbxExperimentField.focus();
 			lastNewItemId = lastNewItemId - 1;
 			itemId = lastNewItemId;
 		}
 		
 		targetReportColumnTable.addItem(itemValues, itemId);
-		targetReportColumnTable.select(lastNewItemId);
-		targetReportColumnTable.setPageLength(0);
+		targetReportColumnTable.select(itemId);
 	}
 		
 	private boolean validateRequiredFields()

@@ -61,7 +61,7 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 		 experimentCRUDModalWindow.setModal(true);
 		 experimentCRUDModalWindow.setResizable(false);
 		 experimentCRUDModalWindow.setContent(new ExperimentForm(ExperimentId));
-		 experimentCRUDModalWindow.setWidth(940, Unit.PIXELS);
+		 experimentCRUDModalWindow.setWidth(995, Unit.PIXELS);
 		 experimentCRUDModalWindow.setHeight(760, Unit.PIXELS);
 		 experimentCRUDModalWindow.center();
 		 experimentCRUDModalWindow.addCloseListener(new Window.CloseListener() {

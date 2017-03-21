@@ -156,6 +156,18 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 				if(spResults != null)
 					VaadinControls.bindDbViewRsToVaadinTable(tblTargetDataReport, spResults, 1);
 				
+
+				/*
+				Add to Group
+				this.tblExperimentFields.setItemDescriptionGenerator(new ItemDescriptionGenerator() {                             
+					public String generateDescription(Component source, Object itemId, Object propertyId) {
+					    if(propertyId == null){
+					        return "Row description "+ itemId;
+					    } else {
+					        return "Cell description " + itemId +","+propertyId;
+					    }            
+					}});
+				*/
 			}
 
 		});

@@ -43,6 +43,7 @@ import com.bringit.experiment.ui.design.XmlTemplateDesign;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -81,6 +82,14 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 	
 	public XmlTemplateForm(int xmlId)
 	{
+		
+		xmlTJobAndMap.getTab(0).setCaption("Job Details");
+		xmlTJobAndMap.getTab(0).setIcon(FontAwesome.CALENDAR_CHECK_O);
+		xmlTJobAndMap.setSelectedTab(0);
+		
+		xmlTJobAndMap.getTab(1).setCaption("Xml Template Mapping");
+		xmlTJobAndMap.getTab(1).setIcon(FontAwesome.SITEMAP);
+		
 		this.tblXmlNodes.setContainerDataSource(null);
 		this.tblXmlNodes.addContainerProperty("*", CheckBox.class, null);
 		this.tblXmlNodes.addContainerProperty("Xml Node Name", TextArea.class, null);
@@ -133,6 +142,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				txtAreaXmlNodeName.setReadOnly(true);
 				txtAreaXmlNodeName.addStyleName("tiny");
 				txtAreaXmlNodeName.setWidth(100, Unit.PERCENTAGE);
+				txtAreaXmlNodeName.setRows(3);
 				itemValues[1] = txtAreaXmlNodeName;
 				
 				CheckBox chxIsLoop = new CheckBox();
@@ -487,6 +497,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			txtAreaXmlNodeName.setReadOnly(true);
 			txtAreaXmlNodeName.addStyleName("tiny");
 			txtAreaXmlNodeName.setWidth(100, Unit.PERCENTAGE);
+			txtAreaXmlNodeName.setRows(3);
 			itemValues[1] = txtAreaXmlNodeName;
 			
 			CheckBox chxIsLoop = new CheckBox();
@@ -531,13 +542,11 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		
 		this.comboXmlTExperiment.setNullSelectionAllowed(false);
 		this.comboXmlTExperiment.setImmediate(true);
-		this.comboXmlTExperiment.addStyleName("small");
 		
 		//Contract Manufacturer
 		
 		this.cbxContractManufacturer.setNullSelectionAllowed(true);
 		this.cbxContractManufacturer.setImmediate(true);
-		this.cbxContractManufacturer.addStyleName("small");
 		
 		for(int i=0; contractManufacturers!=null && i<contractManufacturers.size(); i++)
 		{
@@ -564,15 +573,12 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		
 		this.comboXmlTinRepo.setNullSelectionAllowed(true);
 		this.comboXmlTinRepo.setImmediate(true);
-		this.comboXmlTinRepo.addStyleName("small");
 		
 		this.comboXmloutRepo.setNullSelectionAllowed(true);
 		this.comboXmloutRepo.setImmediate(true);
-		this.comboXmloutRepo.addStyleName("small");
 		
 		this.comboXmlTerrRepo.setNullSelectionAllowed(true);
 		this.comboXmlTerrRepo.setImmediate(true);
-		this.comboXmlTerrRepo.addStyleName("small");
 		
 		//Jobs
 		for(int j=0; j<jobs.size(); j++)
@@ -583,7 +589,6 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		
 		this.comboXmljobScheduler.setNullSelectionAllowed(true);
 		this.comboXmljobScheduler.setImmediate(true);
-		this.comboXmljobScheduler.addStyleName("small");
 		
 		//Hour Execution Start
 		this.cbxStartHour.setNullSelectionAllowed(false);

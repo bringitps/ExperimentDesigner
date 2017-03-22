@@ -54,8 +54,8 @@ public class XmlTemplateManagementForm extends XmlTemplateManagementDesign  {
 		 xmlTemplateCRUDModalWindow.setModal(true);
 		 xmlTemplateCRUDModalWindow.setResizable(false);
 		 xmlTemplateCRUDModalWindow.setContent(new XmlTemplateForm(xmlTemplateId));
-		 xmlTemplateCRUDModalWindow.setWidth(940, Unit.PIXELS);
-		 xmlTemplateCRUDModalWindow.setHeight(760, Unit.PIXELS);
+		 xmlTemplateCRUDModalWindow.setWidth(993, Unit.PIXELS);
+		 xmlTemplateCRUDModalWindow.setHeight(660, Unit.PIXELS);
 		 xmlTemplateCRUDModalWindow.center();
 		 xmlTemplateCRUDModalWindow.addCloseListener(new Window.CloseListener() {
 			

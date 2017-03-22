@@ -918,16 +918,4 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		}		
 		return true;
 	}
-	
-	private void test(ValueChangeEvent event)
-	{ 
-		Event e = (Event)event;
-		TextField tblTextField = (TextField) e.getComponent();
-		
-		System.out.println("Parent ->" + tblTextField.getValue().toString());
-		/*VerticalLayout colGroupLayout = (VerticalLayout)this.tabColumnGroups.getSelectedTab();
-		HorizontalSplitPanel splitTblPanel = (HorizontalSplitPanel)colGroupLayout.getComponent(1);
-		Table tblTargetReportColumns = (Table)splitTblPanel.getFirstComponent();
-		System.out.println(tblTargetReportColumns.getValue());*/
-	}
 }

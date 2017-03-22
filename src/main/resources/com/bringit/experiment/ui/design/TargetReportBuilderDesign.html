@@ -6,12 +6,9 @@
   <meta name="vaadin-version" content="7.7.0">
  </head> 
  <body> 
-  <vaadin-vertical-layout responsive> 
-   <vaadin-label style-name="valo-menu" plain-text>
-     - Target Report Builder 
-   </vaadin-label> 
-   <vaadin-vertical-layout width-auto height="50px" _id="layoutHeaderBtns" :middle :center> 
-    <vaadin-grid-layout width="800px" :middle :center> 
+  <vaadin-vertical-layout style-name="well" responsive margin> 
+   <vaadin-vertical-layout width="960px" height="40px" _id="layoutHeaderBtns" :middle :center> 
+    <vaadin-grid-layout width-full> 
      <row> 
       <column> 
        <vaadin-grid-layout width="100px" height="30px"> 
@@ -29,11 +26,14 @@
         </row> 
        </vaadin-grid-layout> 
       </column> 
+      <column> 
+       <vaadin-check-box caption="Active" id="chxActive" style-name="tiny" _id="chxActive" :right></vaadin-check-box> 
+      </column> 
      </row> 
     </vaadin-grid-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-vertical-layout width-auto height="130px" :middle :center> 
-    <vaadin-vertical-layout width="800px" _id="targetRptLayout" :middle :center> 
+   <vaadin-vertical-layout width="960px" height="140px"> 
+    <vaadin-vertical-layout _id="targetRptLayout"> 
      <vaadin-grid-layout spacing width-full _id="gridMainData" :middle :center> 
       <row> 
        <column> 
@@ -45,37 +45,33 @@
       </row> 
       <row> 
        <column> 
-        <vaadin-check-box caption="Active" id="chxActive" style-name="tiny" _id="chxActive"></vaadin-check-box> 
-       </column> 
-       <column> 
         <vaadin-combo-box caption="Experiment:" required style-name="tiny" width-full _id="cbxExperiment"></vaadin-combo-box> 
        </column> 
       </row> 
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
-    <vaadin-css-layout style-name="content" width="800px" height="650px"></vaadin-css-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-vertical-layout width="800px" height="60px" _id="colGroupLayout" :middle :center> 
-    <vaadin-grid-layout width-full height="40px" :middle :center> 
+   <vaadin-vertical-layout style-name="well" width="960px" _id="colGroupLayout"> 
+    <vaadin-grid-layout width-full height="50px"> 
      <row> 
       <column> 
-       <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" plain-text _id="btnAddColumnGroup">
+       <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" plain-text _id="btnAddColumnGroup" :middle>
          Add Column Group 
        </vaadin-button> 
       </column> 
       <column> 
-       <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" plain-text _id="btnDeleteColumnGroup" :right>
+       <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" plain-text _id="btnDeleteColumnGroup" :middle :right>
          Delete Column Group 
        </vaadin-button> 
       </column> 
      </row> 
     </vaadin-grid-layout> 
+    <vaadin-horizontal-layout width-full height="285px" _id="targetFieldGroupsLayout"> 
+     <vaadin-tab-sheet style-name="framed compact" size-full _id="tabColumnGroups"></vaadin-tab-sheet> 
+    </vaadin-horizontal-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-horizontal-layout width="800px" height="260px" _id="targetFieldGroupsLayout" :center> 
-    <vaadin-tab-sheet style-name="framed" size-full _id="tabColumnGroups"></vaadin-tab-sheet> 
-   </vaadin-horizontal-layout> 
-   <vaadin-vertical-layout margin _id="btnDeleteLayout"> 
-    <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="small danger" plain-text _id="btnDelete" :right>
+   <vaadin-vertical-layout height="40px" _id="btnDeleteLayout"> 
+    <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" plain-text _id="btnDelete" :bottom :right>
       Delete Target Report 
     </vaadin-button> 
    </vaadin-vertical-layout> 

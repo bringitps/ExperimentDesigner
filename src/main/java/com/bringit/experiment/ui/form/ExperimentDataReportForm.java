@@ -221,12 +221,12 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 	
 	private void openDataViewRecordCRUDModalWindow(int experimentRecordId)
 	{
-		 Window dataViewRecordCRUDModalWindow = new Window("View Record");
+		 Window dataViewRecordCRUDModalWindow = new Window("View Record - " + this.experiment.getExpName());
 		 dataViewRecordCRUDModalWindow.setModal(true);
 		 dataViewRecordCRUDModalWindow.setResizable(false);
 		 dataViewRecordCRUDModalWindow.setContent(new ExperimentDataViewRecordForm(this.experiment, this.experimentFields, experimentRecordId));
-		 dataViewRecordCRUDModalWindow.setWidth(940, Unit.PIXELS);
-		 dataViewRecordCRUDModalWindow.setHeight(680, Unit.PIXELS);
+		 dataViewRecordCRUDModalWindow.setWidth(993, Unit.PIXELS);
+		 dataViewRecordCRUDModalWindow.setHeight(660, Unit.PIXELS);
 		 dataViewRecordCRUDModalWindow.center();
 		 dataViewRecordCRUDModalWindow.addCloseListener(new Window.CloseListener() {
 			
@@ -244,7 +244,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 		if(this.selectedRecordId == -1)
 			return;
 		
-		Window dataViewRecordChangesHistoryModalWindow = new Window("View Record History");
+		Window dataViewRecordChangesHistoryModalWindow = new Window("View Record History - " + this.experiment.getExpName());
 		dataViewRecordChangesHistoryModalWindow.setModal(true);
 		dataViewRecordChangesHistoryModalWindow.setResizable(false);
 		dataViewRecordChangesHistoryModalWindow.setContent(new ExperimentRecordChangesHistoryForm(this.experiment, this.selectedRecordId));

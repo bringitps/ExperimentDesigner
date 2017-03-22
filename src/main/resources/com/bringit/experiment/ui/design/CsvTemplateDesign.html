@@ -6,12 +6,9 @@
   <meta name="vaadin-version" content="7.7.0">
  </head> 
  <body> 
-  <vaadin-vertical-layout style-name="crud-template" responsive> 
-   <vaadin-label style-name="valo-menu" plain-text>
-     - Csv Template 
-   </vaadin-label> 
-   <vaadin-vertical-layout margin> 
-    <vaadin-grid-layout width-full height="30px"> 
+  <vaadin-vertical-layout style-name="well" responsive margin> 
+   <vaadin-vertical-layout width="960px"> 
+    <vaadin-grid-layout width-full height="35px"> 
      <row> 
       <column> 
        <vaadin-grid-layout width="100px" height="30px"> 
@@ -22,86 +19,96 @@
           </vaadin-button> 
          </column> 
          <column> 
-          <vaadin-button style-name="tiny" plain-text _id="btnCancel">
+          <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny" plain-text _id="btnCancel">
             Cancel 
           </vaadin-button> 
          </column> 
         </row> 
        </vaadin-grid-layout> 
       </column> 
+      <column> 
+       <vaadin-check-box caption="Active" style-name="tiny" _id="chxActive" :right></vaadin-check-box> 
+      </column> 
      </row> 
     </vaadin-grid-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-vertical-layout width-auto height="500px"> 
-    <vaadin-vertical-layout style-name="CsvTemplateCRUDLayout" width="940px" _id="crudLayout"> 
-     <vaadin-grid-layout spacing id="gridMainData" width="940px" margin> 
+   <vaadin-vertical-layout width="960px" height="220px"> 
+    <vaadin-vertical-layout style-name="CsvTemplateCRUDLayout" _id="crudLayout"> 
+     <vaadin-grid-layout spacing id="gridMainData" width-full height="215px"> 
       <row> 
        <column> 
-        <vaadin-combo-box caption="Experiment:" required style-name="small" width-full _id="comboCsvTExperiment"></vaadin-combo-box> 
+        <vaadin-combo-box caption="Experiment:" required style-name="tiny" width-full _id="comboCsvTExperiment"></vaadin-combo-box> 
        </column> 
        <column> 
-        <vaadin-upload caption="Load Csv Layout File" immediate width-full _id="upCsv"></vaadin-upload> 
+        <vaadin-upload caption="Load Csv Layout File" style-name="tiny" immediate width-full _id="upCsv"></vaadin-upload> 
        </column> 
       </row> 
       <row> 
        <column> 
-        <vaadin-check-box caption="Active" _id="chxActive"></vaadin-check-box> 
+        <vaadin-text-field caption="Name:" required style-name="tiny" width-full _id="txtCsvTName"></vaadin-text-field> 
        </column> 
        <column> 
-        <vaadin-text-field caption="Name:" required style-name="small" width-full _id="txtCsvTName"></vaadin-text-field> 
-       </column> 
-      </row> 
-      <row> 
-       <column> 
-        <vaadin-text-field caption="Prefix:" style-name="small" width-full _id="txtCsvTPrefix"></vaadin-text-field> 
-       </column> 
-       <column> 
-        <vaadin-text-field caption="Comments:" style-name="small" width-full _id="txtCsvTComments"></vaadin-text-field> 
+        <vaadin-combo-box caption="Contract Manufacturer" required style-name="tiny" width-full _id="cbxContractManufacturer"></vaadin-combo-box> 
        </column> 
       </row> 
       <row> 
        <column> 
-        <vaadin-date-field caption="Start Execution Date:" style-name="small" width-full _id="dtCsvTstart"></vaadin-date-field> 
-       </column> 
-       <column> 
-        <vaadin-date-field caption="Finish Execution Date:" style-name="small" width-full _id="dtCsvTend"></vaadin-date-field> 
-       </column> 
-      </row> 
-      <row> 
-       <column> 
-        <vaadin-combo-box caption="Start Execution Hour:" required style-name="small" width-full _id="cbxStartHour"></vaadin-combo-box> 
-       </column> 
-       <column> 
-        <vaadin-combo-box caption="Job Execution Repeat:" style-name="small" width-full _id="comboCsvjobScheduler"></vaadin-combo-box> 
-       </column> 
-      </row> 
-      <row> 
-       <column> 
-        <vaadin-combo-box caption="Contract Manufacturer" required style-name="small" width-full _id="cbxContractManufacturer"></vaadin-combo-box> 
-       </column> 
-       <column> 
-        <vaadin-combo-box caption="Inbound File Repository:" required style-name="small" width-full _id="comboCsvTinRepo"></vaadin-combo-box> 
-       </column> 
-      </row> 
-      <row> 
-       <column> 
-        <vaadin-combo-box caption="Processed File Repository" required style-name="small" width-full _id="comboCsvoutRepo"></vaadin-combo-box> 
-       </column> 
-       <column> 
-        <vaadin-combo-box caption="Exception File Repository:" required style-name="small" width-full _id="comboCsvTerrRepo"></vaadin-combo-box> 
+        <vaadin-text-area caption="Comments:" rows="2" style-name="tiny" width-full _id="txtCsvTComments"></vaadin-text-area> 
        </column> 
       </row> 
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-vertical-layout width="940px" margin> 
-    <vaadin-table selectable caption="CsvTemplate Columns" style-name="tiny" immediate width-full height="440px" _id="tblCsvCols"> 
-     <table> 
-     </table> 
-    </vaadin-table> 
-   </vaadin-vertical-layout> 
-   <vaadin-vertical-layout margin> 
-    <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="small danger" plain-text _id="btnDelete" :right>
+   <vaadin-accordion style-name="tiny" width="960px" height="300px" _id="csvTJobAndMap"> 
+    <tab caption="Job Details" icon="fonticon://FontAwesome/f274" selected> 
+     <vaadin-vertical-layout style-name="well" margin _id="csvTJobLayout"> 
+      <vaadin-grid-layout spacing width-full height="70px"> 
+       <row> 
+        <column> 
+         <vaadin-date-field caption="Start Execution Date:" required style-name="tiny" width-full _id="dtCsvTstart"></vaadin-date-field> 
+        </column> 
+        <column> 
+         <vaadin-combo-box caption="Start Execution Hour:" required style-name="small" width-full _id="cbxStartHour"></vaadin-combo-box> 
+        </column> 
+        <column> 
+         <vaadin-combo-box caption="Job Execution Repeat:" required style-name="small" width-full _id="comboCsvjobScheduler"></vaadin-combo-box> 
+        </column> 
+        <column> 
+         <vaadin-date-field caption="Finish Execution Date:" style-name="small" width-full _id="dtCsvTend"></vaadin-date-field> 
+        </column> 
+       </row> 
+      </vaadin-grid-layout> 
+      <vaadin-grid-layout width-full height="125px"> 
+       <row> 
+        <column> 
+         <vaadin-combo-box caption="Inbound File Repository:" required style-name="small" width-full _id="comboCsvTinRepo"></vaadin-combo-box> 
+        </column> 
+        <column> 
+         <vaadin-text-field caption="Prefix:" style-name="small" width-full _id="txtCsvTPrefix"></vaadin-text-field> 
+        </column> 
+       </row> 
+       <row> 
+        <column> 
+         <vaadin-combo-box caption="Processed File Repository" required style-name="small" width-full _id="comboCsvoutRepo"></vaadin-combo-box> 
+        </column> 
+        <column> 
+         <vaadin-combo-box caption="Exception File Repository:" required style-name="small" width-full _id="comboCsvTerrRepo"></vaadin-combo-box> 
+        </column> 
+       </row> 
+      </vaadin-grid-layout> 
+     </vaadin-vertical-layout> 
+    </tab> 
+    <tab caption="Csv Template Mapping" icon="fonticon://FontAwesome/f0e8"> 
+     <vaadin-vertical-layout _id="csvTMapLayout"> 
+      <vaadin-table selectable style-name="tiny" immediate width-full height="220px" _id="tblCsvCols"> 
+       <table> 
+       </table> 
+      </vaadin-table> 
+     </vaadin-vertical-layout> 
+    </tab> 
+   </vaadin-accordion> 
+   <vaadin-vertical-layout width="960px" height="33px"> 
+    <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" plain-text _id="btnDelete" :right>
       Delete Csv Template 
     </vaadin-button> 
    </vaadin-vertical-layout> 

@@ -64,7 +64,7 @@ public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign
 		this.experiment = experiment;
 		this.experimentFields = experimentFields;
 		
-		this.lblExperimentTitle.setValue(" -" + experiment.getExpName());
+		//this.lblExperimentTitle.setValue(" -" + experiment.getExpName());
 		
 		
 		String sqlSelectQuery = ExperimentUtil.buildEqualsFilteredSqlSelectQueryByExperiment(this.experiment, this.experimentFields, "Id", this.recordId.toString()); 

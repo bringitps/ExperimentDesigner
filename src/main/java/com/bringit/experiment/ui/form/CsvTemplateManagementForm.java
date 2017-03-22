@@ -54,8 +54,8 @@ public class CsvTemplateManagementForm extends CsvTemplateManagementDesign  {
 		 csvTemplateCRUDModalWindow.setModal(true);
 		 csvTemplateCRUDModalWindow.setResizable(false);
 		 csvTemplateCRUDModalWindow.setContent(new CsvTemplateForm(csvTemplateId));
-		 csvTemplateCRUDModalWindow.setWidth(940, Unit.PIXELS);
-		 csvTemplateCRUDModalWindow.setHeight(760, Unit.PIXELS);
+		 csvTemplateCRUDModalWindow.setWidth(993, Unit.PIXELS);
+		 csvTemplateCRUDModalWindow.setHeight(660, Unit.PIXELS);
 		 csvTemplateCRUDModalWindow.center();
 		 csvTemplateCRUDModalWindow.addCloseListener(new Window.CloseListener() {
 			

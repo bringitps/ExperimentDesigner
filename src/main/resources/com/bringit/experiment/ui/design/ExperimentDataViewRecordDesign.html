@@ -6,12 +6,9 @@
   <meta name="vaadin-version" content="7.7.0">
  </head> 
  <body> 
-  <vaadin-vertical-layout> 
-   <vaadin-label style-name="valo-menu" height="25px" plain-text _id="lblExperimentTitle">
-     - Experiment Record Data 
-   </vaadin-label> 
-   <vaadin-vertical-layout margin> 
-    <vaadin-grid-layout width-full height="30px"> 
+  <vaadin-vertical-layout style-name="well" margin> 
+   <vaadin-vertical-layout> 
+    <vaadin-grid-layout width-full height="40px"> 
      <row> 
       <column> 
        <vaadin-grid-layout width="100px" height="30px"> 
@@ -32,11 +29,11 @@
      </row> 
     </vaadin-grid-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-vertical-layout spacing margin> 
-    <vaadin-panel caption="Record Data" height="300px" _id="pnlExperimentFields"></vaadin-panel> 
+   <vaadin-vertical-layout spacing> 
+    <vaadin-panel caption="Record Data" style-name="well" height="400px" _id="pnlExperimentFields"></vaadin-panel> 
    </vaadin-vertical-layout> 
-   <vaadin-horizontal-layout spacing width-full margin _id="layoutEditComments"> 
-    <vaadin-text-area caption="Comments:" rows="3" style-name="tiny" width-full _id="txtComments"></vaadin-text-area> 
+   <vaadin-horizontal-layout spacing width-full height="145px" _id="layoutEditComments"> 
+    <vaadin-text-area caption="Comments:" rows="4" style-name="tiny" width-full _id="txtComments" :middle></vaadin-text-area> 
    </vaadin-horizontal-layout> 
   </vaadin-vertical-layout>  
  </body>

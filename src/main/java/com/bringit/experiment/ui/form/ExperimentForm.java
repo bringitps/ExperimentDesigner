@@ -93,12 +93,8 @@ public class ExperimentForm extends ExperimentDesign {
 	  
 	public ExperimentForm(int experimentId)
 	{		
-		expElements.getTab(0).setCaption("Experiment Images");
-		expElements.getTab(0).setIcon(FontAwesome.FILE_IMAGE_O);
-		
-		expElements.getTab(1).setCaption("Experiment Fields");
-		expElements.getTab(1).setIcon(FontAwesome.FILE_TEXT_O);
 		expElements.setSelectedTab(1);
+		
 		
 		this.vlViewer.setSizeFull();
 		//this.vlViewer.setMargin(true);

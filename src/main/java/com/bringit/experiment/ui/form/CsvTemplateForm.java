@@ -445,14 +445,14 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		
 		this.comboCsvTExperiment.setNullSelectionAllowed(false);
 		this.comboCsvTExperiment.setImmediate(true);
-		this.comboCsvTExperiment.addStyleName("small");
+		//this.comboCsvTExperiment.addStyleName("small");
 		
 		
 		//Contract Manufacturer
 		
 		this.cbxContractManufacturer.setNullSelectionAllowed(true);
 		this.cbxContractManufacturer.setImmediate(true);
-		this.cbxContractManufacturer.addStyleName("small");
+		//this.cbxContractManufacturer.addStyleName("small");
 		
 		for(int i=0; contractManufacturers!=null && i<contractManufacturers.size(); i++)
 		{
@@ -479,15 +479,15 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		
 		this.comboCsvTinRepo.setNullSelectionAllowed(true);
 		this.comboCsvTinRepo.setImmediate(true);
-		this.comboCsvTinRepo.addStyleName("small");
+		//this.comboCsvTinRepo.addStyleName("small");
 		
 		this.comboCsvoutRepo.setNullSelectionAllowed(true);
 		this.comboCsvoutRepo.setImmediate(true);
-		this.comboCsvoutRepo.addStyleName("small");
+		//this.comboCsvoutRepo.addStyleName("small");
 		
 		this.comboCsvTerrRepo.setNullSelectionAllowed(true);
 		this.comboCsvTerrRepo.setImmediate(true);
-		this.comboCsvTerrRepo.addStyleName("small");
+		//this.comboCsvTerrRepo.addStyleName("small");
 		
 		//Jobs
 		for(int j=0; j<jobs.size(); j++)
@@ -498,7 +498,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		
 		this.comboCsvjobScheduler.setNullSelectionAllowed(true);
 		this.comboCsvjobScheduler.setImmediate(true);
-		this.comboCsvjobScheduler.addStyleName("small");
+		//this.comboCsvjobScheduler.addStyleName("small");
 		
 		//Hour Execution Start
 		this.cbxStartHour.setNullSelectionAllowed(false);

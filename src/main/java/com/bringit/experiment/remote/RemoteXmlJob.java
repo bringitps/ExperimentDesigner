@@ -334,21 +334,27 @@ public class RemoteXmlJob implements Job {
             int iBatchSize = Integer.parseInt(strBatchSize);
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            System.out.println("Document Builder Factory Instance ");
 
             factory.setNamespaceAware(true);
             factory.setValidating(false);
 
             DocumentBuilder domBuilder = factory.newDocumentBuilder();
+            System.out.println("Document Builder Instance of Available Bytes: " + is.available());
+
             Document doc = domBuilder.parse(is);
+            System.out.println("Starting Parsing & Validation: "+filename);
+            
             //1)Parsing & Validation
             ResponseObj responseObj = new ExperimentParser().parseXmlDocument(doc, xmlTemplate);
+            System.out.println("Successfully parsed file: "+filename);
             
             //2)Batch Insert
             ResponseObj batchResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(responseObj.getCsvInsertColumns(),
                     responseObj.getCsvInsertValues(), xmlTemplate, null, null, dataFile, xmlTemplate.getExperiment(), iBatchSize);
 
             if (responseObj.getCode() == 0) {
-                System.out.println("Successfully parsed file: "+filename);
+                System.out.println("Records Successfully inserted. DataFile: "+filename);
 
             } else {
                 sendTransferError(xmlTemplate, filename);

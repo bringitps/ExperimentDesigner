@@ -27,11 +27,11 @@ public class TargetReportBuilderDesign extends VerticalLayout {
 	protected VerticalLayout layoutHeaderBtns;
 	protected Button btnSave;
 	protected Button btnCancel;
+	protected CheckBox chxActive;
 	protected VerticalLayout targetRptLayout;
 	protected GridLayout gridMainData;
 	protected TextField txtTargetRptName;
 	protected TextField txtTargetRptDescription;
-	protected CheckBox chxActive;
 	protected ComboBox cbxExperiment;
 	protected VerticalLayout colGroupLayout;
 	protected Button btnAddColumnGroup;

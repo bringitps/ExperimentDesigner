@@ -81,15 +81,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 	private List<Integer> dbIdOfXmlTemplateNodeItemsToDelete = new ArrayList<Integer>();
 	
 	public XmlTemplateForm(int xmlId)
-	{
-		
-		xmlTJobAndMap.getTab(0).setCaption("Job Details");
-		xmlTJobAndMap.getTab(0).setIcon(FontAwesome.CALENDAR_CHECK_O);
-		xmlTJobAndMap.setSelectedTab(0);
-		
-		xmlTJobAndMap.getTab(1).setCaption("Xml Template Mapping");
-		xmlTJobAndMap.getTab(1).setIcon(FontAwesome.SITEMAP);
-		
+	{		
 		this.tblXmlNodes.setContainerDataSource(null);
 		this.tblXmlNodes.addContainerProperty("*", CheckBox.class, null);
 		this.tblXmlNodes.addContainerProperty("Xml Node Name", TextArea.class, null);

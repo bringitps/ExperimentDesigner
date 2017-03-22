@@ -56,8 +56,8 @@ public class TargetReportForm extends TargetReportDesign {
  		targetReportModalWindow.setModal(true);
  		targetReportModalWindow.setResizable(false);
  		targetReportModalWindow.setContent(new TargetReportBuilderForm(targetReportId));
- 		targetReportModalWindow.setWidth(940, Unit.PIXELS);
- 		targetReportModalWindow.setHeight(760, Unit.PIXELS);
+ 		targetReportModalWindow.setWidth(993, Unit.PIXELS);
+ 		targetReportModalWindow.setHeight(660, Unit.PIXELS);
  		targetReportModalWindow.center();
  		targetReportModalWindow.addCloseListener(new Window.CloseListener() {
 				

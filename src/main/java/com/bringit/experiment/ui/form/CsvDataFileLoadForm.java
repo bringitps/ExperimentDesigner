@@ -34,8 +34,8 @@ public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 		 processCsvDataFileModalWindow.setModal(true);
 		 processCsvDataFileModalWindow.setResizable(false);
 		 processCsvDataFileModalWindow.setContent(new CsvDataFileProcessForm());
-		 processCsvDataFileModalWindow.setWidth(940, Unit.PIXELS);
-		 processCsvDataFileModalWindow.setHeight(760, Unit.PIXELS);
+		 processCsvDataFileModalWindow.setWidth(993, Unit.PIXELS);
+		 processCsvDataFileModalWindow.setHeight(310, Unit.PIXELS);
 		 processCsvDataFileModalWindow.center();
 		 processCsvDataFileModalWindow.addCloseListener(new Window.CloseListener() {
 			

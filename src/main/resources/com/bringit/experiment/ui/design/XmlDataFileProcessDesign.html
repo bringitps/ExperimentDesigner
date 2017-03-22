@@ -6,12 +6,9 @@
   <meta name="vaadin-version" content="7.7.0">
  </head> 
  <body> 
-  <vaadin-vertical-layout style-name="crud-template" responsive> 
-   <vaadin-label style-name="valo-menu" plain-text>
-     - Process Xml Data File 
-   </vaadin-label> 
-   <vaadin-vertical-layout margin> 
-    <vaadin-grid-layout width-full height="30px"> 
+  <vaadin-vertical-layout style-name="well" responsive margin> 
+   <vaadin-vertical-layout> 
+    <vaadin-grid-layout width="960px" height="35px"> 
      <row> 
       <column> 
        <vaadin-grid-layout width="100px" height="30px"> 
@@ -32,9 +29,9 @@
      </row> 
     </vaadin-grid-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-vertical-layout size-auto> 
-    <vaadin-vertical-layout style-name="XmlTemplateCRUDLayout" width="940px" _id="crudLayout"> 
-     <vaadin-grid-layout spacing id="gridMainData" width="940px" margin> 
+   <vaadin-vertical-layout width="960px"> 
+    <vaadin-vertical-layout style-name="XmlTemplateCRUDLayout" _id="crudLayout"> 
+     <vaadin-grid-layout spacing id="gridMainData" width-full> 
       <row> 
        <column> 
         <vaadin-combo-box caption="Xml Template:" required style-name="small" width-full _id="cbxXmlTemplate"></vaadin-combo-box> 
@@ -54,7 +51,7 @@
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-vertical-layout width="940px" margin> 
+   <vaadin-vertical-layout width="960px"> 
     <vaadin-text-area caption="Xml Data File Load Process Results..." style-name="tiny" width-full readonly _id="txtXmlDataFileLoadResults"></vaadin-text-area> 
    </vaadin-vertical-layout> 
   </vaadin-vertical-layout>  

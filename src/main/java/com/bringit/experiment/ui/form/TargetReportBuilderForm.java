@@ -75,6 +75,8 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 	{	
 		enableComponents(false);
 		cbxExperiment.setNullSelectionAllowed(false);
+		colGroupLayout.setMargin(new MarginInfo(false, true, true, true));
+		
 		for(int j=0; j<experiments.size(); j++)
 		{
 			cbxExperiment.addItem(experiments.get(j).getExpId());
@@ -432,7 +434,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			gridInfoColGroup.addComponent(chxIsFailGroup, 1, 0);
 			gridInfoColGroup.setComponentAlignment(chxIsFailGroup, Alignment.MIDDLE_RIGHT);
 			
-			gridInfoColGroup.setMargin(new MarginInfo(false, true, false, true));
+			//gridInfoColGroup.setMargin(new MarginInfo(false, true, false, true));
 			gridInfoColGroup.setSpacing(true);
 					
 			infoColGroupLayout.addComponent(gridInfoColGroup);
@@ -471,7 +473,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			tblTargetReportInfoColumns.addContainerProperty("Column Label", TextField.class, null);
 			tblTargetReportInfoColumns.setPageLength(100);
 			tblTargetReportInfoColumns.setWidth(100, Unit.PERCENTAGE);
-			tblTargetReportInfoColumns.setHeight(150, Unit.PIXELS);
+			tblTargetReportInfoColumns.setHeight(155, Unit.PIXELS);
 			tblTargetReportInfoColumns.setStyleName("tiny");
 			tblTargetReportInfoColumns.setSelectable(true);
 			tblTargetReportInfoColumns.setMultiSelect(false);
@@ -507,7 +509,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			splitTblPanel.setLocked(true);
 			splitTblPanel.addComponent(tblTargetReportInfoColumns);
 			splitTblPanel.addComponent(gridBtnsReportColumns);
-
+			infoColGroupLayout.setMargin(true);
 			infoColGroupLayout.addComponent(splitTblPanel);
 			
 			if(targetColumnGroup != null)
@@ -549,7 +551,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 	        });
 			
 			gridNewColumnGroup.addComponent(newTxtInfoColumnGroupName, 0, 0);
-			gridNewColumnGroup.setComponentAlignment(newTxtInfoColumnGroupName, Alignment.MIDDLE_LEFT);
+			//gridNewColumnGroup.setComponentAlignment(newTxtInfoColumnGroupName, Alignment.MIDDLE_LEFT);
 
 			
 			CheckBox chxIsFailGroup = new CheckBox();
@@ -557,7 +559,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			chxIsFailGroup.setCaption("Is Fail Group?");
 			gridNewColumnGroup.addComponent(chxIsFailGroup, 1, 0);
 			gridNewColumnGroup.setComponentAlignment(chxIsFailGroup, Alignment.MIDDLE_RIGHT);
-			gridNewColumnGroup.setMargin(new MarginInfo(false, true, false, true));
+			//gridNewColumnGroup.setMargin(new MarginInfo(false, true, false, true));
 			gridNewColumnGroup.setSpacing(true);
 			
 			newColumnGroupLayout.addComponent(gridNewColumnGroup);
@@ -598,7 +600,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			tblTargetReportColumns.addContainerProperty("Max", TextField.class, null);
 			tblTargetReportColumns.setPageLength(100);
 			tblTargetReportColumns.setWidth(100, Unit.PERCENTAGE);
-			tblTargetReportColumns.setHeight(150, Unit.PIXELS);
+			tblTargetReportColumns.setHeight(155, Unit.PIXELS);
 			tblTargetReportColumns.setStyleName("tiny");
 			tblTargetReportColumns.setSelectable(true);
 			tblTargetReportColumns.setMultiSelect(false);
@@ -608,7 +610,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			splitTblPanel.setLocked(true);
 			splitTblPanel.addComponent(tblTargetReportColumns);
 			splitTblPanel.addComponent(gridBtnsReportColumns);
-			
+			newColumnGroupLayout.setMargin(true);
 			newColumnGroupLayout.addComponent(splitTblPanel);
 
 			

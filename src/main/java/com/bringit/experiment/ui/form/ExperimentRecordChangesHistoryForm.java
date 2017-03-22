@@ -12,7 +12,7 @@ public class ExperimentRecordChangesHistoryForm extends ExperimentRecordChangesH
 
 	public ExperimentRecordChangesHistoryForm(Experiment experiment, Integer experimentDbRecordId)
 	{
-		this.lblExperimentRecordTitle.setValue(" -" + experiment.getExpName());
+		//this.lblExperimentRecordTitle.setValue(" -" + experiment.getExpName());
 		
 		String sqlSelectQuery = ExperimentUtil.buildSqlSelectQueryExperimentChangesLog(experiment.getExpId().toString(), experimentDbRecordId.toString());
 		ResultSet experimentRecordChangesViewResults = new ExecuteQueryDao().getSqlSelectQueryResults(sqlSelectQuery);

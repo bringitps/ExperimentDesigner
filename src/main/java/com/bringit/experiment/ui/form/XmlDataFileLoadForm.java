@@ -51,8 +51,8 @@ public class XmlDataFileLoadForm extends XmlDataFileLoadDesign{
 		 processXmlDataFileModalWindow.setModal(true);
 		 processXmlDataFileModalWindow.setResizable(false);
 		 processXmlDataFileModalWindow.setContent(new XmlDataFileProcessForm());
-		 processXmlDataFileModalWindow.setWidth(940, Unit.PIXELS);
-		 processXmlDataFileModalWindow.setHeight(760, Unit.PIXELS);
+		 processXmlDataFileModalWindow.setWidth(993, Unit.PIXELS);
+		 processXmlDataFileModalWindow.setHeight(310, Unit.PIXELS);
 		 processXmlDataFileModalWindow.center();
 		 processXmlDataFileModalWindow.addCloseListener(new Window.CloseListener() {
 			

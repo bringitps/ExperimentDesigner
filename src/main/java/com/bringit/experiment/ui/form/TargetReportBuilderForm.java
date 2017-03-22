@@ -380,6 +380,9 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				
 				targetRptColGroup.setTargetReport(this.targetReport);
 				targetRptColGroups.add(targetRptColGroup);
+				
+				
+				
 				//infoColGroupLayout.getComponent(0).getCaption();
 				//System.out.println("Group Name: " + txtInfoColGroupName.getValue() + " Is Fail Group?:" + chxIsFailGroup.getValue()+ "\n");
 				//System.out.println("Group: " + infoColGroupLayout.getCaption() + " Tbl Rows:" + tblTargetReportInfoColumns.getItemIds().size() + "\n");
@@ -392,7 +395,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				//	System.out.println("Target Report Column Group: " + targetRptColGroups.get(j));
 			
 				//for(int j=0; j<targetRptColumns.size(); j++)
-				//	System.out.println("Target Report Column: " + targetRptColumns.get(j));
+				//System.out.println("Target Report Column: " + targetRptColumns.get(j));
 				
 		}
 	}
@@ -708,20 +711,20 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
             }
         };
 
-		TextField txtGoal = new TextField();
-		txtGoal.setRequired(true);
-		txtGoal.setStyleName("tiny");
-		txtGoal.setWidth(65, Unit.PIXELS);
-		txtGoal.addValidator(floatValidator);	
-		itemValues[3] = txtGoal;
-		
 		TextField txtOffset = new TextField();
 		txtOffset.setRequired(true);
 		txtOffset.setStyleName("tiny");
 		txtOffset.setWidth(65, Unit.PIXELS);
 		txtOffset.addValidator(floatValidator);
-		itemValues[4] = txtOffset;
+		itemValues[3] = txtOffset;
 
+		TextField txtGoal = new TextField();
+		txtGoal.setRequired(true);
+		txtGoal.setStyleName("tiny");
+		txtGoal.setWidth(65, Unit.PIXELS);
+		txtGoal.addValidator(floatValidator);	
+		itemValues[4] = txtGoal;
+		
 		TextField txtMin = new TextField();
 		txtMin.setEnabled(false);
 		txtMin.setStyleName("tiny");

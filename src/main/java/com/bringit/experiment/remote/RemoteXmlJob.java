@@ -37,6 +37,7 @@ import java.util.List;
 /**
  * Created by msilay on 2/22/17.
  */
+@DisallowConcurrentExecution
 public class RemoteXmlJob implements Job {
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {

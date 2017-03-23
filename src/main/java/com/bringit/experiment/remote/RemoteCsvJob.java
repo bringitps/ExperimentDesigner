@@ -25,6 +25,7 @@ import java.util.List;
 /**
  * Created by msilay on 3/8/17.
  */
+@DisallowConcurrentExecution
 public class RemoteCsvJob implements Job {
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {

@@ -456,7 +456,19 @@ public class FTPUtil {
             // behind firewalls these days.
             ftp.enterLocalPassiveMode();
             ftp.changeWorkingDirectory(directory);
-            fStream = ftp.retrieveFileStream(filename);
+
+            // Changed to fix unreliable behavior
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ftp.retrieveFile(filename, outputStream);
+            //boolean cpc = ftp.completePendingCommand();
+            //System.out.println("complete pending command: "+cpc);
+
+            fStream = new ByteArrayInputStream(outputStream.toByteArray());
+
+            outputStream.close();
+
+            //fStream = ftp.retrieveFileStream(filename);
             return fStream;
             //ftp.logout();
         } catch (Exception e) {

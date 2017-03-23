@@ -200,8 +200,21 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.csvt.setProcessedFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvoutRepo.getValue()));
 			this.csvt.setInboundFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvTinRepo.getValue()));
 		
+			//if(this.comboCsvjobScheduler.getValue()!=null) 
+			//	this.csvt.setJobExecRepeat(new JobExecutionRepeatDao().getJobExecutionRepeatById((int) this.comboCsvjobScheduler.getValue()));
+			
+			if(this.cbxContractManufacturer.getValue()!=null)
+				this.csvt.setContractManufacturer(new ContractManufacturerDao().getContractManufacturerById((int) this.cbxContractManufacturer.getValue()));
+			else
+				this.csvt.setContractManufacturer(null);
+				
 			if(this.comboCsvjobScheduler.getValue()!=null) 
 				this.csvt.setJobExecRepeat(new JobExecutionRepeatDao().getJobExecutionRepeatById((int) this.comboCsvjobScheduler.getValue()));
+			else
+				this.csvt.setJobExecRepeat(null);
+			
+		
+			
 			this.csvt.setLastModifiedBy(sessionUser);
 			this.csvt.setModifiedDate(new Date());
 			this.csvt.setCsvTemplateExecStartDate(this.dtCsvTstart.getValue());
@@ -515,6 +528,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 		this.csvt.setLastModifiedBy(sessionUser);
 		this.csvt.setModifiedDate(new Date());
+		this.csvt.setContractManufacturer(null);
 		CsvTemplateDao csvDao = new CsvTemplateDao();
 		csvDao.updateCsvTemplate(csvt);
 

@@ -27,6 +27,7 @@ public class UnitOfMeasureConfigDesign extends VerticalLayout {
 	protected TextField txtSearch;
 	protected ComboBox cbxUnitsOfMeasureFilters;
 	protected Button btnSave;
+	protected Button btnCancel;
 	protected GridLayout gridButtons;
 	protected Button btnAddUom;
 	protected Button btnDeleteUom;

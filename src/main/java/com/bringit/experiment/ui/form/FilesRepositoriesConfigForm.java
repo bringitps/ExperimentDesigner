@@ -120,7 +120,7 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 		this.tblFilesRepository.addContainerProperty("Port", TextField.class, null);
 		this.tblFilesRepository.addContainerProperty("User", TextField.class, null);
 		this.tblFilesRepository.addContainerProperty("Pass", PasswordField.class, null);
-		tblFilesRepository.setColumnWidth("*", 15);
+		tblFilesRepository.setColumnWidth("*", 20);
 		this.tblFilesRepository.setEditable(true);
 		this.tblFilesRepository.setPageLength(100);
 		

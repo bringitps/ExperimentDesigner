@@ -170,7 +170,7 @@ public class ExperimentDao {
 			query += " DataFileId int ,";
 			query += " CreatedDate datetime ,";
 			query += " LastModifiedDate datetime ,";
-			query += " FOREIGN KEY (CmId) REFERENCES ContractManufacturer(CmId), ";
+			query += " FOREIGN KEY (CmId) REFERENCES ContractManufacturer(CmId) ON DELETE CASCADE, ";
 			query += " FOREIGN KEY (CreatedBy) REFERENCES SysUser(UserId), ";
 			query += " FOREIGN KEY (LastModifiedBy) REFERENCES SysUser(UserId), ";
 			query += " FOREIGN KEY (DataFileId) REFERENCES DataFile(DataFileId));";

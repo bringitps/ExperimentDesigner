@@ -6,14 +6,18 @@ import java.util.List;
 
 import com.bringit.experiment.bll.ContractManufacturer;
 import com.bringit.experiment.dao.ContractManufacturerDao;
+import com.bringit.experiment.dao.CsvTemplateDao;
+import com.bringit.experiment.dao.XmlTemplateDao;
 import com.bringit.experiment.ui.design.ContractManufacturerConfigDesign;
 import com.vaadin.data.Item;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.util.filter.Like;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification.Type;
 
@@ -68,18 +72,30 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
                 }
 			}
 			});
+
+		btnCancel.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				 loadTblData();
+			}
+
+		});
 	}
 	
 	private void loadTblData()
 	{
+		dbIdOfItemsToDelete = new ArrayList<Integer>();
+		
 		tblContractManufacturer.setContainerDataSource(null);
 		tblContractManufacturer.addContainerProperty("*", CheckBox.class, null);
-		tblContractManufacturer.addContainerProperty("Name", String.class, null);
-		tblContractManufacturer.addContainerProperty("Abbreviation", String.class, null);
-		tblContractManufacturer.addContainerProperty("Description", String.class, null);
-		tblContractManufacturer.addContainerProperty("E-mail", String.class, null);
+		tblContractManufacturer.addContainerProperty("Name", TextField.class, null);
+		tblContractManufacturer.addContainerProperty("Abbreviation", TextField.class, null);
+		tblContractManufacturer.addContainerProperty("Description", TextField.class, null);
+		tblContractManufacturer.addContainerProperty("E-mail", TextField.class, null);
 		tblContractManufacturer.setEditable(true);
 		tblContractManufacturer.setPageLength(0);
+		tblContractManufacturer.setColumnWidth("*", 20);
 
 		cbxContractManufacturerFilters.addItem("Name");
 		cbxContractManufacturerFilters.addItem("Abbreviation");
@@ -97,10 +113,29 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 			chxSelect.setVisible(false);
 			itemValues[0] = chxSelect;
 
-			itemValues[1] = contractManufacturers.get(i).getCmName();
-			itemValues[2] = contractManufacturers.get(i).getCmAbbreviation();
-			itemValues[3] = contractManufacturers.get(i).getCmDescription();
-			itemValues[4] = contractManufacturers.get(i).getCmEmail();
+			TextField txtCmName = new TextField();
+			txtCmName.setStyleName("tiny");
+			txtCmName.setValue(contractManufacturers.get(i).getCmName());		
+			txtCmName.setWidth(97, Unit.PERCENTAGE);
+			itemValues[1] = txtCmName;
+			
+			TextField txtCmAbbreviation = new TextField();
+			txtCmAbbreviation.setStyleName("tiny");
+			txtCmAbbreviation.setValue(contractManufacturers.get(i).getCmAbbreviation());		
+			txtCmAbbreviation.setWidth(97, Unit.PERCENTAGE);
+			itemValues[2] = txtCmAbbreviation;
+			
+			TextField txtCmDescription = new TextField();
+			txtCmDescription.setStyleName("tiny");
+			txtCmDescription.setValue(contractManufacturers.get(i).getCmDescription());		
+			txtCmDescription.setWidth(97, Unit.PERCENTAGE);
+			itemValues[3] = txtCmDescription;
+			
+			TextField txtCmEmail = new TextField();
+			txtCmEmail.setStyleName("tiny");
+			txtCmEmail.setValue(contractManufacturers.get(i).getCmEmail());		
+			txtCmEmail.setWidth(97, Unit.PERCENTAGE);
+			itemValues[4] = txtCmEmail;
 			
 			tblContractManufacturer.addItem(itemValues, contractManufacturers.get(i).getCmId());
 		}
@@ -114,11 +149,38 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 		chxSelect.setVisible(false);
 		itemValues[0] = chxSelect;
 
+
+		TextField txtCmName = new TextField();
+		txtCmName.setStyleName("tiny");
+		txtCmName.setValue("");		
+		txtCmName.setWidth(97, Unit.PERCENTAGE);
+		itemValues[1] = txtCmName;
+		
+		TextField txtCmAbbreviation = new TextField();
+		txtCmAbbreviation.setStyleName("tiny");
+		txtCmAbbreviation.setValue("");		
+		txtCmAbbreviation.setWidth(97, Unit.PERCENTAGE);
+		itemValues[2] = txtCmAbbreviation;
+		
+		TextField txtCmDescription = new TextField();
+		txtCmDescription.setStyleName("tiny");
+		txtCmDescription.setValue("");		
+		txtCmDescription.setWidth(97, Unit.PERCENTAGE);
+		itemValues[3] = txtCmDescription;
+		
+		TextField txtCmEmail = new TextField();
+		txtCmEmail.setStyleName("tiny");
+		txtCmEmail.setValue("");		
+		txtCmEmail.setWidth(97, Unit.PERCENTAGE);
+		itemValues[4] = txtCmEmail;
+		
+		/*
 		itemValues[1] = new String();
 		itemValues[2] = new String();
 		itemValues[3] = new String();
 		itemValues[4] = new String();
-
+		*/
+		
 		this.lastNewItemId = this.lastNewItemId - 1;
 		tblContractManufacturer.addItem(itemValues, this.lastNewItemId);
 		tblContractManufacturer.select(this.lastNewItemId);
@@ -126,24 +188,24 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 	
 	private void deleteContractManufacturerRow()
 	{
-		dbIdOfItemsToDelete.add((int)tblContractManufacturer.getValue());
-		tblContractManufacturer.removeItem((int)tblContractManufacturer.getValue());
+		//dbIdOfItemsToDelete.add((int)tblContractManufacturer.getValue());
+		//tblContractManufacturer.removeItem((int)tblContractManufacturer.getValue());
 		
-		/*
-		boolean hasExperimentFieldsLinked = false;
-		if(this.tblUnitsOfMeasure.getValue() != null && (int)this.tblUnitsOfMeasure.getValue() > 0 )
+		boolean hasTemplatesLinked = false;
+		if(this.tblContractManufacturer.getValue() != null && (int)this.tblContractManufacturer.getValue() > 0 )
 		{
-			if(new ExperimentFieldDao().getAllExperimentFieldsByUnitOfMeasureId((int)this.tblUnitsOfMeasure.getValue()).size() <= 0)
-				dbIdOfItemsToDelete.add((int)this.tblUnitsOfMeasure.getValue());
+			if(new CsvTemplateDao().getCsvTemplatesByCmId((int)this.tblContractManufacturer.getValue()).size() == 0
+					&& new XmlTemplateDao().getXmlTemplatesByCmId((int)this.tblContractManufacturer.getValue()).size() == 0)
+				dbIdOfItemsToDelete.add((int)this.tblContractManufacturer.getValue());
 			else
-				hasExperimentFieldsLinked = true;
+				hasTemplatesLinked = true;
 		}
 		
-		if(!hasExperimentFieldsLinked && this.tblUnitsOfMeasure.getValue() != null)
-			this.tblUnitsOfMeasure.removeItem((int)this.tblUnitsOfMeasure.getValue());
-		else if(hasExperimentFieldsLinked)
-			this.getUI().showNotification("Unit Of Measure Record can not be deleted. \nThere are Experiment Fields linked.", Type.WARNING_MESSAGE);
-		*/	
+		if(!hasTemplatesLinked && this.tblContractManufacturer.getValue() != null)
+			this.tblContractManufacturer.removeItem((int)this.tblContractManufacturer.getValue());
+		else if(hasTemplatesLinked)
+			this.getUI().showNotification("Contract Manufacturer Record can not be deleted. \nThere are Xml or Csv Templates linked.", Type.WARNING_MESSAGE);
+			
 	}
 	
 
@@ -152,8 +214,9 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 	{
 		boolean validateRequiredFieldsResult = validateRequiredFields();
 		boolean validateEmailAddressesResult = validateEmailAddresses();
+		boolean validateDuplicatedNamesResult = validateDuplicatedNames();
 		
-		if(validateRequiredFieldsResult && validateEmailAddressesResult)
+		if(validateRequiredFieldsResult && validateEmailAddressesResult && validateDuplicatedNamesResult)
 		{
 			ContractManufacturerDao contractManufacturerDao = new ContractManufacturerDao();
 		
@@ -169,10 +232,10 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 				Item tblRowItem = tblContractManufacturer.getContainerDataSource().getItem(itemId);
 				
 				ContractManufacturer contractManufacturer = new ContractManufacturer();
-				contractManufacturer.setCmName((String)(tblRowItem.getItemProperty("Name").getValue()));
-				contractManufacturer.setCmAbbreviation((String)(tblRowItem.getItemProperty("Abbreviation").getValue()));
-				contractManufacturer.setCmDescription((String)(tblRowItem.getItemProperty("Description").getValue()));
-				contractManufacturer.setCmEmail((String)(tblRowItem.getItemProperty("E-mail").getValue()));
+				contractManufacturer.setCmName(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
+				contractManufacturer.setCmAbbreviation(((TextField)(tblRowItem.getItemProperty("Abbreviation").getValue())).getValue());
+				contractManufacturer.setCmDescription(((TextField)(tblRowItem.getItemProperty("Description").getValue())).getValue());
+				contractManufacturer.setCmEmail(((TextField)(tblRowItem.getItemProperty("E-mail").getValue())).getValue());
 							
 				if(itemId > 0)
 				{
@@ -190,6 +253,8 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 			this.getUI().showNotification("Name must be set for New Contract Manufacturer Records", Type.WARNING_MESSAGE);
 		else if(!validateEmailAddressesResult)	
 			this.getUI().showNotification("Invalid E-mail addresses found. Please check.", Type.WARNING_MESSAGE);
+		else if(!validateDuplicatedNamesResult)
+			this.getUI().showNotification("Name of Contract Manufacturer can not be duplicated.", Type.WARNING_MESSAGE);
 	}
 	
 	private boolean validateRequiredFields()
@@ -201,7 +266,7 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 			int itemId = (int)itemIdObj;
 			Item tblRowItem = tblContractManufacturer.getContainerDataSource().getItem(itemId);
 			
-			if(((String)(tblRowItem.getItemProperty("Name").getValue())).isEmpty())
+			if(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue().isEmpty())
 			{
 				tblContractManufacturer.select(itemId);
 				return false;
@@ -220,11 +285,35 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 			int itemId = (int)itemIdObj;
 			Item tblRowItem = tblContractManufacturer.getContainerDataSource().getItem(itemId);
 			
-			if(!isValidEmailAddress((String)(tblRowItem.getItemProperty("E-mail").getValue())))
+			if(!isValidEmailAddress(((TextField)(tblRowItem.getItemProperty("E-mail").getValue())).getValue()))
 			{
 				tblContractManufacturer.select(itemId);
 				return false;
 			}
+		}
+		
+		return true;
+	}
+	
+
+	private boolean validateDuplicatedNames()
+	{
+		List<String> fileRepoNames = new ArrayList<String>();
+		
+		Collection itemIds = this.tblContractManufacturer.getContainerDataSource().getItemIds();
+		
+		for (Object itemIdObj : itemIds) 
+		{	
+			int itemId = (int)itemIdObj;
+			Item tblRowItem = this.tblContractManufacturer.getContainerDataSource().getItem(itemId);
+			
+			if(fileRepoNames.indexOf(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue()) >= 0)
+			{
+				tblContractManufacturer.select(itemId);
+				return false;
+			}
+			else
+				fileRepoNames.add(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
 		}
 		
 		return true;

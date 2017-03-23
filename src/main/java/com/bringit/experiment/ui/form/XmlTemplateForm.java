@@ -234,9 +234,13 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			
 			if(this.cbxContractManufacturer.getValue()!=null)
 				this.xmlt.setContractManufacturer(new ContractManufacturerDao().getContractManufacturerById((int) this.cbxContractManufacturer.getValue()));
-			
+			else
+				this.xmlt.setContractManufacturer(null);
+				
 			if(this.comboXmljobScheduler.getValue()!=null) 
 				this.xmlt.setJobExecRepeat(new JobExecutionRepeatDao().getJobExecutionRepeatById((int) this.comboXmljobScheduler.getValue()));
+			else
+				this.xmlt.setJobExecRepeat(null);
 			
 			this.xmlt.setLastModifiedBy(sessionUser);
 			this.xmlt.setModifiedDate(new Date());
@@ -597,6 +601,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 		this.xmlt.setLastModifiedBy(sessionUser);
 		this.xmlt.setModifiedDate(new Date());
+		this.xmlt.setContractManufacturer(null);
 		XmlTemplateDao xmlDao = new XmlTemplateDao();
 		xmlDao.updateXmlTemplate(xmlt);
 		closeModalWindow();

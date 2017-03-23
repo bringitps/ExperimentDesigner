@@ -187,5 +187,23 @@ public class XmlTemplateDao {
 	        }
 	        return xmlTemplates;
 	    }
-	
+
+		
+	 @SuppressWarnings({ "unchecked", "unused" })
+		public List<XmlTemplate> getXmlTemplatesByCmId(int ContractManufacturerId)  {
+	        List<XmlTemplate> xmlTemplates = new ArrayList<XmlTemplate>();
+	        Transaction trns = null;
+	        Session session = HibernateUtil.getSessionFactory().openSession();
+			// Session session = HibernateUtil.openSession(dialectXmlFile);
+	        try {
+	            trns = session.beginTransaction();
+	            xmlTemplates = session.createQuery("from XmlTemplate where CmId = :id").setInteger("id", ContractManufacturerId).list();
+	        } catch (RuntimeException e) {
+	            e.printStackTrace();
+	        } finally {
+	            session.flush();
+	            session.close();
+	        }
+	        return xmlTemplates;
+	    }
 }

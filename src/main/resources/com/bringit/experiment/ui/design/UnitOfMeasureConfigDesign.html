@@ -12,22 +12,25 @@
    </vaadin-label> 
    <vaadin-horizontal-layout style-name="top-bar" width-full height="60px"> 
     <vaadin-horizontal-layout width-full :middle :expand> 
-     <vaadin-text-field icon="fonticon://FontAwesome/f002" input-prompt="Search" style-name="small inline-icon search" width-full _id="txtSearch"></vaadin-text-field> 
+     <vaadin-text-field icon="fonticon://FontAwesome/f002" input-prompt="Search" style-name="tiny inline-icon search" width-full _id="txtSearch"></vaadin-text-field> 
     </vaadin-horizontal-layout> 
-    <vaadin-combo-box style-name="small" _id="cbxUnitsOfMeasureFilters" :middle></vaadin-combo-box> 
-    <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="primary small" id="btnAddExperiment" plain-text _id="btnSave" :middle :right>
+    <vaadin-combo-box style-name="tiny" _id="cbxUnitsOfMeasureFilters" :middle></vaadin-combo-box> 
+    <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="primary tiny" id="btnAddExperiment" plain-text _id="btnSave" :middle :right>
       Save 
+    </vaadin-button> 
+    <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny" plain-text _id="btnCancel" :middle>
+      Cancel 
     </vaadin-button> 
    </vaadin-horizontal-layout> 
    <vaadin-grid-layout width-full height="40px" _id="gridButtons"> 
     <row> 
      <column> 
-      <vaadin-button icon="fonticon://FontAwesome/f067" style-name="small friendly" plain-text _id="btnAddUom">
+      <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" plain-text _id="btnAddUom">
         Add Unit of Measure 
       </vaadin-button> 
      </column> 
      <column> 
-      <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="small danger" plain-text _id="btnDeleteUom" :right>
+      <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" plain-text _id="btnDeleteUom" :right>
         Delete Unit of Measure 
       </vaadin-button> 
      </column> 

@@ -37,8 +37,8 @@ public class ExperimentDataReportDesign extends VerticalLayout {
 	protected PopupDateField dtFilter1;
 	protected PopupDateField dtFilter2;
 	protected Button btnOkDateFilters;
-	protected Button btnExportExcel;
 	protected Button btnViewRecordHistory;
+	protected Button btnExportExcel;
 	protected Table tblExperimentDataReport;
 
 	public ExperimentDataReportDesign() {

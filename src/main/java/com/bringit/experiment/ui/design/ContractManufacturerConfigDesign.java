@@ -27,6 +27,7 @@ public class ContractManufacturerConfigDesign extends VerticalLayout {
 	protected TextField txtSearch;
 	protected ComboBox cbxContractManufacturerFilters;
 	protected Button btnSave;
+	protected Button btnCancel;
 	protected GridLayout gridButtons;
 	protected Button btnAddJobExecRepeat;
 	protected Button btnDeleteJobExecRepeat;

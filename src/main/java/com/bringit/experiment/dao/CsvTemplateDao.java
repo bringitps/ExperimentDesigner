@@ -186,5 +186,23 @@ public class CsvTemplateDao {
         }
         return csvTemplates;
 	}
+
 	
+	 @SuppressWarnings({ "unchecked", "unused" })
+		public List<CsvTemplate> getCsvTemplatesByCmId(int ContractManufacturerId)  {
+	        List<CsvTemplate> csvTemplates = new ArrayList<CsvTemplate>();
+	        Transaction trns = null;
+	        Session session = HibernateUtil.getSessionFactory().openSession();
+			//Session session = HibernateUtil.openSession(dialectXmlFile);
+	        try {
+	            trns = session.beginTransaction();
+	            csvTemplates = session.createQuery("from CsvTemplate where CmId = :id").setInteger("id", ContractManufacturerId).list();
+	        } catch (RuntimeException e) {
+	            e.printStackTrace();
+	        } finally {
+	            session.flush();
+	            session.close();
+	        }
+	        return csvTemplates;
+	    }
 }

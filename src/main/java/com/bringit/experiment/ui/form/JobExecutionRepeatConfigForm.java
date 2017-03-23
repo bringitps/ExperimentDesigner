@@ -79,18 +79,29 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
                 }
 			}
 			});
+
+		btnCancel.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				 loadTblData();
+			}
+
+		});
 	}
 	
 	
 	private void loadTblData()
 	{
+		dbIdOfItemsToDelete = new ArrayList<Integer>();
+		
 		tblJobExecutionRepeat.setContainerDataSource(null);
 		tblJobExecutionRepeat.addContainerProperty("*", CheckBox.class, null);
 		tblJobExecutionRepeat.addContainerProperty("Name", TextField.class, null);
 		tblJobExecutionRepeat.addContainerProperty("Milliseconds", TextField.class, null);
 		tblJobExecutionRepeat.setEditable(true);
 		tblJobExecutionRepeat.setPageLength(0);
-		tblJobExecutionRepeat.setColumnWidth("*", 15);
+		tblJobExecutionRepeat.setColumnWidth("*", 20);
 		
 		cbxJobExecRepeatFilters.addItem("Name");
 		cbxJobExecRepeatFilters.addItem("Milliseconds");
@@ -189,8 +200,9 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 	{
 		boolean validateRequiredFieldsResult = validateRequiredFields();
 		boolean validateTextFieldNumberResult = validateTextFieldNumber();
+		boolean validateDuplicatedNamesResult = validateDuplicatedNames();
 		
-		if(validateRequiredFieldsResult && validateTextFieldNumberResult)
+		if(validateRequiredFieldsResult && validateTextFieldNumberResult && validateDuplicatedNamesResult)
 		{
 			JobExecutionRepeatDao jobExecRepeatDao = new JobExecutionRepeatDao();
 		
@@ -225,6 +237,8 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 			this.getUI().showNotification("Name and Milliseconds must be set for New Job Execution Repeat Records", Type.WARNING_MESSAGE);
 		else if(!validateTextFieldNumberResult)
 			this.getUI().showNotification("Invalid value for Milliseconds", Type.WARNING_MESSAGE);
+		else if(!validateDuplicatedNamesResult)
+			this.getUI().showNotification("Name of Job Execution Repeat can not be duplicated.", Type.WARNING_MESSAGE);
 		
 	}
 	
@@ -267,6 +281,29 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 				tblJobExecutionRepeat.select(itemId);
 				return false;
 			}
+		}
+		
+		return true;
+	}
+	
+	private boolean validateDuplicatedNames()
+	{
+		List<String> fileRepoNames = new ArrayList<String>();
+		
+		Collection itemIds = this.tblJobExecutionRepeat.getContainerDataSource().getItemIds();
+		
+		for (Object itemIdObj : itemIds) 
+		{	
+			int itemId = (int)itemIdObj;
+			Item tblRowItem = this.tblJobExecutionRepeat.getContainerDataSource().getItem(itemId);
+			
+			if(fileRepoNames.indexOf(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue()) >= 0)
+			{
+				tblJobExecutionRepeat.select(itemId);
+				return false;
+			}
+			else
+				fileRepoNames.add(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
 		}
 		
 		return true;

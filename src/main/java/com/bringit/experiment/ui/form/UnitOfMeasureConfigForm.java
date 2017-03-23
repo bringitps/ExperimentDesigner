@@ -13,10 +13,12 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.filter.Like;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.TextField;
 
 public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 
@@ -69,16 +71,28 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
                 }
 			}
 			});
+
+		btnCancel.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				 loadTblData();
+			}
+
+		});
 	}
 	
 	private void loadTblData()
 	{
+		dbIdOfItemsToDelete = new ArrayList<Integer>();
+		
 		this.tblUnitsOfMeasure.setContainerDataSource(null);
 		this.tblUnitsOfMeasure.addContainerProperty("*", CheckBox.class, null);
-		this.tblUnitsOfMeasure.addContainerProperty("Name", String.class, null);
-		this.tblUnitsOfMeasure.addContainerProperty("Abbreviation", String.class, null);
+		this.tblUnitsOfMeasure.addContainerProperty("Name", TextField.class, null);
+		this.tblUnitsOfMeasure.addContainerProperty("Abbreviation", TextField.class, null);
 		this.tblUnitsOfMeasure.setEditable(true);
 		this.tblUnitsOfMeasure.setPageLength(0);
+		tblUnitsOfMeasure.setColumnWidth("*", 20);
 
 		cbxUnitsOfMeasureFilters.addItem("Name");
 		cbxUnitsOfMeasureFilters.addItem("Abbreviation");
@@ -93,9 +107,18 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 			CheckBox chxSelect = new CheckBox();
 			chxSelect.setVisible(false);
 			itemValues[0] = chxSelect;
+						
+			TextField txtUomName = new TextField();
+			txtUomName.setStyleName("tiny");
+			txtUomName.setValue(unitOfMeasures.get(i).getUomName());		
+			txtUomName.setWidth(97, Unit.PERCENTAGE);
+			itemValues[1] = txtUomName;
 			
-			itemValues[1] = unitOfMeasures.get(i).getUomName();
-			itemValues[2] = unitOfMeasures.get(i).getUomAbbreviation();
+			TextField txtUomAbbreviation = new TextField();
+			txtUomAbbreviation.setStyleName("tiny");
+			txtUomAbbreviation.setValue(unitOfMeasures.get(i).getUomAbbreviation());		
+			txtUomAbbreviation.setWidth(97, Unit.PERCENTAGE);			
+			itemValues[2] = txtUomAbbreviation;
 			
 			this.tblUnitsOfMeasure.addItem(itemValues, unitOfMeasures.get(i).getUomId());
 		}
@@ -109,9 +132,18 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 		chxSelect.setVisible(false);
 		itemValues[0] = chxSelect;
 		
-		itemValues[1] = new String();
-		itemValues[2] = new String();
-
+		TextField txtUomName = new TextField();
+		txtUomName.setStyleName("tiny");
+		txtUomName.setValue("");		
+		txtUomName.setWidth(97, Unit.PERCENTAGE);
+		itemValues[1] = txtUomName;
+		
+		TextField txtUomAbbreviation = new TextField();
+		txtUomAbbreviation.setStyleName("tiny");
+		txtUomAbbreviation.setValue("");		
+		txtUomAbbreviation.setWidth(97, Unit.PERCENTAGE);			
+		itemValues[2] = txtUomAbbreviation;
+		
 		this.lastNewItemId = this.lastNewItemId - 1;
 		this.tblUnitsOfMeasure.addItem(itemValues, this.lastNewItemId);
 		this.tblUnitsOfMeasure.select(this.lastNewItemId);
@@ -138,7 +170,9 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 	private void saveUomRows()
 	{
 		boolean validateRequiredFieldsResult = validateRequiredFields();
-		if(validateRequiredFieldsResult)
+		boolean validateDuplicatedNamesResult = validateDuplicatedNames();
+		
+		if(validateRequiredFieldsResult && validateDuplicatedNamesResult)
 		{
 			UnitOfMeasureDao uomDao = new UnitOfMeasureDao();
 		
@@ -154,8 +188,9 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 				Item tblRowItem = this.tblUnitsOfMeasure.getContainerDataSource().getItem(itemId);
 				
 				UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
-				unitOfMeasure.setUomName((String)(tblRowItem.getItemProperty("Name").getValue()));
-				unitOfMeasure.setUomAbbreviation((String)(tblRowItem.getItemProperty("Abbreviation").getValue()));
+				
+				unitOfMeasure.setUomName(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
+				unitOfMeasure.setUomAbbreviation(((TextField)(tblRowItem.getItemProperty("Abbreviation").getValue())).getValue());
 							
 				if(itemId > 0)
 				{
@@ -169,9 +204,10 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 			this.getUI().showNotification("Data Saved.", Type.HUMANIZED_MESSAGE);
 			loadTblData();
 		}
-		else
+		else if(!validateRequiredFieldsResult)
 			this.getUI().showNotification("Name and Abbreviation must be set for New Unit Of Measure Records", Type.WARNING_MESSAGE);
-	
+		else if(!validateDuplicatedNamesResult)
+			this.getUI().showNotification("Name of Unit Of Measure can not be duplicated.", Type.WARNING_MESSAGE);
 	}
 	
 	private boolean validateRequiredFields()
@@ -183,16 +219,39 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 			int itemId = (int)itemIdObj;
 			Item tblRowItem = this.tblUnitsOfMeasure.getContainerDataSource().getItem(itemId);
 			
-			if(((String)(tblRowItem.getItemProperty("Name").getValue())).isEmpty())
+			if(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue().isEmpty())
 			{
 				tblUnitsOfMeasure.select(itemId);
 				return false;
 			}
-			if(((String)(tblRowItem.getItemProperty("Abbreviation").getValue())).isEmpty())
+			if(((TextField)(tblRowItem.getItemProperty("Abbreviation").getValue())).getValue().isEmpty())
 			{
 				tblUnitsOfMeasure.select(itemId);
 				return false;
 			}
+		}
+		
+		return true;
+	}
+
+	private boolean validateDuplicatedNames()
+	{
+		List<String> fileRepoNames = new ArrayList<String>();
+		
+		Collection itemIds = this.tblUnitsOfMeasure.getContainerDataSource().getItemIds();
+		
+		for (Object itemIdObj : itemIds) 
+		{	
+			int itemId = (int)itemIdObj;
+			Item tblRowItem = this.tblUnitsOfMeasure.getContainerDataSource().getItem(itemId);
+			
+			if(fileRepoNames.indexOf(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue()) >= 0)
+			{
+				tblUnitsOfMeasure.select(itemId);
+				return false;
+			}
+			else
+				fileRepoNames.add(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
 		}
 		
 		return true;

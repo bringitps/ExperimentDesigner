@@ -27,6 +27,7 @@ public class FilesRepositoriesConfigDesign extends VerticalLayout {
 	protected TextField txtSearch;
 	protected ComboBox cbxFilesRepositoriesFilters;
 	protected Button btnSave;
+	protected Button btnCancel;
 	protected GridLayout gridButtons;
 	protected Button btnAddFileRepo;
 	protected Button btnDeleteFileRepo;

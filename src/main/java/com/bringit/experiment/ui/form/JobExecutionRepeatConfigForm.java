@@ -84,13 +84,14 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 	
 	private void loadTblData()
 	{
-		this.tblJobExecutionRepeat.setContainerDataSource(null);
-		this.tblJobExecutionRepeat.addContainerProperty("*", CheckBox.class, null);
-		this.tblJobExecutionRepeat.addContainerProperty("Name", String.class, null);
-		this.tblJobExecutionRepeat.addContainerProperty("Milliseconds", TextField.class, null);
-		this.tblJobExecutionRepeat.setEditable(true);
-		this.tblJobExecutionRepeat.setPageLength(0);
-
+		tblJobExecutionRepeat.setContainerDataSource(null);
+		tblJobExecutionRepeat.addContainerProperty("*", CheckBox.class, null);
+		tblJobExecutionRepeat.addContainerProperty("Name", TextField.class, null);
+		tblJobExecutionRepeat.addContainerProperty("Milliseconds", TextField.class, null);
+		tblJobExecutionRepeat.setEditable(true);
+		tblJobExecutionRepeat.setPageLength(0);
+		tblJobExecutionRepeat.setColumnWidth("*", 15);
+		
 		cbxJobExecRepeatFilters.addItem("Name");
 		cbxJobExecRepeatFilters.addItem("Milliseconds");
 		cbxJobExecRepeatFilters.select("Name");
@@ -103,11 +104,17 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 		{
 			CheckBox chxSelect = new CheckBox();
 			chxSelect.setVisible(false);
+			chxSelect.setWidth(10, Unit.PIXELS);
 			itemValues[0] = chxSelect;
 			
-			itemValues[1] = jobExecutionRepeats.get(i).getJobExecRepeatName();
+			TextField txtJobExecRepeatName = new TextField();
+			txtJobExecRepeatName.setStyleName("tiny");
+			txtJobExecRepeatName.setValue(jobExecutionRepeats.get(i).getJobExecRepeatName());			
+			txtJobExecRepeatName.setWidth(95, Unit.PERCENTAGE);
+			itemValues[1] = txtJobExecRepeatName;
 			
 			TextField txtMilliSeconds = new TextField();
+			txtMilliSeconds.setStyleName("tiny");
 			txtMilliSeconds.addValidator(new Validator() {
 
 	            public void validate(Object value) throws InvalidValueException {
@@ -117,6 +124,7 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 	            
 	        });
 			txtMilliSeconds.setValue(((Integer)jobExecutionRepeats.get(i).getJobExecRepeatMilliseconds()).toString());
+			txtMilliSeconds.setWidth(95, Unit.PERCENTAGE);
 			itemValues[2] = txtMilliSeconds;
 
 			this.tblJobExecutionRepeat.addItem(itemValues, jobExecutionRepeats.get(i).getJobExecRepeatId());
@@ -131,10 +139,16 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 		CheckBox chxSelect = new CheckBox();
 		chxSelect.setVisible(false);
 		itemValues[0] = chxSelect;
-		
-		itemValues[1] = new String();
+
+		TextField txtJobExecRepeatName = new TextField();
+		txtJobExecRepeatName.setStyleName("tiny");
+		txtJobExecRepeatName.setValue("");
+		txtJobExecRepeatName.setWidth(95, Unit.PERCENTAGE);
+		itemValues[1] = txtJobExecRepeatName;
 		
 		TextField txtMilliSeconds = new TextField();
+		txtMilliSeconds.setWidth(95, Unit.PERCENTAGE);
+		txtMilliSeconds.setStyleName("tiny");
 		txtMilliSeconds.addValidator(new Validator() {
 
             public void validate(Object value) throws InvalidValueException {
@@ -192,7 +206,7 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 				Item tblRowItem = this.tblJobExecutionRepeat.getContainerDataSource().getItem(itemId);
 				
 				JobExecutionRepeat jobExecRepeat = new JobExecutionRepeat();
-				jobExecRepeat.setJobExecRepeatName((String)(tblRowItem.getItemProperty("Name").getValue()));
+				jobExecRepeat.setJobExecRepeatName(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
 				jobExecRepeat.setJobExecRepeatMilliseconds(Integer.parseInt(((TextField)(tblRowItem.getItemProperty("Milliseconds").getValue())).getValue()));
 							
 				if(itemId > 0)
@@ -224,7 +238,7 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 			int itemId = (int)itemIdObj;
 			Item tblRowItem = this.tblJobExecutionRepeat.getContainerDataSource().getItem(itemId);
 			
-			if(((String)(tblRowItem.getItemProperty("Name").getValue())).isEmpty())
+			if(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue().isEmpty())
 			{
 				tblJobExecutionRepeat.select(itemId);
 				return false;

@@ -2,13 +2,18 @@ package com.bringit.experiment.ui.form;
 
 
 
+import java.sql.ResultSet;
 import java.util.List;
 
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.CsvTemplate;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.CsvTemplateDao;
+import com.bringit.experiment.dao.DataBaseViewDao;
 import com.bringit.experiment.ui.design.CsvDataFileLoadDesign;
+import com.bringit.experiment.util.VaadinControls;
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
@@ -17,7 +22,14 @@ import com.vaadin.ui.Window.CloseEvent;
 public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 
 	public CsvDataFileLoadForm() {
-
+		
+		ResultSet vwCsvDataLoadExecResults = new DataBaseViewDao().getViewResults("vwCsvDataLoadExecutionResult");
+		if(vwCsvDataLoadExecResults != null)
+		{
+			VaadinControls.bindDbViewRsToVaadinTable(tblCsvDataFileLoads, vwCsvDataLoadExecResults, 1);
+			VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxCsvDataFileLoadsViewFilters, vwCsvDataLoadExecResults);
+		}
+		
 		btnProcessCsvDataFile.addClickListener(new Button.ClickListener() {
 			
 			@Override
@@ -25,7 +37,13 @@ public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 				openProcessCsvDataFileModalWindow();
 			}
 		});
-		
+
+		txtSearch.addShortcutListener(new ShortcutListener("Enter Shortcut", ShortcutAction.KeyCode.ENTER, null) {
+			@Override
+			public void handleAction(Object sender, Object target) {
+				filterDbViewResults();
+			}
+			});
 	}
 	
 	public void openProcessCsvDataFileModalWindow()
@@ -42,11 +60,21 @@ public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 			@Override
 			public void windowClose(CloseEvent e) {
 				// TODO Auto-generated method stub
-				//reloadExperimentDbViewResults();
+				filterDbViewResults();
 			}
 		});
 		 this.getUI().addWindow(processCsvDataFileModalWindow);
     }
 	
+	private void filterDbViewResults()
+	{
+		if(cbxCsvDataFileLoadsViewFilters.getValue() != null)
+		{
+			ResultSet experimentViewResults = new DataBaseViewDao().getFilteredViewResults("vwCsvDataLoadExecutionResult", (String)cbxCsvDataFileLoadsViewFilters.getValue(), txtSearch.getValue());
+
+			if(experimentViewResults != null)
+				VaadinControls.bindDbViewRsToVaadinTable(tblCsvDataFileLoads, experimentViewResults, 1);
+		}
+	}
 	
 }

@@ -276,11 +276,19 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 		boolean validateDuplicatedNamesResult = validateDuplicatedNames();
 		boolean validateUniqueFileRepoProtocolResult = validateUniqueFileRepoProtocol();
 		boolean validateFileRepoConnectionResult = false;
+		boolean validateFileRepoPathResult = false;
+		boolean validateFileRepoPermissionsResult = false;
 		
 		if(validateUniqueFileRepoProtocolResult)
 			validateFileRepoConnectionResult = validateFileRepoConnection();
 		
-		if(validateRequiredFieldsResult && validateDuplicatedNamesResult && validateUniqueFileRepoProtocolResult && validateFileRepoConnectionResult)
+		if(validateFileRepoConnectionResult)
+			validateFileRepoPathResult = validateFileRepoPath();
+		
+		if(validateFileRepoPathResult)
+			validateFileRepoPermissionsResult = validateFileRepoPermissions();
+		
+		if(validateRequiredFieldsResult && validateDuplicatedNamesResult && validateUniqueFileRepoProtocolResult && validateFileRepoConnectionResult && validateFileRepoPathResult && validateFileRepoPermissionsResult)
 		{
 			FilesRepositoryDao filesRepoDao = new FilesRepositoryDao();
 		
@@ -325,7 +333,11 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 		else if(!validateUniqueFileRepoProtocolResult)
 			this.getUI().showNotification("Only 1 communication protocol should be selected.", Type.WARNING_MESSAGE);
 		else if(!validateFileRepoConnectionResult)
-			this.getUI().showNotification("Invalid File Repository. Connection could not be established.", Type.WARNING_MESSAGE);			
+			this.getUI().showNotification("Invalid Connection Data of File Repository. Connection could not be established.", Type.WARNING_MESSAGE);			
+		else if(!validateFileRepoPathResult)
+			this.getUI().showNotification("Invalid Path of File Repository. Folder not found.", Type.WARNING_MESSAGE);			
+		else if(!validateFileRepoPermissionsResult)
+			this.getUI().showNotification("Folder permissions not granted for File Repository.", Type.WARNING_MESSAGE);			
 	}
 	
 	private boolean validateRequiredFields()
@@ -370,12 +382,8 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 		return true;
 	}	
 	
-	
-
 	private boolean validateUniqueFileRepoProtocol()
 	{
-		List<String> fileRepoNames = new ArrayList<String>();
-		
 		Collection itemIds = this.tblFilesRepository.getContainerDataSource().getItemIds();
 		
 		for (Object itemIdObj : itemIds) 
@@ -399,8 +407,123 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 	
 	private boolean validateFileRepoConnection()
 	{
-		List<String> fileRepoNames = new ArrayList<String>();
+		Collection itemIds = this.tblFilesRepository.getContainerDataSource().getItemIds();
 	
+		for (Object itemIdObj : itemIds) 
+		{	
+			int itemId = (int)itemIdObj;
+			Item tblRowItem = this.tblFilesRepository.getContainerDataSource().getItem(itemId);
+		
+			boolean isFTP = ((CheckBox)(tblRowItem.getItemProperty("Is FTP").getValue())).getValue();
+			boolean isSFTP = ((CheckBox)(tblRowItem.getItemProperty("Is SFTP").getValue())).getValue();
+		
+			if(isFTP || isSFTP)
+			{
+				String ftpHost = ((TextField)(tblRowItem.getItemProperty("Host").getValue())).getValue();
+				String ftpPort = ((TextField)(tblRowItem.getItemProperty("Port").getValue())).getValue();
+				String ftpUser = ((TextField)(tblRowItem.getItemProperty("User").getValue())).getValue();
+				String ftpPass = ((PasswordField)(tblRowItem.getItemProperty("Pass").getValue())).getValue();
+				
+				FTPUtil ftp = new FTPUtil(ftpHost, Integer.parseInt(ftpPort),
+						ftpUser, ftpPass);
+			
+				if(isFTP)
+				{
+					if(!ftp.checkConnection())
+					{
+						tblFilesRepository.select(itemId);
+						return false;
+					}
+				}
+				else
+				{
+					if(!ftp.secureCheckConnection())
+					{
+						tblFilesRepository.select(itemId);
+						return false;
+					}
+					/*
+					if(ftp.secureCheckDirectoryExists(ftpPath))
+					{
+						if(ftp.secureSend(ftpPath, is, fileName))
+						{
+							if(!ftp.secureRemoveFile(fileName, ftpPath))
+								return false;
+						}
+						else 
+							return false;
+					}
+					else
+						return false;
+					*/
+				}
+				
+			}
+		}
+	
+		return true;
+	}
+
+	private boolean validateFileRepoPath()
+	{
+		Collection itemIds = this.tblFilesRepository.getContainerDataSource().getItemIds();
+	
+		for (Object itemIdObj : itemIds) 
+		{	
+			int itemId = (int)itemIdObj;
+			Item tblRowItem = this.tblFilesRepository.getContainerDataSource().getItem(itemId);
+		
+			boolean isLocal = ((CheckBox)(tblRowItem.getItemProperty("Is Local").getValue())).getValue();
+			boolean isFTP = ((CheckBox)(tblRowItem.getItemProperty("Is FTP").getValue())).getValue();
+			boolean isSFTP = ((CheckBox)(tblRowItem.getItemProperty("Is SFTP").getValue())).getValue();
+		
+			if(isLocal)
+			{
+				String localPath = (((TextField)(tblRowItem.getItemProperty("Path").getValue())).getValue());
+				File localFolder = new File(localPath);
+				
+				if (localFolder == null || !localFolder.exists() || !localFolder.isDirectory()) 
+				{
+					tblFilesRepository.select(itemId);
+					return false;				
+				}
+			}	
+			else if(isFTP || isSFTP)
+			{
+				String ftpPath = ((TextField)(tblRowItem.getItemProperty("Path").getValue())).getValue();
+				String ftpHost = ((TextField)(tblRowItem.getItemProperty("Host").getValue())).getValue();
+				String ftpPort = ((TextField)(tblRowItem.getItemProperty("Port").getValue())).getValue();
+				String ftpUser = ((TextField)(tblRowItem.getItemProperty("User").getValue())).getValue();
+				String ftpPass = ((PasswordField)(tblRowItem.getItemProperty("Pass").getValue())).getValue();
+				
+				FTPUtil ftp = new FTPUtil(ftpHost, Integer.parseInt(ftpPort),
+						ftpUser, ftpPass);
+							
+				if(isFTP)
+				{
+					if(!ftp.checkDirectoryExists(ftpPath))
+					{
+						tblFilesRepository.select(itemId);
+						return false;
+					}
+				}
+				else
+				{
+					if(!ftp.secureCheckDirectoryExists(ftpPath))
+					{
+						tblFilesRepository.select(itemId);
+						return false;
+					}
+				}
+				
+			}
+		}
+	
+		return true;
+	}
+
+	private boolean validateFileRepoPermissions()
+	{	
 		Collection itemIds = this.tblFilesRepository.getContainerDataSource().getItemIds();
 	
 		for (Object itemIdObj : itemIds) 
@@ -473,25 +596,42 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 				
 				if(isFTP)
 				{
-					if(ftp.simpleSendFile(ftpPath, is, fileName))
+					if(!ftp.checkDirectoryExists(ftpPath))
 					{
-						if(!ftp.deleteFile(fileName, ftpPath))
-							return false;
-					}
-					else 
+						tblFilesRepository.select(itemId);
 						return false;
+					}
+					else
+					{
+						if(ftp.simpleSendFile(ftpPath, is, fileName))
+						{
+							if(!ftp.deleteFile(fileName, ftpPath))
+							{
+								tblFilesRepository.select(itemId);
+								return false;
+							}
+						}
+					}
 				}
 				else
 				{
-					if(ftp.secureSend(ftpPath, is, fileName))
+					if(!ftp.secureCheckDirectoryExists(ftpPath))
 					{
-						if(!ftp.secureRemoveFile(fileName, ftpPath))
-							return false;
-					}
-					else 
+						tblFilesRepository.select(itemId);
 						return false;
+					}
+					else
+					{
+						if(ftp.secureSend(ftpPath, is, fileName))
+						{
+							if(!ftp.secureRemoveFile(fileName, ftpPath))
+							{
+								tblFilesRepository.select(itemId);
+								return false;
+							}
+						}
+					}
 				}
-				
 			}
 		}
 	

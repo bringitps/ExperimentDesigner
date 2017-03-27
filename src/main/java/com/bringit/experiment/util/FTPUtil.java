@@ -234,7 +234,7 @@ public class FTPUtil {
         }
         return input;
     }
-
+    
     public boolean simpleSendFile(String directory, InputStream is, String fileName) {
         FTPClient ftp = new FTPClient();
 
@@ -609,6 +609,10 @@ public class FTPUtil {
             //unknown host key exception
             //
             java.util.Properties config = new java.util.Properties();
+            
+            //Line Added to avoid "Algoritm Negotiation Fail Exception"
+            config.put("kex", "diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256");
+            
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
             session.connect();
@@ -627,6 +631,143 @@ public class FTPUtil {
         }
 
         return null;
+    }
+    
+
+    private ChannelSftp getSecureChannel(int timeout) 
+    {
+    	
+    	try {
+    		JSch jsch = new JSch();
+		    Session session;
+		    Channel channel;
+		    //Create a session sending through our username and password
+		    session = jsch.getSession(ftpUserName, ftpHost, ftpPort);
+		    session.setTimeout(timeout);
+		    System.out.println("Session created.");
+		    session.setPassword(ftpPassword);
+		    //Security.addProvider(new com.sun.crypto.provider.SunJCE());
+		
+		    //
+		    //Setup Strict HostKeyChecking to no so we dont get the
+		    //unknown host key exception
+		    //
+		    java.util.Properties config = new java.util.Properties();
+		    
+		    //Line Added to avoid "Algoritm Negotiation Fail Exception"
+		    config.put("kex", "diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256");
+		    
+		    config.put("StrictHostKeyChecking", "no");
+		    session.setConfig(config);
+		    session.connect();
+		    System.out.println("Session connected.");
+		
+		    //
+		    //Open the SFTP channel
+		    //
+		    System.out.println("Opening Channel.");
+		    channel = session.openChannel("sftp");
+		    channel.connect(timeout);
+		    return (ChannelSftp) channel;
+
+    	} catch (Exception e) {
+    		System.out.println("Unable to create secure Channel: " + e);
+    	}
+
+    	return null;
+    }
+    
+
+    public boolean checkConnection()
+    {
+		FTPClient ftp = new FTPClient();
+		try 
+		{
+			ftp.setConnectTimeout(30000);
+		    ftp.connect(ftpHost);
+		    
+		    int replyCode = ftp.getReplyCode();
+            if (!FTPReply.isPositiveCompletion(replyCode)) 
+                return false;
+            
+            boolean success = ftp.login(ftpUserName, ftpPassword);
+            if (!success) 
+                return false;
+            
+            ftp.logout();
+        }
+		catch(Exception e)
+		{
+			 return false;
+		}
+		
+        return true;
+    }
+    
+    public boolean secureCheckConnection()
+    {
+    	try {
+            ChannelSftp c = getSecureChannel(10000);
+            if(c==null)
+            	return false;
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean checkDirectoryExists(String directory)
+    {
+		FTPClient ftp = new FTPClient();
+		
+		try 
+		{
+			ftp.setConnectTimeout(30000);
+		    ftp.connect(ftpHost);
+		    
+		    int replyCode = ftp.getReplyCode();
+            if (!FTPReply.isPositiveCompletion(replyCode)) 
+                return false;
+            
+
+            boolean success = ftp.login(ftpUserName, ftpPassword);
+            if (!success) 
+                return false;
+            
+            
+		    ftp.changeWorkingDirectory(directory);
+		    int returnCode = ftp.getReplyCode();
+		    
+			if (returnCode == 550) 
+			{
+	            ftp.logout();
+				return false;
+			}
+
+            ftp.logout();
+		}
+		catch(Exception e)
+		{
+			 return false;
+		}
+        return true;
+    }
+    
+    
+    public boolean secureCheckDirectoryExists(String directory)
+    {
+        ChannelSftp c = getSecureChannel(10000);
+        if(c == null)
+        	return false;
+        
+    	try {
+			SftpATTRS attrs = c.lstat(directory);
+			return true;
+		} catch (SftpException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
     }
 }
 

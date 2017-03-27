@@ -59,7 +59,7 @@ public class XmlDataFileLoadForm extends XmlDataFileLoadDesign{
 			@Override
 			public void windowClose(CloseEvent e) {
 				// TODO Auto-generated method stub
-				//reloadExperimentDbViewResults();
+				filterDbViewResults();
 			}
 		});
 		 this.getUI().addWindow(processXmlDataFileModalWindow);
@@ -70,7 +70,7 @@ public class XmlDataFileLoadForm extends XmlDataFileLoadDesign{
 	{
 		if(cbxXmlDataFileLoadsViewFilters.getValue() != null)
 		{
-			ResultSet experimentViewResults = new DataBaseViewDao().getFilteredViewResults("vwXmlTemplate", (String)cbxXmlDataFileLoadsViewFilters.getValue(), txtSearch.getValue());
+			ResultSet experimentViewResults = new DataBaseViewDao().getFilteredViewResults("vwXmlDataLoadExecutionResult", (String)cbxXmlDataFileLoadsViewFilters.getValue(), txtSearch.getValue());
 
 			if(experimentViewResults != null)
 				VaadinControls.bindDbViewRsToVaadinTable(tblXmlDataFileLoads, experimentViewResults, 1);

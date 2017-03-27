@@ -1,6 +1,6 @@
 CREATE VIEW vwXmlDataLoadExecutionResult as
 SELECT  
-XmlDataLoadExecutionResult.XmlTemplateId AS 'Id',
+XmlDataLoadExecutionResult.XmlDataLoadExecId AS 'Id',
 XmlDataLoadExecutionResult.XmlDataLoadExecTime AS 'Execution Date',
 DataFile.DataFileName AS 'FileName',
 CONCAT(FileRepo.FileRepoHost, FileRepo.FileRepoPath) AS 'Location',

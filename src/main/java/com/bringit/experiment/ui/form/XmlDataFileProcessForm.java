@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
@@ -12,11 +13,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.bringit.experiment.bll.DataFile;
 import com.bringit.experiment.bll.ExperimentField;
+import com.bringit.experiment.bll.FilesRepository;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.XmlDataLoadExecutionResult;
 import com.bringit.experiment.bll.XmlTemplate;
@@ -28,6 +31,7 @@ import com.bringit.experiment.data.ExperimentParser;
 import com.bringit.experiment.data.ResponseObj;
 import com.bringit.experiment.ui.design.XmlDataFileProcessDesign;
 import com.bringit.experiment.util.Config;
+import com.bringit.experiment.util.FTPUtil;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.VaadinService;
@@ -122,6 +126,11 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 
 			this.txtXmlDataFileLoadResults.setValue(this.txtXmlDataFileLoadResults.getValue() + "Step 1 of 3. Validating & Parsing XML File.\n");
 			xmlTemplate = new XmlTemplateDao().getXmlTemplateById((int)cbxXmlTemplate.getValue());
+		
+
+	        FilesRepository outboundRepo = xmlTemplate.getProcessedFileRepo();
+	        FilesRepository exceptionRepo = xmlTemplate.getExceptionFileRepo();
+	        
 			ResponseObj parseXmlResponse = new ExperimentParser().parseXmlDocument(xmlDocument, xmlTemplate);
 			
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
@@ -182,6 +191,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 					
 					//Save File into Execptioned Folder (Rename)
 					//Pending Matt's code
+                	//moveFileToRepo(exceptionRepo, is, file.getName());
 				}
 			}
 			else
@@ -204,6 +214,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 			this.txtXmlDataFileLoadResults.setValue(this.txtXmlDataFileLoadResults.getValue() + "\n\n=== Process Finished ===\n");
 			this.txtXmlDataFileLoadResults.setReadOnly(true);
 			this.txtXmlDataFileLoadResults.setSelectionRange(this.txtXmlDataFileLoadResults.getValue().length()-1, 1);
+			enableRunButton(false);
 		}	
 	}
 	
@@ -271,4 +282,31 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 			cbxXmlTemplate.setItemCaption(xmlTemplates.get(i).getXmlTemplateId(), xmlTemplates.get(i).getXmlTemplateName());
 		}
 	}
+	
+	private void moveFileToRepo(FilesRepository repo, InputStream is, String filename) {
+        try {
+
+            if (repo.isFileRepoIsSftp()) {
+                FTPUtil sftp = new FTPUtil(repo.getFileRepoHost(), Integer.parseInt(repo.getFileRepoPort()),
+                        repo.getFileRepoUser(), repo.getFileRepoPass());
+
+                boolean didMove = sftp.secureSend(repo.getFileRepoPath(), is, filename);
+
+            } else if (repo.isFileRepoIsFtp()) {
+                FTPUtil ftp = new FTPUtil(repo.getFileRepoHost(), Integer.parseInt(repo.getFileRepoPort()),
+                        repo.getFileRepoUser(), repo.getFileRepoPass());
+
+                boolean didMove = ftp.simpleSendFile(repo.getFileRepoPath(), is, filename);
+
+            } else if (repo.isFileRepoIsLocal()) {
+                FileOutputStream fos = new FileOutputStream(repo.getFileRepoPath() + "/" + filename);
+                IOUtils.copy(is, fos);
+                is.close();
+            }
+
+        } catch (Exception ex) {
+            System.out.println("Error moving file to repo: "+filename);
+        }
+
+    }
 }

@@ -1,11 +1,15 @@
 package com.bringit.experiment.ui.form;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
@@ -46,6 +50,7 @@ import com.vaadin.ui.Upload.Receiver;
 public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 
 	private File tempFile;
+	private InputStream isFile;
     private List<ExperimentField> expFields;
 	private Document xmlDocument = null;
 	private List<XmlTemplate> xmlTemplates = new XmlTemplateDao().getAllActiveXmlTemplates();
@@ -128,7 +133,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 			xmlTemplate = new XmlTemplateDao().getXmlTemplateById((int)cbxXmlTemplate.getValue());
 		
 
-	        FilesRepository outboundRepo = xmlTemplate.getProcessedFileRepo();
+	        FilesRepository processedRepo = xmlTemplate.getProcessedFileRepo();
 	        FilesRepository exceptionRepo = xmlTemplate.getExceptionFileRepo();
 	        
 			ResponseObj parseXmlResponse = new ExperimentParser().parseXmlDocument(xmlDocument, xmlTemplate);
@@ -171,7 +176,8 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 					new XmlDataLoadExecutionResultDao().addXmlDataLoadExecutionResult(xmlDataLoadExecResult);
 					
 					//Save File into Processed Folder
-					//Pending Matt's code
+					if(isFile != null)
+						moveFileToRepo(processedRepo, isFile, loadedFileName);
 				}	
 				else
 				{
@@ -189,9 +195,9 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 					xmlDataLoadExecResult.setXmlTemplate(xmlTemplate);
 					new XmlDataLoadExecutionResultDao().addXmlDataLoadExecutionResult(xmlDataLoadExecResult);
 					
-					//Save File into Execptioned Folder (Rename)
-					//Pending Matt's code
-                	//moveFileToRepo(exceptionRepo, is, file.getName());
+					//Save File into Exceptioned Folder (Rename)
+					if(isFile != null)
+						moveFileToRepo(exceptionRepo, isFile, loadedFileName);
 				}
 			}
 			else
@@ -208,7 +214,8 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 				new XmlDataLoadExecutionResultDao().addXmlDataLoadExecutionResult(xmlDataLoadExecResult);
 				
 				//Save File into Execptioned Folder (Rename)
-				//Pending Matt's code
+				if(isFile != null)
+					moveFileToRepo(exceptionRepo, isFile, loadedFileName);
 			
 			}
 			this.txtXmlDataFileLoadResults.setValue(this.txtXmlDataFileLoadResults.getValue() + "\n\n=== Process Finished ===\n");
@@ -248,8 +255,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 				try {
 				
 					reader = new FileReader(tempFile);
-				
-	            
+
 					DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 					DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 	    			xmlDocument = docBuilder.parse(tempFile);
@@ -262,7 +268,13 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 	    				
 			            reader.close();
 	    			}
-	    		
+	    			try {
+	    				isFile = new FileInputStream(tempFile);
+	    			} catch (FileNotFoundException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    				isFile = null;
+	    			}
 	    			tempFile.delete();
 				} catch (ParserConfigurationException | SAXException | IOException e) {
 					// TODO Auto-generated catch block

@@ -5,6 +5,7 @@ import com.vaadin.annotations.DesignRoot;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
@@ -33,6 +34,8 @@ public class ExperimentDesign extends VerticalLayout {
 	protected GridLayout gridMainData;
 	protected TextField txtExpName;
 	protected TextField txtExpDbTableNameId;
+	protected ComboBox cbxExperimentType;
+	protected GridLayout gridInstructions;
 	protected TextArea txtExpInstructions;
 	protected TextArea txtExpComments;
 	protected Accordion expElements;

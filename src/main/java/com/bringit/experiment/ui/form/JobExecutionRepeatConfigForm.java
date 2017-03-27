@@ -35,7 +35,7 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 	
 	public JobExecutionRepeatConfigForm()
 	{
-		loadTblData();
+		loadTblData("","");
 		
 		this.btnAddJobExecRepeat.addClickListener(new Button.ClickListener() {
 			
@@ -67,16 +67,8 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 		txtSearch.addShortcutListener(new ShortcutListener("Enter Shortcut", ShortcutAction.KeyCode.ENTER, null) {
 			@Override
 			public void handleAction(Object sender, Object target) {
-				Filterable filter= (Filterable) (tblJobExecutionRepeat.getContainerDataSource());
-                filter.removeAllContainerFilters();
-
-                String filterString = txtSearch.getValue();
-                Like filterLike = new Like(cbxJobExecRepeatFilters.getValue().toString(), "%" + filterString + "%");
-                filterLike.setCaseSensitive(false);
-                
-                if (filterString.length() > 0 && !cbxJobExecRepeatFilters.getValue().toString().isEmpty()) {
-                    filter.addContainerFilter(filterLike);
-                }
+				if(cbxJobExecRepeatFilters.getValue() != null) 
+					loadTblData(cbxJobExecRepeatFilters.getValue().toString(), txtSearch.getValue());				
 			}
 			});
 
@@ -84,14 +76,14 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				 loadTblData();
+				 loadTblData("","");
 			}
 
 		});
 	}
 	
 	
-	private void loadTblData()
+	private void loadTblData(String filterName, String filterValue)
 	{
 		dbIdOfItemsToDelete = new ArrayList<Integer>();
 		
@@ -102,10 +94,14 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 		tblJobExecutionRepeat.setEditable(true);
 		tblJobExecutionRepeat.setPageLength(0);
 		tblJobExecutionRepeat.setColumnWidth("*", 20);
-		
+
+		cbxJobExecRepeatFilters.setContainerDataSource(null);
 		cbxJobExecRepeatFilters.addItem("Name");
-		cbxJobExecRepeatFilters.addItem("Milliseconds");
-		cbxJobExecRepeatFilters.select("Name");
+		
+		if(filterName.isEmpty())
+			cbxJobExecRepeatFilters.select("Name");
+		else
+			cbxJobExecRepeatFilters.select(filterName.trim());
 		
 		Object[] itemValues = new Object[3];
 
@@ -113,32 +109,35 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 		
 		for(int i=0; jobExecutionRepeats != null && i<jobExecutionRepeats.size(); i++)
 		{
-			CheckBox chxSelect = new CheckBox();
-			chxSelect.setVisible(false);
-			chxSelect.setWidth(10, Unit.PIXELS);
-			itemValues[0] = chxSelect;
-			
-			TextField txtJobExecRepeatName = new TextField();
-			txtJobExecRepeatName.setStyleName("tiny");
-			txtJobExecRepeatName.setValue(jobExecutionRepeats.get(i).getJobExecRepeatName());			
-			txtJobExecRepeatName.setWidth(95, Unit.PERCENTAGE);
-			itemValues[1] = txtJobExecRepeatName;
-			
-			TextField txtMilliSeconds = new TextField();
-			txtMilliSeconds.setStyleName("tiny");
-			txtMilliSeconds.addValidator(new Validator() {
-
-	            public void validate(Object value) throws InvalidValueException {
-	                if(!StringUtils.isNumeric((String) value))
-	                    throw new InvalidValueException("Only Digits are allowed for Milliseconds");
-	            }
-	            
-	        });
-			txtMilliSeconds.setValue(((Integer)jobExecutionRepeats.get(i).getJobExecRepeatMilliseconds()).toString());
-			txtMilliSeconds.setWidth(95, Unit.PERCENTAGE);
-			itemValues[2] = txtMilliSeconds;
-
-			this.tblJobExecutionRepeat.addItem(itemValues, jobExecutionRepeats.get(i).getJobExecRepeatId());
+			if(filterName.isEmpty() || (filterName.trim().equals("Name") && jobExecutionRepeats.get(i).getJobExecRepeatName().toLowerCase().contains(filterValue.trim().toLowerCase())))
+			{	
+				CheckBox chxSelect = new CheckBox();
+				chxSelect.setVisible(false);
+				chxSelect.setWidth(10, Unit.PIXELS);
+				itemValues[0] = chxSelect;
+				
+				TextField txtJobExecRepeatName = new TextField();
+				txtJobExecRepeatName.setStyleName("tiny");
+				txtJobExecRepeatName.setValue(jobExecutionRepeats.get(i).getJobExecRepeatName());			
+				txtJobExecRepeatName.setWidth(95, Unit.PERCENTAGE);
+				itemValues[1] = txtJobExecRepeatName;
+				
+				TextField txtMilliSeconds = new TextField();
+				txtMilliSeconds.setStyleName("tiny");
+				txtMilliSeconds.addValidator(new Validator() {
+	
+		            public void validate(Object value) throws InvalidValueException {
+		                if(!StringUtils.isNumeric((String) value))
+		                    throw new InvalidValueException("Only Digits are allowed for Milliseconds");
+		            }
+		            
+		        });
+				txtMilliSeconds.setValue(((Integer)jobExecutionRepeats.get(i).getJobExecRepeatMilliseconds()).toString());
+				txtMilliSeconds.setWidth(95, Unit.PERCENTAGE);
+				itemValues[2] = txtMilliSeconds;
+	
+				this.tblJobExecutionRepeat.addItem(itemValues, jobExecutionRepeats.get(i).getJobExecRepeatId());
+			}
 		}
 	}
 	
@@ -231,7 +230,9 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 			}
 
 			this.getUI().showNotification("Data Saved.", Type.HUMANIZED_MESSAGE);
-			loadTblData();
+			cbxJobExecRepeatFilters.select("Name");
+			txtSearch.setValue("");
+			loadTblData("","");
 		}
 		else if(!validateRequiredFieldsResult)
 			this.getUI().showNotification("Name and Milliseconds must be set for New Job Execution Repeat Records", Type.WARNING_MESSAGE);

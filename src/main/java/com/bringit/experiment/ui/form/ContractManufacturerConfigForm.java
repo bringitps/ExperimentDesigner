@@ -28,7 +28,7 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 	
 	public ContractManufacturerConfigForm()
 	{
-		loadTblData();
+		loadTblData("","");
 		
 		this.btnAddJobExecRepeat.addClickListener(new Button.ClickListener() {
 			
@@ -60,16 +60,8 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 		txtSearch.addShortcutListener(new ShortcutListener("Enter Shortcut", ShortcutAction.KeyCode.ENTER, null) {
 			@Override
 			public void handleAction(Object sender, Object target) {
-				Filterable filter= (Filterable) (tblContractManufacturer.getContainerDataSource());
-                filter.removeAllContainerFilters();
-
-                String filterString = txtSearch.getValue();
-                Like filterLike = new Like(cbxContractManufacturerFilters.getValue().toString(), "%" + filterString + "%");
-                filterLike.setCaseSensitive(false);
-                
-                if (filterString.length() > 0 && !cbxContractManufacturerFilters.getValue().toString().isEmpty()) {
-                    filter.addContainerFilter(filterLike);
-                }
+				if(cbxContractManufacturerFilters.getValue() != null) 
+					loadTblData(cbxContractManufacturerFilters.getValue().toString(), txtSearch.getValue());				
 			}
 			});
 
@@ -77,13 +69,13 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				 loadTblData();
+				 loadTblData("","");
 			}
 
 		});
 	}
 	
-	private void loadTblData()
+	private void loadTblData(String filterName, String filterValue)
 	{
 		dbIdOfItemsToDelete = new ArrayList<Integer>();
 		
@@ -97,10 +89,16 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 		tblContractManufacturer.setPageLength(0);
 		tblContractManufacturer.setColumnWidth("*", 20);
 
+		cbxContractManufacturerFilters.setContainerDataSource(null);
 		cbxContractManufacturerFilters.addItem("Name");
 		cbxContractManufacturerFilters.addItem("Abbreviation");
 		cbxContractManufacturerFilters.addItem("Description");
-		cbxContractManufacturerFilters.select("E-mail");
+		cbxContractManufacturerFilters.addItem("E-mail");
+		
+		if(filterName.isEmpty())
+			cbxContractManufacturerFilters.select("Name");
+		else
+			cbxContractManufacturerFilters.select(filterName.trim());
 		
 		Object[] itemValues = new Object[5];
 
@@ -109,35 +107,42 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 		
 		for(int i=0; contractManufacturers != null && i<contractManufacturers.size(); i++)
 		{
-			CheckBox chxSelect = new CheckBox();
-			chxSelect.setVisible(false);
-			itemValues[0] = chxSelect;
-
-			TextField txtCmName = new TextField();
-			txtCmName.setStyleName("tiny");
-			txtCmName.setValue(contractManufacturers.get(i).getCmName());		
-			txtCmName.setWidth(97, Unit.PERCENTAGE);
-			itemValues[1] = txtCmName;
-			
-			TextField txtCmAbbreviation = new TextField();
-			txtCmAbbreviation.setStyleName("tiny");
-			txtCmAbbreviation.setValue(contractManufacturers.get(i).getCmAbbreviation());		
-			txtCmAbbreviation.setWidth(97, Unit.PERCENTAGE);
-			itemValues[2] = txtCmAbbreviation;
-			
-			TextField txtCmDescription = new TextField();
-			txtCmDescription.setStyleName("tiny");
-			txtCmDescription.setValue(contractManufacturers.get(i).getCmDescription());		
-			txtCmDescription.setWidth(97, Unit.PERCENTAGE);
-			itemValues[3] = txtCmDescription;
-			
-			TextField txtCmEmail = new TextField();
-			txtCmEmail.setStyleName("tiny");
-			txtCmEmail.setValue(contractManufacturers.get(i).getCmEmail());		
-			txtCmEmail.setWidth(97, Unit.PERCENTAGE);
-			itemValues[4] = txtCmEmail;
-			
-			tblContractManufacturer.addItem(itemValues, contractManufacturers.get(i).getCmId());
+			if(filterName.isEmpty() 
+					|| (filterName.trim().equals("Name") && contractManufacturers.get(i).getCmName().toLowerCase().contains(filterValue.trim().toLowerCase()))
+					|| (filterName.trim().equals("Abbreviation") && contractManufacturers.get(i).getCmAbbreviation().toLowerCase().contains(filterValue.trim().toLowerCase()))
+					|| (filterName.trim().equals("Description") && contractManufacturers.get(i).getCmDescription().toLowerCase().contains(filterValue.trim().toLowerCase()))
+					|| (filterName.trim().equals("E-mail") && contractManufacturers.get(i).getCmEmail().toLowerCase().contains(filterValue.trim().toLowerCase())))
+			{
+				CheckBox chxSelect = new CheckBox();
+				chxSelect.setVisible(false);
+				itemValues[0] = chxSelect;
+	
+				TextField txtCmName = new TextField();
+				txtCmName.setStyleName("tiny");
+				txtCmName.setValue(contractManufacturers.get(i).getCmName());		
+				txtCmName.setWidth(97, Unit.PERCENTAGE);
+				itemValues[1] = txtCmName;
+				
+				TextField txtCmAbbreviation = new TextField();
+				txtCmAbbreviation.setStyleName("tiny");
+				txtCmAbbreviation.setValue(contractManufacturers.get(i).getCmAbbreviation());		
+				txtCmAbbreviation.setWidth(97, Unit.PERCENTAGE);
+				itemValues[2] = txtCmAbbreviation;
+				
+				TextField txtCmDescription = new TextField();
+				txtCmDescription.setStyleName("tiny");
+				txtCmDescription.setValue(contractManufacturers.get(i).getCmDescription());		
+				txtCmDescription.setWidth(97, Unit.PERCENTAGE);
+				itemValues[3] = txtCmDescription;
+				
+				TextField txtCmEmail = new TextField();
+				txtCmEmail.setStyleName("tiny");
+				txtCmEmail.setValue(contractManufacturers.get(i).getCmEmail());		
+				txtCmEmail.setWidth(97, Unit.PERCENTAGE);
+				itemValues[4] = txtCmEmail;
+				
+				tblContractManufacturer.addItem(itemValues, contractManufacturers.get(i).getCmId());
+			}
 		}
 	}
 	
@@ -247,7 +252,9 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 			}
 
 			this.getUI().showNotification("Data Saved.", Type.HUMANIZED_MESSAGE);
-			loadTblData();
+			cbxContractManufacturerFilters.select("Name");
+			txtSearch.setValue("");
+			loadTblData("","");
 		}
 		else if(!validateRequiredFieldsResult)
 			this.getUI().showNotification("Name must be set for New Contract Manufacturer Records", Type.WARNING_MESSAGE);

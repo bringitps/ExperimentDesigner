@@ -44,6 +44,7 @@
         <mapping class="com.bringit.experiment.bll.SysUser" />
         <mapping class="com.bringit.experiment.bll.Experiment" />
         <mapping class="com.bringit.experiment.bll.ExperimentField" />
+        <mapping class="com.bringit.experiment.bll.ExperimentType" />
         <mapping class="com.bringit.experiment.bll.ExperimentImage" />
         <mapping class="com.bringit.experiment.bll.ExperimentFieldValueUpdateLog" />
         <mapping class="com.bringit.experiment.bll.UnitOfMeasure" />

@@ -40,7 +40,7 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 	
 	public FilesRepositoriesConfigForm()
 	{
-		loadTblData();
+		loadTblData("","");
 		/*
 		tblFilesRepository.setCellStyleGenerator(new Table.CellStyleGenerator() {
 		       @Override
@@ -80,32 +80,23 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 		txtSearch.addShortcutListener(new ShortcutListener("Enter Shortcut", ShortcutAction.KeyCode.ENTER, null) {
 			@Override
 			public void handleAction(Object sender, Object target) {
-				Filterable filter= (Filterable) (tblFilesRepository.getContainerDataSource());
-                filter.removeAllContainerFilters();
-
-                String filterString = txtSearch.getValue();
-                Like filterLike = new Like(cbxFilesRepositoriesFilters.getValue().toString(), "%" + filterString + "%");
-                filterLike.setCaseSensitive(false);
-                
-                if (filterString.length() > 0 && !cbxFilesRepositoriesFilters.getValue().toString().isEmpty()) {
-                    filter.addContainerFilter(filterLike);
-                }
+				if(cbxFilesRepositoriesFilters.getValue() != null) 
+						loadTblData(cbxFilesRepositoriesFilters.getValue().toString(), txtSearch.getValue());
 			}
-			});
-		
+		});
 
 		btnCancel.addClickListener(new Button.ClickListener() {
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				 loadTblData();
+				 loadTblData("","");
 			}
 
 		});
 		
 	}
 	
-	private void loadTblData()
+	private void loadTblData(String filterName, String filterValue)
 	{
 		dbIdOfItemsToDelete = new ArrayList<Integer>();
 		
@@ -123,12 +114,17 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 		tblFilesRepository.setColumnWidth("*", 20);
 		this.tblFilesRepository.setEditable(true);
 		this.tblFilesRepository.setPageLength(100);
-		
+
+		cbxFilesRepositoriesFilters.setContainerDataSource(null);
 		cbxFilesRepositoriesFilters.addItem("Name");
 		cbxFilesRepositoriesFilters.addItem("Path");
 		cbxFilesRepositoriesFilters.addItem("Host");
 		cbxFilesRepositoriesFilters.addItem("User");
-		cbxFilesRepositoriesFilters.select("Path");
+		
+		if(filterName.isEmpty())
+			cbxFilesRepositoriesFilters.select("Name");
+		else
+			cbxFilesRepositoriesFilters.select(filterName.trim());
 		
 		Object[] itemValues = new Object[10];
 
@@ -136,59 +132,66 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 		
 		for(int i=0; filesRepositories != null && i<filesRepositories.size(); i++)
 		{
-			CheckBox chxSelect = new CheckBox();
-			chxSelect.setVisible(false);
-			itemValues[0] = chxSelect;
-			
-			TextField txtFileRepoName = new TextField();
-			txtFileRepoName.setStyleName("tiny");
-			txtFileRepoName.setValue(filesRepositories.get(i).getFileRepoName());		
-			txtFileRepoName.setWidth(97, Unit.PERCENTAGE);
-			itemValues[1] = txtFileRepoName;
-			
-			CheckBox chxIsLocal = new CheckBox();
-			chxIsLocal.setValue(filesRepositories.get(i).isFileRepoIsLocal());
-			itemValues[2] = chxIsLocal;
-			
-			CheckBox chxIsFtp = new CheckBox();
-			chxIsFtp.setValue(filesRepositories.get(i).isFileRepoIsFtp());
-			itemValues[3] = chxIsFtp;
-			
-			CheckBox chxIsSftp = new CheckBox();
-			chxIsSftp.setValue(filesRepositories.get(i).isFileRepoIsSftp());
-			itemValues[4] = chxIsSftp;
-			
-			TextField txtFileRepoPath = new TextField();
-			txtFileRepoPath.setStyleName("tiny");
-			txtFileRepoPath.setValue(filesRepositories.get(i).getFileRepoPath());		
-			txtFileRepoPath.setWidth(97, Unit.PERCENTAGE);
-			itemValues[5] = txtFileRepoPath;
-
-			TextField txtFileRepoHost = new TextField();
-			txtFileRepoHost.setStyleName("tiny");
-			txtFileRepoHost.setValue(filesRepositories.get(i).getFileRepoHost());
-			txtFileRepoHost.setWidth(97, Unit.PERCENTAGE);
-			itemValues[6] = txtFileRepoHost;
-
-			TextField txtFileRepoPort = new TextField();
-			txtFileRepoPort.setStyleName("tiny");
-			txtFileRepoPort.setValue(filesRepositories.get(i).getFileRepoPort());
-			txtFileRepoPort.setWidth(97, Unit.PERCENTAGE);
-			itemValues[7] = txtFileRepoPort;
-
-			TextField txtFileRepoUser = new TextField();
-			txtFileRepoUser.setStyleName("tiny");
-			txtFileRepoUser.setValue(filesRepositories.get(i).getFileRepoUser());
-			txtFileRepoUser.setWidth(97, Unit.PERCENTAGE);
-			itemValues[8] = txtFileRepoUser;
-
-			PasswordField txtFileRepoPass = new PasswordField();
-			txtFileRepoPass.setStyleName("tiny");
-			txtFileRepoPass.setValue(filesRepositories.get(i).getFileRepoPass());
-			txtFileRepoPass.setWidth(97, Unit.PERCENTAGE);
-			itemValues[9] = txtFileRepoPass;
-			
-			this.tblFilesRepository.addItem(itemValues, filesRepositories.get(i).getFileRepoId());			
+			if(filterName.isEmpty() 
+					|| (filterName.trim().equals("Name") && filesRepositories.get(i).getFileRepoName().toLowerCase().contains(filterValue.trim().toLowerCase()))
+					|| (filterName.trim().equals("Path") && filesRepositories.get(i).getFileRepoPath().toLowerCase().contains(filterValue.trim().toLowerCase()))
+					|| (filterName.trim().equals("Host") && filesRepositories.get(i).getFileRepoHost().toLowerCase().contains(filterValue.trim().toLowerCase()))
+					|| (filterName.trim().equals("User") && filesRepositories.get(i).getFileRepoUser().toLowerCase().contains(filterValue.trim().toLowerCase())))
+			{
+				CheckBox chxSelect = new CheckBox();
+				chxSelect.setVisible(false);
+				itemValues[0] = chxSelect;
+				
+				TextField txtFileRepoName = new TextField();
+				txtFileRepoName.setStyleName("tiny");
+				txtFileRepoName.setValue(filesRepositories.get(i).getFileRepoName());		
+				txtFileRepoName.setWidth(97, Unit.PERCENTAGE);
+				itemValues[1] = txtFileRepoName;
+				
+				CheckBox chxIsLocal = new CheckBox();
+				chxIsLocal.setValue(filesRepositories.get(i).isFileRepoIsLocal());
+				itemValues[2] = chxIsLocal;
+				
+				CheckBox chxIsFtp = new CheckBox();
+				chxIsFtp.setValue(filesRepositories.get(i).isFileRepoIsFtp());
+				itemValues[3] = chxIsFtp;
+				
+				CheckBox chxIsSftp = new CheckBox();
+				chxIsSftp.setValue(filesRepositories.get(i).isFileRepoIsSftp());
+				itemValues[4] = chxIsSftp;
+				
+				TextField txtFileRepoPath = new TextField();
+				txtFileRepoPath.setStyleName("tiny");
+				txtFileRepoPath.setValue(filesRepositories.get(i).getFileRepoPath());		
+				txtFileRepoPath.setWidth(97, Unit.PERCENTAGE);
+				itemValues[5] = txtFileRepoPath;
+	
+				TextField txtFileRepoHost = new TextField();
+				txtFileRepoHost.setStyleName("tiny");
+				txtFileRepoHost.setValue(filesRepositories.get(i).getFileRepoHost());
+				txtFileRepoHost.setWidth(97, Unit.PERCENTAGE);
+				itemValues[6] = txtFileRepoHost;
+	
+				TextField txtFileRepoPort = new TextField();
+				txtFileRepoPort.setStyleName("tiny");
+				txtFileRepoPort.setValue(filesRepositories.get(i).getFileRepoPort());
+				txtFileRepoPort.setWidth(97, Unit.PERCENTAGE);
+				itemValues[7] = txtFileRepoPort;
+	
+				TextField txtFileRepoUser = new TextField();
+				txtFileRepoUser.setStyleName("tiny");
+				txtFileRepoUser.setValue(filesRepositories.get(i).getFileRepoUser());
+				txtFileRepoUser.setWidth(97, Unit.PERCENTAGE);
+				itemValues[8] = txtFileRepoUser;
+	
+				PasswordField txtFileRepoPass = new PasswordField();
+				txtFileRepoPass.setStyleName("tiny");
+				txtFileRepoPass.setValue(filesRepositories.get(i).getFileRepoPass());
+				txtFileRepoPass.setWidth(97, Unit.PERCENTAGE);
+				itemValues[9] = txtFileRepoPass;
+				
+				this.tblFilesRepository.addItem(itemValues, filesRepositories.get(i).getFileRepoId());	
+			}
 		}
 		
 	}
@@ -324,7 +327,9 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 			}
 			
 			this.getUI().showNotification("Data Saved.", Type.HUMANIZED_MESSAGE);
-			loadTblData();
+			cbxFilesRepositoriesFilters.select("Name");
+			txtSearch.setValue("");
+			loadTblData("","");
 		}
 		else if(!validateRequiredFieldsResult)
 			this.getUI().showNotification("Name must be set for New Files Repository Records", Type.WARNING_MESSAGE);

@@ -131,6 +131,10 @@ public class MainForm extends MainFormDesign {
      				formContentLayout.removeAllComponents();
      				formContentLayout.addComponent(new UserManagementForm());
 			 		break;
+			 	case "experiment types":  
+     				formContentLayout.removeAllComponents();
+     				formContentLayout.addComponent(new ExperimentTypeConfigForm());
+			 		break;
 			 	default:
 	         			break;
 			 }

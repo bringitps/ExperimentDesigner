@@ -43,7 +43,12 @@
        <column> 
         <vaadin-text-field required-error="This field is mandatory." caption="DB Id:" required style-name="tiny" width-full _id="txtExpDbTableNameId"></vaadin-text-field> 
        </column> 
+       <column> 
+        <vaadin-combo-box caption="Experiment Type:" style-name="tiny" width-full _id="cbxExperimentType"></vaadin-combo-box> 
+       </column> 
       </row> 
+     </vaadin-grid-layout> 
+     <vaadin-grid-layout width="960px" height="30px" _id="gridInstructions"> 
       <row> 
        <column> 
         <vaadin-text-area caption="Instructions:" style-name="tiny" width-full height="45px" _id="txtExpInstructions"></vaadin-text-area> 
@@ -54,7 +59,6 @@
       </row> 
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
-    <vaadin-css-layout style-name="content" width="960px" height="650px"></vaadin-css-layout> 
    </vaadin-vertical-layout> 
    <vaadin-vertical-layout width="960px"> 
     <vaadin-accordion height="350px" _id="expElements"> 

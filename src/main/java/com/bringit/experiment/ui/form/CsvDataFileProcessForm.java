@@ -1,6 +1,8 @@
 package com.bringit.experiment.ui.form;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -46,6 +48,7 @@ import com.vaadin.ui.Upload.Receiver;
 public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 
 	private File tempFile;
+	private InputStream isFile;
     private List<ExperimentField> expFields;
 	private Document csvDocument = null;
 	private List<CsvTemplate> csvTemplates = new CsvTemplateDao().getAllActiveCsvTemplates();
@@ -127,11 +130,18 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 			this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 1 of 3. Validating & Parsing CSV File.\n");
 			csvTemplate = new CsvTemplateDao().getCsvTemplateById((int)cbxCsvTemplate.getValue());
 
-	        FilesRepository outboundRepo = csvTemplate.getProcessedFileRepo();
+	        FilesRepository processedRepo = csvTemplate.getProcessedFileRepo();
 	        FilesRepository exceptionRepo = csvTemplate.getExceptionFileRepo();
 	       
 			
 			ResponseObj parseCsvResponse = new ExperimentParser().parseCSV(tempFile, csvTemplate);
+			try {
+				isFile = new FileInputStream(tempFile);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				isFile = null;
+			}
 			tempFile.delete(); // delete the temp file 
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			DataFile dataFile = new DataFile();
@@ -171,7 +181,8 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 					new CsvDataLoadExecutionResultDao().addCsvDataLoadExecutionResult(csvDataLoadExecResult);
 					
 					//Save File into Processed Folder
-					//Pending Matt's code
+					if(isFile != null)
+						moveFileToRepo(processedRepo, isFile, loadedFileName);
 				}	
 				else
 				{
@@ -190,7 +201,8 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 					new CsvDataLoadExecutionResultDao().addCsvDataLoadExecutionResult(csvDataLoadExecResult);
 					
 					//Save File into Execptioned Folder (Rename)
-					//Pending Matt's code
+					if(isFile != null)
+						moveFileToRepo(exceptionRepo, isFile, loadedFileName);
 				}
 			}
 			else
@@ -207,7 +219,8 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 				new CsvDataLoadExecutionResultDao().addCsvDataLoadExecutionResult(csvDataLoadExecResult);
 				
 				//Save File into Execptioned Folder (Rename)
-				//Pending Matt's code
+				if(isFile != null)
+					moveFileToRepo(exceptionRepo, isFile, loadedFileName);
 			
 			}
 			this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "\n\n=== Process Finished ===\n");

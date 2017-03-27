@@ -27,7 +27,7 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 	
 	public UnitOfMeasureConfigForm()
 	{
-		loadTblData();
+		loadTblData("","");
 		
 		this.btnAddUom.addClickListener(new Button.ClickListener() {
 			
@@ -59,16 +59,8 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 		txtSearch.addShortcutListener(new ShortcutListener("Enter Shortcut", ShortcutAction.KeyCode.ENTER, null) {
 			@Override
 			public void handleAction(Object sender, Object target) {
-				Filterable filter= (Filterable) (tblUnitsOfMeasure.getContainerDataSource());
-                filter.removeAllContainerFilters();
-
-                String filterString = txtSearch.getValue();
-                Like filterLike = new Like(cbxUnitsOfMeasureFilters.getValue().toString(), "%" + filterString + "%");
-                filterLike.setCaseSensitive(false);
-                
-                if (filterString.length() > 0 && !cbxUnitsOfMeasureFilters.getValue().toString().isEmpty()) {
-                    filter.addContainerFilter(filterLike);
-                }
+				if(cbxUnitsOfMeasureFilters.getValue() != null) 
+					loadTblData(cbxUnitsOfMeasureFilters.getValue().toString(), txtSearch.getValue());	
 			}
 			});
 
@@ -76,13 +68,13 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				 loadTblData();
+				 loadTblData("","");
 			}
 
 		});
 	}
 	
-	private void loadTblData()
+	private void loadTblData(String filterName, String filterValue)
 	{
 		dbIdOfItemsToDelete = new ArrayList<Integer>();
 		
@@ -94,9 +86,14 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 		this.tblUnitsOfMeasure.setPageLength(0);
 		tblUnitsOfMeasure.setColumnWidth("*", 20);
 
+		cbxUnitsOfMeasureFilters.setContainerDataSource(null);
 		cbxUnitsOfMeasureFilters.addItem("Name");
 		cbxUnitsOfMeasureFilters.addItem("Abbreviation");
-		cbxUnitsOfMeasureFilters.select("Name");
+		
+		if(filterName.isEmpty())
+			cbxUnitsOfMeasureFilters.select("Name");
+		else
+			cbxUnitsOfMeasureFilters.select(filterName.trim());
 		
 		Object[] itemValues = new Object[3];
 
@@ -104,23 +101,28 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 		
 		for(int i=0; unitOfMeasures != null && i<unitOfMeasures.size(); i++)
 		{
-			CheckBox chxSelect = new CheckBox();
-			chxSelect.setVisible(false);
-			itemValues[0] = chxSelect;
-						
-			TextField txtUomName = new TextField();
-			txtUomName.setStyleName("tiny");
-			txtUomName.setValue(unitOfMeasures.get(i).getUomName());		
-			txtUomName.setWidth(97, Unit.PERCENTAGE);
-			itemValues[1] = txtUomName;
-			
-			TextField txtUomAbbreviation = new TextField();
-			txtUomAbbreviation.setStyleName("tiny");
-			txtUomAbbreviation.setValue(unitOfMeasures.get(i).getUomAbbreviation());		
-			txtUomAbbreviation.setWidth(97, Unit.PERCENTAGE);			
-			itemValues[2] = txtUomAbbreviation;
-			
-			this.tblUnitsOfMeasure.addItem(itemValues, unitOfMeasures.get(i).getUomId());
+			if(filterName.isEmpty() 
+					|| (filterName.trim().equals("Name") && unitOfMeasures.get(i).getUomName().toLowerCase().contains(filterValue.trim().toLowerCase()))
+					|| (filterName.trim().equals("Abbreviation") && unitOfMeasures.get(i).getUomAbbreviation().toLowerCase().contains(filterValue.trim().toLowerCase())))
+			{
+				CheckBox chxSelect = new CheckBox();
+				chxSelect.setVisible(false);
+				itemValues[0] = chxSelect;
+							
+				TextField txtUomName = new TextField();
+				txtUomName.setStyleName("tiny");
+				txtUomName.setValue(unitOfMeasures.get(i).getUomName());		
+				txtUomName.setWidth(97, Unit.PERCENTAGE);
+				itemValues[1] = txtUomName;
+				
+				TextField txtUomAbbreviation = new TextField();
+				txtUomAbbreviation.setStyleName("tiny");
+				txtUomAbbreviation.setValue(unitOfMeasures.get(i).getUomAbbreviation());		
+				txtUomAbbreviation.setWidth(97, Unit.PERCENTAGE);			
+				itemValues[2] = txtUomAbbreviation;
+				
+				this.tblUnitsOfMeasure.addItem(itemValues, unitOfMeasures.get(i).getUomId());
+			}
 		}
 	}
 	
@@ -202,7 +204,9 @@ public class UnitOfMeasureConfigForm extends UnitOfMeasureConfigDesign{
 			}
 
 			this.getUI().showNotification("Data Saved.", Type.HUMANIZED_MESSAGE);
-			loadTblData();
+			cbxUnitsOfMeasureFilters.select("Name");
+			txtSearch.setValue("");
+			loadTblData("","");
 		}
 		else if(!validateRequiredFieldsResult)
 			this.getUI().showNotification("Name and Abbreviation must be set for New Unit Of Measure Records", Type.WARNING_MESSAGE);

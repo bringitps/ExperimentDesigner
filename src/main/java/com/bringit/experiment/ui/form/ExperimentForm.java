@@ -21,11 +21,13 @@ import com.bringit.experiment.WebApplication;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.ExperimentImage;
+import com.bringit.experiment.bll.ExperimentType;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.UnitOfMeasure;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.ExperimentImageDao;
+import com.bringit.experiment.dao.ExperimentTypeDao;
 import com.bringit.experiment.dao.UnitOfMeasureDao;
 import com.bringit.experiment.ui.design.ExperimentDesign;
 import com.bringit.experiment.util.Config;
@@ -81,6 +83,7 @@ public class ExperimentForm extends ExperimentDesign {
 	private List<ExperimentField> experimentFields;
 	private List<ExperimentImage> experimentImages;
 	List <UnitOfMeasure> unitOfMeasures= new UnitOfMeasureDao().getAllUnitOfMeasures();
+	List <ExperimentType> experimentTypes = new ExperimentTypeDao().getAllExperimentTypes();
 	String[] dbfieldTypes;
 	private int lastNewItemId = 0;
 	private File tempImageFile;
@@ -94,6 +97,13 @@ public class ExperimentForm extends ExperimentDesign {
 	public ExperimentForm(int experimentId)
 	{		
 		expElements.setSelectedTab(1);
+
+		//Load Experiment Type Combo Box
+		for(int i=0; i<experimentTypes.size(); i++)
+		{
+			cbxExperimentType.addItem(experimentTypes.get(i).getExpTypeId());
+			cbxExperimentType.setItemCaption(experimentTypes.get(i).getExpTypeId(), experimentTypes.get(i).getExpTypeName());
+		}
 		
 		
 		this.vlViewer.setSizeFull();
@@ -142,6 +152,8 @@ public class ExperimentForm extends ExperimentDesign {
 			this.chxActive.setValue(this.experiment.isExpIsActive());
 			this.txtExpInstructions.setValue(this.experiment.getExpInstructions());
 			this.txtExpComments.setValue(this.experiment.getExpComments());
+			if(this.experiment.getExperimentType() != null)
+				this.cbxExperimentType.setValue(this.experiment.getExperimentType().getExpTypeId());
 			
 			loadImageTabs();
 
@@ -486,6 +498,11 @@ public class ExperimentForm extends ExperimentDesign {
 			this.experiment.setLastModifiedBy(sessionUser);
 			this.experiment.setModifiedDate(new Date());
 
+			if(this.cbxExperimentType.getValue() != null)
+				this.experiment.setExperimentType(new ExperimentTypeDao().getExperimentTypeById((int)this.cbxExperimentType.getValue()));
+			else
+				this.experiment.setExperimentType(null);
+			
 			ExperimentDao expDao = new ExperimentDao();
 			
 			if(this.experiment.getExpId() != null )

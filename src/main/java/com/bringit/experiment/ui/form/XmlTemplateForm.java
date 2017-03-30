@@ -98,6 +98,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.xmlt = new XmlTemplate();
 			this.chxActive.setValue(true);
 			this.chxActive.setEnabled(false);
+			this.btnDelete.setEnabled(false);
 			//we disable all the components until an experiment is selected
 			enableComponents(false); 
 		}

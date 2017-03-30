@@ -86,6 +86,14 @@
        <vaadin-grid-layout width-full height="40px"> 
         <row> 
          <column> 
+          <vaadin-horizontal-layout> 
+           <vaadin-upload style-name="tiny" immediate _id="upCsvExpFields"></vaadin-upload> 
+           <vaadin-text-area rows="2" style-name="tiny borderless" width="280px" readonly _id="txtCsvInstructions">
+             Req. CSV columns: FieldName, DatabaseId Opt. CSV columns: DatabaseType, UoM 
+           </vaadin-text-area> 
+          </vaadin-horizontal-layout> 
+         </column> 
+         <column> 
           <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" plain-text _id="btnAddField">
             Add Experiment Field 
           </vaadin-button> 

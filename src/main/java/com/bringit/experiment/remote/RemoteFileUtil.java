@@ -65,7 +65,6 @@ public class RemoteFileUtil {
                 scheduler.scheduleJob(job, trigger);
             }
 
-            List<String> allJobs = getScheduledJobs();
         } catch (Exception ex) {
             System.out.println(ex);
         }
@@ -223,7 +222,7 @@ public class RemoteFileUtil {
                             .withIdentity(csvData.getCsvTemplateId().toString(), CSV_JOB_GROUP)
                             .build();
                     JobDataMap jobDataMap = job.getJobDataMap();
-                    jobDataMap.put("jobData", csvJobsData);
+                    jobDataMap.put("jobData", csvData);
 
                     if(scheduler.checkExists(new JobKey(csvData.getCsvTemplateId().toString(), CSV_JOB_GROUP))){
                         System.out.println("Rescheduling the Job");

@@ -23,6 +23,7 @@ import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.FilesRepositoryDao;
 import com.bringit.experiment.dao.JobExecutionRepeatDao;
+import com.bringit.experiment.dao.XmlTemplateDao;
 import com.bringit.experiment.dao.XmlTemplateNodeDao;
 import com.bringit.experiment.dao.ContractManufacturerDao;
 import com.bringit.experiment.dao.CsvTemplateColumnsDao;
@@ -78,6 +79,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.csvt = new CsvTemplate();
 			this.chxActive.setValue(true);
 			this.chxActive.setEnabled(false);
+			this.btnDelete.setEnabled(false);
 			//we disable all the components until an experiment is selected
 			enableComponents(false); 
 		}
@@ -205,11 +207,12 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	@SuppressWarnings("deprecation")
 	protected void onSave() {
 		Collection itemIds = this.tblCsvCols.getContainerDataSource().getItemIds();
+		boolean validateCsvTemplateNameResult = validateCsvTemplateName();		
 		boolean validateReqFieldsResult = validateRequiredFields();		
 		boolean validateNonRepeatedExperimentFieldsResult = validateNonRepeatedExperimentFields();
 		
 		//---Validate Required Fields---//
-		if(itemIds.size() > 0 && validateReqFieldsResult && validateNonRepeatedExperimentFieldsResult)
+		if(itemIds.size() > 0 && validateReqFieldsResult && validateNonRepeatedExperimentFieldsResult && validateCsvTemplateNameResult)
 		{
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			
@@ -328,6 +331,8 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				this.getUI().showNotification("Please fill in all required Fields", Type.WARNING_MESSAGE);
 			else if(!validateNonRepeatedExperimentFieldsResult)
 				this.getUI().showNotification("You can not map 1 Experiment Field to 2 or more CSV Columns.", Type.WARNING_MESSAGE);
+			else if(!validateCsvTemplateNameResult)
+				this.getUI().showNotification("Name is already selected for another Csv Template. Please rename CsvTemplate", Type.WARNING_MESSAGE);
 		
 		}
 	}
@@ -351,6 +356,12 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		return true;
 	}
 	
+	private boolean validateCsvTemplateName()
+	{
+		if(this.csvt.getCsvTemplateId() == null && new CsvTemplateDao().getActiveCsvTemplateByName(this.txtCsvTName.getValue()) != null)
+			return false;
+		return true;
+	}
 
 	private boolean validateNonRepeatedExperimentFields()
 	{

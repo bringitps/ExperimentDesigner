@@ -46,13 +46,16 @@ public class RemoteCsvJob implements Job {
             List<ChannelSftp.LsEntry> files =  sftp.secureGetFileList(filesRepository.getFileRepoPath());
             for (ChannelSftp.LsEntry file: files) {
 
-                if (file.getFilename().endsWith(".csv")) {
+                if (file.getFilename().endsWith(".csv") && (jobData.getCsvTemplatePrefix() == null || (jobData.getCsvTemplatePrefix() != null && jobData.getCsvTemplatePrefix().isEmpty()) || (jobData.getCsvTemplatePrefix() != null && file.getFilename().startsWith(jobData.getCsvTemplatePrefix())))) {
                     InputStream is = sftp.secureGetFile(filesRepository.getFileRepoPath()+"/"+file.getFilename());
                     if (is != null) {
                         System.out.println("Received Input file and passing to parser: "+file.getFilename());
                         //--  Data File --//
 
                         if (new DataFileDao().getDataFileByName(file.getFilename()) != null) {
+                        	
+                        	System.out.println(new Date().toString() + " Filename already processed: "+file.getFilename());
+     	                      
                             DataFile dataFile = new DataFile();
                             Date createdDate = new Date();
                             dataFile.setCreatedDate(createdDate);
@@ -61,57 +64,66 @@ public class RemoteCsvJob implements Job {
                             dataFile.setDataFileIsCsv(false);
                             dataFile.setDataFileName(file.getFilename());
                             new DataFileDao().addDataFile(dataFile);
-
+                            
+                            System.out.println(new Date().toString() + " Moving to Exception Folder");
+     	                    
                             moveFileToRepo(exceptionRepo, is, file.getFilename());
+                            sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
+                        	
+                            System.out.println(new Date().toString() + " Removed from Inbound Folder");
+    	                      
                             dataFile.setFileRepoId(exceptionRepo);
 
                             saveExecutionResult(dataFile, file.getFilename(), jobData, true, "Data File is already processed. File Name: " + file.getFilename());
-                            return;
+
+    	                    new DataFileDao().updateDataFile(dataFile);
+    	                    
                         }
-
-                        DataFile dataFile = new DataFile();
-                        Date createdDate = new Date();
-                        dataFile.setCreatedDate(createdDate);
-                        dataFile.setLastModifiedDate(createdDate);
-                        dataFile.setDataFileIsXml(true);
-                        dataFile.setDataFileIsCsv(false);
-                        dataFile.setDataFileName(file.getFilename());
-                        new DataFileDao().addDataFile(dataFile);
-
-                        dataFile = new DataFileDao().getDataFileByName(file.getFilename());
-
-                        ResponseObj sftpResponse = processFile(is, jobData, file.getFilename(), dataFile);
-
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        else
+                        {	
+	                        DataFile dataFile = new DataFile();
+	                        Date createdDate = new Date();
+	                        dataFile.setCreatedDate(createdDate);
+	                        dataFile.setLastModifiedDate(createdDate);
+	                        dataFile.setDataFileIsXml(true);
+	                        dataFile.setDataFileIsCsv(false);
+	                        dataFile.setDataFileName(file.getFilename());
+	                        new DataFileDao().addDataFile(dataFile);
+	
+	                        dataFile = new DataFileDao().getDataFileByName(file.getFilename());
+	
+	                        ResponseObj sftpResponse = processFile(is, jobData, file.getFilename(), dataFile);
+	
+	                        try {
+	                            is.close();
+	                        } catch (IOException e) {
+	                            e.printStackTrace();
+	                        }
+	                        InputStream copyStream = sftp.secureGetFile(filesRepository.getFileRepoPath() + "/" + file.getFilename());
+	
+	                        if (0 == sftpResponse.getCode()) {
+	
+	                            // Send file to outbound
+	                            moveFileToRepo(outboundRepo, copyStream, file.getFilename());
+	                            sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
+	
+	                            dataFile.setFileRepoId(outboundRepo);
+	                            System.out.println("Removed file from SFTP server");
+	                        } else {
+	                            // Send file to Exception
+	                            moveFileToRepo(exceptionRepo, copyStream, file.getFilename());
+	                            sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
+	                            dataFile.setFileRepoId(exceptionRepo);
+	                            System.out.println("Removed file from SFTP server");
+	                        }
+	                        //b) Update Data File Repo dataFile.setFileRepoId();
+	                        try {
+	                            copyStream.close();
+	                        } catch (IOException e) {
+	                            e.printStackTrace();
+	                        }
+	                        new DataFileDao().updateDataFile(dataFile);
                         }
-                        InputStream copyStream = sftp.secureGetFile(filesRepository.getFileRepoPath() + "/" + file.getFilename());
-
-                        if (0 == sftpResponse.getCode()) {
-
-                            // Send file to outbound
-                            moveFileToRepo(outboundRepo, copyStream, file.getFilename());
-                            sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
-
-                            dataFile.setFileRepoId(outboundRepo);
-                            System.out.println("Removed file from SFTP server");
-                        } else {
-                            // Send file to Exception
-                            moveFileToRepo(exceptionRepo, copyStream, file.getFilename());
-                            sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
-                            dataFile.setFileRepoId(exceptionRepo);
-                            System.out.println("Removed file from SFTP server");
-                        }
-                        //b) Update Data File Repo dataFile.setFileRepoId();
-                        try {
-                            copyStream.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        new DataFileDao().updateDataFile(dataFile);
-
                     } else {
                         sendTransferError(jobData, file.getFilename());
                     }
@@ -124,12 +136,15 @@ public class RemoteCsvJob implements Job {
             FTPFile[] ftpFiles = ftp.simpleGetFileList(filesRepository.getFileRepoPath());
             for (FTPFile ftpFile: ftpFiles) {
 
-                if (ftpFile.getName().endsWith(".csv")) {
+                if (ftpFile.getName().endsWith(".csv") && (jobData.getCsvTemplatePrefix() == null || (jobData.getCsvTemplatePrefix() != null && jobData.getCsvTemplatePrefix().isEmpty()) || (jobData.getCsvTemplatePrefix() != null && ftpFile.getName().startsWith(jobData.getCsvTemplatePrefix())))) {
 
                     InputStream is = ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName());
                     if (is != null) {
 
                         if (new DataFileDao().getDataFileByName(ftpFile.getName()) != null) {
+                        	
+                        	System.out.println(new Date().toString() + " Filename already processed: "+ftpFile.getName());
+   	                      
                             DataFile dataFile = new DataFile();
                             Date createdDate = new Date();
                             dataFile.setCreatedDate(createdDate);
@@ -139,60 +154,69 @@ public class RemoteCsvJob implements Job {
                             dataFile.setDataFileName(ftpFile.getName());
                             new DataFileDao().addDataFile(dataFile);
 
+                            System.out.println(new Date().toString() + " Moving to Exception Folder");
+     	                    
                             moveFileToRepo(exceptionRepo, is, ftpFile.getName());
+                            ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+                            
+                            System.out.println(new Date().toString() + " Removed from Inbound Folder");
+     	                    
                             dataFile.setFileRepoId(exceptionRepo);
 
                             saveExecutionResult(dataFile, ftpFile.getName(), jobData, true, "Data File is already processed. File Name: " + ftpFile.getName());
-                            return;
+
+    	                    new DataFileDao().updateDataFile(dataFile);
+    	                    
                         }
-
-                        DataFile dataFile = new DataFile();
-                        Date createdDate = new Date();
-                        dataFile.setCreatedDate(createdDate);
-                        dataFile.setLastModifiedDate(createdDate);
-                        dataFile.setDataFileIsXml(true);
-                        dataFile.setDataFileIsCsv(false);
-                        dataFile.setDataFileName(ftpFile.getName());
-                        new DataFileDao().addDataFile(dataFile);
-
-                        dataFile = new DataFileDao().getDataFileByName(ftpFile.getName());
-                        System.out.println("Filename : " + ftpFile.getName());
-                        System.out.println("Trying to process file");
-
-                        ResponseObj ftpResponse = processFile(is, jobData, ftpFile.getName(), dataFile);
-                        System.out.println("Processed File: " + ftpResponse.getDetail());
-
-                        // original stream has been read.  Need to get a new stream to move file.
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        else
+                        {
+	                        DataFile dataFile = new DataFile();
+	                        Date createdDate = new Date();
+	                        dataFile.setCreatedDate(createdDate);
+	                        dataFile.setLastModifiedDate(createdDate);
+	                        dataFile.setDataFileIsXml(true);
+	                        dataFile.setDataFileIsCsv(false);
+	                        dataFile.setDataFileName(ftpFile.getName());
+	                        new DataFileDao().addDataFile(dataFile);
+	
+	                        dataFile = new DataFileDao().getDataFileByName(ftpFile.getName());
+	                        System.out.println("Filename : " + ftpFile.getName());
+	                        System.out.println("Trying to process file");
+	
+	                        ResponseObj ftpResponse = processFile(is, jobData, ftpFile.getName(), dataFile);
+	                        System.out.println("Processed File: " + ftpResponse.getDetail());
+	
+	                        // original stream has been read.  Need to get a new stream to move file.
+	                        try {
+	                            is.close();
+	                        } catch (IOException e) {
+	                            e.printStackTrace();
+	                        }
+	                        InputStream copyStream = ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+	
+	                        if (0 == ftpResponse.getCode()) {
+	                            // Send file to outbound
+	                            moveFileToRepo(outboundRepo, copyStream, ftpFile.getName());
+	                            ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+	
+	                            dataFile.setFileRepoId(outboundRepo);
+	                            System.out.println("Removed file from FTP server");
+	                        } else {
+	                            // Send file to Exception
+	                            moveFileToRepo(exceptionRepo, copyStream, ftpFile.getName());
+	                            ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+	
+	                            dataFile.setFileRepoId(exceptionRepo);
+	                            System.out.println("Removed file from FTP server");
+	                        }
+	
+	                        try {
+	                            copyStream.close();
+	                        } catch (IOException e) {
+	                            e.printStackTrace();
+	                        }
+	                        new DataFileDao().updateDataFile(dataFile);
                         }
-                        InputStream copyStream = ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName());
-
-                        if (0 == ftpResponse.getCode()) {
-                            // Send file to outbound
-                            moveFileToRepo(outboundRepo, copyStream, ftpFile.getName());
-                            ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
-
-                            dataFile.setFileRepoId(outboundRepo);
-                            System.out.println("Removed file from FTP server");
-                        } else {
-                            // Send file to Exception
-                            moveFileToRepo(exceptionRepo, copyStream, ftpFile.getName());
-                            ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
-
-                            dataFile.setFileRepoId(exceptionRepo);
-                            System.out.println("Removed file from FTP server");
-                        }
-
-                        try {
-                            copyStream.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        new DataFileDao().updateDataFile(dataFile);
-
                     } else {
                         sendTransferError(jobData, ftpFile.getName());
                     }
@@ -206,66 +230,81 @@ public class RemoteCsvJob implements Job {
             List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, false);
             for (File file: files) {
 
-                try {
-                    InputStream is = new FileInputStream(file);
-                    System.out.println("Reading input file and passing to parser: "+ file.getName());
+            	if(jobData.getCsvTemplatePrefix() == null || (jobData.getCsvTemplatePrefix() != null && jobData.getCsvTemplatePrefix().isEmpty()) || (jobData.getCsvTemplatePrefix() != null && file.getName().startsWith(jobData.getCsvTemplatePrefix())))
+            	{	
+	                try {
+	                    InputStream is = new FileInputStream(file);
+	                    System.out.println("Reading input file and passing to parser: "+ file.getName());
+	
+	                    if(new DataFileDao().getDataFileByName(file.getName()) != null)
+	                    {
+	                    	System.out.println(new Date().toString() + " Filename already processed: "+file.getName());
+   	                    
+	                        DataFile dataFile = new DataFile();
+	                        Date createdDate = new Date();
+	                        dataFile.setCreatedDate(createdDate);
+	                        dataFile.setLastModifiedDate(createdDate);
+	                        dataFile.setDataFileIsXml(true);
+	                        dataFile.setDataFileIsCsv(false);
+	                        dataFile.setDataFileName(file.getName());
+	                        new DataFileDao().addDataFile(dataFile);
+	
+	                        System.out.println(new Date().toString() + " Moving to Exception Folder");
+	   	                    
+	                        moveFileToRepo(exceptionRepo, is, file.getName());
+	                        file.delete();
+	                        
+	                        System.out.println(new Date().toString() + " Removed from Inbound Folder");
+	   	                    
+	                        dataFile.setFileRepoId(exceptionRepo);
+	
+	                        saveExecutionResult(dataFile, file.getName(), jobData, true, "Data File is already processed. File Name: " + file.getName());
 
-                    if(new DataFileDao().getDataFileByName(file.getName()) != null)
-                    {
-                        DataFile dataFile = new DataFile();
-                        Date createdDate = new Date();
-                        dataFile.setCreatedDate(createdDate);
-                        dataFile.setLastModifiedDate(createdDate);
-                        dataFile.setDataFileIsXml(true);
-                        dataFile.setDataFileIsCsv(false);
-                        dataFile.setDataFileName(file.getName());
-                        new DataFileDao().addDataFile(dataFile);
-
-                        moveFileToRepo(exceptionRepo, is, file.getName());
-                        dataFile.setFileRepoId(exceptionRepo);
-
-                        saveExecutionResult(dataFile, file.getName(), jobData, true, "Data File is already processed. File Name: " + file.getName());
-                        return;
-                    }
-
-                    DataFile dataFile = new DataFile();
-                    Date createdDate = new Date();
-                    dataFile.setCreatedDate(createdDate);
-                    dataFile.setLastModifiedDate(createdDate);
-                    dataFile.setDataFileIsXml(true);
-                    dataFile.setDataFileIsCsv(false);
-                    dataFile.setDataFileName(file.getName());
-                    new DataFileDao().addDataFile(dataFile);
-
-                    dataFile = new DataFileDao().getDataFileByName(file.getName());
-
-                    ResponseObj localResponse = processFile(is, jobData, file.getName(), dataFile);
-
-                    is.close();
-                    InputStream copyStream = new FileInputStream(file);
-
-                    if (0 == localResponse.getCode()) {
-                        // Send file to outbound
-                        moveFileToRepo(outboundRepo, copyStream, file.getName());
-                        file.delete();
-
-                        dataFile.setFileRepoId(outboundRepo);
-                        System.out.println("Removed file from local server");
-                    } else {
-                        // Send file to Exception
-                        moveFileToRepo(exceptionRepo, copyStream, file.getName());
-                        file.delete();
-
-                        dataFile.setFileRepoId(exceptionRepo);
-                        System.out.println("Removed file from local server");
-                    }
-
-                    copyStream.close();
-                    new DataFileDao().updateDataFile(dataFile);
-                } catch (Exception e) {
-                    System.out.println("Error processing local file: "+file.getName());
-                }
-
+		                    new DataFileDao().updateDataFile(dataFile);
+		                   
+	                    }
+	                    else
+	                    {
+		                    DataFile dataFile = new DataFile();
+		                    Date createdDate = new Date();
+		                    dataFile.setCreatedDate(createdDate);
+		                    dataFile.setLastModifiedDate(createdDate);
+		                    dataFile.setDataFileIsXml(true);
+		                    dataFile.setDataFileIsCsv(false);
+		                    dataFile.setDataFileName(file.getName());
+		                    new DataFileDao().addDataFile(dataFile);
+		
+		                    dataFile = new DataFileDao().getDataFileByName(file.getName());
+		
+		                    ResponseObj localResponse = processFile(is, jobData, file.getName(), dataFile);
+		
+		                    is.close();
+		                    InputStream copyStream = new FileInputStream(file);
+		
+		                    if (0 == localResponse.getCode()) {
+		                        // Send file to outbound
+		                        moveFileToRepo(outboundRepo, copyStream, file.getName());
+		                        file.delete();
+		
+		                        dataFile.setFileRepoId(outboundRepo);
+		                        System.out.println("Removed file from local server");
+		                    } else {
+		                        // Send file to Exception
+		                        moveFileToRepo(exceptionRepo, copyStream, file.getName());
+		                        file.delete();
+		
+		                        dataFile.setFileRepoId(exceptionRepo);
+		                        System.out.println("Removed file from local server");
+		                    }
+		
+		                    copyStream.close();
+		                    new DataFileDao().updateDataFile(dataFile);
+	                    }
+	                } catch (Exception e) {
+	                    System.out.println("Error processing local file: "+file.getName());
+	                }
+	
+	            }
             }
         }
 

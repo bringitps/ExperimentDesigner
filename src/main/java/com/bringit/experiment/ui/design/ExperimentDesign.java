@@ -45,6 +45,8 @@ public class ExperimentDesign extends VerticalLayout {
 	protected VerticalLayout vlViewer;
 	protected TabSheet tsImages;
 	protected VerticalLayout expFieldsLayout;
+	protected Upload upCsvExpFields;
+	protected TextArea txtCsvInstructions;
 	protected Button btnAddField;
 	protected Button btnDeleteField;
 	protected Table tblExperimentFields;

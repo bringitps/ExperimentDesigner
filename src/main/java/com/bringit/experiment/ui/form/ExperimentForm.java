@@ -105,6 +105,7 @@ public class ExperimentForm extends ExperimentDesign {
 			cbxExperimentType.setItemCaption(experimentTypes.get(i).getExpTypeId(), experimentTypes.get(i).getExpTypeName());
 		}
 		
+		upCsvExpFields.setButtonCaption("Upload by Csv");
 		
 		this.vlViewer.setSizeFull();
 		//this.vlViewer.setMargin(true);
@@ -112,6 +113,7 @@ public class ExperimentForm extends ExperimentDesign {
 		this.tsImages.setSizeFull();
 		
 		upImage.setButtonCaption("Add Experiment Image");
+		
 		Config configuration = new Config();
 		if(configuration.getProperty("dbms").equals("sqlserver"))
 			dbfieldTypes = configuration.getProperty("sqlserverdatatypes").split(",");
@@ -138,6 +140,7 @@ public class ExperimentForm extends ExperimentDesign {
 		{
 			isNewExperiment = true;
 			this.chxActive.setValue(true);
+			this.chxActive.setEnabled(false);
 			this.btnDelete.setEnabled(false);
 			this.experiment = new Experiment();
 			this.tsImages.setCaption("No images found.");

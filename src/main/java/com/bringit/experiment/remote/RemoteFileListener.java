@@ -1,5 +1,7 @@
 package com.bringit.experiment.remote;
 
+import java.util.List;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -22,6 +24,9 @@ public class RemoteFileListener implements ServletContextListener {
             RemoteFileUtil rfu = RemoteFileUtil.getInstance();
             rfu.startAll();
 
+            List<String> allJobs = rfu.getScheduledJobs();
+            System.out.println("Jobs Scheduled: " + allJobs );
+            
         } catch (Exception ex) {
             System.out.println("Error stating Scheduler: "+ex);
         }

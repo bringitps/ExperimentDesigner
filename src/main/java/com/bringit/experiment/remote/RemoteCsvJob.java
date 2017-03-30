@@ -157,7 +157,7 @@ public class RemoteCsvJob implements Job {
                             System.out.println(new Date().toString() + " Moving to Exception Folder");
      	                    
                             moveFileToRepo(exceptionRepo, is, ftpFile.getName());
-                            ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+                            ftp.deleteFile(ftpFile.getName(), filesRepository.getFileRepoPath());
                             
                             System.out.println(new Date().toString() + " Removed from Inbound Folder");
      	                    
@@ -197,14 +197,14 @@ public class RemoteCsvJob implements Job {
 	                        if (0 == ftpResponse.getCode()) {
 	                            // Send file to outbound
 	                            moveFileToRepo(outboundRepo, copyStream, ftpFile.getName());
-	                            ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+	                            ftp.deleteFile(ftpFile.getName(), filesRepository.getFileRepoPath());
 	
 	                            dataFile.setFileRepoId(outboundRepo);
 	                            System.out.println("Removed file from FTP server");
 	                        } else {
 	                            // Send file to Exception
 	                            moveFileToRepo(exceptionRepo, copyStream, ftpFile.getName());
-	                            ftp.deleteFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+	                            ftp.deleteFile(ftpFile.getName(), filesRepository.getFileRepoPath());
 	
 	                            dataFile.setFileRepoId(exceptionRepo);
 	                            System.out.println("Removed file from FTP server");

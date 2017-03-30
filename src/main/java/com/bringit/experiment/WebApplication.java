@@ -21,7 +21,6 @@ import com.bringit.experiment.ui.form.MainForm;
 import com.bringit.experiment.ui.form.SysUserSettingsForm;
 import com.bringit.experiment.ui.form.XmlDataFileProcessForm;
 import com.bringit.experiment.util.Config;
-import com.bringit.experiment.util.PasswordEncrypter;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;

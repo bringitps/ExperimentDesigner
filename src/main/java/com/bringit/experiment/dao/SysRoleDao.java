@@ -10,7 +10,6 @@ import org.hibernate.Transaction;
 import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.HibernateXmlConfigSupport;
-import com.bringit.experiment.util.PasswordEncrypter;
 
 public class SysRoleDao {
 

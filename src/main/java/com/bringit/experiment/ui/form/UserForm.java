@@ -77,8 +77,8 @@ public class UserForm extends UserDesign {
 		{
 			user = new SysUserDao().getUserById(usrId);
 			this.txtUserName.setValue(user.getUserName());
-			this.chxActiveDirectory.setValue(user.isActiveDirectoryUser());
-			if(user.isActiveDirectoryUser()){
+			this.chxActiveDirectory.setValue(user.getIsActiveDirectoryUser());
+			if(user.getIsActiveDirectoryUser()){
 				this.txtPassword.setEnabled(false);
 			}else{
 				this.txtPassword.setEnabled(true);
@@ -174,7 +174,7 @@ public class UserForm extends UserDesign {
 			
 			//Save user
 			this.user.setUserName(this.txtUserName.getValue());
-			this.user.setActiveDirectoryUser(this.chxActiveDirectory.getValue());
+			this.user.setIsActiveDirectoryUser(this.chxActiveDirectory.getValue());
 			this.user.setUserPass(this.txtPassword.getValue());
 
 			if(this.user.getUserId() != null ) {

@@ -292,7 +292,7 @@ public class ContractManufacturerConfigForm extends ContractManufacturerConfigDe
 			int itemId = (int)itemIdObj;
 			Item tblRowItem = tblContractManufacturer.getContainerDataSource().getItem(itemId);
 			
-			if(!isValidEmailAddress(((TextField)(tblRowItem.getItemProperty("E-mail").getValue())).getValue()))
+			if(!((TextField)(tblRowItem.getItemProperty("E-mail").getValue())).getValue().isEmpty() && !isValidEmailAddress(((TextField)(tblRowItem.getItemProperty("E-mail").getValue())).getValue()))
 			{
 				tblContractManufacturer.select(itemId);
 				return false;

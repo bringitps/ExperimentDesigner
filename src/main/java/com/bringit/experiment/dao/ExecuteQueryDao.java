@@ -47,7 +47,6 @@ public class ExecuteQueryDao {
 	*/
 	public void executeQueryFile(String filePath) {
 
-		ResultSet rs = null;
 		Config configuration = new Config();
 		String dbHost = configuration.getProperty("dbhost");
 		String dbPort = configuration.getProperty("dbport");
@@ -70,7 +69,7 @@ public class ExecuteQueryDao {
 				
 			}
 			
-		   stmt.executeQuery(query);
+		   stmt.execute(query);
 		    
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

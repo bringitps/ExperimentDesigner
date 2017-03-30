@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name="XmlTemplate")
@@ -33,6 +34,7 @@ public class XmlTemplate {
 	private String xmlTemplateName;
 	
 	@Column(name="XmlTemplateComments")
+	@Type(type="text")
 	private String xmlTemplateComments;
 	
 	@Column(name="XmlTemplatePrefix")

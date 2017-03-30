@@ -2,6 +2,7 @@ package com.bringit.experiment;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpSession;
@@ -17,6 +18,8 @@ import com.bringit.experiment.dao.SysUserDao;
 import com.bringit.experiment.dao.UserRoleDao;
 import com.bringit.experiment.ui.form.LoginForm;
 import com.bringit.experiment.ui.form.MainForm;
+import com.bringit.experiment.ui.form.SysUserSettingsForm;
+import com.bringit.experiment.ui.form.XmlDataFileProcessForm;
 import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.PasswordEncrypter;
 import com.vaadin.annotations.Push;
@@ -32,6 +35,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.WrappedSession;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -47,9 +51,11 @@ import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Window.CloseEvent;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 @Theme("valo")
 @Push
@@ -73,7 +79,9 @@ public class WebApplication extends UI {
 
 	private void buildContent()
 	{
+		this.setContent(null);
 		SysUser sysUserSession = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
+		SysRole sysRoleSession = (SysRole)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
 		
 		//--- Loading BringIT Logo ---//
 	    String basePath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
@@ -101,9 +109,19 @@ public class WebApplication extends UI {
 			
 			MenuBar mnuSession = new MenuBar();
 			mnuSession.setStyleName("borderless");
-			mnuSession.addItem(sysUserSession.getUserName(), FontAwesome.USER, null);
-			mnuSession.getItems().get(0).addItem("My Account", FontAwesome.GEAR, null);		//Phase 2 
+			mnuSession.addItem(sysUserSession.getUserFullName() + " - " + sysRoleSession.getRoleName(), FontAwesome.USER, null);
+			mnuSession.getItems().get(0).addItem("My Account", FontAwesome.GEAR, sysUserSettingsCmd);		 
 			mnuSession.getItems().get(0).addItem("Logout", FontAwesome.SIGN_OUT, signOutCmd);
+			mnuSession.getItems().get(0).addSeparator();
+			
+			List<UserRole> availableUserRoles = new UserRoleDao().getUserRolesByUser(sysUserSession);
+			for(int i=0; i<availableUserRoles.size(); i++)
+			{
+				if(availableUserRoles.get(i).getSysRole().getRoleId() != sysRoleSession.getRoleId())
+					mnuSession.getItems().get(0).addItem("Change Role: " + availableUserRoles.get(i).getSysRole().getRoleName(), FontAwesome.EXCHANGE, changeUserRole);	
+			}
+			//mnuSession.getItems().get(0).addItem("Change Role 1: ", FontAwesome.EXCHANGE, changeUserRole);	
+			//mnuSession.getItems().get(0).addItem("Change Role 2: ", FontAwesome.EXCHANGE, changeUserRole);	
 			
 			headerGrid.addComponent(mnuSession, 1, 0);
 			headerGrid.setComponentAlignment(mnuSession, Alignment.BOTTOM_RIGHT);
@@ -122,6 +140,7 @@ public class WebApplication extends UI {
 			headerLayout.addComponent(headerGrid);
 			headerLayout.addComponent(headerNonVisibleSeparatorLayout);
 			headerLayout.addComponent(headerBlueSeparatorLayout);
+			mainForm.updateMenuAccess();
 		}
 		else
 		{
@@ -131,11 +150,12 @@ public class WebApplication extends UI {
 				SysUser rootUser = new SysUser();
 				rootUser.setUserName("root");
 				rootUser.setUserPass("1234");
-				rootUser.setActiveDirectoryUser(false);
+				rootUser.setUserFullName("Root User");
+				rootUser.setIsActiveDirectoryUser(false);
 				new SysUserDao().addSysUser(rootUser);
 				
 				SysRole adminRole = new SysRole();
-				adminRole.setRoleName("Administrator");
+				adminRole.setRoleName("sys_admin");
 				adminRole.setRoleDescription("Users with full access and privileges");
 				
 				SysRole guestRole = new SysRole();
@@ -152,10 +172,6 @@ public class WebApplication extends UI {
 				rootRole.setDefaultRole(true);
 				new UserRoleDao().addUserRole(rootRole);
 				
-			
-				
-				
-
 				Config configuration = new Config();
 				if(configuration.getProperty("dbms").equals("sqlserver"))
 				{
@@ -224,6 +240,7 @@ public class WebApplication extends UI {
 		mainLayout.setExpandRatio(contentLayout, 1);
 		contentLayout.setSizeFull();
 		setContent(mainLayout);
+		
 	}
 
 	MenuBar.Command signOutCmd = new MenuBar.Command() {
@@ -233,9 +250,61 @@ public class WebApplication extends UI {
 
     };
 
+
+	MenuBar.Command changeUserRole = new MenuBar.Command() {
+        public void menuSelected(MenuItem selectedItem) {
+        	String changedRoleName = selectedItem.getText().split(":")[1].trim();
+    		SysRole sysRole = new SysRoleDao().getRoleByRoleName(changedRoleName);
+    		SysUser sysUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
+    		changeUserRole(sysUser, sysRole);
+        }
+    };
+
+	MenuBar.Command sysUserSettingsCmd = new MenuBar.Command() {
+        public void menuSelected(MenuItem selectedItem) {
+
+        	 Window sysUserSettingsModalWindow = new Window("User Settings");
+        	 sysUserSettingsModalWindow.setModal(true);
+        	 sysUserSettingsModalWindow.setResizable(false);
+        	 sysUserSettingsModalWindow.setContent(new SysUserSettingsForm());
+        	 sysUserSettingsModalWindow.setWidth(993, Unit.PIXELS);
+        	 sysUserSettingsModalWindow.setHeight(310, Unit.PIXELS);
+        	 sysUserSettingsModalWindow.center();
+        	 sysUserSettingsModalWindow.addCloseListener(new Window.CloseListener() {
+    			
+    			@Override
+    			public void windowClose(CloseEvent e) {
+    				// TODO Auto-generated method stub
+    				buildContent();
+    			}
+    		});
+    		addWindow(sysUserSettingsModalWindow);
+        }
+
+    };
+    
+    public void changeUserRole(SysUser sysUser, SysRole sysRole)
+    {
+    	VaadinService.getCurrentRequest().getWrappedSession().setAttribute("UserSession", sysUser);
+		VaadinService.getCurrentRequest().getWrappedSession().setAttribute("RoleSession", sysRole);
+		mainForm = new MainForm(this, null);
+		buildContent();
+    }
+    
 	public void createUserSession(SysUser sysUser) 
 	{
 		VaadinService.getCurrentRequest().getWrappedSession().setAttribute("UserSession", sysUser);
+		
+		UserRole sysUserDefaultRole = new UserRoleDao().getDefaultUserRoleByUserId(sysUser.getUserId()); 
+		if(sysUserDefaultRole == null)
+		{
+			List<UserRole> userRoles = new UserRoleDao().getUserRolesByUser(sysUser);
+			if(userRoles != null)
+				sysUserDefaultRole = userRoles.get(0);
+		}
+		
+		VaadinService.getCurrentRequest().getWrappedSession().setAttribute("RoleSession", sysUserDefaultRole.getSysRole());
+		
 		buildContent();
 	}
 	
@@ -248,6 +317,7 @@ public class WebApplication extends UI {
 	public void closeUserSession()
 	{
 		VaadinService.getCurrentRequest().getWrappedSession().setAttribute("UserSession", null);
+		VaadinService.getCurrentRequest().getWrappedSession().setAttribute("RoleSession", null);
 		mainForm = new MainForm(this, null);
 		buildContent();
 	}

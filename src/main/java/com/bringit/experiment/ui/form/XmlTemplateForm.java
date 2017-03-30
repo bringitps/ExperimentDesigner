@@ -214,11 +214,13 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 	@SuppressWarnings("deprecation")
 	protected void onSave() {
 		Collection itemIds = this.tblXmlNodes.getContainerDataSource().getItemIds();
+		boolean validateXmlTemplateNameResult = validateXmlTemplateName();		
 		boolean validateReqFieldsResult = validateRequiredFields();
 		boolean validateUniqueLoopNodeResult = validateUniqueLoopNode();		
 		boolean validateNonRepeatedExperimentFieldsResult = validateNonRepeatedExperimentFields();
+		
 		//---Validate Required Fields---//
-		if(itemIds.size() > 0 && validateReqFieldsResult && validateUniqueLoopNodeResult && validateNonRepeatedExperimentFieldsResult)
+		if(itemIds.size() > 0 && validateReqFieldsResult && validateUniqueLoopNodeResult && validateNonRepeatedExperimentFieldsResult && validateXmlTemplateNameResult)
 		{
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			
@@ -250,16 +252,17 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			if(this.xmlt.getXmlTemplateId() != null ) {
 				new XmlTemplateDao().updateXmlTemplate(xmlt);
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
-				//remoteFileUtil.updateJob(Integer.toString(xmlt.getXmlTemplateId()), xmlt);
-				remoteFileUtil.updateJob(xmlt);
+				
+				if(xmlt.isXmlTemplateIsActive())
+					remoteFileUtil.updateJob(xmlt);
+				else
+					remoteFileUtil.cancelJob(xmlt);
 			} else {
 				this.xmlt.setCreatedBy(sessionUser);
 				this.xmlt.setCreatedDate(this.xmlt.getModifiedDate());
 				new XmlTemplateDao().addXmlTemplate(xmlt);
-				XmlTemplate xmltWithId = new XmlTemplateDao().getXmlTemplateByExperimentId(xmlt.getExperiment().getExpId());
+				XmlTemplate xmltWithId = new XmlTemplateDao().getActiveXmlTemplateByName(this.txtXmlTName.getValue());
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
-				//remoteFileUtil.updateJob(Integer.toString(xmltWithId.getXmlTemplateId()), xmltWithId);
-				//remoteFileUtil.updateJob(xmlt);
 				remoteFileUtil.updateJob(xmltWithId);
 			}
 			
@@ -310,14 +313,38 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		else
 		{
 			if(itemIds.size() <= 0)
-				this.getUI().showNotification("There are no xml nodes mapped on your XmlTemplate", Type.WARNING_MESSAGE);
+				this.getUI().showNotification("There are no xml nodes mapped on your Xml Template", Type.WARNING_MESSAGE);
 			else if(!validateReqFieldsResult)
 				this.getUI().showNotification("Please fill in all required Fields", Type.WARNING_MESSAGE);
 			else if(!validateUniqueLoopNodeResult)
 				this.getUI().showNotification("Only 1 Loop Node is allowed", Type.WARNING_MESSAGE);
 			else if(!validateNonRepeatedExperimentFieldsResult)
 				this.getUI().showNotification("You can not map 1 Experiment Field to 2 or more Xml Node Value/Attribute.", Type.WARNING_MESSAGE);
+			else if(!validateXmlTemplateNameResult)
+				this.getUI().showNotification("Name is already selected for another Xml Template. Please rename XmlTemplate", Type.WARNING_MESSAGE);
 		}
+	}
+	
+	private boolean validateNonRepeatedExperimentFields()
+	{
+		List<Integer> selectedExpFields = new ArrayList<Integer>();
+		
+		Collection itemIds = this.tblXmlNodes.getContainerDataSource().getItemIds();
+		
+		for (Object itemIdObj : itemIds) 
+		{	
+			int itemId = (int)itemIdObj;
+			Item tblRowItem = this.tblXmlNodes.getContainerDataSource().getItem(itemId);
+			
+			if(((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue() != null)
+			{
+				if(selectedExpFields.indexOf(((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue())) > -1)
+					return false;
+				else
+					selectedExpFields.add(((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue()));
+			}
+		}
+		return true;
 	}
 	
 	private boolean validateRequiredFields()
@@ -352,25 +379,10 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		
 	}
 	
-	private boolean validateNonRepeatedExperimentFields()
+	private boolean validateXmlTemplateName()
 	{
-		List<Integer> selectedExpFields = new ArrayList<Integer>();
-		
-		Collection itemIds = this.tblXmlNodes.getContainerDataSource().getItemIds();
-		
-		for (Object itemIdObj : itemIds) 
-		{	
-			int itemId = (int)itemIdObj;
-			Item tblRowItem = this.tblXmlNodes.getContainerDataSource().getItem(itemId);
-			
-			if(((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue() != null)
-			{
-				if(selectedExpFields.indexOf(((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue())) > -1)
-					return false;
-				else
-					selectedExpFields.add(((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue()));
-			}
-		}
+		if(this.xmlt.getXmlTemplateId() == null && new XmlTemplateDao().getActiveXmlTemplateByName(this.txtXmlTName.getValue()) != null)
+			return false;
 		return true;
 	}
 	
@@ -604,6 +616,10 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 		this.xmlt.setContractManufacturer(null);
 		XmlTemplateDao xmlDao = new XmlTemplateDao();
 		xmlDao.updateXmlTemplate(xmlt);
+		
+		RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
+		remoteFileUtil.cancelJob(xmlt);
+		
 		closeModalWindow();
 		
 		/*

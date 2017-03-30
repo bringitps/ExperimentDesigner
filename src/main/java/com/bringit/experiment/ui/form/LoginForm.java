@@ -49,7 +49,7 @@ public class LoginForm extends LoginFormDesign {
 						webApplication.createUserSession(loggedUser);
 					else
 						loggedUser = new SysUser();
-						loggedUser.setActiveDirectoryUser(true);
+						loggedUser.setIsActiveDirectoryUser(true);
 						loggedUser.setUserName(txtUsername.getValue());
 						loggedUser.setUserPass("");		
 						//Register user automatically? or give them a point of contact to request access?

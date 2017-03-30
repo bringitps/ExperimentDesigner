@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name="TargetReport")
@@ -34,6 +35,7 @@ public class TargetReport {
 	private String targetReportName;
 
 	@Column(name="TargetReportDescription")
+	@Type(type="text")
 	private String targetReportDescription;
 
 	@OneToOne(fetch=FetchType.LAZY)

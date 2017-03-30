@@ -10,6 +10,7 @@ import org.hibernate.Transaction;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.HibernateXmlConfigSupport;
+import com.bringit.experiment.util.M5Encryption;
 import com.bringit.experiment.util.PasswordEncrypter;
 
 public class SysUserDao {
@@ -19,8 +20,8 @@ public class SysUserDao {
 	public void addSysUser(SysUser sysUser) {
 
 
-    	String encryptedPassword = PasswordEncrypter.encryptPassword(sysUser.getUserPass());
-    	sysUser.setUserPass(encryptedPassword);
+    	//String encryptedPassword = PasswordEncrypter.encryptPassword(sysUser.getUserPass());
+    	//sysUser.setUserPass(encryptedPassword);
     	
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
@@ -98,6 +99,24 @@ public class SysUserDao {
         return sysUsers;
     }
 
+    @SuppressWarnings({ "unused", "unchecked" })
+	public List<SysUser> getAllActiveSysUsers() {
+        List<SysUser> sysUsers = new ArrayList<SysUser>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            sysUsers = session.createQuery("from SysUser where UserIsActive = 'true'").list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return sysUsers;
+    }
+
     @SuppressWarnings("unused")
 	public SysUser getUserById(int userId) {
         SysUser sysUser = null;
@@ -142,7 +161,7 @@ public class SysUserDao {
     @SuppressWarnings("unused")
 	public SysUser getUserByUserNameAndPassword(String userName, String password) {
     	
-    	String encryptedPassword = PasswordEncrypter.encryptPassword(password);
+    	String encryptedPassword = M5Encryption.encrypt(password);
     	
         SysUser sysUser = null;
         Transaction trns = null;

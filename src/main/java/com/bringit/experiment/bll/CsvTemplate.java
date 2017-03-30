@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name="CsvTemplate")
@@ -33,6 +34,7 @@ public class CsvTemplate {
 	private String CsvTemplateName;
 	
 	@Column(name="CsvTemplateComments")
+	@Type(type="text")
 	private String csvTemplateComments;
 	
 	@Column(name="CsvTemplatePrefix")

@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head> 
+ <body> 
+  <vaadin-vertical-layout style-name="well" responsive margin> 
+   <vaadin-vertical-layout> 
+    <vaadin-grid-layout width="960px" height="35px"> 
+     <row> 
+      <column> 
+       <vaadin-grid-layout width="100px" height="30px"> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="primary tiny" plain-text _id="btnSave">
+            Save 
+          </vaadin-button> 
+         </column> 
+         <column> 
+          <vaadin-button style-name="tiny" plain-text _id="btnCancel">
+            Cancel 
+          </vaadin-button> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout> 
+    <vaadin-vertical-layout style-name="XmlTemplateCRUDLayout" _id="crudLayout"> 
+     <vaadin-grid-layout spacing id="gridMainData" width-full> 
+      <row> 
+       <column> 
+        <vaadin-text-field required-error="This field is mandatory." caption="Username:" enabled="false" required style-name="tiny" width-full _id="txtUsername"></vaadin-text-field> 
+       </column> 
+       <column> 
+        <vaadin-password-field caption="Password:" style-name="tiny" width-full _id="txtPassword"></vaadin-password-field> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-text-field required-error="This field is mandatory." caption="Full Name:" required style-name="tiny" width-full _id="txtFullName"></vaadin-text-field> 
+       </column> 
+       <column> 
+        <vaadin-combo-box caption="Default Role:" style-name="tiny" width-full _id="cbxDefaultRole"></vaadin-combo-box> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-text-field caption="E-mail:" style-name="tiny" width-full _id="txtEmail"></vaadin-text-field> 
+       </column> 
+      </row> 
+     </vaadin-grid-layout> 
+    </vaadin-vertical-layout> 
+   </vaadin-vertical-layout> 
+  </vaadin-vertical-layout>  
+ </body>
+</html>

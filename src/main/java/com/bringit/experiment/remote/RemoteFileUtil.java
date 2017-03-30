@@ -73,7 +73,7 @@ public class RemoteFileUtil {
 
     public void updateJob(XmlTemplate jobData) {
         try {
-
+        	System.out.println("Trying to update a job\n");
             if (jobData == null) throw new RuntimeException("Cannot restart a job with a null name");
 
             //RemoteXmlJob ssd = new RemoteXmlJob();
@@ -85,27 +85,35 @@ public class RemoteFileUtil {
             Trigger trigger = getTrigger(jobData);
 
             if (scheduler.checkExists(tk)) {
-                System.out.println("UPDATING job: "+jobData.getXmlTemplateId().toString()+ " rescheduled the job.");
-                scheduler.rescheduleJob(tk, trigger);
+            		System.out.println("UPDATING job: "+jobData.getXmlTemplateId().toString()+ " rescheduled the job.");
+            		scheduler.rescheduleJob(tk, trigger);            	
             } else {
                 System.out.println("Scheduling a new job: "+jobData.getXmlTemplateId().toString()+ " NOT AN UPDATE.");
-                scheduler.scheduleJob(job, trigger);
+                
+                JobDataMap jobDataMap = job.getJobDataMap();
+                jobDataMap.put("jobData", jobData);
+                scheduler.scheduleJob(job, getTrigger(jobData));
             }
 
 
         } catch (Exception ex) {
+
+        	System.out.println("Failed to update a job\n");
             System.out.println(ex);
         }
     }
 
     public void cancelJob(CsvTemplate jobData) {
         try {
+        	cancelJobByIdAndGroup(jobData.getCsvTemplateId().toString(), CSV_JOB_GROUP);
+        	
+        	/*
             TriggerKey tk = new TriggerKey(jobData.getCsvTemplateId().toString(), CSV_JOB_GROUP);
             if (scheduler.checkExists(tk)) {
                 System.out.println("UNSCHEDULED: "+jobData.getCsvTemplateId().toString());
                 scheduler.unscheduleJob(tk);
             }
-
+			*/
         } catch (Exception ex) {
             System.out.println(ex);
         }
@@ -114,16 +122,21 @@ public class RemoteFileUtil {
 
     public void cancelJob(XmlTemplate jobData) {
         try {
-            TriggerKey tk = new TriggerKey(jobData.getXmlTemplateId().toString(), XML_JOB_GROUP);
+        	
+        	cancelJobByIdAndGroup(jobData.getXmlTemplateId().toString(), XML_JOB_GROUP);
+        	/*
+        	TriggerKey tk = new TriggerKey(jobData.getXmlTemplateId().toString(), XML_JOB_GROUP);
             if (scheduler.checkExists(tk)) {
                 System.out.println("UNSCHEDULED: "+jobData.getXmlTemplateId().toString());
                 scheduler.unscheduleJob(tk);
             }
+            */
 
         } catch (Exception ex) {
             System.out.println(ex);
         }
-
+     
+        System.out.println("Scheduled Jobs:" + getScheduledJobs());
     }
 
     public void stopAll() {
@@ -161,7 +174,7 @@ public class RemoteFileUtil {
 
             if (xmlTemplateDao == null) xmlTemplateDao = new XmlTemplateDao();
 
-            List<XmlTemplate> jobsData = xmlTemplateDao.getAllXmlTemplates();
+            List<XmlTemplate> jobsData = xmlTemplateDao.getAllActiveXmlTemplates();
             if (jobsData != null) {
                 System.out.println("Jobs: "+jobsData.size());
                 System.out.println("Retrieving XML Jobs from Database and Scheduling One by One | Total Number of Jobs: " + jobsData.size());
@@ -249,6 +262,7 @@ public class RemoteFileUtil {
                     //get job's trigger
                     List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
                     Date nextFireTime = triggers.get(0).getNextFireTime();
+                    
                     String strJobDetails = "[jobName] : " + jobName + " [groupName] : "
                             + jobGroup + " - " + nextFireTime;
                     allJobs.add(strJobDetails);
@@ -272,8 +286,25 @@ public class RemoteFileUtil {
         // value to an int for setting the trigger.
         Long iRepeat = new Long(jobExecutionRepeat.getJobExecRepeatMilliseconds()/1000);
 
+        /*
         SimpleTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobData.getCsvTemplateId().toString(), CSV_TRIGGER_GROUP)
                 .startAt(new Date(jobData.getCsvTemplateExecStartDate().getTime()))
+                .endAt(new Date(jobData.getCsvTemplateExecEndDate().getTime()))
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(iRepeat.intValue())
+                        .withRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY)).build();
+        return trigger;*/
+        
+
+        int startHour = jobData.getCsvTemplateExecStartHour();
+        System.out.println("Setting trigger with the following hour: "+startHour);
+        java.util.Calendar startCal = java.util.Calendar.getInstance();
+        startCal.setTimeInMillis(jobData.getCsvTemplateExecStartDate().getTime());
+        startCal.set(java.util.Calendar.HOUR_OF_DAY, startHour);
+        startCal.set(java.util.Calendar.MINUTE, 0);
+        startCal.set(Calendar.SECOND, 0);
+        startCal.set(Calendar.MILLISECOND, 0);
+        SimpleTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobData.getCsvTemplateId().toString(), CSV_TRIGGER_GROUP)
+                .startAt(new Date(startCal.getTimeInMillis()))
                 .endAt(new Date(jobData.getCsvTemplateExecEndDate().getTime()))
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(iRepeat.intValue())
                         .withRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY)).build();
@@ -329,4 +360,35 @@ public class RemoteFileUtil {
         return jobs;
     }*/
 
+    
+    
+    private boolean cancelJobByIdAndGroup(String jobId, String jobGroup)
+    {
+    	try {
+
+            for (String groupName : scheduler.getJobGroupNames()) {
+
+                for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+
+                    String jobKeyName = jobKey.getName();
+                    String jobKeyGroup = jobKey.getGroup();
+
+                    if(jobId.equals(jobKeyName) && jobGroup.equals(jobKeyGroup))
+                    {
+                    	List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+                        scheduler.unscheduleJob(triggers.get(0).getKey());
+                        System.out.println("Cancelled [jobName] : " + jobKeyName + " [groupName] : "
+                                + jobKeyGroup );
+                    	return true;
+                    }                    
+                }
+            }
+
+        } catch (Exception ex) {
+            System.out.println("Error cancelling job: "+ex);
+            return false;
+        }
+    	return false;
+    }
+    
 }

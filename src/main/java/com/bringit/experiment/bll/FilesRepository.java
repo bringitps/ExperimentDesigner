@@ -16,6 +16,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.bringit.experiment.util.M5Encryption;
+
 @Entity
 @Table(name="FilesRepository")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region="entity")
@@ -177,12 +179,13 @@ public class FilesRepository {
 		this.fileRepoUser = fileRepoUser;
 	}
 
-	public String getFileRepoPass() {
-		return fileRepoPass;
+	public String getFileRepoPass() 
+	{
+	   	return M5Encryption.decrypt(fileRepoPass);
 	}
 
 	public void setFileRepoPass(String fileRepoPass) {
-		this.fileRepoPass = fileRepoPass;
+	    this.fileRepoPass = M5Encryption.encrypt(fileRepoPass);
 	}
 
 	public Date getCreatedDate() {

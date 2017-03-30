@@ -10,6 +10,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.bringit.experiment.util.M5Encryption;
+
 @Entity
 @Table(name="SysUser")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region="entity")
@@ -21,26 +23,45 @@ public class SysUser {
 	@Column(name="UserId")
 	private Integer userId;
 
+	@Column(name="UserIsActive")
+	private Boolean userIsActive;
+	
+	@Column(name="UserFullName")
+	private String userFullName;
+
+	@Column(name="UserEmail")
+	private String userEmail;
+	
 	@Column(name="UserName",unique=true)
-	private String UserName;
+	private String userName;
 	
 	@Column(name="UserPass")
-	private String UserPass;
+	private String userPass;
 	
 	@Column(name="IsActiveDirectoryUser")
-	private boolean isActiveDirectoryUser;
+	private Boolean isActiveDirectoryUser;
 
 	public SysUser() {
+		
 		this.userId = null;
-		this.UserName = null;
-		this.UserPass = null;
-		this.isActiveDirectoryUser = false;
+		this.userIsActive = null;
+		this.userFullName = null;
+		this.userEmail = null;
+		this.userName = null;
+		this.userPass = null;
+		this.isActiveDirectoryUser = null;
+		
 	}
+	
+	public SysUser(Integer userId, Boolean userIsActive, String userFullName, String userEmail, String userName, String userPass,
+			Boolean isActiveDirectoryUser) {
 
-	public SysUser(Integer userId, String userName, String userPass, boolean isActiveDirectoryUser) {
 		this.userId = userId;
-		this.UserName = userName;
-		this.UserPass = userPass;
+		this.userIsActive = userIsActive;
+		this.userFullName = userFullName;
+		this.userEmail = userEmail;
+		this.userName = userName;
+		this.userPass = userPass;
 		this.isActiveDirectoryUser = isActiveDirectoryUser;
 	}
 
@@ -52,28 +73,53 @@ public class SysUser {
 		this.userId = userId;
 	}
 
-	public String getUserName() {
-		return UserName;
+	public Boolean getUserIsActive() {
+		return userIsActive;
 	}
 
-	public void setUserName(String userName) {
-		UserName = userName;
+	public void setUserIsActive(Boolean userIsActive) {
+		this.userIsActive = userIsActive;
 	}
 
-	public String getUserPass() {
-		return UserPass;
-	}
-
-	public void setUserPass(String userPass) {
-		UserPass = userPass;
-	}
-
-	public boolean isActiveDirectoryUser() {
+	public Boolean getIsActiveDirectoryUser() {
 		return isActiveDirectoryUser;
 	}
 
-	public void setActiveDirectoryUser(boolean isActiveDirectoryUser) {
+	public void setIsActiveDirectoryUser(Boolean isActiveDirectoryUser) {
 		this.isActiveDirectoryUser = isActiveDirectoryUser;
 	}
-	
+
+	public String getUserFullName() {
+		return userFullName;
+	}
+
+	public void setUserFullName(String userFullName) {
+		this.userFullName = userFullName;
+	}
+
+	public String getUserEmail() {
+		return userEmail;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getUserPass() 
+	{
+	   	return M5Encryption.decrypt(userPass);
+	}
+
+	public void setUserPass(String userPass) {
+	    this.userPass = M5Encryption.encrypt(userPass);
+	}
+
 }

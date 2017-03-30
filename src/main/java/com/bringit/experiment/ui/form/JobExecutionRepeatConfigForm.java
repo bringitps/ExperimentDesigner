@@ -141,7 +141,6 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 		}
 	}
 	
-
 	private void addJobExecRepeatRow()
 	{
 		Object[] itemValues = new Object[3];
@@ -175,7 +174,6 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 		this.tblJobExecutionRepeat.select(this.lastNewItemId);
 	}
 	
-
 	private void deleteJobExecRepeatRow()
 	{
 		boolean hasXmlTemplatesLinked = false;
@@ -193,8 +191,7 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 			this.getUI().showNotification("Job Execution Repeat record can not be deleted. \nThere are XML Templates linked.", Type.WARNING_MESSAGE);
 			
 	}
-	
-	
+		
 	private void saveJobExecRepeatRows()
 	{
 		boolean validateRequiredFieldsResult = validateRequiredFields();
@@ -242,8 +239,7 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 			this.getUI().showNotification("Name of Job Execution Repeat can not be duplicated.", Type.WARNING_MESSAGE);
 		
 	}
-	
-	
+		
 	private boolean validateRequiredFields()
 	{	
 		Collection itemIds = this.tblJobExecutionRepeat.getContainerDataSource().getItemIds();
@@ -289,7 +285,7 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 	
 	private boolean validateDuplicatedNames()
 	{
-		List<String> fileRepoNames = new ArrayList<String>();
+		List<String> jobExecutionNames = new ArrayList<String>();
 		
 		Collection itemIds = this.tblJobExecutionRepeat.getContainerDataSource().getItemIds();
 		
@@ -298,13 +294,13 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 			int itemId = (int)itemIdObj;
 			Item tblRowItem = this.tblJobExecutionRepeat.getContainerDataSource().getItem(itemId);
 			
-			if(fileRepoNames.indexOf(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue()) >= 0)
+			if(jobExecutionNames.indexOf(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue()) >= 0)
 			{
 				tblJobExecutionRepeat.select(itemId);
 				return false;
 			}
 			else
-				fileRepoNames.add(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
+				jobExecutionNames.add(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
 		}
 		
 		return true;

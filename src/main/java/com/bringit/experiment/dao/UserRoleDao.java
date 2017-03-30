@@ -112,15 +112,15 @@ public class UserRoleDao {
         return sysRole;
     }
     @SuppressWarnings("unused")
-	public UserRole getDefaultUserRoleByUserId(int usrRoleId) {
+	public UserRole getDefaultUserRoleByUserId(int userId) {
         UserRole sysRole = null;
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            String queryString = "from UserRole where UserRoleId = :id and IsDefaultRole = 1";
+            String queryString = "from UserRole where UserId = :id and IsDefaultRole = 'true'";
             Query query = session.createQuery(queryString);
-            query.setInteger("id", usrRoleId);
+            query.setInteger("id", userId);
             sysRole = (UserRole) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -154,7 +154,7 @@ public class UserRoleDao {
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            userRoles = session.createQuery("from userRoles where RoleId = :id").setInteger("id", role.getRoleId()).list();
+            userRoles = session.createQuery("from userRole where RoleId = :id").setInteger("id", role.getRoleId()).list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {

@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name="Experiment")
@@ -37,9 +38,11 @@ public class Experiment {
 	private String expName;
 
 	@Column(name="ExpComments")
+	@Type(type="text")
 	private String expComments;
 
 	@Column(name="ExpInstructions")
+	@Type(type="text")
 	private String expInstructions;
 	
 	@Column(name="CreatedDate")

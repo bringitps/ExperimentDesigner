@@ -1,9 +1,11 @@
 package com.bringit.experiment.ui.form;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.bringit.experiment.WebApplication;
 import com.bringit.experiment.bll.Experiment;
+import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.dao.ExperimentDao;
@@ -74,11 +76,97 @@ public class MainForm extends MainFormDesign {
                 	setFormContent(event.getItemId().toString(), treeMainMenu.getItem(event.getItemId()));
             }
         });
-	    
+		
 	    if(selectedForm != null)
 	    	setFormContent(selectedForm, null);
 	}
 	
+	public void updateMenuAccess()
+	{
+		
+		SysRole sysRoleSession = (SysRole)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
+		if(sysRoleSession != null)
+		{
+			if(!sysRoleSession.getRoleName().equals("sys_admin"))
+			{
+				if(sysRoleSession.getRoleMenuAccess() != null && !sysRoleSession.getRoleMenuAccess().trim().isEmpty())
+				{
+					List<String> mnuAccessTrimmed = new ArrayList<String>();
+					List<String> mnuParentToKeep = new ArrayList<String>();
+					
+					String[] mnuAccess = sysRoleSession.getRoleMenuAccess().split("\n");
+				
+					for(int i=0; i<mnuAccess.length; i++)
+					{
+						if(!mnuAccess[i].contains("/") &&  mnuParentToKeep.indexOf(mnuAccess[i].trim()) == -1)
+							mnuParentToKeep.add(mnuAccess[i].trim());
+						{
+							String[] mnuAccessFullTree = mnuAccess[i].split("/");
+							mnuAccessTrimmed.add(mnuAccessFullTree[mnuAccessFullTree.length-1].trim());		
+							
+							for(int j=0; j<mnuAccessFullTree.length-1; j++)
+							{
+								if(!mnuAccessFullTree[j].trim().isEmpty() && mnuParentToKeep.indexOf(mnuAccessFullTree[j].trim()) == -1)
+									mnuParentToKeep.add(mnuAccessFullTree[j].trim());
+							}
+						}
+					}
+					
+					
+					//Get Root Item
+					String rootItemId = "";
+					for (Object id : treeMainMenu.rootItemIds()) 
+						rootItemId = id.toString().trim();
+					
+					List<String> mainMenuItemIds = new ArrayList<String>();
+					for (Object id : treeMainMenu.getItemIds()) 
+					{
+						if(!id.toString().trim().equals(rootItemId))
+							mainMenuItemIds.add(id.toString().trim());
+					}
+										
+					//Remove Not Granted Parents
+					for(int i=0; i<mainMenuItemIds.size(); i++)
+					{
+						if(treeMainMenu.getItem(mainMenuItemIds.get(i)) != null && treeMainMenu.getChildren(mainMenuItemIds.get(i)) != null
+								&& mnuParentToKeep.indexOf(mainMenuItemIds.get(i).toString().trim()) == -1)
+								treeMainMenu.removeItem(mainMenuItemIds.get(i));
+					}
+					
+					//Remove Not Granted Children
+					for(int i=0; i<mainMenuItemIds.size(); i++)
+					{
+						if(treeMainMenu.getParent(mainMenuItemIds.get(i)) != null 
+								&& (treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isExperimentDataReport").getValue() == null 
+								&& (treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isTargetReport").getValue() == null)))
+						{
+							if(mnuAccessTrimmed.indexOf(mainMenuItemIds.get(i).toString().trim()) == -1)
+							{	
+								if(treeMainMenu.getChildren(mainMenuItemIds.get(i)) == null)
+									treeMainMenu.removeItem(mainMenuItemIds.get(i));
+								
+							}
+						}
+					}
+					
+					List<String> mainMenuWithoutParentItemIds = new ArrayList<String>();
+					for (Object id : treeMainMenu.rootItemIds()) 
+					{
+						if(!id.toString().trim().equals(rootItemId))
+							mainMenuWithoutParentItemIds.add(id.toString().trim());
+					}
+					
+					for(int i=0; i<mainMenuWithoutParentItemIds.size(); i++)
+						treeMainMenu.removeItem(mainMenuWithoutParentItemIds.get(i));
+					
+					treeMainMenu.setVisible(true);		
+					
+				}
+				else
+					treeMainMenu.setVisible(false);				
+			}
+		}
+	}
 	
 	private void setFormContent(String itemClickedText, Item treeItemClicked)
 	{
@@ -116,25 +204,29 @@ public class MainForm extends MainFormDesign {
 	     				formContentLayout.addComponent(new XmlDataFileLoadForm());
 	                  	break;   
 			 	case "csv data file loads":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new CsvDataFileLoadForm());
-                  	break;
+     					formContentLayout.removeAllComponents();
+     					formContentLayout.addComponent(new CsvDataFileLoadForm());
+     					break;
 			 	case "target report":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new TargetReportForm());
-			 		break;
+     					formContentLayout.removeAllComponents();
+     					formContentLayout.addComponent(new TargetReportForm());
+     					break;
 			 	case "contract manufacturers":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new ContractManufacturerConfigForm());
-			 		break;
+     					formContentLayout.removeAllComponents();
+     					formContentLayout.addComponent(new ContractManufacturerConfigForm());
+     					break;
 			 	case "users":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new UserManagementForm());
-			 		break;
+     					formContentLayout.removeAllComponents();
+     					formContentLayout.addComponent(new SysUserConfigForm());
+     					break;
+			 	case "user roles":  
+     					formContentLayout.removeAllComponents();
+     					formContentLayout.addComponent(new SysRoleConfigForm(treeMainMenu));
+     					break;
 			 	case "experiment types":  
-     				formContentLayout.removeAllComponents();
-     				formContentLayout.addComponent(new ExperimentTypeConfigForm());
-			 		break;
+     					formContentLayout.removeAllComponents();
+     					formContentLayout.addComponent(new ExperimentTypeConfigForm());
+     					break;
 			 	default:
 	         			break;
 			 }

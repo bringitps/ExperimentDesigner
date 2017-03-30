@@ -9,6 +9,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name="SysRole")
@@ -23,21 +24,26 @@ public class SysRole {
 
 	@Column(name="RoleName",unique=true)
 	private String roleName;
-	
+
 	@Column(name="RoleDescription")
 	private String roleDescription;
-
+	
+	@Column(name="RoleMenuAccess")
+	@Type(type="text")
+	private String roleMenuAccess;
 
 	public SysRole() {
 		this.roleId = null;
 		this.roleName = null;
 		this.roleDescription = null;
+		this.roleMenuAccess = null;
 	}
 
-	public SysRole(Integer roleId, String roleName, String roleDesc) {
+	public SysRole(Integer roleId, String roleName, String roleDesc, String roleMenuAccess) {
 		this.roleId = roleId;
 		this.roleName = roleName;
 		this.roleDescription = roleDesc;
+		this.roleMenuAccess = roleMenuAccess;
 	}
 
 	public Integer getRoleId() {
@@ -62,6 +68,14 @@ public class SysRole {
 
 	public void setRoleDescription(String roleDesc) {
 		this.roleDescription = roleDesc;
+	}
+
+	public String getRoleMenuAccess() {
+		return roleMenuAccess;
+	}
+
+	public void setRoleMenuAccess(String roleMenuAccess) {
+		this.roleMenuAccess = roleMenuAccess;
 	}
 	
 }

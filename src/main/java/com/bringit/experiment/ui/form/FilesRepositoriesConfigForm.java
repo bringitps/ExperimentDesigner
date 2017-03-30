@@ -207,6 +207,7 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 		TextField txtFileRepoName = new TextField();
 		txtFileRepoName.setStyleName("tiny");
 		txtFileRepoName.setValue("");
+		txtFileRepoName.setWidth(97, Unit.PERCENTAGE);
 		itemValues[1] = txtFileRepoName;
 		
 		CheckBox chxIsLocal = new CheckBox();
@@ -221,35 +222,33 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 		TextField txtFileRepoPath = new TextField();
 		txtFileRepoPath.setStyleName("tiny");
 		txtFileRepoPath.setValue("");
+		txtFileRepoPath.setWidth(97, Unit.PERCENTAGE);
 		itemValues[5] = txtFileRepoPath;
 
 		TextField txtFileRepoHost = new TextField();
 		txtFileRepoHost.setStyleName("tiny");
 		txtFileRepoHost.setValue("");
+		txtFileRepoHost.setWidth(97, Unit.PERCENTAGE);
 		itemValues[6] = txtFileRepoHost;
 
 		TextField txtFileRepoPort = new TextField();
 		txtFileRepoPort.setStyleName("tiny");
 		txtFileRepoPort.setValue("");
+		txtFileRepoPort.setWidth(97, Unit.PERCENTAGE);
 		itemValues[7] = txtFileRepoPort;
 
 		TextField txtFileRepoUser = new TextField();
 		txtFileRepoUser.setStyleName("tiny");
 		txtFileRepoUser.setValue("");
+		txtFileRepoUser.setWidth(97, Unit.PERCENTAGE);
 		itemValues[8] = txtFileRepoUser;
 
 		PasswordField txtFileRepoPass = new PasswordField();
 		txtFileRepoPass.setStyleName("tiny");
 		txtFileRepoPass.setValue("");
+		txtFileRepoPass.setWidth(97, Unit.PERCENTAGE);
 		itemValues[9] = txtFileRepoPass;
 		
-		/*
-		itemValues[5] = "";
-		itemValues[6] = "";
-		itemValues[7] = "";
-		itemValues[8] = "";
-		itemValues[9] = "";
-		*/
 		this.lastNewItemId = this.lastNewItemId - 1;
 		this.tblFilesRepository.addItem(itemValues, this.lastNewItemId);
 		this.tblFilesRepository.select(this.lastNewItemId);

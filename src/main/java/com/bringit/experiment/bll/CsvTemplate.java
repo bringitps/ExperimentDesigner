@@ -40,6 +40,9 @@ public class CsvTemplate {
 	@Column(name="CsvTemplatePrefix")
 	private String csvTemplatePrefix;
 
+	@Column(name="CsvTemplateNotScheduled")
+	private Boolean csvTemplateNotScheduled;
+	
 	@Column(name="CsvTemplateExecStartDate")
 	private Date csvTemplateExecStartDate;
 	
@@ -93,6 +96,7 @@ public class CsvTemplate {
 		this.CsvTemplateName = null;
 		this.csvTemplateComments = null;
 		this.csvTemplatePrefix = null;
+		this.csvTemplateNotScheduled = null;
 		this.csvTemplateExecStartDate = null;
 		this.csvTemplateExecStartHour = null;
 		this.csvTemplateExecEndDate = null;
@@ -110,7 +114,7 @@ public class CsvTemplate {
 	
 	
 	public CsvTemplate(Integer csvTemplateId, Boolean csvTemplateIsActive, String csvTemplateName,
-			String csvTemplateComments, String csvTemplatePrefix, Date csvTemplateExecStartDate,
+			String csvTemplateComments, String csvTemplatePrefix, Boolean csvTemplateNotScheduled, Date csvTemplateExecStartDate,
 			Integer csvTemplateExecStartHour, Date csvTemplateExecEndDate, Date createdDate, Date modifiedDate,
 			ContractManufacturer contractManufacturer, FilesRepository inboundFileRepo,
 			FilesRepository processedFileRepo, FilesRepository exceptionFileRepo, JobExecutionRepeat jobExecRepeat,
@@ -120,6 +124,7 @@ public class CsvTemplate {
 		CsvTemplateName = csvTemplateName;
 		this.csvTemplateComments = csvTemplateComments;
 		this.csvTemplatePrefix = csvTemplatePrefix;
+		this.csvTemplateNotScheduled = csvTemplateNotScheduled;
 		this.csvTemplateExecStartDate = csvTemplateExecStartDate;
 		this.csvTemplateExecStartHour = csvTemplateExecStartHour;
 		this.csvTemplateExecEndDate = csvTemplateExecEndDate;
@@ -167,6 +172,21 @@ public class CsvTemplate {
 	public void setCsvTemplatePrefix(String csvTemplatePrefix) {
 		this.csvTemplatePrefix = csvTemplatePrefix;
 	}
+
+	public Boolean getCsvTemplateNotScheduled() {
+		return csvTemplateNotScheduled;
+	}
+
+
+	public void setCsvTemplateNotScheduled(Boolean csvTemplateNotScheduled) {
+		this.csvTemplateNotScheduled = csvTemplateNotScheduled;
+	}
+
+
+	public Boolean getCsvTemplateIsActive() {
+		return csvTemplateIsActive;
+	}
+
 
 	public Date getCsvTemplateExecStartDate() {
 		return csvTemplateExecStartDate;

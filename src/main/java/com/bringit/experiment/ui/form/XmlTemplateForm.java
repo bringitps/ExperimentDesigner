@@ -97,6 +97,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.btnDelete.setEnabled(false);
 			this.xmlt = new XmlTemplate();
 			this.chxActive.setValue(true);
+			this.chxActive.setEnabled(false);
 			//we disable all the components until an experiment is selected
 			enableComponents(false); 
 		}
@@ -107,6 +108,8 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.comboXmlTExperiment.setValue(xmlt.getExperiment().getExpId());
 			this.comboXmlTExperiment.setEnabled(false);
 			this.chxActive.setValue(xmlt.isXmlTemplateIsActive());
+			this.chxNotScheduled.setValue(xmlt.getXmlTemplateNotScheduled());
+			
 			if(xmlt.getContractManufacturer() != null) this.cbxContractManufacturer.setValue(xmlt.getContractManufacturer().getCmId());
 			if(xmlt.getJobExecRepeat() != null) this.comboXmljobScheduler.setValue(xmlt.getJobExecRepeat().getJobExecRepeatId());
 			if(xmlt.getInboundFileRepo() != null) this.comboXmlTinRepo.setValue(xmlt.getInboundFileRepo().getFileRepoId());
@@ -120,6 +123,14 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.xmlNodes = new XmlTemplateNodeDao().getAllXmlTemplateNodesByTemplateId(xmlt.getXmlTemplateId());
 			this.expFields = new ExperimentFieldDao().getActiveExperimentFields(xmlt.getExperiment());
 			this.cbxStartHour.setValue(xmlt.getXmlTemplateExecStartHour());
+			
+			if(xmlt.getXmlTemplateNotScheduled() != null)
+			{
+				cbxStartHour.setEnabled(!xmlt.getXmlTemplateNotScheduled());
+				comboXmljobScheduler.setEnabled(!xmlt.getXmlTemplateNotScheduled());
+				startXmlTstart.setEnabled(!xmlt.getXmlTemplateNotScheduled());
+				endXmlTstart.setEnabled(!xmlt.getXmlTemplateNotScheduled());
+			}
 			
 			Object[] itemValues = new Object[5];
 			for(int i=0; i<this.xmlNodes.size(); i++)
@@ -177,6 +188,18 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				
 			}   
 	    });
+		
+		chxNotScheduled.addValueChangeListener(new ValueChangeListener() {
+
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+				cbxStartHour.setEnabled(!chxNotScheduled.getValue());
+				comboXmljobScheduler.setEnabled(!chxNotScheduled.getValue());
+				startXmlTstart.setEnabled(!chxNotScheduled.getValue());
+				endXmlTstart.setEnabled(!chxNotScheduled.getValue());
+			}   
+	    });
+		
 		btnSave.addClickListener(new Button.ClickListener() {
 			
 			@Override
@@ -249,11 +272,24 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			this.xmlt.setXmlTemplateExecStartDate(this.startXmlTstart.getValue());
 			this.xmlt.setXmlTemplateExecEndDate(this.endXmlTstart.getValue());
 			this.xmlt.setXmlTemplateExecStartHour((int) this.cbxStartHour.getValue());
+			
+
+			this.xmlt.setXmlTemplateNotScheduled(chxNotScheduled.getValue());
+			
+			if(chxNotScheduled.getValue())
+			{
+				this.xmlt.setJobExecRepeat(null);
+				this.xmlt.setXmlTemplateExecStartDate(null);
+				this.xmlt.setXmlTemplateExecEndDate(null);
+				this.xmlt.setXmlTemplateExecStartHour(null);
+			}
+			
+			
 			if(this.xmlt.getXmlTemplateId() != null ) {
 				new XmlTemplateDao().updateXmlTemplate(xmlt);
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
 				
-				if(xmlt.isXmlTemplateIsActive())
+				if(xmlt.isXmlTemplateIsActive() && (xmlt.getXmlTemplateNotScheduled() == null || !xmlt.getXmlTemplateNotScheduled()))
 					remoteFileUtil.updateJob(xmlt);
 				else
 					remoteFileUtil.cancelJob(xmlt);
@@ -263,7 +299,9 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				new XmlTemplateDao().addXmlTemplate(xmlt);
 				XmlTemplate xmltWithId = new XmlTemplateDao().getActiveXmlTemplateByName(this.txtXmlTName.getValue());
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
-				remoteFileUtil.updateJob(xmltWithId);
+				
+				if(xmlt.getXmlTemplateNotScheduled() == null || !xmlt.getXmlTemplateNotScheduled())
+					remoteFileUtil.updateJob(xmltWithId);
 			}
 			
 			//Save XmlTemplateNodes
@@ -351,11 +389,20 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 	{
 		if(!this.txtXmlTName.isValid()) return false;
 		if(!this.txtXmlTPrefix.isValid()) return false;
-		if(!((ComboBox)(this.comboXmloutRepo)).isValid()) return false;
-		if(!((ComboBox)(this.comboXmlTerrRepo)).isValid()) return false;
-		if(!((ComboBox)(this.comboXmlTinRepo)).isValid()) return false;
-		if(!((ComboBox)(this.comboXmlTExperiment)).isValid()) return false;
-		if(!((ComboBox)(this.cbxStartHour)).isValid()) return false;
+		if(!this.comboXmloutRepo.isValid()) return false;
+		if(!this.comboXmlTerrRepo.isValid()) return false;
+		if(!this.comboXmlTinRepo.isValid()) return false;
+		if(!this.comboXmlTExperiment.isValid()) return false;
+		
+
+		if(!this.chxNotScheduled.getValue())
+		{
+			if(!this.cbxStartHour.isValid()) return false;
+			if(!this.comboXmljobScheduler.isValid()) return false;
+			if(!this.startXmlTstart.isValid()) return false;
+			if(!this.endXmlTstart.isValid()) return false;
+		}
+		
 		return true;
 	}
 	

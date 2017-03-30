@@ -6,8 +6,11 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.bringit.experiment.bll.CsvTemplate;
 import com.bringit.experiment.bll.JobExecutionRepeat;
 import com.bringit.experiment.bll.UnitOfMeasure;
+import com.bringit.experiment.bll.XmlTemplate;
+import com.bringit.experiment.dao.CsvTemplateDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.JobExecutionRepeatDao;
 import com.bringit.experiment.dao.UnitOfMeasureDao;
@@ -115,11 +118,18 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 				chxSelect.setVisible(false);
 				chxSelect.setWidth(10, Unit.PIXELS);
 				itemValues[0] = chxSelect;
+
+				List<XmlTemplate> linkedXmlTemplates = new XmlTemplateDao().getXmlTemplatesByJobExecRepeatId(jobExecutionRepeats.get(i).getJobExecRepeatId());
+				List<CsvTemplate> linkedCsvTemplates = new CsvTemplateDao().getCsvTemplatesByJobExecRepeatId(jobExecutionRepeats.get(i).getJobExecRepeatId());
 				
 				TextField txtJobExecRepeatName = new TextField();
 				txtJobExecRepeatName.setStyleName("tiny");
 				txtJobExecRepeatName.setValue(jobExecutionRepeats.get(i).getJobExecRepeatName());			
 				txtJobExecRepeatName.setWidth(95, Unit.PERCENTAGE);
+				
+				if((linkedXmlTemplates != null && linkedXmlTemplates.size() > 0) || (linkedCsvTemplates != null && linkedCsvTemplates.size() > 0)) 
+					txtJobExecRepeatName.setEnabled(false);
+				
 				itemValues[1] = txtJobExecRepeatName;
 				
 				TextField txtMilliSeconds = new TextField();
@@ -134,6 +144,10 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 		        });
 				txtMilliSeconds.setValue(((Integer)jobExecutionRepeats.get(i).getJobExecRepeatMilliseconds()).toString());
 				txtMilliSeconds.setWidth(95, Unit.PERCENTAGE);
+				
+				if((linkedXmlTemplates != null && linkedXmlTemplates.size() > 0) || (linkedCsvTemplates != null && linkedCsvTemplates.size() > 0)) 
+					txtMilliSeconds.setEnabled(false);
+				
 				itemValues[2] = txtMilliSeconds;
 	
 				this.tblJobExecutionRepeat.addItem(itemValues, jobExecutionRepeats.get(i).getJobExecRepeatId());
@@ -176,19 +190,22 @@ public class JobExecutionRepeatConfigForm extends JobExecutionRepeatConfigDesign
 	
 	private void deleteJobExecRepeatRow()
 	{
-		boolean hasXmlTemplatesLinked = false;
+		boolean hasTemplatesLinked = false;
 		if(this.tblJobExecutionRepeat.getValue() != null && (int)this.tblJobExecutionRepeat.getValue() > 0 )
 		{
-			if(new XmlTemplateDao().getXmlTemplatesByJobExecRepeatId((int)this.tblJobExecutionRepeat.getValue()).size() <= 0)
-				dbIdOfItemsToDelete.add((int)this.tblJobExecutionRepeat.getValue());
+			List<XmlTemplate> linkedXmlTemplates = new XmlTemplateDao().getXmlTemplatesByJobExecRepeatId((int)this.tblJobExecutionRepeat.getValue());
+			List<CsvTemplate> linkedCsvTemplates = new CsvTemplateDao().getCsvTemplatesByJobExecRepeatId((int)this.tblJobExecutionRepeat.getValue());
+			
+			if((linkedXmlTemplates != null && linkedXmlTemplates.size() > 0) || (linkedCsvTemplates != null && linkedCsvTemplates.size() > 0)) 
+				hasTemplatesLinked = true;
 			else
-				hasXmlTemplatesLinked = true;
+				dbIdOfItemsToDelete.add((int)this.tblJobExecutionRepeat.getValue());			
 		}
 		
-		if(!hasXmlTemplatesLinked && this.tblJobExecutionRepeat.getValue() != null)
+		if(!hasTemplatesLinked && this.tblJobExecutionRepeat.getValue() != null)
 			this.tblJobExecutionRepeat.removeItem((int)this.tblJobExecutionRepeat.getValue());
-		else if(hasXmlTemplatesLinked)
-			this.getUI().showNotification("Job Execution Repeat record can not be deleted. \nThere are XML Templates linked.", Type.WARNING_MESSAGE);
+		else if(hasTemplatesLinked)
+			this.getUI().showNotification("Job Execution Repeat record can not be deleted. \nThere are Xml/Csv Templates linked.", Type.WARNING_MESSAGE);
 			
 	}
 		

@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import com.bringit.experiment.bll.CsvTemplate;
+import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
@@ -170,22 +171,39 @@ public class CsvTemplateDao {
 	        return csvTemplates;
 	    }
 
-	public List<CsvTemplate> getAllActiveCsvTemplates() {
-        List<CsvTemplate> csvTemplates = new ArrayList<CsvTemplate>();
-        Transaction trns = null;
-        Session session = HibernateUtil.getSessionFactory().openSession();
-		// Session session = HibernateUtil.openSession(dialectXmlFile);
-        try {
-            trns = session.beginTransaction();
-            csvTemplates = session.createQuery("from CsvTemplate where CsvTemplateIsActive='true'").list();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        } finally {
-            session.flush();
-            session.close();
-        }
-        return csvTemplates;
-	}
+		public List<CsvTemplate> getAllActiveCsvTemplates() {
+	        List<CsvTemplate> csvTemplates = new ArrayList<CsvTemplate>();
+	        Transaction trns = null;
+	        Session session = HibernateUtil.getSessionFactory().openSession();
+			// Session session = HibernateUtil.openSession(dialectXmlFile);
+	        try {
+	            trns = session.beginTransaction();
+	            csvTemplates = session.createQuery("from CsvTemplate where CsvTemplateIsActive='true'").list();
+	        } catch (RuntimeException e) {
+	            e.printStackTrace();
+	        } finally {
+	            session.flush();
+	            session.close();
+	        }
+	        return csvTemplates;
+		}
+
+		public List<CsvTemplate> getAllScheduledCsvTemplates() {
+	        List<CsvTemplate> csvTemplates = new ArrayList<CsvTemplate>();
+	        Transaction trns = null;
+	        Session session = HibernateUtil.getSessionFactory().openSession();
+			// Session session = HibernateUtil.openSession(dialectXmlFile);
+	        try {
+	            trns = session.beginTransaction();
+	            csvTemplates = session.createQuery("from CsvTemplate where CsvTemplateIsActive='true' and CsvTemplateNotScheduled != 'true'").list();
+	        } catch (RuntimeException e) {
+	            e.printStackTrace();
+	        } finally {
+	            session.flush();
+	            session.close();
+	        }
+	        return csvTemplates;
+		}
 
 	
 	 @SuppressWarnings({ "unchecked", "unused" })
@@ -204,5 +222,25 @@ public class CsvTemplateDao {
 	            session.close();
 	        }
 	        return csvTemplates;
+	    }
+	
+		public CsvTemplate getActiveCsvTemplateByName(String csvTemplateName) {
+	    	CsvTemplate csvTemplate = null;
+	        Transaction trns = null;
+	        Session session = HibernateUtil.getSessionFactory().openSession();
+			// Session session = HibernateUtil.openSession(dialectXmlFile);
+	        try {
+	            trns = session.beginTransaction();
+	            String queryString = "from CsvTemplate where CsvTemplateIsActive = 'true' and CsvTemplateName = :name";
+	            Query query = session.createQuery(queryString);
+	            query.setString("csv", csvTemplateName);
+	            csvTemplate = (CsvTemplate) query.uniqueResult();
+	        } catch (RuntimeException e) {
+	            e.printStackTrace();
+	        } finally {
+	            session.flush();
+	            session.close();
+	        }
+	        return csvTemplate;
 	    }
 }

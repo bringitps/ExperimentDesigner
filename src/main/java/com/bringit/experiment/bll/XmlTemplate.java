@@ -39,6 +39,9 @@ public class XmlTemplate {
 	
 	@Column(name="XmlTemplatePrefix")
 	private String xmlTemplatePrefix;
+
+	@Column(name="XmlTemplateNotScheduled")
+	private Boolean xmlTemplateNotScheduled;
 	
 	@Column(name="XmlTemplateExecStartDate")
 	private Date xmlTemplateExecStartDate;
@@ -93,6 +96,7 @@ public class XmlTemplate {
 		this.xmlTemplateName = null;
 		this.xmlTemplateComments = null;
 		this.xmlTemplatePrefix = null;
+		this.xmlTemplateNotScheduled = null;
 		this.xmlTemplateExecStartDate = null;
 		this.xmlTemplateExecStartHour = null;
 		this.xmlTemplateExecEndDate = null;
@@ -110,7 +114,7 @@ public class XmlTemplate {
 	
 
 	public XmlTemplate(Integer xmlTemplateId, Boolean xmlTemplateIsActive, String xmlTemplateName,
-			String xmlTemplateComments, String xmlTemplatePrefix, Date xmlTemplateExecStartDate,
+			String xmlTemplateComments, String xmlTemplatePrefix, Boolean xmlTemplateNotScheduled, Date xmlTemplateExecStartDate,
 			Integer xmlTemplateExecStartHour, Date xmlTemplateExecEndDate, Date createdDate, Date modifiedDate,
 			ContractManufacturer contractManufacturer, FilesRepository inboundFileRepo,
 			FilesRepository processedFileRepo, FilesRepository exceptionFileRepo, JobExecutionRepeat jobExecRepeat,
@@ -120,6 +124,7 @@ public class XmlTemplate {
 		this.xmlTemplateName = xmlTemplateName;
 		this.xmlTemplateComments = xmlTemplateComments;
 		this.xmlTemplatePrefix = xmlTemplatePrefix;
+		this.xmlTemplateNotScheduled = xmlTemplateNotScheduled;
 		this.xmlTemplateExecStartDate = xmlTemplateExecStartDate;
 		this.xmlTemplateExecStartHour = xmlTemplateExecStartHour;
 		this.xmlTemplateExecEndDate = xmlTemplateExecEndDate;
@@ -176,6 +181,21 @@ public class XmlTemplate {
 	public void setXmlTemplatePrefix(String xmlTemplatePrefix) {
 		this.xmlTemplatePrefix = xmlTemplatePrefix;
 	}
+
+	public Boolean getXmlTemplateNotScheduled() {
+		return xmlTemplateNotScheduled;
+	}
+
+
+	public void setXmlTemplateNotScheduled(Boolean xmlTemplateNotScheduled) {
+		this.xmlTemplateNotScheduled = xmlTemplateNotScheduled;
+	}
+
+
+	public Boolean getXmlTemplateIsActive() {
+		return xmlTemplateIsActive;
+	}
+
 
 	public Date getXmlTemplateExecStartDate() {
 		return xmlTemplateExecStartDate;

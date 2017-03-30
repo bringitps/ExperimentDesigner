@@ -174,7 +174,7 @@ public class RemoteFileUtil {
 
             if (xmlTemplateDao == null) xmlTemplateDao = new XmlTemplateDao();
 
-            List<XmlTemplate> jobsData = xmlTemplateDao.getAllActiveXmlTemplates();
+            List<XmlTemplate> jobsData = xmlTemplateDao.getAllScheduledXmlTemplates();
             if (jobsData != null) {
                 System.out.println("Jobs: "+jobsData.size());
                 System.out.println("Retrieving XML Jobs from Database and Scheduling One by One | Total Number of Jobs: " + jobsData.size());
@@ -183,7 +183,7 @@ public class RemoteFileUtil {
             }
 
             if (csvTemplateDao == null) csvTemplateDao = new CsvTemplateDao();
-            List<CsvTemplate> csvJobsData = csvTemplateDao.getAllActiveCsvTemplates();
+            List<CsvTemplate> csvJobsData = csvTemplateDao.getAllScheduledCsvTemplates();
             if (csvJobsData != null) {
                 System.out.println("Jobs: "+csvJobsData.size());
                 System.out.println("Retrieving CSV Jobs from Database and Scheduling One by One | Total Number of Jobs: " + csvJobsData.size());

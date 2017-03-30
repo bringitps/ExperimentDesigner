@@ -77,6 +77,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.btnDelete.setEnabled(false);
 			this.csvt = new CsvTemplate();
 			this.chxActive.setValue(true);
+			this.chxActive.setEnabled(false);
 			//we disable all the components until an experiment is selected
 			enableComponents(false); 
 		}
@@ -87,6 +88,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.comboCsvTExperiment.setValue(csvt.getExperiment().getExpId());
 			this.comboCsvTExperiment.setEnabled(false);
 			this.chxActive.setValue(csvt.isCsvTemplateIsActive());
+			this.chxNotScheduled.setValue(csvt.getCsvTemplateNotScheduled());
 			if(csvt.getContractManufacturer() != null) this.cbxContractManufacturer.setValue(csvt.getContractManufacturer().getCmId());
 			if(csvt.getJobExecRepeat() != null) this.comboCsvjobScheduler.setValue(csvt.getJobExecRepeat().getJobExecRepeatId());
 			if(csvt.getInboundFileRepo() != null) this.comboCsvTinRepo.setValue(csvt.getInboundFileRepo().getFileRepoId());
@@ -97,6 +99,16 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.dtCsvTstart.setValue(csvt.getCsvTemplateExecStartDate());
 			this.dtCsvTend.setValue(csvt.getCsvTemplateExecEndDate());
 			this.cbxStartHour.setValue(csvt.getCsvTemplateExecStartHour());
+			
+			
+			if(csvt.getCsvTemplateNotScheduled() != null)
+			{
+				cbxStartHour.setEnabled(!csvt.getCsvTemplateNotScheduled());
+				comboCsvjobScheduler.setEnabled(!csvt.getCsvTemplateNotScheduled());
+				dtCsvTend.setEnabled(!csvt.getCsvTemplateNotScheduled());
+				dtCsvTstart.setEnabled(!csvt.getCsvTemplateNotScheduled());				
+			}
+			
 			
 			this.csvCols = new CsvTemplateColumnsDao().getAllCsvTemplateColumnssByTemplateId(csvt.getCsvTemplateId());
 			this.expFields = new ExperimentFieldDao().getActiveExperimentFields(csvt.getExperiment());
@@ -144,6 +156,18 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				
 			}   
 	    });
+		
+		chxNotScheduled.addValueChangeListener(new ValueChangeListener() {
+
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+				cbxStartHour.setEnabled(!chxNotScheduled.getValue());
+				comboCsvjobScheduler.setEnabled(!chxNotScheduled.getValue());
+				dtCsvTstart.setEnabled(!chxNotScheduled.getValue());
+				dtCsvTend.setEnabled(!chxNotScheduled.getValue());
+			}   
+	    });
+		
 		btnSave.addClickListener(new Button.ClickListener() {
 			
 			@Override
@@ -221,19 +245,37 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.csvt.setCsvTemplateExecEndDate(this.dtCsvTend.getValue());
 			this.csvt.setCsvTemplateExecStartHour((int) this.cbxStartHour.getValue());
 			
+			this.csvt.setCsvTemplateNotScheduled(chxNotScheduled.getValue());
+			
+			if(chxNotScheduled.getValue())
+			{
+				this.csvt.setJobExecRepeat(null);
+				this.csvt.setCsvTemplateExecStartDate(null);
+				this.csvt.setCsvTemplateExecEndDate(null);
+				this.csvt.setCsvTemplateExecStartHour(null);
+			}
+			
 			if(this.csvt.getCsvTemplateId() != null ) {
 				new CsvTemplateDao().updateCsvTemplate(csvt);
+				
 				// added logic to schedule the CSV Tempate
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
-				remoteFileUtil.updateJob(csvt);
+				
+				if(csvt.isCsvTemplateIsActive() && (csvt.getCsvTemplateNotScheduled() == null || !csvt.getCsvTemplateNotScheduled()))
+					remoteFileUtil.updateJob(csvt);
+				else
+					remoteFileUtil.cancelJob(csvt);				
 			} else
 			{
 				this.csvt.setCreatedBy(sessionUser);
 				this.csvt.setCreatedDate(this.csvt.getModifiedDate());
 				new CsvTemplateDao().addCsvTemplate(csvt);
-				CsvTemplate csvTemplateWithId = new CsvTemplateDao().getCsvTemplateByExperimentId(this.csvt.getExperiment().getExpId());
+				CsvTemplate csvTemplateWithId = new CsvTemplateDao().getActiveCsvTemplateByName(this.txtCsvTName.getValue());
+				
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
-				remoteFileUtil.updateJob(csvTemplateWithId);
+
+				if(csvt.getCsvTemplateNotScheduled() == null || !csvt.getCsvTemplateNotScheduled())
+					remoteFileUtil.updateJob(csvTemplateWithId);
 			}
 			
 
@@ -294,11 +336,17 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	{
 		if(!this.txtCsvTName.isValid()) return false;
 		if(!this.txtCsvTPrefix.isValid()) return false;
-		if(!((ComboBox)(this.comboCsvoutRepo)).isValid()) return false;
-		if(!((ComboBox)(this.comboCsvTerrRepo)).isValid()) return false;
-		if(!((ComboBox)(this.comboCsvTinRepo)).isValid()) return false;
-		if(!((ComboBox)(this.comboCsvTExperiment)).isValid()) return false;
-		if(!((ComboBox)(this.cbxStartHour)).isValid()) return false;
+		if(!this.comboCsvoutRepo.isValid()) return false;
+		if(!this.comboCsvTerrRepo.isValid()) return false;
+		if(!this.comboCsvTinRepo.isValid()) return false;
+		if(!this.comboCsvTExperiment.isValid()) return false;
+		
+		if(!this.chxNotScheduled.getValue())
+		{
+			if(!this.cbxStartHour.isValid()) return false;
+			if(!this.comboCsvjobScheduler.isValid()) return false;
+			if(!this.dtCsvTstart.isValid()) return false;
+		}
 		
 		return true;
 	}

@@ -37,10 +37,11 @@ public class CsvTemplateDesign extends VerticalLayout {
 	protected TextArea txtCsvTComments;
 	protected Accordion csvTJobAndMap;
 	protected VerticalLayout csvTJobLayout;
-	protected DateField dtCsvTstart;
-	protected ComboBox cbxStartHour;
-	protected ComboBox comboCsvjobScheduler;
 	protected DateField dtCsvTend;
+	protected ComboBox comboCsvjobScheduler;
+	protected ComboBox cbxStartHour;
+	protected DateField dtCsvTstart;
+	protected CheckBox chxNotScheduled;
 	protected ComboBox comboCsvTinRepo;
 	protected TextField txtCsvTPrefix;
 	protected ComboBox comboCsvoutRepo;

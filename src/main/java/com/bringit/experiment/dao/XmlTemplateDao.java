@@ -111,6 +111,25 @@ public class XmlTemplateDao {
         return xmlTemplates;
     }
 
+
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<XmlTemplate> getAllScheduledXmlTemplates() {
+        List<XmlTemplate> xmlTemplates = new ArrayList<XmlTemplate>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            xmlTemplates = session.createQuery("from XmlTemplate where XmlTemplateIsActive = 'true' and XmlTemplateNotScheduled != 'true'").list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return xmlTemplates;
+    }
+
     @SuppressWarnings("unused")
 	public XmlTemplate getXmlTemplateById(int xmlTemplateId) {
     	XmlTemplate xmlTemplate = null;

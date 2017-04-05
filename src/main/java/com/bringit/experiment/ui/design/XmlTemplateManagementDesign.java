@@ -26,6 +26,7 @@ public class XmlTemplateManagementDesign extends VerticalLayout {
 	protected ComboBox cbxXmlTemplateViewFilters;
 	protected GridLayout gridButtons;
 	protected Button btnAddXmlTemplate;
+	protected Button btnViewNextExecution;
 	protected Table tblXmlTemplate;
 
 	public XmlTemplateManagementDesign() {

@@ -50,7 +50,7 @@ public class RemoteFileUtil {
             if (jobData == null) throw new RuntimeException("Cannot restart a job with a null name");
 
             //RemoteXmlJob ssd = new RemoteXmlJob();
-            TriggerKey tk = new TriggerKey(jobData.getCsvTemplateId().toString(), CSV_JOB_GROUP);
+            TriggerKey tk = new TriggerKey(jobData.getCsvTemplateId().toString(), CSV_TRIGGER_GROUP);
             JobDetail job = newJob(RemoteCsvJob.class)
                     .withIdentity(jobData.getCsvTemplateId().toString(), CSV_JOB_GROUP)
                     .build();
@@ -60,11 +60,20 @@ public class RemoteFileUtil {
             if (scheduler.checkExists(tk)) {
                 System.out.println("UPDATING job: "+jobData.getCsvTemplateId().toString()+ " rescheduled the job.");
                 scheduler.rescheduleJob(tk, trigger);
+                if(!jobData.getCsvTemplateExecEndDate().after(new Date()))
+                	cancelJobByIdAndGroup(jobData.getCsvTemplateId().toString(), CSV_JOB_GROUP);
             } else {
                 System.out.println("Scheduling a new job: "+jobData.getCsvTemplateId().toString()+ " NOT AN UPDATE.");
-                scheduler.scheduleJob(job, trigger);
+                if(jobData.getCsvTemplateExecEndDate().after(new Date()))
+                {
+                    JobDataMap jobDataMap = job.getJobDataMap();
+                    jobDataMap.put("jobData", jobData);
+                	scheduler.scheduleJob(job, trigger);
+                }
             }
 
+            
+            
         } catch (Exception ex) {
             System.out.println(ex);
         }
@@ -76,7 +85,7 @@ public class RemoteFileUtil {
             if (jobData == null) throw new RuntimeException("Cannot restart a job with a null name");
 
             //RemoteXmlJob ssd = new RemoteXmlJob();
-            TriggerKey tk = new TriggerKey(jobData.getXmlTemplateId().toString(), XML_JOB_GROUP);
+            TriggerKey tk = new TriggerKey(jobData.getXmlTemplateId().toString(), XML_TRIGGER_GROUP);
             JobDetail job = newJob(RemoteXmlJob.class)
                     .withIdentity(jobData.getXmlTemplateId().toString(), XML_JOB_GROUP)
                     .build();
@@ -85,13 +94,17 @@ public class RemoteFileUtil {
 
             if (scheduler.checkExists(tk)) {
             		System.out.println("UPDATING job: "+jobData.getXmlTemplateId().toString()+ " rescheduled the job.");
-            		scheduler.rescheduleJob(tk, trigger);            	
+            		scheduler.rescheduleJob(tk, trigger);  
+                    if(!jobData.getXmlTemplateExecEndDate().after(new Date()))
+                    	cancelJobByIdAndGroup(jobData.getXmlTemplateId().toString(), XML_JOB_GROUP);          	
             } else {
                 System.out.println("Scheduling a new job: "+jobData.getXmlTemplateId().toString()+ " NOT AN UPDATE.");
-                
-                JobDataMap jobDataMap = job.getJobDataMap();
-                jobDataMap.put("jobData", jobData);
-                scheduler.scheduleJob(job, getTrigger(jobData));
+                if(jobData.getXmlTemplateExecEndDate().after(new Date()))
+                {
+                	JobDataMap jobDataMap = job.getJobDataMap();
+                	jobDataMap.put("jobData", jobData);
+                	scheduler.scheduleJob(job, getTrigger(jobData));
+                }
             }
 
 
@@ -209,11 +222,12 @@ public class RemoteFileUtil {
                         Trigger oldTrigger = scheduler.getTrigger(new TriggerKey(jobData.getXmlTemplateId().toString(), XML_TRIGGER_GROUP));
 
                         Trigger trigger = getTrigger(jobData);
-
-                        scheduler.rescheduleJob(oldTrigger.getKey(), trigger);
+                        if(jobData.getXmlTemplateExecEndDate().after(new Date()))
+                        	scheduler.rescheduleJob(oldTrigger.getKey(), trigger);
                     }else{
                         System.out.println("Scheduling the Job");
-                        scheduler.scheduleJob(job,getTrigger(jobData));
+                        if(jobData.getXmlTemplateExecEndDate().after(new Date()))
+                        	scheduler.scheduleJob(job,getTrigger(jobData));
                     }
                 }
 
@@ -229,11 +243,12 @@ public class RemoteFileUtil {
                         Trigger oldTrigger = scheduler.getTrigger(new TriggerKey(csvData.getCsvTemplateId().toString(), CSV_TRIGGER_GROUP));
 
                         Trigger trigger = getTrigger(csvData);
-
-                        scheduler.rescheduleJob(oldTrigger.getKey(), trigger);
+                        if(csvData.getCsvTemplateExecEndDate().after(new Date()))
+                        	scheduler.rescheduleJob(oldTrigger.getKey(), trigger);
                     }else{
                         System.out.println("Scheduling the Job");
-                        scheduler.scheduleJob(job,getTrigger(csvData));
+                        if(csvData.getCsvTemplateExecEndDate().after(new Date()))
+                        	scheduler.scheduleJob(job,getTrigger(csvData));
                     }
                 }
 
@@ -278,6 +293,64 @@ public class RemoteFileUtil {
         return allJobs;
     }
 
+    public List<String> getCsvStrDataOfXmlScheduledJobs() {
+        List<String> allCsvStrDataXmlJobs = new ArrayList<String>();
+        try {
+
+            for (String groupName : scheduler.getJobGroupNames()) {
+
+                for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+
+                    String jobName = jobKey.getName();
+                    String jobGroup = jobKey.getGroup();
+
+                    if(jobGroup.contains(XML_JOB_GROUP))
+                    {	
+                    	//get job's trigger
+                    	List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+                    	Date nextFireTime = triggers.get(0).getNextFireTime();
+                    
+                    	String csvStrJobDetails = jobName + "," + nextFireTime;
+                    	allCsvStrDataXmlJobs.add(csvStrJobDetails);                  
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            System.out.println("Error listing schedules: "+ex);
+        }
+        return allCsvStrDataXmlJobs;
+    }
+
+    public List<String> getCsvStrDataOfCsvScheduledJobs() {
+        List<String> allCsvStrDataCsvJobs = new ArrayList<String>();
+        try {
+
+            for (String groupName : scheduler.getJobGroupNames()) {
+
+                for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+
+                    String jobName = jobKey.getName();
+                    String jobGroup = jobKey.getGroup();
+
+                    if(jobGroup.contains(CSV_JOB_GROUP))
+                    {	
+                    	//get job's trigger
+                    	List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+                    	Date nextFireTime = triggers.get(0).getNextFireTime();
+                    
+                    	String csvStrJobDetails = jobName + "," + nextFireTime;
+                    	allCsvStrDataCsvJobs.add(csvStrJobDetails);                  
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            System.out.println("Error listing schedules: "+ex);
+        }
+        return allCsvStrDataCsvJobs;
+    }
+    
     private Trigger getTrigger(CsvTemplate jobData){
 
         JobExecutionRepeat jobExecutionRepeat = jobData.getJobExecRepeat();
@@ -302,9 +375,17 @@ public class RemoteFileUtil {
         startCal.set(java.util.Calendar.MINUTE, 0);
         startCal.set(Calendar.SECOND, 0);
         startCal.set(Calendar.MILLISECOND, 0);
+        
+        java.util.Calendar endCal = java.util.Calendar.getInstance();
+        endCal.setTimeInMillis(jobData.getCsvTemplateExecEndDate().getTime());
+        endCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        endCal.set(java.util.Calendar.MINUTE, 0);
+        endCal.set(Calendar.SECOND, 0);
+        endCal.set(Calendar.MILLISECOND, 0);
+        
         SimpleTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobData.getCsvTemplateId().toString(), CSV_TRIGGER_GROUP)
                 .startAt(new Date(startCal.getTimeInMillis()))
-                .endAt(new Date(jobData.getCsvTemplateExecEndDate().getTime()))
+                .endAt(new Date(endCal.getTimeInMillis()))
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(iRepeat.intValue())
                         .withRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY)).build();
         return trigger;
@@ -325,9 +406,17 @@ public class RemoteFileUtil {
         startCal.set(java.util.Calendar.MINUTE, 0);
         startCal.set(Calendar.SECOND, 0);
         startCal.set(Calendar.MILLISECOND, 0);
+        
+        java.util.Calendar endCal = java.util.Calendar.getInstance();
+        endCal.setTimeInMillis(jobData.getXmlTemplateExecEndDate().getTime());
+        endCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        endCal.set(java.util.Calendar.MINUTE, 0);
+        endCal.set(Calendar.SECOND, 0);
+        endCal.set(Calendar.MILLISECOND, 0);
+        
         SimpleTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobData.getXmlTemplateId().toString(), XML_TRIGGER_GROUP)
                 .startAt(new Date(startCal.getTimeInMillis()))
-                .endAt(new Date(jobData.getXmlTemplateExecEndDate().getTime()))
+                .endAt(new Date(endCal.getTimeInMillis()))
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(iRepeat.intValue())
                         .withRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY)).build();
         return trigger;

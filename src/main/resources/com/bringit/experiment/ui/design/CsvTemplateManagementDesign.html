@@ -16,11 +16,16 @@
     </vaadin-horizontal-layout> 
     <vaadin-combo-box style-name="tiny" _id="cbxCsvTemplateViewFilters" :middle></vaadin-combo-box> 
    </vaadin-horizontal-layout> 
-   <vaadin-grid-layout width="100px" height="40px" _id="gridButtons"> 
+   <vaadin-grid-layout width-full height="40px" _id="gridButtons"> 
     <row> 
      <column> 
       <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" plain-text _id="btnAddCsvTemplate">
         Add new 
+      </vaadin-button> 
+     </column> 
+     <column> 
+      <vaadin-button icon="fonticon://FontAwesome/f133" style-name="tiny native" plain-text _id="btnViewNextExecution" :right>
+        View Next Execution Time 
       </vaadin-button> 
      </column> 
     </row> 

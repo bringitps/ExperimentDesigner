@@ -1,8 +1,10 @@
 package com.bringit.experiment.ui.form;
 
 import java.sql.ResultSet;
+import java.util.List;
 
 import com.bringit.experiment.dao.DataBaseViewDao;
+import com.bringit.experiment.remote.RemoteFileUtil;
 import com.bringit.experiment.ui.design.ExperimentManagementDesign;
 import com.bringit.experiment.ui.design.CsvTemplateManagementDesign;
 import com.bringit.experiment.util.VaadinControls;
@@ -11,12 +13,14 @@ import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Window.CloseEvent;
 
 public class CsvTemplateManagementForm extends CsvTemplateManagementDesign  {
-	
+
+	Integer selectedRecordId = -1;
 	public CsvTemplateManagementForm() {
 		ResultSet vwCsvTemplateResults = new DataBaseViewDao().getViewResults("vwCsvTemplate");
 		if(vwCsvTemplateResults != null)
@@ -47,7 +51,37 @@ public class CsvTemplateManagementForm extends CsvTemplateManagementDesign  {
 				filterDbViewResults();
 			}
 			});
+		
+		btnViewNextExecution.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				viewNextExecution();
+			}
+		
+		});
 	}
+	
+	private void viewNextExecution()
+	{
+		if(this.selectedRecordId == -1)
+			return;
+		
+		List<String> csvStrDataCsvScheduledJobs = RemoteFileUtil.getInstance().getCsvStrDataOfCsvScheduledJobs();
+		
+		for(int i=0; csvStrDataCsvScheduledJobs != null && i<csvStrDataCsvScheduledJobs.size(); i++)
+		{
+			if(csvStrDataCsvScheduledJobs.get(i).split(",")[0].trim().equals(this.selectedRecordId.toString().trim()))
+			{
+				this.getUI().showNotification("Next Execution Time: " + csvStrDataCsvScheduledJobs.get(i).split(",")[1], Notification.TYPE_HUMANIZED_MESSAGE);
+				return;
+			}
+		}
+		
+		this.getUI().showNotification("Template without Next Executions Scheduled.", Notification.TYPE_HUMANIZED_MESSAGE);
+		
+	}
+	
 	public void openCsvTemplateCRUDModalWindow(int csvTemplateId)
 	{
 		 Window csvTemplateCRUDModalWindow = new Window("Csv Template");

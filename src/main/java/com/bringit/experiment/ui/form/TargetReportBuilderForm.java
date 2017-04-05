@@ -218,8 +218,9 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		boolean validateTargetColCntResult = validateTargetColumnCnt();
 		boolean validateReqFieldsResult = validateRequiredFields();
 		boolean validateNumberColsResult = validateNumberColsResult();
+		boolean validateDuplicatedColNamesResult = validateDuplicatedColNames();
 		
-		if(validateTargetColCntResult && validateReqFieldsResult && validateNumberColsResult)
+		if(validateTargetColCntResult && validateReqFieldsResult && validateNumberColsResult && validateDuplicatedColNamesResult)
 		{
 			//Delete Records from DataBase
 			if(dbIdOfTargetColumnGroupsToDelete.size() > 0)
@@ -297,6 +298,8 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				this.getUI().showNotification("Invalid Numbers.", Type.WARNING_MESSAGE);
 			else if(!validateReqFieldsResult)
 				this.getUI().showNotification("Please fill in all required Fields.", Type.WARNING_MESSAGE);
+			else if(!validateDuplicatedColNamesResult)
+				this.getUI().showNotification("Column names can not be duplicated.", Type.WARNING_MESSAGE);
 		}	
 	}
 
@@ -379,23 +382,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				
 				
 				targetRptColGroup.setTargetReport(this.targetReport);
-				targetRptColGroups.add(targetRptColGroup);
-				
-				
-				
-				//infoColGroupLayout.getComponent(0).getCaption();
-				//System.out.println("Group Name: " + txtInfoColGroupName.getValue() + " Is Fail Group?:" + chxIsFailGroup.getValue()+ "\n");
-				//System.out.println("Group: " + infoColGroupLayout.getCaption() + " Tbl Rows:" + tblTargetReportInfoColumns.getItemIds().size() + "\n");
-				
-				
-				//System.out.println("Target Column    Label: " + targetRptColumn.getTargetColumnLabel() + " Experiment Field Name: " + targetRptColumn.getExperimentField().getExpFieldName() + "\n");
-				//System.out.println("Target Report: " + this.targetReport.toString());
-			
-				//for(int j=0; j<targetRptColGroups.size(); j++)
-				//	System.out.println("Target Report Column Group: " + targetRptColGroups.get(j));
-			
-				//for(int j=0; j<targetRptColumns.size(); j++)
-				//System.out.println("Target Report Column: " + targetRptColumns.get(j));
+				targetRptColGroups.add(targetRptColGroup);				
 				
 		}
 	}
@@ -871,6 +858,37 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				}	
 			}
 		}		
+		return true;
+	}
+	
+	private boolean validateDuplicatedColNames()
+	{	
+		List<String> addedColNames = new ArrayList<String>();
+		
+		for(int i=0; i<this.tabColumnGroups.getComponentCount(); i++)
+		{
+			VerticalLayout colGroupLayout = (VerticalLayout)this.tabColumnGroups.getTab(i).getComponent();
+			HorizontalSplitPanel splitTblPanel = (HorizontalSplitPanel)colGroupLayout.getComponent(1);
+			Table tblTargetReportColumns = (Table)splitTblPanel.getFirstComponent();
+			
+			Collection itemIds = tblTargetReportColumns.getContainerDataSource().getItemIds();
+			for (Object itemIdObj : itemIds) 
+			{	
+				int itemId = (int)itemIdObj;
+				Item tblRowItem = tblTargetReportColumns.getContainerDataSource().getItem(itemId);
+				String addedColName =((TextField)(tblRowItem.getItemProperty("Column Label").getValue())).getValue();
+			
+				if(addedColNames.indexOf(addedColName) >= 0)
+				{
+					this.tabColumnGroups.setSelectedTab(i);
+					tblTargetReportColumns.select(itemId);
+					return false;
+				}
+				else
+					addedColNames.add(addedColName);					
+			}
+		}
+		
 		return true;
 	}
 

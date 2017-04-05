@@ -26,6 +26,7 @@ public class CsvTemplateManagementDesign extends VerticalLayout {
 	protected ComboBox cbxCsvTemplateViewFilters;
 	protected GridLayout gridButtons;
 	protected Button btnAddCsvTemplate;
+	protected Button btnViewNextExecution;
 	protected Table tblCsvTemplate;
 
 	public CsvTemplateManagementDesign() {

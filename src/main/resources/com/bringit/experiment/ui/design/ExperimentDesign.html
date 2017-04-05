@@ -83,12 +83,14 @@
      </tab> 
      <tab caption="Experiment Fields" icon="fonticon://FontAwesome/f0f6"> 
       <vaadin-vertical-layout margin _id="expFieldsLayout"> 
-       <vaadin-grid-layout width-full height="40px"> 
+       <vaadin-grid-layout width-full height="40px" _id="gridExpFiledsBtns"> 
         <row> 
          <column> 
-          <vaadin-horizontal-layout> 
-           <vaadin-upload style-name="tiny" immediate _id="upCsvExpFields"></vaadin-upload> 
-           <vaadin-text-area rows="2" style-name="tiny borderless" width="280px" readonly _id="txtCsvInstructions">
+          <vaadin-horizontal-layout immediate> 
+           <vaadin-panel style-name="borderless" size-auto _id="pnlCsvUpload"> 
+            <vaadin-upload style-name="tiny" immediate _id="upCsvExpFields"></vaadin-upload> 
+           </vaadin-panel> 
+           <vaadin-text-area rows="2" style-name="tiny borderless" width="270px" readonly _id="txtCsvInstructions">
              Req. CSV columns: FieldName, DatabaseId Opt. CSV columns: DatabaseType, UoM 
            </vaadin-text-area> 
           </vaadin-horizontal-layout> 
@@ -104,10 +106,13 @@
           </vaadin-button> 
          </column> 
         </row> 
+        <row></row> 
        </vaadin-grid-layout> 
-       <vaadin-table selectable style-name="tiny" immediate width-full height="200px" _id="tblExperimentFields"> 
-        <table></table> 
-       </vaadin-table> 
+       <vaadin-panel height="200px" _id="pnlExpFields"> 
+        <vaadin-table selectable style-name="tiny" immediate width-full _id="tblExperimentFields"> 
+         <table></table> 
+        </vaadin-table> 
+       </vaadin-panel> 
       </vaadin-vertical-layout> 
      </tab> 
     </vaadin-accordion> 

@@ -7,6 +7,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
@@ -45,10 +46,13 @@ public class ExperimentDesign extends VerticalLayout {
 	protected VerticalLayout vlViewer;
 	protected TabSheet tsImages;
 	protected VerticalLayout expFieldsLayout;
+	protected GridLayout gridExpFiledsBtns;
+	protected Panel pnlCsvUpload;
 	protected Upload upCsvExpFields;
 	protected TextArea txtCsvInstructions;
 	protected Button btnAddField;
 	protected Button btnDeleteField;
+	protected Panel pnlExpFields;
 	protected Table tblExperimentFields;
 	protected Button btnDelete;
 

@@ -63,7 +63,15 @@ import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Upload.FailedEvent;
+import com.vaadin.ui.Upload.FailedListener;
+import com.vaadin.ui.Upload.FinishedEvent;
+import com.vaadin.ui.Upload.FinishedListener;
 import com.vaadin.ui.Upload.Receiver;
+import com.vaadin.ui.Upload.StartedEvent;
+import com.vaadin.ui.Upload.StartedListener;
+import com.vaadin.ui.Upload.SucceededEvent;
+import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.Slider;
@@ -87,6 +95,7 @@ public class ExperimentForm extends ExperimentDesign {
 	String[] dbfieldTypes;
 	private int lastNewItemId = 0;
 	private File tempImageFile;
+	private File tempCsvFile;    
 	private boolean isNewExperiment = false;
 	List<Integer> imagesToDelete = new ArrayList<Integer>();
 	
@@ -105,7 +114,8 @@ public class ExperimentForm extends ExperimentDesign {
 			cbxExperimentType.setItemCaption(experimentTypes.get(i).getExpTypeId(), experimentTypes.get(i).getExpTypeName());
 		}
 		
-		upCsvExpFields.setButtonCaption("Upload by Csv");
+		upCsvExpFields.setButtonCaption("Upload by CSV");
+	    replaceCsvUploadComponent(upCsvExpFields);
 		
 		this.vlViewer.setSizeFull();
 		//this.vlViewer.setMargin(true);
@@ -229,7 +239,7 @@ public class ExperimentForm extends ExperimentDesign {
 		    }
 			
 			this.tblExperimentFields.setEditable(true);
-			this.tblExperimentFields.setPageLength(100);
+			this.tblExperimentFields.setPageLength(0);
 			
 		}
 		btnAddField.addClickListener(new Button.ClickListener() {
@@ -388,7 +398,7 @@ public class ExperimentForm extends ExperimentDesign {
 		      });
 		
 	}
-
+	
 	private void addField(){
 		
 		Object[] itemValues = new Object[6];
@@ -463,6 +473,123 @@ public class ExperimentForm extends ExperimentDesign {
 		cbxUnitOfMeasure.setImmediate(true);
 		cbxUnitOfMeasure.addStyleName("tiny");
 		cbxUnitOfMeasure.setWidth(100, Unit.PIXELS);
+		itemValues[5] = cbxUnitOfMeasure;
+		
+		this.lastNewItemId = this.lastNewItemId - 1;
+		this.tblExperimentFields.addItem(itemValues, this.lastNewItemId);
+		this.tblExperimentFields.select(this.lastNewItemId);
+		
+	}
+	
+	private void addField(String fieldName, String fieldDbId, String fieldDbType, Integer uomId){
+		
+		Object[] itemValues = new Object[6];
+		
+		CheckBox chxSelect = new CheckBox();
+		chxSelect.setVisible(false);
+		chxSelect.setWidth(50, Unit.PIXELS);
+		itemValues[0] = chxSelect;
+		
+		TextField txtFieldName = new TextField();
+		txtFieldName.setImmediate(true);
+		txtFieldName.focus();
+		txtFieldName.addStyleName("tiny");
+		txtFieldName.setRequired(true);
+		txtFieldName.setRequiredError("This field is mandatory");
+		txtFieldName.setWidth(200, Unit.PIXELS);
+		txtFieldName.setValue(fieldName);
+		itemValues[1] = txtFieldName;
+		
+		CheckBox chxActive = new CheckBox();
+		chxActive.addStyleName("tiny");
+		chxActive.setValue(true);
+		itemValues[2] = chxActive;
+		
+		
+		TextField txtExpDbFieldNameId = new TextField();
+		txtExpDbFieldNameId.setRequired(true);
+		txtExpDbFieldNameId.setRequiredError("This field is mandatory");
+		txtExpDbFieldNameId.addStyleName("tiny");
+		txtExpDbFieldNameId.setWidth(200, Unit.PIXELS);
+		txtExpDbFieldNameId.addValidator(new Validator() {
+
+            public void validate(Object value) throws InvalidValueException {
+                if(!StringUtils.isAlphanumeric(((String) value).replaceAll("_", "")))
+                    throw new InvalidValueException("Only AlphaNumeric and Underscores are allowed for DB Names");
+                else
+                {
+                	String dbFieldIdName = ((String) value);
+                	if(dbFieldIdName.toLowerCase().equals("recordid") || dbFieldIdName.toLowerCase().equals("comments") || dbFieldIdName.toLowerCase().equals("createdby")
+						 || dbFieldIdName.toLowerCase().equals("lastmodifiedby") || dbFieldIdName.toLowerCase().equals("datafileid")
+						 || dbFieldIdName.toLowerCase().equals("createddate") || dbFieldIdName.toLowerCase().equals("lastmodifieddate")) 
+                    throw new InvalidValueException("'RecordId', 'Comments', 'CreatedBy', 'LastModifiedBy', 'DataFileId', 'CreatedDate', 'LastModifiedDate' are Non-Eligible for Experiment Field DB Ids.");
+                }
+            }
+        });
+		
+		if(fieldDbId!=null)
+			txtExpDbFieldNameId.setValue(fieldDbId);
+		
+		itemValues[3] = txtExpDbFieldNameId;
+		
+		ComboBox cbxFieldType = new ComboBox("");
+		
+		for(int j=0; j<dbfieldTypes.length; j++)
+		{
+			cbxFieldType.addItem(dbfieldTypes[j]);
+			cbxFieldType.setItemCaption(dbfieldTypes[j], dbfieldTypes[j]);
+		}
+
+		cbxFieldType.setNullSelectionAllowed(false);
+		cbxFieldType.setImmediate(true);
+		cbxFieldType.setRequired(true);
+		cbxFieldType.setRequiredError("This field is mandatory");
+		cbxFieldType.addStyleName("tiny");
+		cbxFieldType.setWidth(150, Unit.PIXELS);
+		
+		if(fieldDbType != null) 
+		{
+			//Select DB DataType
+			if(fieldDbType.trim().toLowerCase().startsWith("varchar") && selectedCsvVarcharValidation(fieldDbType))
+			{				
+				if(fieldDbType.trim().toLowerCase().equals("varchar") || fieldDbType.trim().toLowerCase().equals("text"))
+					fieldDbType = "varchar(max)";
+			
+				if(!cbxFieldType.containsId(fieldDbType.trim().toLowerCase())) 
+				{
+					cbxFieldType.addItem(fieldDbType.trim().toLowerCase());
+					cbxFieldType.setItemCaption(fieldDbType.trim().toLowerCase(), fieldDbType.trim().toLowerCase());
+				}
+				
+				cbxFieldType.select(fieldDbType.trim().toLowerCase());
+				
+			}
+			else
+			{
+				if(cbxFieldType.containsId(fieldDbType.trim().toLowerCase())) 
+					cbxFieldType.select(fieldDbType.trim().toLowerCase());
+			}
+			
+			cbxFieldType.setValue(fieldDbType);
+		}
+		
+		itemValues[4] = cbxFieldType;
+		
+		ComboBox cbxUnitOfMeasure = new ComboBox("");
+		
+		for(int j=0; j<unitOfMeasures.size(); j++)
+		{
+			cbxUnitOfMeasure.addItem(unitOfMeasures.get(j).getUomId());
+			cbxUnitOfMeasure.setItemCaption(unitOfMeasures.get(j).getUomId(), unitOfMeasures.get(j).getUomAbbreviation());
+		}
+		
+		cbxUnitOfMeasure.setImmediate(true);
+		cbxUnitOfMeasure.addStyleName("tiny");
+		cbxUnitOfMeasure.setWidth(100, Unit.PIXELS);
+		
+		if(uomId != -1)
+			cbxUnitOfMeasure.setValue(uomId);
+		
 		itemValues[5] = cbxUnitOfMeasure;
 		
 		this.lastNewItemId = this.lastNewItemId - 1;
@@ -741,4 +868,257 @@ public class ExperimentForm extends ExperimentDesign {
 		return true;
 	}
 	
+	private void replaceCsvUploadComponent(Upload upToReplace)
+	{
+		//Replace Uploader Component by a new one due to issues detected at loading file with same name
+	    Upload newUpload = new Upload();
+	    newUpload.setImmediate(true);
+	    newUpload.setButtonCaption(upToReplace.getButtonCaption());
+	    newUpload.setStyleName(upToReplace.getStyleName());
+	    
+	    newUpload.setReceiver(new Receiver(){
+
+			@Override
+			public OutputStream receiveUpload(String filename, String mimeType) 
+			{
+			      FileOutputStream fos = null; 
+			      try 
+			      {
+			    	  if(!filename.trim().toLowerCase().endsWith("csv"))
+					    return null;
+					  
+			          // Open the file for writing.
+			    	  tempCsvFile = File.createTempFile("tempCsv", ".csv");
+			          fos = new FileOutputStream(tempCsvFile);
+			      } 
+			      catch (Exception e) {
+			          // Error while opening the file. Not reported here.
+			          e.printStackTrace();
+			          return null;
+			      }
+			
+			      return fos; // Return the output stream to write to
+			}
+	    });
+	    
+	    newUpload.addSucceededListener(new SucceededListener() {
+			@Override
+			public void uploadSucceeded(SucceededEvent event) {
+				// TODO Auto-generated method stub
+			    processCsvUpload(tempCsvFile);
+			    replaceCsvUploadComponent((Upload)event.getComponent());
+			    tempCsvFile.delete();
+			}
+		});
+	    
+	    newUpload.addFailedListener(new FailedListener() {
+			
+			@Override
+			public void uploadFailed(FailedEvent event) {
+				// TODO Auto-generated method stub
+				getUI().showNotification("Invalid CSV file. Try again.", Type.WARNING_MESSAGE);
+			}
+		});
+	    pnlCsvUpload.setContent(null);
+	    pnlCsvUpload.setContent(newUpload);
+	}
+	
+	private void processCsvUpload(File csvFile)
+	{
+	    System.out.println("________________ PROCESSING FILE");
+	    CSVReader reader = null;
+	    
+	    //Matrix with CSV Data
+	    List<String> fieldNameCsvMtx = new ArrayList<String>();
+	    List<String> fieldNameLowerCaseCsvMtx = new ArrayList<String>();
+	    List<String> fieldDbIdCsvMtx = new ArrayList<String>();
+	    List<String> fieldDbTypeCsvMtx = new ArrayList<String>();
+	    List<String> fieldUoMCsvMtx = new ArrayList<String>();
+	    List<Boolean> fieldAddedCsvMtx = new ArrayList<Boolean>();
+	    
+		try {
+		
+			Integer rowCnt = 0;
+			reader = new CSVReader(new FileReader(tempCsvFile));
+			if(reader != null)
+			{	
+				String[] csvRow = reader.readNext();
+				while(csvRow != null)
+				{
+					if(rowCnt == 0)
+					{
+						//Validate Headers: FieldName, DatabaseId, DatabaseType, UoM
+						if(csvRow[0] == null || (csvRow[0] != null && !csvRow[0].trim().toLowerCase().equals("fieldname")))
+					    {
+					    	getUI().showNotification("Invalid CSV file. FieldName column not found.", Type.WARNING_MESSAGE);
+					    	break;
+					    }
+					    if(csvRow[1] == null || (csvRow[1] != null && !csvRow[1].trim().toLowerCase().equals("databaseid")))
+					    {
+					    	getUI().showNotification("Invalid CSV file. DatabaseId column not found.", Type.WARNING_MESSAGE);
+					    	break;
+					    }
+					    if(csvRow[2] == null || (csvRow[2] != null && !csvRow[2].trim().toLowerCase().equals("databasetype")))
+	    					{
+					    	getUI().showNotification("Invalid CSV file. DatabaseType column not found.", Type.WARNING_MESSAGE);
+					        break;
+					    }
+					    if(csvRow[3] == null || (csvRow[3] != null && !csvRow[3].trim().toLowerCase().equals("uom")))
+					    {
+							getUI().showNotification("Invalid CSV file. UoM column not found.", Type.WARNING_MESSAGE);
+				            break;
+					    }
+					}
+					else
+					{
+						if(csvRow[0].trim().isEmpty() || csvRow[1].trim().isEmpty()
+								&& (!csvRow[2].trim().isEmpty() || !csvRow[3].trim().isEmpty()))
+							getUI().showNotification("Invalid CSV file. FieldName and DatabaseId are mandatory. CSV Line: " + (rowCnt+1), Type.WARNING_MESSAGE);
+				        else
+						{
+				        	if(!csvRow[0].trim().isEmpty() && !csvRow[1].trim().isEmpty())
+				        	{
+				        		if(fieldNameCsvMtx.indexOf(csvRow[0].trim()) == -1)
+				        		{
+				        			fieldNameCsvMtx.add(csvRow[0].trim());
+				        			fieldNameLowerCaseCsvMtx.add(csvRow[0].trim().toLowerCase());
+				        			fieldDbIdCsvMtx.add(csvRow[1].trim());
+				        			fieldDbTypeCsvMtx.add(csvRow[2].trim());
+				        			fieldUoMCsvMtx.add(csvRow[3].trim());
+				        			fieldAddedCsvMtx.add(false);
+				        		}
+				        	}
+						}
+						
+					}
+					rowCnt++;
+					csvRow = reader.readNext();
+				}
+				
+	            reader.close();
+	            
+	            //Load Experiment Fields into TBL
+	            List<UnitOfMeasure> unitOfMeasures = new UnitOfMeasureDao().getAllUnitOfMeasures();
+	            List<String> uomNameMtx = new ArrayList<String>();
+	            List<String> uomAbbreviationMtx = new ArrayList<String>();
+	            List<Integer> uomIdMtx = new ArrayList<Integer>();
+	            
+	            for(int i=0; unitOfMeasures != null && i<unitOfMeasures.size(); i++)
+	            {
+	            	uomNameMtx.add(unitOfMeasures.get(i).getUomName());
+	            	uomAbbreviationMtx.add(unitOfMeasures.get(i).getUomAbbreviation());
+	            	uomIdMtx.add(unitOfMeasures.get(i).getUomId());
+	            }
+	            
+	            
+	            //Update Exp Fields already Added
+	            Collection itemIds = this.tblExperimentFields.getContainerDataSource().getItemIds();
+	    		
+	    		for (Object itemIdObj : itemIds) 
+	    		{	
+	    			int itemId = (int)itemIdObj;
+	    			
+    				Item tblRowItem = this.tblExperimentFields.getContainerDataSource().getItem(itemId);
+    					
+    				String fieldName = ((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue();
+    				
+    				if(fieldNameLowerCaseCsvMtx.indexOf(fieldName.trim().toLowerCase()) >= 0)
+    				{
+    					Integer fieldCsvMtxIndex = fieldNameLowerCaseCsvMtx.indexOf(fieldName.trim().toLowerCase());
+    					fieldAddedCsvMtx.set(fieldCsvMtxIndex, true);
+    					
+    					String csvFieldDataType = fieldDbTypeCsvMtx.get(fieldCsvMtxIndex);
+	        			
+	        			Integer csvFieldUomId = -1;
+	        			String csvFieldUom = fieldUoMCsvMtx.get(fieldCsvMtxIndex);
+	        			
+	        			if(uomNameMtx.indexOf(csvFieldUom) >= 0)
+	        				csvFieldUomId = uomIdMtx.get(uomNameMtx.indexOf(csvFieldUom));
+	        			else if(uomAbbreviationMtx.indexOf(csvFieldUom) >= 0)
+	        				csvFieldUomId = uomIdMtx.get(uomAbbreviationMtx.indexOf(csvFieldUom));
+	        			
+	        			//Select DB DataType
+	        			if(csvFieldDataType.trim().toLowerCase().startsWith("varchar") && selectedCsvVarcharValidation(csvFieldDataType))
+	        			{
+	        				if(csvFieldDataType.trim().toLowerCase().equals("varchar") || csvFieldDataType.trim().toLowerCase().equals("text"))
+	        					csvFieldDataType = "varchar(max)";
+	        				
+
+	        				if(!((ComboBox)(tblRowItem.getItemProperty("DB DataType").getValue())).containsId(csvFieldDataType.trim().toLowerCase())) 
+	        				{
+	        					((ComboBox)(tblRowItem.getItemProperty("DB DataType").getValue())).addItem(csvFieldDataType.trim().toLowerCase());
+	        					((ComboBox)(tblRowItem.getItemProperty("DB DataType").getValue())).setItemCaption(csvFieldDataType.trim().toLowerCase(), csvFieldDataType.trim().toLowerCase());
+	        				}
+	        				
+	        				((ComboBox)(tblRowItem.getItemProperty("DB DataType").getValue())).select(csvFieldDataType.trim().toLowerCase());
+        					
+	        			}
+	        			else
+	        			{
+	        				if(((ComboBox)(tblRowItem.getItemProperty("DB DataType").getValue())).containsId(csvFieldDataType.trim().toLowerCase())) 
+	        					((ComboBox)(tblRowItem.getItemProperty("DB DataType").getValue())).select(csvFieldDataType.trim().toLowerCase());
+	        			}
+	        			
+	        			//Select UoM
+    					if(csvFieldUomId != -1)
+    						((ComboBox)(tblRowItem.getItemProperty("UoM").getValue())).select(csvFieldUomId);			        		
+    				}
+	    			
+	    		}
+	    		
+
+	            //Add new Exp Fields
+	    		for(int i = 0; i<fieldNameCsvMtx.size(); i++)
+	    		{
+		            if(!fieldAddedCsvMtx.get(i))
+		            {
+		    			String csvFieldName = fieldNameCsvMtx.get(i);
+	        			String csvFieldDbId = fieldDbIdCsvMtx.get(i);
+	        			String csvFieldDataType = fieldDbTypeCsvMtx.get(i);
+	        			
+	        			Integer csvFieldUomId = -1;
+	        			String csvFieldUom = fieldUoMCsvMtx.get(i);
+	        			
+	        			if(uomNameMtx.indexOf(csvFieldUom) >= 0)
+	        				csvFieldUomId = uomIdMtx.get(uomNameMtx.indexOf(csvFieldUom));
+	        			else if(uomAbbreviationMtx.indexOf(csvFieldUom) >= 0)
+	        				csvFieldUomId = uomIdMtx.get(uomAbbreviationMtx.indexOf(csvFieldUom));
+	        		
+	        			//Set DB Id
+	        			if(!StringUtils.isEmpty(csvFieldDbId.trim().toLowerCase()) && StringUtils.isAlphanumeric(csvFieldDbId.trim().toLowerCase().replaceAll("_", ""))
+	        					&& !csvFieldDbId.trim().toLowerCase().equals("recordid") && !csvFieldDbId.trim().toLowerCase().equals("comments") 
+	        					&& !csvFieldDbId.trim().toLowerCase().equals("createdby") && !csvFieldDbId.trim().toLowerCase().equals("lastmodifiedby") 
+	        					&& !csvFieldDbId.trim().toLowerCase().equals("datafileid") && !csvFieldDbId.trim().toLowerCase().equals("createddate") 
+	        					&& !csvFieldDbId.trim().toLowerCase().equals("lastmodifieddate")) 
+	        				csvFieldDbId = csvFieldDbId.trim().toLowerCase();
+	        			else
+	        				csvFieldDbId = null;
+	        			
+	        			
+		    			addField(csvFieldName, csvFieldDbId, csvFieldDataType, csvFieldUomId);	    	
+		            }
+	    		}
+			}
+		} catch ( IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private boolean selectedCsvVarcharValidation(String varcharDataType)
+	{
+		Config configuration = new Config();
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			if(varcharDataType.trim().toLowerCase().equals("varchar") || varcharDataType.trim().toLowerCase().equals("varchar(max)") || varcharDataType.trim().toLowerCase().equals("text"))
+				return true;
+			else
+			{
+				String varcharLengthStr = varcharDataType.trim().replace(" ", "").replace("varchar(", "").replace(")", "");
+				return StringUtils.isNumeric(varcharLengthStr);
+			}
+		}
+		
+		return true;
+	}
 }

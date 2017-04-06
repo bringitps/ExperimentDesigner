@@ -264,6 +264,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 		    passAreaSeries.add(new DataSeriesItem(minValueX,minValueY));
 	
 	        PlotOptionsSpline plotTargetRectangle = new PlotOptionsSpline();
+	        plotTargetRectangle.setTurboThreshold(0);
 	        plotTargetRectangle.setColor(new SolidColor(Color.MAGENTA.getCSS()));
 	        passAreaSeries.setPlotOptions(plotTargetRectangle);
 	        targetChartConf.addSeries(passAreaSeries);
@@ -302,7 +303,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 			String toolTipBody = "";
 			
 		    Collection itemIds = tblTargetDataReport.getContainerDataSource().getItemIds();
-			int cnt=1;
+			Integer cnt=1;
 			for (Object itemIdObj : itemIds) 
 			{	
 				toolTipBody = "";
@@ -332,33 +333,18 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 				if(valueX != null && valueY != null && !valueX.isEmpty() && !valueY.isEmpty())
 				{
 					newValue = new DataSeriesItem(Double.parseDouble(valueX), Double.parseDouble(valueY));
+					newValue.setId(cnt.toString());
 					newValue.setColor(new SolidColor(Color.BLUE.getCSS()));
 					newValue.setName(toolTipHeaderX+"<br>"+toolTipHeaderY+"<br><br>"+toolTipBody);
 					valuesSeries.add(newValue);
 				}
+				
+				//System.out.println("Added Value: " + cnt);
+				cnt++;
 			}
-		    
-			/*
-		    for(int i=0; i<10; i++)
-		    {
-		    	newValue = new DataSeriesItem(i*1.5, i+1.5);
-		    	newValue.setColor(new SolidColor(Color.BLUE.getCSS()));
-		    	newValue.setName("Testing<br>NewLine");
-				valuesSeries.add(newValue);
-				   
-			}
-	
-		    for(int i=3; i<9; i++)
-		    {
-		    	newValue = new DataSeriesItem(i*0.5, i+1);
-		    	newValue.setColor(new SolidColor(Color.BLUE.getCSS()));
-		    	newValue.setName("Testing<br>NewLine");
-				valuesSeries.add(newValue);
-				   
-			}
-			*/
-			
+		    		
 			PlotOptionsScatter plotValues = new PlotOptionsScatter();
+			plotValues.setTurboThreshold(0);
 			valuesSeries.setPlotOptions(plotValues);
 		    targetChartConf.addSeries(valuesSeries);
 		    

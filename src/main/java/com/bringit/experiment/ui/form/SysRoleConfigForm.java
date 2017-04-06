@@ -104,6 +104,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 		tblSysRole.addContainerProperty("*", CheckBox.class, null);
 		tblSysRole.addContainerProperty("Name", TextField.class, null);
 		tblSysRole.addContainerProperty("Description", TextField.class, null);
+		tblSysRole.addContainerProperty("AD Default Role?", CheckBox.class, null);
 		tblSysRole.addContainerProperty("Menu Access", Panel.class, null);
 		tblSysRole.setEditable(true);
 		tblSysRole.setPageLength(0);
@@ -118,7 +119,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 		else
 			cbxSysRoleFilters.select(filterName.trim());
 		
-		Object[] itemValues = new Object[4];
+		Object[] itemValues = new Object[5];
 
 		List<SysRole> sysRoles = new SysRoleDao().getAllSysRoles();
 		
@@ -143,12 +144,14 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 				txtRoleDescription.setValue(sysRoles.get(i).getRoleDescription());			
 				txtRoleDescription.setWidth(95, Unit.PERCENTAGE);
 				itemValues[2] = txtRoleDescription;
+		
+				CheckBox chxIsAdDefaultRole = new CheckBox();
+				chxIsAdDefaultRole.setValue(sysRoles.get(i).getIsActiveDirectoryDefaultRole());
+				itemValues[3] = chxIsAdDefaultRole;
 				
 				List<String> mnuAccessList = new ArrayList<String>();
 				if(sysRoles.get(i).getRoleMenuAccess() != null)
 					mnuAccessList = Arrays.asList(sysRoles.get(i).getRoleMenuAccess().split("\n"));
-				//String[] mnuAccessList = sysRoles.get(i).getRoleMenuAccess().split("\n");
-				//List list = Arrays.asList(stringArray)
 				
 				Panel pnlMnuAccess = new Panel("Menu Access");
 				VerticalLayout layoutPnlMnuAccess = new VerticalLayout();
@@ -187,7 +190,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 			    layoutPnlMnuAccess.addComponent(optGrpMnuAccess);
 				pnlMnuAccess.setContent(layoutPnlMnuAccess);
 				    
-				itemValues[3] = pnlMnuAccess;
+				itemValues[4] = pnlMnuAccess;
 				
 				if(!sysRoles.get(i).getRoleName().equals("sys_admin"))
 					tblSysRole.addItem(itemValues, sysRoles.get(i).getRoleId());
@@ -197,7 +200,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 	
 	private void addSysRoleRow()
 	{
-		Object[] itemValues = new Object[4];
+		Object[] itemValues = new Object[5];
 		
 		CheckBox chxSelect = new CheckBox();
 		chxSelect.setVisible(false);
@@ -215,6 +218,11 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 		txtRoleDescription.setWidth(95, Unit.PERCENTAGE);
 		itemValues[2] = txtRoleDescription;
 
+
+		CheckBox chxIsAdDefaultRole = new CheckBox();
+		chxIsAdDefaultRole.setValue(false);
+		itemValues[3] = chxIsAdDefaultRole;
+		
 		Panel pnlMnuAccess = new Panel("Menu Access");
 		VerticalLayout layoutPnlMnuAccess = new VerticalLayout();
 		OptionGroup optGrpMnuAccess = new OptionGroup();
@@ -246,7 +254,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 	    layoutPnlMnuAccess.addComponent(optGrpMnuAccess);
 		pnlMnuAccess.setContent(layoutPnlMnuAccess);
 		    
-		itemValues[3] = pnlMnuAccess;
+		itemValues[4] = pnlMnuAccess;
 		
 		this.lastNewItemId = this.lastNewItemId - 1;
 		tblSysRole.addItem(itemValues, this.lastNewItemId);
@@ -295,6 +303,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 				SysRole sysRole = new SysRole();
 				sysRole.setRoleName(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
 				sysRole.setRoleDescription(((TextField)(tblRowItem.getItemProperty("Description").getValue())).getValue());
+				sysRole.setIsActiveDirectoryDefaultRole(((CheckBox)(tblRowItem.getItemProperty("AD Default Role?").getValue())).getValue());
 				
 				Panel pnlMnuAccess = ((Panel)(tblRowItem.getItemProperty("Menu Access").getValue()));
 				VerticalLayout layoutPnlMnuAccess = (VerticalLayout)pnlMnuAccess.getContent();

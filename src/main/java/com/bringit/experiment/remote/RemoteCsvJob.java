@@ -12,6 +12,7 @@ import com.bringit.experiment.util.FTPUtil;
 import com.jcraft.jsch.ChannelSftp;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPFile;
 import org.quartz.*;
 import org.w3c.dom.Document;
@@ -74,7 +75,7 @@ public class RemoteCsvJob implements Job {
     	                      
                             dataFile.setFileRepoId(exceptionRepo);
 
-                            saveExecutionResult(dataFile, file.getFilename(), jobData, true, "Data File is already processed. File Name: " + file.getFilename());
+                            saveExecutionResult(dataFile, file.getFilename(), jobData, true, "Data File is already processed. File Name: " + file.getFilename(), 0);
 
     	                    new DataFileDao().updateDataFile(dataFile);
     	                    
@@ -108,13 +109,17 @@ public class RemoteCsvJob implements Job {
 	                            sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
 	
 	                            dataFile.setFileRepoId(outboundRepo);
+	                            Integer totalRecords = StringUtils.isNumeric(sftpResponse.getDetail().toString()) ? Integer.parseInt(sftpResponse.getDetail().toString()) : 0;
+	                            saveExecutionResult(dataFile, file.getFilename(), jobData, false, "", totalRecords);
+	                            
 	                            System.out.println("Removed file from SFTP server");
 	                        } else {
 	                            // Send file to Exception
 	                            moveFileToRepo(exceptionRepo, copyStream, file.getFilename());
 	                            sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
 	                            dataFile.setFileRepoId(exceptionRepo);
-	                            System.out.println("Removed file from SFTP server");
+	                            saveExecutionResult(dataFile, file.getFilename(), jobData, true, sftpResponse.getDescription(), 0);
+		                        System.out.println("Removed file from SFTP server");
 	                        }
 	                        //b) Update Data File Repo dataFile.setFileRepoId();
 	                        try {
@@ -163,7 +168,7 @@ public class RemoteCsvJob implements Job {
      	                    
                             dataFile.setFileRepoId(exceptionRepo);
 
-                            saveExecutionResult(dataFile, ftpFile.getName(), jobData, true, "Data File is already processed. File Name: " + ftpFile.getName());
+                            saveExecutionResult(dataFile, ftpFile.getName(), jobData, true, "Data File is already processed. File Name: " + ftpFile.getName(), 0);
 
     	                    new DataFileDao().updateDataFile(dataFile);
     	                    
@@ -200,6 +205,8 @@ public class RemoteCsvJob implements Job {
 	                            ftp.deleteFile(ftpFile.getName(), filesRepository.getFileRepoPath());
 	
 	                            dataFile.setFileRepoId(outboundRepo);
+	                            Integer totalRecords = StringUtils.isNumeric(ftpResponse.getDetail().toString()) ? Integer.parseInt(ftpResponse.getDetail().toString()) : 0;
+		                        saveExecutionResult(dataFile, ftpFile.getName(), jobData, false, "", totalRecords);
 	                            System.out.println("Removed file from FTP server");
 	                        } else {
 	                            // Send file to Exception
@@ -207,6 +214,7 @@ public class RemoteCsvJob implements Job {
 	                            ftp.deleteFile(ftpFile.getName(), filesRepository.getFileRepoPath());
 	
 	                            dataFile.setFileRepoId(exceptionRepo);
+	                            saveExecutionResult(dataFile, ftpFile.getName(), jobData, true, ftpResponse.getDescription(), 0);
 	                            System.out.println("Removed file from FTP server");
 	                        }
 	
@@ -258,7 +266,7 @@ public class RemoteCsvJob implements Job {
 	   	                    
 	                        dataFile.setFileRepoId(exceptionRepo);
 	
-	                        saveExecutionResult(dataFile, file.getName(), jobData, true, "Data File is already processed. File Name: " + file.getName());
+	                        saveExecutionResult(dataFile, file.getName(), jobData, true, "Data File is already processed. File Name: " + file.getName(), 0);
 
 		                    new DataFileDao().updateDataFile(dataFile);
 		                   
@@ -287,6 +295,8 @@ public class RemoteCsvJob implements Job {
 		                        file.delete();
 		
 		                        dataFile.setFileRepoId(outboundRepo);
+		                        Integer totalRecords = StringUtils.isNumeric(localResponse.getDetail().toString()) ? Integer.parseInt(localResponse.getDetail().toString()) : 0;
+		                        saveExecutionResult(dataFile, file.getName(), jobData, false, "", totalRecords);
 		                        System.out.println("Removed file from local server");
 		                    } else {
 		                        // Send file to Exception
@@ -294,7 +304,8 @@ public class RemoteCsvJob implements Job {
 		                        file.delete();
 		
 		                        dataFile.setFileRepoId(exceptionRepo);
-		                        System.out.println("Removed file from local server");
+		                        saveExecutionResult(dataFile, file.getName(), jobData, true, localResponse.getDescription(), 0);
+			                    System.out.println("Removed file from local server");
 		                    }
 		
 		                    copyStream.close();
@@ -393,7 +404,7 @@ public class RemoteCsvJob implements Job {
 
     }
 
-    private void saveExecutionResult(DataFile dataFile, String fileName, CsvTemplate csvTemplate, boolean exception, String exceptionDetails)
+    private void saveExecutionResult(DataFile dataFile, String fileName, CsvTemplate csvTemplate, boolean exception, String exceptionDetails, Integer totalRecords)
     {
 
         CsvDataLoadExecutionResult csvDataLoadExecResult = new CsvDataLoadExecutionResult();
@@ -401,6 +412,7 @@ public class RemoteCsvJob implements Job {
         csvDataLoadExecResult.setCsvDataLoadExecException(exception);
         csvDataLoadExecResult.setCsvDataLoadExecExeptionDetails(exceptionDetails);
         csvDataLoadExecResult.setCsvDataLoadExecTime(new Date());
+        csvDataLoadExecResult.setCsvDataLoadTotalRecords(totalRecords);
         csvDataLoadExecResult.setCsvTemplate(csvTemplate);
         new CsvDataLoadExecutionResultDao().addCsvDataLoadExecutionResult(csvDataLoadExecResult);
     }

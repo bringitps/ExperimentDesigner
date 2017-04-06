@@ -19,6 +19,7 @@ import com.vaadin.ui.Notification.Type;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPFile;
 
 import org.quartz.*;
@@ -88,7 +89,7 @@ public class RemoteXmlJob implements Job {
   	                      
                             dataFile.setFileRepoId(exceptionRepo);
                         	
-                            saveExecutionResult(dataFile, file.getFilename(), jobData, true, "Data File is already processed. File Name: " + file.getFilename());
+                            saveExecutionResult(dataFile, file.getFilename(), jobData, true, "Data File is already processed. File Name: " + file.getFilename(), 0);
 
     	                    new DataFileDao().updateDataFile(dataFile);
     	                     
@@ -118,14 +119,15 @@ public class RemoteXmlJob implements Job {
 	                            sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
 	
 	                            dataFile.setFileRepoId(outboundRepo);
-	                            saveExecutionResult(dataFile, file.getFilename(), jobData, false, "");
+	                            Integer totalRecords = StringUtils.isNumeric(sftpResponse.getDetail().toString()) ? Integer.parseInt(sftpResponse.getDetail().toString()) : 0;
+	                            saveExecutionResult(dataFile, file.getFilename(), jobData, false, "", totalRecords);
 	                            System.out.println("Removed file from SFTP server");
 	                        } else {
 	                            // Send file to Exception
 	                            moveFileToRepo(exceptionRepo, is, file.getFilename());
 	                            sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());
 	                            dataFile.setFileRepoId(exceptionRepo);
-	                            saveExecutionResult(dataFile, file.getFilename(), jobData, true, sftpResponse.getDescription());
+	                            saveExecutionResult(dataFile, file.getFilename(), jobData, true, sftpResponse.getDescription(), 0);
 	                            System.out.println("Removed file from SFTP server");
 	                        }
 	                        //b) Update Data File Repo dataFile.setFileRepoId();
@@ -174,7 +176,7 @@ public class RemoteXmlJob implements Job {
      	                      
                         	dataFile.setFileRepoId(exceptionRepo);
                         	
-                            saveExecutionResult(dataFile, ftpFile.getName(), jobData, true, "Data File is already processed. File Name: " + ftpFile.getName());
+                            saveExecutionResult(dataFile, ftpFile.getName(), jobData, true, "Data File is already processed. File Name: " + ftpFile.getName(), 0);
 
     	                    new DataFileDao().updateDataFile(dataFile);
     	                    
@@ -212,7 +214,8 @@ public class RemoteXmlJob implements Job {
 	                            ftp.deleteFile(ftpFile.getName(),filesRepository.getFileRepoPath());
 	
 	                            dataFile.setFileRepoId(outboundRepo);
-	                            saveExecutionResult(dataFile, ftpFile.getName(), jobData, false, "");
+	                            Integer totalRecords = StringUtils.isNumeric(ftpResponse.getDetail().toString()) ? Integer.parseInt(ftpResponse.getDetail().toString()) : 0;
+		                        saveExecutionResult(dataFile, ftpFile.getName(), jobData, false, "", totalRecords);
 	                            System.out.println("Removed file from FTP server");
 	                        } else {
 	                            // Send file to Exception
@@ -220,7 +223,7 @@ public class RemoteXmlJob implements Job {
 	                            ftp.deleteFile(ftpFile.getName(), filesRepository.getFileRepoPath());
 	
 	                            dataFile.setFileRepoId(exceptionRepo);
-	                            saveExecutionResult(dataFile, ftpFile.getName(), jobData, true, ftpResponse.getDescription());
+	                            saveExecutionResult(dataFile, ftpFile.getName(), jobData, true, ftpResponse.getDescription(), 0);
 	                            System.out.println("Removed file from FTP server");
 	                        }
 	
@@ -276,7 +279,7 @@ public class RemoteXmlJob implements Job {
 	   	                    
 	                        dataFile.setFileRepoId(exceptionRepo);
 	                    	
-	                        saveExecutionResult(dataFile, file.getName(), jobData, true, "Data File is already processed. File Name: " + file.getName());
+	                        saveExecutionResult(dataFile, file.getName(), jobData, true, "Data File is already processed. File Name: " + file.getName(), 0);
 
 		                    new DataFileDao().updateDataFile(dataFile);
 		                    
@@ -302,7 +305,8 @@ public class RemoteXmlJob implements Job {
 		                        file.delete();
 		
 		                        dataFile.setFileRepoId(outboundRepo);
-		                        saveExecutionResult(dataFile, file.getName(), jobData, false, "");
+		                        Integer totalRecords = StringUtils.isNumeric(localResponse.getDetail().toString()) ? Integer.parseInt(localResponse.getDetail().toString()) : 0;
+		                        saveExecutionResult(dataFile, file.getName(), jobData, false, "", totalRecords);
 		                        
 		                        System.out.println("Removed file from local server");
 		                    } else {
@@ -311,7 +315,7 @@ public class RemoteXmlJob implements Job {
 		                        file.delete();
 		
 		                        dataFile.setFileRepoId(exceptionRepo);
-		                        saveExecutionResult(dataFile, file.getName(), jobData, true, localResponse.getDescription());
+		                        saveExecutionResult(dataFile, file.getName(), jobData, true, localResponse.getDescription(), 0);
 		                        System.out.println("Removed file from local server");
 		                    }
 		
@@ -424,13 +428,14 @@ public class RemoteXmlJob implements Job {
 
     }
     
-    private void saveExecutionResult(DataFile dataFile, String fileName, XmlTemplate xmlTemplate, boolean exception, String exceptionDetails)
+    private void saveExecutionResult(DataFile dataFile, String fileName, XmlTemplate xmlTemplate, boolean exception, String exceptionDetails, Integer totalRecords)
     {
     	XmlDataLoadExecutionResult xmlDataLoadExecResult = new XmlDataLoadExecutionResult();
 		xmlDataLoadExecResult.setDataFile(dataFile);
 		xmlDataLoadExecResult.setXmlDataLoadExecException(exception);
 		xmlDataLoadExecResult.setXmlDataLoadExecExeptionDetails(exceptionDetails);
 		xmlDataLoadExecResult.setXmlDataLoadExecTime(new Date());
+		xmlDataLoadExecResult.setXmlDataLoadTotalRecords(totalRecords);
 		xmlDataLoadExecResult.setXmlTemplate(xmlTemplate);
 		new XmlDataLoadExecutionResultDao().addXmlDataLoadExecutionResult(xmlDataLoadExecResult);		
     }

@@ -177,6 +177,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 					csvDataLoadExecResult.setDataFile(dataFile);
 					csvDataLoadExecResult.setCsvDataLoadExecException(false);
 					csvDataLoadExecResult.setCsvDataLoadExecTime(new Date());
+					csvDataLoadExecResult.setCsvDataLoadTotalRecords(parseCsvResponse.getCsvInsertValues().size());
 					csvDataLoadExecResult.setCsvTemplate(csvTemplate);
 					new CsvDataLoadExecutionResultDao().addCsvDataLoadExecutionResult(csvDataLoadExecResult);
 					
@@ -197,6 +198,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 					csvDataLoadExecResult.setCsvDataLoadExecException(true);
 					csvDataLoadExecResult.setCsvDataLoadExecExeptionDetails(batchInsertResponse.getDescription());
 					csvDataLoadExecResult.setCsvDataLoadExecTime(new Date());
+					csvDataLoadExecResult.setCsvDataLoadTotalRecords(0);
 					csvDataLoadExecResult.setCsvTemplate(csvTemplate);
 					new CsvDataLoadExecutionResultDao().addCsvDataLoadExecutionResult(csvDataLoadExecResult);
 					
@@ -215,6 +217,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 				csvDataLoadExecResult.setCsvDataLoadExecException(true);
 				csvDataLoadExecResult.setCsvDataLoadExecExeptionDetails(parseCsvResponse.getDescription());
 				csvDataLoadExecResult.setCsvDataLoadExecTime(new Date());
+				csvDataLoadExecResult.setCsvDataLoadTotalRecords(0);
 				csvDataLoadExecResult.setCsvTemplate(csvTemplate);
 				new CsvDataLoadExecutionResultDao().addCsvDataLoadExecutionResult(csvDataLoadExecResult);
 				

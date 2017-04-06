@@ -35,6 +35,9 @@ public class XmlDataLoadExecutionResult {
 	@Column(name="XmlDataLoadExecTime")
 	private Date xmlDataLoadExecTime;
 
+	@Column(name="XmlDataLoadTotalRecords")
+	private Integer xmlDataLoadTotalRecords;
+	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="DataFileId", unique=false, updatable=true)
 	private DataFile dataFile;
@@ -49,17 +52,19 @@ public class XmlDataLoadExecutionResult {
 		this.xmlDataLoadExecException = null;
 		this.xmlDataLoadExecExeptionDetails = null;
 		this.xmlDataLoadExecTime = null;
+		this.xmlDataLoadTotalRecords = null;
 		this.dataFile = null;
 		this.xmlTemplate = null;
 	}
 	
 	public XmlDataLoadExecutionResult(Integer xmlDataLoadExecId, boolean xmlDataLoadExecException,
-			String xmlDataLoadExecExeptionDetails, Date xmlDataLoadExecTime, DataFile dataFile,
-			XmlTemplate xmlTemplate) {
+			String xmlDataLoadExecExeptionDetails, Date xmlDataLoadExecTime, 
+			Integer xmlDataLoadTotalRecords, DataFile dataFile,	XmlTemplate xmlTemplate) {
 		this.xmlDataLoadExecId = xmlDataLoadExecId;
 		this.xmlDataLoadExecException = xmlDataLoadExecException;
 		this.xmlDataLoadExecExeptionDetails = xmlDataLoadExecExeptionDetails;
 		this.xmlDataLoadExecTime = xmlDataLoadExecTime;
+		this.xmlDataLoadTotalRecords = xmlDataLoadTotalRecords;
 		this.dataFile = dataFile;
 		this.xmlTemplate = xmlTemplate;
 	}
@@ -102,6 +107,18 @@ public class XmlDataLoadExecutionResult {
 
 	public void setXmlDataLoadExecTime(Date xmlDataLoadExecTime) {
 		this.xmlDataLoadExecTime = xmlDataLoadExecTime;
+	}
+
+	public Integer getXmlDataLoadTotalRecords() {
+		return xmlDataLoadTotalRecords;
+	}
+
+	public void setXmlDataLoadTotalRecords(Integer xmlDataLoadTotalRecords) {
+		this.xmlDataLoadTotalRecords = xmlDataLoadTotalRecords;
+	}
+
+	public void setXmlDataLoadExecException(Boolean xmlDataLoadExecException) {
+		this.xmlDataLoadExecException = xmlDataLoadExecException;
 	}
 
 	public XmlTemplate getXmlTemplate() {

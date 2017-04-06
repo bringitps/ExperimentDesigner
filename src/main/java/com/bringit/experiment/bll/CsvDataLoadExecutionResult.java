@@ -38,6 +38,9 @@ public class CsvDataLoadExecutionResult {
 	@Column(name="CsvDataLoadExecTime")
 	private Date csvDataLoadExecTime;
 
+	@Column(name="CsvDataLoadTotalRecords")
+	private Integer csvDataLoadTotalRecords;
+	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="DataFileId", unique=false, updatable=true)
 	private DataFile dataFile;
@@ -52,18 +55,20 @@ public class CsvDataLoadExecutionResult {
 		this.csvDataLoadExecExeptionDetails = null;
 		this.csvDataLoadExecExeptionFile = null;
 		this.csvDataLoadExecTime = null;
+		this.csvDataLoadTotalRecords = null;
 		this.dataFile = null;
 		this.csvTemplate = null;
 	}
 
 	public CsvDataLoadExecutionResult(Integer csvDataLoadExecId, boolean csvDataLoadExecException,
 			String csvDataLoadExecExeptionDetails, String csvDataLoadExecExeptionFile, Date csvDataLoadExecTime,
-			DataFile dataFile, CsvTemplate csvTemplate) {
+			Integer csvDataLoadTotalRecords, DataFile dataFile, CsvTemplate csvTemplate) {
 		this.csvDataLoadExecId = csvDataLoadExecId;
 		this.csvDataLoadExecException = csvDataLoadExecException;
 		this.csvDataLoadExecExeptionDetails = csvDataLoadExecExeptionDetails;
 		this.csvDataLoadExecExeptionFile = csvDataLoadExecExeptionFile;
 		this.csvDataLoadExecTime = csvDataLoadExecTime;
+		this.csvDataLoadTotalRecords = csvDataLoadTotalRecords;
 		this.dataFile = dataFile;
 		this.csvTemplate = csvTemplate;
 	}
@@ -98,6 +103,18 @@ public class CsvDataLoadExecutionResult {
 
 	public void setCsvDataLoadExecTime(Date csvDataLoadExecTime) {
 		this.csvDataLoadExecTime = csvDataLoadExecTime;
+	}
+
+	public Integer getCsvDataLoadTotalRecords() {
+		return csvDataLoadTotalRecords;
+	}
+
+	public void setCsvDataLoadTotalRecords(Integer csvDataLoadTotalRecords) {
+		this.csvDataLoadTotalRecords = csvDataLoadTotalRecords;
+	}
+
+	public void setCsvDataLoadExecException(Boolean csvDataLoadExecException) {
+		this.csvDataLoadExecException = csvDataLoadExecException;
 	}
 
 	public DataFile getDataFile() {

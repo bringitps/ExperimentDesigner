@@ -32,18 +32,23 @@ public class SysRole {
 	@Type(type="text")
 	private String roleMenuAccess;
 
+	@Column(name="IsActiveDirectoryDefaultRole")
+	private Boolean isActiveDirectoryDefaultRole;
+	
 	public SysRole() {
 		this.roleId = null;
 		this.roleName = null;
 		this.roleDescription = null;
 		this.roleMenuAccess = null;
+		this.isActiveDirectoryDefaultRole = null;
 	}
 
-	public SysRole(Integer roleId, String roleName, String roleDesc, String roleMenuAccess) {
+	public SysRole(Integer roleId, String roleName, String roleDesc, String roleMenuAccess, Boolean isActiveDirectoryDefaultRole) {
 		this.roleId = roleId;
 		this.roleName = roleName;
 		this.roleDescription = roleDesc;
 		this.roleMenuAccess = roleMenuAccess;
+		this.isActiveDirectoryDefaultRole = isActiveDirectoryDefaultRole;
 	}
 
 	public Integer getRoleId() {
@@ -76,6 +81,14 @@ public class SysRole {
 
 	public void setRoleMenuAccess(String roleMenuAccess) {
 		this.roleMenuAccess = roleMenuAccess;
+	}
+
+	public Boolean getIsActiveDirectoryDefaultRole() {
+		return isActiveDirectoryDefaultRole;
+	}
+
+	public void setIsActiveDirectoryDefaultRole(Boolean isActiveDirectoryDefaultRole) {
+		this.isActiveDirectoryDefaultRole = isActiveDirectoryDefaultRole;
 	}
 	
 }

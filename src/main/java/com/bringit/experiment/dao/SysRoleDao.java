@@ -134,4 +134,22 @@ public class SysRoleDao {
         return sysRole;
     }
 	
+    @SuppressWarnings({ "unused", "unchecked" })
+   	public List<SysRole> getAdDefaultSysRoles() {
+           List<SysRole> sysRoles = new ArrayList<SysRole>();
+           Transaction trns = null;
+           Session session = HibernateUtil.getSessionFactory().openSession();
+   		// Session session = HibernateUtil.openSession(dialectXmlFile);
+           try {
+               trns = session.beginTransaction();
+               sysRoles = session.createQuery("from SysRole where IsActiveDirectoryDefaultRole='true'").list();
+           } catch (RuntimeException e) {
+               e.printStackTrace();
+           } finally {
+               session.flush();
+               session.close();
+           }
+           return sysRoles;
+       }
+    
 }

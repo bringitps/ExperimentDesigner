@@ -148,22 +148,17 @@ public class WebApplication extends UI {
 			{
 				SysUser rootUser = new SysUser();
 				rootUser.setUserName("root");
-				rootUser.setUserPass("1234");
+				rootUser.setUserPass("P4sst0f0rg3t!");
 				rootUser.setUserFullName("Root User");
 				rootUser.setIsActiveDirectoryUser(false);
 				new SysUserDao().addSysUser(rootUser);
 				
 				SysRole adminRole = new SysRole();
 				adminRole.setRoleName("sys_admin");
-				adminRole.setRoleDescription("Users with full access and privileges");
-				
-				SysRole guestRole = new SysRole();
-				guestRole.setRoleName("Guest");
-				guestRole.setRoleDescription("Users with view only access");
+				adminRole.setRoleDescription("BringIT Sys Root User");
 				
 				SysRoleDao roleDao = new SysRoleDao();
 				roleDao.addSysRole(adminRole);
-				roleDao.addSysRole(guestRole);
 				
 				UserRole rootRole = new UserRole();
 				rootRole.setSysRole(adminRole);

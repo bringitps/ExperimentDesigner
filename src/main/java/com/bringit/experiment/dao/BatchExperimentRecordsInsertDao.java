@@ -33,6 +33,7 @@ public class BatchExperimentRecordsInsertDao {
 		ResponseObj responseObj = new ResponseObj();
 		responseObj.setCode(0);
 		responseObj.setDescription("");
+		responseObj.setDetail(csvInsertValues.size() + "");//Total Of Records
 		
 		//ResultSet rs = null;
 		Config configuration = new Config();

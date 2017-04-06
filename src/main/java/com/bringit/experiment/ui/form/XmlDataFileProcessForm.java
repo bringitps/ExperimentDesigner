@@ -172,6 +172,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 					xmlDataLoadExecResult.setDataFile(dataFile);
 					xmlDataLoadExecResult.setXmlDataLoadExecException(false);
 					xmlDataLoadExecResult.setXmlDataLoadExecTime(new Date());
+					xmlDataLoadExecResult.setXmlDataLoadTotalRecords(parseXmlResponse.getCsvInsertValues().size());
 					xmlDataLoadExecResult.setXmlTemplate(xmlTemplate);
 					new XmlDataLoadExecutionResultDao().addXmlDataLoadExecutionResult(xmlDataLoadExecResult);
 					
@@ -192,6 +193,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 					xmlDataLoadExecResult.setXmlDataLoadExecException(true);
 					xmlDataLoadExecResult.setXmlDataLoadExecExeptionDetails(batchInsertResponse.getDescription());
 					xmlDataLoadExecResult.setXmlDataLoadExecTime(new Date());
+					xmlDataLoadExecResult.setXmlDataLoadTotalRecords(0);
 					xmlDataLoadExecResult.setXmlTemplate(xmlTemplate);
 					new XmlDataLoadExecutionResultDao().addXmlDataLoadExecutionResult(xmlDataLoadExecResult);
 					
@@ -210,6 +212,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 				xmlDataLoadExecResult.setXmlDataLoadExecException(true);
 				xmlDataLoadExecResult.setXmlDataLoadExecExeptionDetails(parseXmlResponse.getDescription());
 				xmlDataLoadExecResult.setXmlDataLoadExecTime(new Date());
+				xmlDataLoadExecResult.setXmlDataLoadTotalRecords(0);
 				xmlDataLoadExecResult.setXmlTemplate(xmlTemplate);
 				new XmlDataLoadExecutionResultDao().addXmlDataLoadExecutionResult(xmlDataLoadExecResult);
 				

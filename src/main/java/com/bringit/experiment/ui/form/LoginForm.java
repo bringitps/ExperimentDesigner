@@ -1,10 +1,16 @@
 package com.bringit.experiment.ui.form;
 
+import java.util.List;
+
 import javax.security.auth.login.LoginException;
 
 import com.bringit.experiment.WebApplication;
+import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.UserRole;
+import com.bringit.experiment.dao.SysRoleDao;
 import com.bringit.experiment.dao.SysUserDao;
+import com.bringit.experiment.dao.UserRoleDao;
 import com.bringit.experiment.ldap.ActiveDirectoryAuthentication;
 import com.bringit.experiment.ui.design.LoginFormDesign;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -48,13 +54,37 @@ public class LoginForm extends LoginFormDesign {
 					if(loggedUser != null)
 						webApplication.createUserSession(loggedUser);
 					else
-						loggedUser = new SysUser();
-						loggedUser.setIsActiveDirectoryUser(true);
-						loggedUser.setUserName(txtUsername.getValue());
-						loggedUser.setUserPass("");		
-						//Register user automatically? or give them a point of contact to request access?
-						//lblLoginError.setValue("User exists on LDAP, but is not registered to use this app. Please contact IT.");
-						//lblLoginError.setVisible(true);
+					{
+						List<SysRole> adDefaultSysRoles = new SysRoleDao().getAdDefaultSysRoles();
+						if(adDefaultSysRoles != null && adDefaultSysRoles.size() > 0)
+						{
+							//Register User and Assign AD Default Roles
+							loggedUser = new SysUser();
+							loggedUser.setIsActiveDirectoryUser(true);
+							loggedUser.setUserName(txtUsername.getValue());
+							loggedUser.setUserPass("");
+							
+							new SysUserDao().addSysUser(loggedUser);
+							SysUser newAdUser = new SysUserDao().getUserByUserName(txtUsername.getValue());
+							
+							for(int i=0; i<adDefaultSysRoles.size(); i++)
+							{
+								UserRole newAdUserRole = new UserRole();
+								newAdUserRole.setSysRole(adDefaultSysRoles.get(i));
+								newAdUserRole.setSysUser(newAdUser);
+								if(i==0)
+									newAdUserRole.setDefaultRole(true);
+								new UserRoleDao().addUserRole(newAdUserRole);
+							}
+							
+							webApplication.createUserSession(newAdUser);							
+						}
+						else
+						{
+							lblLoginError.setValue("Default Roles for Active Directory Users not found. Please contact your System Administrator.");
+							lblLoginError.setVisible(true);
+						}
+					}							
 				}
 			} catch (LoginException e) {
 			    lblLoginError.setValue(e.getMessage());

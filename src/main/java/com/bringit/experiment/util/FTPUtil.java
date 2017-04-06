@@ -258,23 +258,23 @@ public class FTPUtil {
             System.out.println("Remote system is " + ftp.getSystemName());
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
-            // Use passive mode as default because most of us are
-            // behind firewalls these days.
-            ftp.enterLocalPassiveMode();
-            ftp.setControlKeepAliveTimeout(600);
-            ftp.changeWorkingDirectory(directory);
-            
+             
             boolean didStore = true;
             
             try
             {
+                ftp.enterLocalActiveMode();
+                ftp.setControlKeepAliveTimeout(600);
+                ftp.changeWorkingDirectory(directory);
             	didStore = ftp.storeFile(fileName, is);
             }
             catch(Exception ex1)
             {
             	try
                 {
-            		ftp.enterLocalActiveMode();
+            		 // Use passive mode as default because most of us are
+                    // behind firewalls these days.
+            		ftp.enterLocalPassiveMode();
                     ftp.setControlKeepAliveTimeout(600);
                     ftp.changeWorkingDirectory(directory);
                 	didStore = ftp.storeFile(fileName, is);
@@ -326,11 +326,6 @@ public class FTPUtil {
             System.out.println("Remote system is " + ftp.getSystemName());
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
-            // Use passive mode as default because most of us are
-            // behind firewalls these days.
-            ftp.enterLocalPassiveMode();
-            ftp.setControlKeepAliveTimeout(600);
-            ftp.changeWorkingDirectory(directory);
 
             input = new FileInputStream(filePath);
             
@@ -338,13 +333,18 @@ public class FTPUtil {
             
             try
             {
+                ftp.enterLocalActiveMode();
+                ftp.setControlKeepAliveTimeout(600);
+                ftp.changeWorkingDirectory(directory);
             	didStore = ftp.storeFile(fileName, input);
             }
             catch(Exception ex1)
             {
             	try
                 {
-            		ftp.enterLocalActiveMode();
+                    // Use passive mode as default because most of us are
+                    // behind firewalls these days.
+            		ftp.enterLocalPassiveMode();
                     ftp.setControlKeepAliveTimeout(600);
                     ftp.changeWorkingDirectory(directory);
                 	didStore = ftp.storeFile(fileName, input);
@@ -396,11 +396,29 @@ public class FTPUtil {
             System.out.println("Remote system is " + ftp.getSystemName());
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
-            // Use passive mode as default because most of us are
-            // behind firewalls these days.
-            ftp.enterLocalPassiveMode();
-            ftp.changeWorkingDirectory(directory);
-            return ftp.listFiles();
+            try
+            { 
+            	ftp.enterLocalActiveMode();
+                ftp.setControlKeepAliveTimeout(600);
+                ftp.changeWorkingDirectory(directory);
+                return ftp.listFiles();
+            }
+            catch(Exception ex1)
+            {
+            	try
+                {
+                    // Use passive mode as default because most of us are
+                    // behind firewalls these days.
+            		ftp.enterLocalPassiveMode();
+                    ftp.setControlKeepAliveTimeout(600);
+                    ftp.changeWorkingDirectory(directory);
+                    return ftp.listFiles();
+                }
+                catch(Exception ex2)
+                {
+                }
+            }
+            
 
         } catch (Exception e) {
             System.out.println("Unable to get file list: " + e);
@@ -443,11 +461,28 @@ public class FTPUtil {
             System.out.println("Remote system is " + ftp.getSystemName());
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
-            // Use passive mode as default because most of us are
-            // behind firewalls these days.
-            ftp.enterLocalPassiveMode();
-            ftp.changeWorkingDirectory(directory);
-            ftp.retrieveFile(filename, fos);
+            try
+            { 
+            	ftp.enterLocalActiveMode();
+                ftp.setControlKeepAliveTimeout(600);
+                ftp.changeWorkingDirectory(directory);
+                ftp.retrieveFile(filename, fos);
+            }
+            catch(Exception ex1)
+            {
+            	try
+                {
+                    // Use passive mode as default because most of us are
+                    // behind firewalls these days.
+            		ftp.enterLocalPassiveMode();
+                    ftp.setControlKeepAliveTimeout(600);
+                    ftp.changeWorkingDirectory(directory);
+                    ftp.retrieveFile(filename, fos);
+                }
+                catch(Exception ex2)
+                {
+                }
+            }
             
             
             fStream = true;
@@ -495,10 +530,6 @@ public class FTPUtil {
             System.out.println("Remote system is " + ftp.getSystemName());
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
-            // Use passive mode as default because most of us are
-            // behind firewalls these days.
-            ftp.enterLocalPassiveMode();
-            ftp.changeWorkingDirectory(directory);
 
             // Changed to fix unreliable behavior
 
@@ -506,13 +537,18 @@ public class FTPUtil {
             
             try
             {
+                ftp.enterLocalActiveMode();
+                ftp.setControlKeepAliveTimeout(600);
+                ftp.changeWorkingDirectory(directory);
                 ftp.retrieveFile(filename, outputStream);
             }
             catch(Exception ex1)
             {
             	try
                 {
-            		ftp.enterLocalActiveMode();
+                    // Use passive mode as default because most of us are
+                    // behind firewalls these days.
+            		ftp.enterLocalPassiveMode();
                     ftp.setControlKeepAliveTimeout(600);
                     ftp.changeWorkingDirectory(directory);
                     ftp.retrieveFile(filename, outputStream);
@@ -576,22 +612,23 @@ public class FTPUtil {
             System.out.println("Remote system is " + ftp.getSystemName());
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
-            // Use passive mode as default because most of us are
-            // behind firewalls these days.
-            ftp.enterLocalPassiveMode();
-            ftp.changeWorkingDirectory(directory);
             
             boolean didmove = true;
             
             try
             {
+        		ftp.enterLocalActiveMode();
+                ftp.changeWorkingDirectory(directory);
+                ftp.setControlKeepAliveTimeout(600);
             	didmove =  ftp.deleteFile(filename);
             }
             catch(Exception ex1)
             {
             	try
                 {
-            		ftp.enterLocalActiveMode();
+                    // Use passive mode as default because most of us are
+                    // behind firewalls these days.
+                    ftp.enterLocalPassiveMode();
                     ftp.setControlKeepAliveTimeout(600);
                     ftp.changeWorkingDirectory(directory);
                     didmove =  ftp.deleteFile(filename);
@@ -649,23 +686,23 @@ public class FTPUtil {
             System.out.println("Remote system is " + ftp.getSystemName());
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
-            // Use passive mode as default because most of us are
-            // behind firewalls these days.
-            ftp.enterLocalPassiveMode();
-            ftp.changeWorkingDirectory(directory);
-            ftp.setControlKeepAliveTimeout(600);
             
             boolean didmove = true;
             
             try
             {
+        		ftp.enterLocalActiveMode();
+                ftp.changeWorkingDirectory(directory);
+                ftp.setControlKeepAliveTimeout(600);
             	didmove =  ftp.storeFile(filename, is);
             }	
             catch(Exception ex1)
             {
             	try
                 {
-            		ftp.enterLocalActiveMode();
+            		 // Use passive mode as default because most of us are
+                    // behind firewalls these days.
+                    ftp.enterLocalPassiveMode();
                     ftp.setControlKeepAliveTimeout(600);
                     ftp.changeWorkingDirectory(directory);
                     didmove =  ftp.storeFile(filename, is);

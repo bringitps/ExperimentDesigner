@@ -615,6 +615,11 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 								return false;
 							}
 						}
+						else
+						{
+							tblFilesRepository.select(itemId);
+							return false;						
+						}
 					}
 				}
 				else
@@ -634,6 +639,11 @@ public class FilesRepositoriesConfigForm extends FilesRepositoriesConfigDesign {
 								return false;
 							}
 						}
+						else
+						{
+							tblFilesRepository.select(itemId);
+							return false;
+						}						
 					}
 				}
 			}

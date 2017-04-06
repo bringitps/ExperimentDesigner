@@ -263,8 +263,28 @@ public class FTPUtil {
             ftp.enterLocalPassiveMode();
             ftp.setControlKeepAliveTimeout(600);
             ftp.changeWorkingDirectory(directory);
-
-            boolean didStore = ftp.storeFile(fileName, is);
+            
+            boolean didStore = true;
+            
+            try
+            {
+            	didStore = ftp.storeFile(fileName, is);
+            }
+            catch(Exception ex1)
+            {
+            	try
+                {
+            		ftp.enterLocalActiveMode();
+                    ftp.setControlKeepAliveTimeout(600);
+                    ftp.changeWorkingDirectory(directory);
+                	didStore = ftp.storeFile(fileName, is);
+                }
+                catch(Exception ex2)
+                {
+                	didStore = false;
+                }
+            }
+            
             System.out.println("Did Store: "+didStore);
             is.close();
             ftp.logout();
@@ -313,7 +333,28 @@ public class FTPUtil {
             ftp.changeWorkingDirectory(directory);
 
             input = new FileInputStream(filePath);
-            boolean didStore = ftp.storeFile(fileName, input);
+            
+            boolean didStore = true;
+            
+            try
+            {
+            	didStore = ftp.storeFile(fileName, input);
+            }
+            catch(Exception ex1)
+            {
+            	try
+                {
+            		ftp.enterLocalActiveMode();
+                    ftp.setControlKeepAliveTimeout(600);
+                    ftp.changeWorkingDirectory(directory);
+                	didStore = ftp.storeFile(fileName, input);
+                }
+                catch(Exception ex2)
+                {
+                	didStore = false;
+                }
+            }
+            
             System.out.println("Did Store: "+didStore);
             input.close();
             ftp.logout();
@@ -407,6 +448,8 @@ public class FTPUtil {
             ftp.enterLocalPassiveMode();
             ftp.changeWorkingDirectory(directory);
             ftp.retrieveFile(filename, fos);
+            
+            
             fStream = true;
             //ftp.logout();
         } catch (Exception e) {
@@ -460,7 +503,26 @@ public class FTPUtil {
             // Changed to fix unreliable behavior
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            ftp.retrieveFile(filename, outputStream);
+            
+            try
+            {
+                ftp.retrieveFile(filename, outputStream);
+            }
+            catch(Exception ex1)
+            {
+            	try
+                {
+            		ftp.enterLocalActiveMode();
+                    ftp.setControlKeepAliveTimeout(600);
+                    ftp.changeWorkingDirectory(directory);
+                    ftp.retrieveFile(filename, outputStream);
+                }
+                catch(Exception ex2)
+                {
+                }
+            }
+            
+            
             //boolean cpc = ftp.completePendingCommand();
             //System.out.println("complete pending command: "+cpc);
 
@@ -518,8 +580,30 @@ public class FTPUtil {
             // behind firewalls these days.
             ftp.enterLocalPassiveMode();
             ftp.changeWorkingDirectory(directory);
-            boolean didmove = ftp.deleteFile(filename);
-            System.out.println("did move: "+didmove);
+            
+            boolean didmove = true;
+            
+            try
+            {
+            	didmove =  ftp.deleteFile(filename);
+            }
+            catch(Exception ex1)
+            {
+            	try
+                {
+            		ftp.enterLocalActiveMode();
+                    ftp.setControlKeepAliveTimeout(600);
+                    ftp.changeWorkingDirectory(directory);
+                    didmove =  ftp.deleteFile(filename);
+                }
+                catch(Exception ex2)
+                {
+                	didmove = false;
+                }
+            }
+            
+            
+            System.out.println("did delete: "+didmove);
             return didmove;
             //ftp.logout();
         } catch (Exception e) {
@@ -570,7 +654,28 @@ public class FTPUtil {
             ftp.enterLocalPassiveMode();
             ftp.changeWorkingDirectory(directory);
             ftp.setControlKeepAliveTimeout(600);
-            boolean didmove = ftp.storeFile(filename, is);
+            
+            boolean didmove = true;
+            
+            try
+            {
+            	didmove =  ftp.storeFile(filename, is);
+            }	
+            catch(Exception ex1)
+            {
+            	try
+                {
+            		ftp.enterLocalActiveMode();
+                    ftp.setControlKeepAliveTimeout(600);
+                    ftp.changeWorkingDirectory(directory);
+                    didmove =  ftp.storeFile(filename, is);
+                }
+                catch(Exception ex2)
+                {
+                	didmove = false;
+                }
+            }
+            
             System.out.println("did move: "+didmove);
             return didmove;
             //ftp.logout();

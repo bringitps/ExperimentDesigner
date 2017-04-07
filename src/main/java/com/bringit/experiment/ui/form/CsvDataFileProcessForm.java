@@ -142,6 +142,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 				e.printStackTrace();
 				isFile = null;
 			}
+			
 			tempFile.delete(); // delete the temp file 
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			DataFile dataFile = new DataFile();

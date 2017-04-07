@@ -108,9 +108,8 @@ public class ExperimentParser {
 	            		            	String fieldValue = line[(int) arr.get(i).get(0)];
 
 	            		            	if(!validateFieldType(fieldType, fieldValue))
-	            		            		exceptionRowColumns += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Column '" + (String) arr.get(i).get(1) + "' Row #" + rowCount + ".\n";
-
-
+	            		            		exceptionRowColumns += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Column '" + (String) arr.get(i).get(1) + "' Row #" + rowCount + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss\n": ".\n");
+	            		            	
 	            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? line[(int) arr.get(i).get(0)]+"," : "'"+line[(int) arr.get(i).get(0)]+"',";
 	            		            }
 
@@ -500,7 +499,7 @@ public class ExperimentParser {
 								String fieldType = xRefFieldDBType.get(j);
 								String fieldValue = xmlValueElement.getAttribute(attributeName).trim();
 								boolean isValidData = validateFieldType(fieldType, fieldValue);
-								exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + "\n";
+								exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss\n": ".\n");
 
 								if(isValidData)
 									xRefDBFieldValues.get(j).attachFieldValue(xmlValueElement.getAttribute(attributeName).trim());
@@ -523,7 +522,7 @@ public class ExperimentParser {
 								else
 								{
 									xRefDBFieldValues.get(j).attachFieldValue(null);
-									exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + "\n";
+									exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss\n": ".\n");
 								}
 	    					}
 	    					else
@@ -556,7 +555,7 @@ public class ExperimentParser {
 						else
 						{
 							fieldValues.add(null);
-							exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Global Node '" + xRefXmlNodeSlashFormat.get(j) +"'\n";
+							exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Global Node '" + xRefXmlNodeSlashFormat.get(j) +"'" + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss\n": ".\n");
 						}
 					}
 				}
@@ -609,6 +608,8 @@ public class ExperimentParser {
 	{
 		if(fieldType.contains("date"))
 		{
+			if(fieldValue.contains("/"))
+				return false;
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			try {
 				df.parse(fieldValue);

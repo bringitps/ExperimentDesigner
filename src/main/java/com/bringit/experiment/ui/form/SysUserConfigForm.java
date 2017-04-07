@@ -355,8 +355,13 @@ public class SysUserConfigForm extends SysUserConfigDesign{
 	
 	private void deleteSysUserRow()
 	{
-		dbIdOfItemsToDelete.add((int)tblSysUser.getValue());
-		tblSysUser.removeItem((int)tblSysUser.getValue());			
+		if(tblSysUser.getValue() != null)
+		{
+			if((int)tblSysUser.getValue() > 0)
+				dbIdOfItemsToDelete.add((int)tblSysUser.getValue());
+			
+			tblSysUser.removeItem((int)tblSysUser.getValue());
+		}
 	}
 		
 	private void saveSysUserRows()
@@ -372,7 +377,7 @@ public class SysUserConfigForm extends SysUserConfigDesign{
 			SysUserDao sysUserDao = new SysUserDao();
 		
 			//Deactivate Users in DB
-			for(int i = 0; i<dbIdOfItemsToDelete.size(); i++)
+			for(int i = 0; dbIdOfItemsToDelete != null && i<dbIdOfItemsToDelete.size(); i++)
 			{
 				SysUser userToDeactivate = new SysUserDao().getUserById((int)dbIdOfItemsToDelete.get(i));
 				userToDeactivate.setUserIsActive(false);

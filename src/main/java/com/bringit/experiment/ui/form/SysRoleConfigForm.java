@@ -104,7 +104,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 		tblSysRole.addContainerProperty("*", CheckBox.class, null);
 		tblSysRole.addContainerProperty("Name", TextField.class, null);
 		tblSysRole.addContainerProperty("Description", TextField.class, null);
-		tblSysRole.addContainerProperty("AD Default Role?", CheckBox.class, null);
+		tblSysRole.addContainerProperty("Default Role?", CheckBox.class, null);
 		tblSysRole.addContainerProperty("Menu Access", Panel.class, null);
 		tblSysRole.setEditable(true);
 		tblSysRole.setPageLength(0);
@@ -303,7 +303,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 				SysRole sysRole = new SysRole();
 				sysRole.setRoleName(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
 				sysRole.setRoleDescription(((TextField)(tblRowItem.getItemProperty("Description").getValue())).getValue());
-				sysRole.setIsActiveDirectoryDefaultRole(((CheckBox)(tblRowItem.getItemProperty("AD Default Role?").getValue())).getValue());
+				sysRole.setIsActiveDirectoryDefaultRole(((CheckBox)(tblRowItem.getItemProperty("Default Role?").getValue())).getValue());
 				
 				Panel pnlMnuAccess = ((Panel)(tblRowItem.getItemProperty("Menu Access").getValue()));
 				VerticalLayout layoutPnlMnuAccess = (VerticalLayout)pnlMnuAccess.getContent();

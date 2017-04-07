@@ -1,7 +1,7 @@
-CREATE VIEW [dbo].[vwUser]
+CREATE VIEW vwUser
 AS
-SELECT dbo.SysUser.UserId, dbo.SysUser.UserName, dbo.SysUser.IsActiveDirectoryUser, dbo.SysRole.RoleName AS [Default Role]
-FROM     dbo.SysUser INNER JOIN
-                  dbo.UserRole ON dbo.SysUser.UserId = dbo.UserRole.UserId INNER JOIN
-                  dbo.SysRole ON dbo.UserRole.RoleId = dbo.SysRole.RoleId
-WHERE  (dbo.UserRole.IsDefaultRole = 1)
+SELECT SysUser.UserId, SysUser.UserName, SysUser.IsActiveDirectoryUser, SysRole.RoleName AS [Default Role]
+FROM     SysUser INNER JOIN
+                  UserRole ON SysUser.UserId = UserRole.UserId INNER JOIN
+                  SysRole ON UserRole.RoleId = SysRole.RoleId
+WHERE  (UserRole.IsDefaultRole = 1)

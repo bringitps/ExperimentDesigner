@@ -169,13 +169,18 @@ public class WebApplication extends UI {
 				Config configuration = new Config();
 				if(configuration.getProperty("dbms").equals("sqlserver"))
 				{
-					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_SpTargetReportBuilder_STMT.sql");
-					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwCsvTemplate_STMT.sql");
-					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwExperiment_STMT.sql");
-					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwTargetReport_STMT.sql");
-					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwUser_STMT.sql");
-					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwXmlDataLoadExecutionResult_STMT.sql");
-					new ExecuteQueryDao().executeQueryFile(basePath + "/WEB-INF/classes/sql/SQL_SERVER_CREATE_VwXmlTemplate_STMT.sql");
+					File sqlExecFolder = new File(basePath + "/WEB-INF/classes/sql");
+					File[] sqlExecFiles = sqlExecFolder.listFiles();
+					
+					for (int i = 0; i < sqlExecFiles.length; i++) 
+					{
+					    if (sqlExecFiles[i].isFile()) 
+					    {
+					        System.out.println("Execution of SQL File " + sqlExecFiles[i].getName());
+					        new ExecuteQueryDao().executeQueryFile(sqlExecFolder.getAbsolutePath() + "\\" + sqlExecFiles[i].getName());
+					        System.out.println("SQL File Executed" + sqlExecFiles[i].getName());
+						}
+					}					
 				}
 				
 				JobExecutionRepeat jobExecRepeat15min = new JobExecutionRepeat();

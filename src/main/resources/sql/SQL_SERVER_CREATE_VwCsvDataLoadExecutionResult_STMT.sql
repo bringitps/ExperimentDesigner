@@ -1,12 +1,13 @@
-CREATE VIEW vwXmlDataLoadExecutionResult as
+CREATE VIEW vwCsvDataLoadExecutionResult as
 SELECT  
-CsvDataLoadExecutionResult.CsvDataLoadExecId AS 'Id',
+CsvDataLoadExecutionResult.CsvTemplateId AS 'Id',
 CsvDataLoadExecutionResult.CsvDataLoadExecTime AS 'Execution Date',
 DataFile.DataFileName AS 'FileName',
 CONCAT(FileRepo.FileRepoHost, FileRepo.FileRepoPath) AS 'Location',
 CreatedByUser.UserName AS 'Created By',
 CsvTemplate.CsvTemplateName AS 'Template',
 Experiment.ExpName AS 'Experiment',
+CsvDataLoadExecutionResult.CsvDataLoadTotalRecords AS 'Total Records',
 (CASE WHEN CsvDataLoadExecutionResult.CsvDataLoadExecException = 1 THEN 'Yes' ELSE 'No' END) AS 'Exception',
 CsvDataLoadExecutionResult.CsvDataLoadExecExceptionDetails AS 'Exception Details'
 

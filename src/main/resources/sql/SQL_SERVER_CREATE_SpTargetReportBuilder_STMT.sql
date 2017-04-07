@@ -1,4 +1,4 @@
-CREATE PROCEDURE spTargetReportBuilder
+CREATE PROCEDURE [spTargetReportBuilder]
 @TargetReportId NVARCHAR(MAX),
 @ExperimentId NVARCHAR(MAX),
 @DateFieldName NVARCHAR(MAX),

@@ -7,6 +7,7 @@ CONCAT(FileRepo.FileRepoHost, FileRepo.FileRepoPath) AS 'Location',
 CreatedByUser.UserName AS 'Created By',
 XmlTemplate.XmlTemplateName AS 'Template',
 Experiment.ExpName AS 'Experiment',
+XmlDataLoadExecutionResult.XmlDataLoadTotalRecords AS 'Total Records',
 (CASE WHEN XmlDataLoadExecutionResult.XmlDataLoadExecException = 1 THEN 'Yes' ELSE 'No' END) AS 'Exception',
 XmlDataLoadExecutionResult.XmlDataLoadExecExceptionDetails AS 'Exception Details'
 

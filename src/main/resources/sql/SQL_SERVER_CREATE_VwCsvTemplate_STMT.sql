@@ -1,4 +1,4 @@
-CREATE VIEW [dbo].[vwCsvTemplate] as
+CREATE VIEW vwCsvTemplate as
 SELECT  CsvTemplate.CsvTemplateId AS 'Id',
  CsvTemplate.CsvTemplateName AS 'Name',
  Experiment.ExpName as 'Experiment Name',
@@ -12,4 +12,3 @@ FROM     CsvTemplate LEFT OUTER JOIN
                JobExecutionRepeat AS Job ON CsvTemplate.JobExecRepeatId = Job.JobExecRepeatId LEFT OUTER JOIN
 			   ContractManufacturer AS CMF ON CsvTemplate.CmId = CMF.CmId
                WHERE CsvTemplate.CsvTemplateIsActive = 1;
-GO

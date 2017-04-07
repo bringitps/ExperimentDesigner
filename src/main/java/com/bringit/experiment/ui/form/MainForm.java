@@ -114,6 +114,8 @@ public class MainForm extends MainFormDesign {
 						}
 					}
 					
+
+					System.out.println("Menu Parent To Keep: " + mnuParentToKeep);
 					
 					//Get Root Item
 					String rootItemId = "";
@@ -131,8 +133,12 @@ public class MainForm extends MainFormDesign {
 					for(int i=0; i<mainMenuItemIds.size(); i++)
 					{
 						if(treeMainMenu.getItem(mainMenuItemIds.get(i)) != null && treeMainMenu.getChildren(mainMenuItemIds.get(i)) != null
-								&& mnuParentToKeep.indexOf(mainMenuItemIds.get(i).toString().trim()) == -1)
-								treeMainMenu.removeItem(mainMenuItemIds.get(i));
+								&& mnuParentToKeep.indexOf(mainMenuItemIds.get(i).toString().trim()) == -1
+								&& mnuAccessTrimmed.indexOf(mainMenuItemIds.get(i).toString().trim()) == -1)
+						{
+							System.out.println("Removing: " + mainMenuItemIds.get(i));
+							treeMainMenu.removeItem(mainMenuItemIds.get(i));
+						}
 					}
 					
 					//Remove Not Granted Children

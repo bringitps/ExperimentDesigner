@@ -23,6 +23,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -161,6 +162,17 @@ public class SysUserConfigForm extends SysUserConfigDesign{
 		            }
 		            
 		        });
+
+				txtUserName.addValueChangeListener(new ValueChangeListener() {
+
+					@Override
+					public void valueChange(ValueChangeEvent event) {
+						// TODO Auto-generated method stub
+						txtUserName.setValue(txtUserName.getValue().toLowerCase());
+						
+					}		            
+		        });
+
 				
 				itemValues[3] = txtUserName;
 
@@ -285,6 +297,16 @@ public class SysUserConfigForm extends SysUserConfigDesign{
                     throw new InvalidValueException("Only AlphaNumeric and Underscores are allowed for Username");
             }
             
+        });
+		
+		txtUserName.addValueChangeListener(new ValueChangeListener() {
+
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+				// TODO Auto-generated method stub
+				txtUserName.setValue(txtUserName.getValue().toLowerCase());
+				
+			}		            
         });
 		
 		itemValues[3] = txtUserName;

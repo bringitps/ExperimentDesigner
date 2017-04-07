@@ -943,6 +943,13 @@ public class ExperimentForm extends ExperimentDesign {
 			if(reader != null)
 			{	
 				String[] csvRow = reader.readNext();
+				if(csvRow.length < 4)
+				{
+					getUI().showNotification("Invalid CSV file. File should contain 4 columns: 'FieldName', 'DatabaseId', 'DatabaseType', 'UoM'", Type.WARNING_MESSAGE);
+			    	
+					return;
+				}
+				
 				while(csvRow != null)
 				{
 					if(rowCnt == 0)

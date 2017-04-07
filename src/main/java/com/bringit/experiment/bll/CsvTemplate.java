@@ -63,23 +63,23 @@ public class CsvTemplate {
 	private ContractManufacturer contractManufacturer;
 	
 	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="InboundFileRepoId", unique=false, updatable=false)
+    @JoinColumn(name="InboundFileRepoId", unique=false, updatable=true)
 	private FilesRepository inboundFileRepo;
 	
 	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="ProcessedFileRepoId", unique=false, updatable=false)
+    @JoinColumn(name="ProcessedFileRepoId", unique=false, updatable=true)
 	private FilesRepository processedFileRepo;
 	
 	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="ExceptionFileRepoId", unique=false, updatable=false)
+    @JoinColumn(name="ExceptionFileRepoId", unique=false, updatable=true)
 	private FilesRepository exceptionFileRepo;
 	
 	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="JobExecRepeatId", unique=false, updatable=false)
+    @JoinColumn(name="JobExecRepeatId", unique=false, updatable=true)
 	private JobExecutionRepeat jobExecRepeat;
 	
 	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="ExperimentId", unique=false, updatable=false)
+    @JoinColumn(name="ExperimentId", unique=false, updatable=true)
 	private Experiment experiment;
 	
 	@OneToOne(fetch=FetchType.LAZY)
@@ -121,7 +121,7 @@ public class CsvTemplate {
 			Experiment experiment, SysUser createdBy, SysUser lastModifiedBy) {
 		this.csvTemplateId = csvTemplateId;
 		this.csvTemplateIsActive = csvTemplateIsActive;
-		CsvTemplateName = csvTemplateName;
+		this.CsvTemplateName = csvTemplateName;
 		this.csvTemplateComments = csvTemplateComments;
 		this.csvTemplatePrefix = csvTemplatePrefix;
 		this.csvTemplateNotScheduled = csvTemplateNotScheduled;
@@ -154,7 +154,7 @@ public class CsvTemplate {
 	}
 
 	public void setCsvTemplateName(String csvTemplateName) {
-		CsvTemplateName = csvTemplateName;
+		this.CsvTemplateName = csvTemplateName;
 	}
 
 	public String getCsvTemplateComments() {

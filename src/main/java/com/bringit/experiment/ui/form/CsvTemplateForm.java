@@ -222,7 +222,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.csvt.setCsvTemplateIsActive(this.chxActive.getValue());
 			this.csvt.setCsvTemplatePrefix(this.txtCsvTPrefix.getValue());
 			this.csvt.setCsvTemplateComments(this.txtCsvTComments.getValue());
-			this.csvt.setContractManufacturer(new ContractManufacturerDao().getContractManufacturerById((int) this.cbxContractManufacturer.getValue()));
+			
 			this.csvt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvTerrRepo.getValue()));
 			this.csvt.setProcessedFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvoutRepo.getValue()));
 			this.csvt.setInboundFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvTinRepo.getValue()));
@@ -234,14 +234,16 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				this.csvt.setContractManufacturer(new ContractManufacturerDao().getContractManufacturerById((int) this.cbxContractManufacturer.getValue()));
 			else
 				this.csvt.setContractManufacturer(null);
-				
+			
+			System.out.println("Job Exec Repeat Value: " + this.comboCsvjobScheduler.getValue());
 			if(this.comboCsvjobScheduler.getValue()!=null) 
 				this.csvt.setJobExecRepeat(new JobExecutionRepeatDao().getJobExecutionRepeatById((int) this.comboCsvjobScheduler.getValue()));
 			else
 				this.csvt.setJobExecRepeat(null);
 			
 		
-			
+
+			System.out.println("Job Exec Repeat Value Selected: " + this.csvt.getJobExecRepeat().getJobExecRepeatId());
 			this.csvt.setLastModifiedBy(sessionUser);
 			this.csvt.setModifiedDate(new Date());
 			this.csvt.setCsvTemplateExecStartDate(this.dtCsvTstart.getValue());

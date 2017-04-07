@@ -32,8 +32,12 @@ public class CsvTemplateManagementForm extends CsvTemplateManagementDesign  {
 		tblCsvTemplate.addItemClickListener(new ItemClickEvent.ItemClickListener() 
 	    {
             public void itemClick(ItemClickEvent event) {
+            	selectedRecordId = Integer.parseInt(event.getItemId().toString());
                 if (event.isDoubleClick())
                 	openCsvTemplateCRUDModalWindow(Integer.parseInt(event.getItemId().toString()));
+                else 
+                	tblCsvTemplate.select(event.getItemId());
+                
             }
         });
 		

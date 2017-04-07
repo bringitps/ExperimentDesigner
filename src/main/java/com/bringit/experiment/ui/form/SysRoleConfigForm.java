@@ -169,7 +169,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 					if(treeMainMenu.getParent(id) != null && (treeMainMenu.getItem(id).getItemProperty("isExperimentDataReport").getValue() == null 
 							&& (treeMainMenu.getItem(id).getItemProperty("isTargetReport").getValue() == null)))
 					{
-						if(treeMainMenu.getChildren(id) != null)
+						if(treeMainMenu.getChildren(id) != null && !isDynamicChildren(treeMainMenu.getChildren(id)))
 						{
 							optGrpMnuAccess.addItem(id);
 							optGrpMnuAccess.setItemIcon(id, treeMainMenu.getItemIcon(id));
@@ -197,7 +197,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 			}
 		}
 	}
-	
+		
 	private void addSysRoleRow()
 	{
 		Object[] itemValues = new Object[5];
@@ -238,7 +238,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 			if(treeMainMenu.getParent(id) != null && (treeMainMenu.getItem(id).getItemProperty("isExperimentDataReport").getValue() == null 
 					&& (treeMainMenu.getItem(id).getItemProperty("isTargetReport").getValue() == null)))
 			{
-				if(treeMainMenu.getChildren(id) != null)
+				if(treeMainMenu.getChildren(id) != null && !isDynamicChildren(treeMainMenu.getChildren(id)))
 				{
 					optGrpMnuAccess.addItem(id);
 					optGrpMnuAccess.setItemIcon(id, treeMainMenu.getItemIcon(id));
@@ -261,6 +261,17 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 		tblSysRole.select(this.lastNewItemId);
 	}
 	
+
+	private boolean isDynamicChildren(Collection<?> mnuItemChildren)
+	{
+		for (Object id : mnuItemChildren) 
+	    {
+			if(treeMainMenu.getItem(id).getItemProperty("isExperimentDataReport").getValue() == null 
+					&& (treeMainMenu.getItem(id).getItemProperty("isTargetReport").getValue() == null))
+				return false;
+	    }
+		return true;
+	}
 	private void deleteSysRoleRow()
 	{
 		boolean hasUsersLinked = false;

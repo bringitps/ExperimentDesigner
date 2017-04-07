@@ -178,7 +178,10 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 					
 					//Save File into Processed Folder
 					if(isFile != null)
+					{
 						moveFileToRepo(processedRepo, isFile, loadedFileName);
+						dataFile.setFileRepoId(processedRepo);
+					}
 				}	
 				else
 				{
@@ -199,7 +202,10 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 					
 					//Save File into Exceptioned Folder (Rename)
 					if(isFile != null)
+					{
 						moveFileToRepo(exceptionRepo, isFile, loadedFileName);
+						dataFile.setFileRepoId(exceptionRepo);
+					}
 				}
 			}
 			else
@@ -218,7 +224,10 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 				
 				//Save File into Execptioned Folder (Rename)
 				if(isFile != null)
+				{
 					moveFileToRepo(exceptionRepo, isFile, loadedFileName);
+					dataFile.setFileRepoId(exceptionRepo);
+				}
 			
 			}
 			this.txtXmlDataFileLoadResults.setValue(this.txtXmlDataFileLoadResults.getValue() + "\n\n=== Process Finished ===\n");

@@ -183,7 +183,10 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 					
 					//Save File into Processed Folder
 					if(isFile != null)
+					{
 						moveFileToRepo(processedRepo, isFile, loadedFileName);
+						dataFile.setFileRepoId(processedRepo);
+					}
 				}	
 				else
 				{
@@ -204,7 +207,10 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 					
 					//Save File into Execptioned Folder (Rename)
 					if(isFile != null)
+					{
 						moveFileToRepo(exceptionRepo, isFile, loadedFileName);
+						dataFile.setFileRepoId(exceptionRepo);
+					}
 				}
 			}
 			else
@@ -223,7 +229,10 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 				
 				//Save File into Execptioned Folder (Rename)
 				if(isFile != null)
+				{
 					moveFileToRepo(exceptionRepo, isFile, loadedFileName);
+					dataFile.setFileRepoId(exceptionRepo);
+				}
 			
 			}
 			this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "\n\n=== Process Finished ===\n");

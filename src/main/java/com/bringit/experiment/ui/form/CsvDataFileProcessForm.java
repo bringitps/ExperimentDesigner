@@ -186,6 +186,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 					{
 						moveFileToRepo(processedRepo, isFile, loadedFileName);
 						dataFile.setFileRepoId(processedRepo);
+						new DataFileDao().updateDataFile(dataFile);
 					}
 				}	
 				else
@@ -210,6 +211,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 					{
 						moveFileToRepo(exceptionRepo, isFile, loadedFileName);
 						dataFile.setFileRepoId(exceptionRepo);
+						new DataFileDao().updateDataFile(dataFile);
 					}
 				}
 			}
@@ -232,6 +234,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 				{
 					moveFileToRepo(exceptionRepo, isFile, loadedFileName);
 					dataFile.setFileRepoId(exceptionRepo);
+					new DataFileDao().updateDataFile(dataFile);
 				}
 			
 			}

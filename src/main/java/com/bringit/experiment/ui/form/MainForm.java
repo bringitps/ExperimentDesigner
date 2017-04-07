@@ -98,8 +98,10 @@ public class MainForm extends MainFormDesign {
 				
 					for(int i=0; i<mnuAccess.length; i++)
 					{
-						if(!mnuAccess[i].contains("/") &&  mnuParentToKeep.indexOf(mnuAccess[i].trim()) == -1)
+						System.out.println("Menu Access:" + mnuAccess[i]);
+						if(!mnuAccess[i].contains("/") && mnuParentToKeep.indexOf(mnuAccess[i].trim()) == -1)
 							mnuParentToKeep.add(mnuAccess[i].trim());
+						else
 						{
 							String[] mnuAccessFullTree = mnuAccess[i].split("/");
 							mnuAccessTrimmed.add(mnuAccessFullTree[mnuAccessFullTree.length-1].trim());		

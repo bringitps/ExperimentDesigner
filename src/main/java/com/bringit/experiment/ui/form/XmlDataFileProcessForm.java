@@ -181,6 +181,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 					{
 						moveFileToRepo(processedRepo, isFile, loadedFileName);
 						dataFile.setFileRepoId(processedRepo);
+						new DataFileDao().updateDataFile(dataFile);
 					}
 				}	
 				else
@@ -205,6 +206,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 					{
 						moveFileToRepo(exceptionRepo, isFile, loadedFileName);
 						dataFile.setFileRepoId(exceptionRepo);
+						new DataFileDao().updateDataFile(dataFile);
 					}
 				}
 			}
@@ -227,6 +229,7 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
 				{
 					moveFileToRepo(exceptionRepo, isFile, loadedFileName);
 					dataFile.setFileRepoId(exceptionRepo);
+					new DataFileDao().updateDataFile(dataFile);
 				}
 			
 			}

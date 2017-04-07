@@ -263,7 +263,8 @@ public class FTPUtil {
             ftp.enterLocalPassiveMode();
             ftp.setControlKeepAliveTimeout(600);
             ftp.changeWorkingDirectory(directory);
-            
+            ftp.setUseEPSVwithIPv4(true);
+            ftp.setRemoteVerificationEnabled(false);
             boolean didStore = true;
             
             try
@@ -274,13 +275,18 @@ public class FTPUtil {
             {
             	try
                 {
+            		
             		ftp.enterLocalActiveMode();
                     ftp.setControlKeepAliveTimeout(600);
                     ftp.changeWorkingDirectory(directory);
+                    System.out.println("Trying in Active Mode");
+                	
                 	didStore = ftp.storeFile(fileName, is);
                 }
                 catch(Exception ex2)
                 {
+                	System.out.println("Full Issue info: ");
+                	ex2.printStackTrace();
                 	didStore = false;
                 }
             }
@@ -331,7 +337,8 @@ public class FTPUtil {
             ftp.enterLocalPassiveMode();
             ftp.setControlKeepAliveTimeout(600);
             ftp.changeWorkingDirectory(directory);
-
+            ftp.setUseEPSVwithIPv4(true);
+            ftp.setRemoteVerificationEnabled(false);
             input = new FileInputStream(filePath);
             
             boolean didStore = true;
@@ -344,13 +351,17 @@ public class FTPUtil {
             {
             	try
                 {
+            		
             		ftp.enterLocalActiveMode();
                     ftp.setControlKeepAliveTimeout(600);
                     ftp.changeWorkingDirectory(directory);
+                    System.out.println("Trying in Active Mode");
                 	didStore = ftp.storeFile(fileName, input);
                 }
                 catch(Exception ex2)
                 {
+                	System.out.println("Full Issue info: ");
+                	ex2.printStackTrace();
                 	didStore = false;
                 }
             }
@@ -396,17 +407,13 @@ public class FTPUtil {
             System.out.println("Remote system is " + ftp.getSystemName());
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
-            // Use passive mode as default because most of us are
-            // behind firewalls these days.
-            ftp.enterLocalPassiveMode();
-            ftp.changeWorkingDirectory(directory);
-            
-         // Use passive mode as default because most of us are
+        	// Use passive mode as default because most of us are
             // behind firewalls these days.
             ftp.enterLocalPassiveMode();
             ftp.changeWorkingDirectory(directory);
             ftp.setControlKeepAliveTimeout(600);
-            
+            ftp.setRemoteVerificationEnabled(false);
+            ftp.setUseEPSVwithIPv4(true);
             try
             {
                 return ftp.listFiles();
@@ -470,7 +477,8 @@ public class FTPUtil {
             // behind firewalls these days.
             ftp.enterLocalPassiveMode();
             ftp.changeWorkingDirectory(directory);
-            
+            ftp.setRemoteVerificationEnabled(false);
+            ftp.setUseEPSVwithIPv4(true);
             try
             {
                 ftp.retrieveFile(filename, fos);
@@ -538,7 +546,8 @@ public class FTPUtil {
             // behind firewalls these days.
             ftp.enterLocalPassiveMode();
             ftp.changeWorkingDirectory(directory);
-
+            ftp.setRemoteVerificationEnabled(false);
+            ftp.setUseEPSVwithIPv4(true);
             // Changed to fix unreliable behavior
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -619,7 +628,8 @@ public class FTPUtil {
             // behind firewalls these days.
             ftp.enterLocalPassiveMode();
             ftp.changeWorkingDirectory(directory);
-            
+            ftp.setRemoteVerificationEnabled(false);
+            ftp.setUseEPSVwithIPv4(true);
             boolean didmove = true;
             
             try
@@ -693,7 +703,8 @@ public class FTPUtil {
             ftp.enterLocalPassiveMode();
             ftp.changeWorkingDirectory(directory);
             ftp.setControlKeepAliveTimeout(600);
-            
+            ftp.setRemoteVerificationEnabled(false);
+            ftp.setUseEPSVwithIPv4(true);
             boolean didmove = true;
             
             try
@@ -880,6 +891,9 @@ public class FTPUtil {
             
             
 		    ftp.changeWorkingDirectory(directory);
+            ftp.setRemoteVerificationEnabled(false);
+		    ftp.setUseEPSVwithIPv4(true);
+		    
 		    int returnCode = ftp.getReplyCode();
 		    
 			if (returnCode == 550) 

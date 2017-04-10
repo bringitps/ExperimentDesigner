@@ -26,10 +26,11 @@ public class ExperimentUtil {
 			for(int i=0; experimentFields != null && i<experimentFields.size(); i++)
 				sqlSelectQuery +=  experiment.getExpDbTableNameId() + "." + experimentFields.get(i).getExpDbFieldNameId() + " AS '" + experimentFields.get(i).getExpFieldName() + "',";
 			
-			sqlSelectQuery += experiment.getExpDbTableNameId() + ".Comments," + experiment.getExpDbTableNameId() + ".CreatedDate, ";
+			sqlSelectQuery += "Cm.CmName AS 'Contract Manufacturer'," + experiment.getExpDbTableNameId() + ".Comments," + experiment.getExpDbTableNameId() + ".CreatedDate, ";
 			sqlSelectQuery += experiment.getExpDbTableNameId() + ".LastModifiedDate, CreatedByUser.UserName AS CreatedBy, LastModifiedByUser.UserName AS LastModifiedBy, ";
 			sqlSelectQuery += " DataFile.DataFileName AS FileName, CONCAT(FileRepo.FileRepoHost, FileRepo.FileRepoPath) AS Location ";
 			sqlSelectQuery += " FROM " + experiment.getExpDbTableNameId();
+			sqlSelectQuery += " LEFT OUTER JOIN ContractManufacturer AS Cm ON " + experiment.getExpDbTableNameId() + ".CmId = Cm.CmId ";
 			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS CreatedByUser ON " + experiment.getExpDbTableNameId() + ".CreatedBy = CreatedByUser.UserId ";
 			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS LastModifiedByUser ON " + experiment.getExpDbTableNameId() + ".LastModifiedBy = CreatedByUser.UserId ";
 			sqlSelectQuery += " LEFT OUTER JOIN DataFile AS DataFile ON " + experiment.getExpDbTableNameId() + ".DataFileId = DataFile.DataFileId ";
@@ -55,10 +56,11 @@ public class ExperimentUtil {
 			for(int i=0; experimentFields != null && i<experimentFields.size(); i++)
 				sqlSelectQuery +=  experiment.getExpDbTableNameId() + "." + experimentFields.get(i).getExpDbFieldNameId() + " AS '" + experimentFields.get(i).getExpFieldName() + "',";
 			
-			sqlSelectQuery += experiment.getExpDbTableNameId() + ".Comments AS Comments," + experiment.getExpDbTableNameId() + ".CreatedDate AS CreatedDate, ";
+			sqlSelectQuery += "Cm.CmName AS 'Contract Manufacturer'," + experiment.getExpDbTableNameId() + ".Comments AS Comments," + experiment.getExpDbTableNameId() + ".CreatedDate AS CreatedDate, ";
 			sqlSelectQuery += experiment.getExpDbTableNameId() + ".LastModifiedDate AS LastModifiedDate, CreatedByUser.UserName AS CreatedBy, LastModifiedByUser.UserName AS LastModifiedBy, ";
 			sqlSelectQuery += " DataFile.DataFileName AS FileName, CONCAT(FileRepo.FileRepoHost, FileRepo.FileRepoPath) AS Location ";
 			sqlSelectQuery += " FROM " + experiment.getExpDbTableNameId();
+			sqlSelectQuery += " LEFT OUTER JOIN ContractManufacturer AS Cm ON " + experiment.getExpDbTableNameId() + ".CmId = Cm.CmId ";
 			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS CreatedByUser ON " + experiment.getExpDbTableNameId() + ".CreatedBy = CreatedByUser.UserId ";
 			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS LastModifiedByUser ON " + experiment.getExpDbTableNameId() + ".LastModifiedBy = CreatedByUser.UserId ";
 			sqlSelectQuery += " LEFT OUTER JOIN DataFile AS DataFile ON " + experiment.getExpDbTableNameId() + ".DataFileId = DataFile.DataFileId ";
@@ -87,10 +89,11 @@ public class ExperimentUtil {
 			for(int i=0; experimentFields != null && i<experimentFields.size(); i++)
 				sqlSelectQuery +=  experiment.getExpDbTableNameId() + "." + experimentFields.get(i).getExpDbFieldNameId() + " AS '" + experimentFields.get(i).getExpFieldName() + "',";
 			
-			sqlSelectQuery += experiment.getExpDbTableNameId() + ".Comments AS Comments," + experiment.getExpDbTableNameId() + ".CreatedDate AS CreatedDate, ";
+			sqlSelectQuery += "Cm.CmName AS 'Contract Manufacturer'," + experiment.getExpDbTableNameId() + ".Comments AS Comments," + experiment.getExpDbTableNameId() + ".CreatedDate AS CreatedDate, ";
 			sqlSelectQuery += experiment.getExpDbTableNameId() + ".LastModifiedDate AS LastModifiedDate, CreatedByUser.UserName AS CreatedBy, LastModifiedByUser.UserName AS LastModifiedBy, ";
 			sqlSelectQuery += " DataFile.DataFileName AS FileName, CONCAT(FileRepo.FileRepoHost, FileRepo.FileRepoPath) AS Location ";
 			sqlSelectQuery += " FROM " + experiment.getExpDbTableNameId();
+			sqlSelectQuery += " LEFT OUTER JOIN ContractManufacturer AS Cm ON " + experiment.getExpDbTableNameId() + ".CmId = Cm.CmId ";
 			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS CreatedByUser ON " + experiment.getExpDbTableNameId() + ".CreatedBy = CreatedByUser.UserId ";
 			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS LastModifiedByUser ON " + experiment.getExpDbTableNameId() + ".LastModifiedBy = CreatedByUser.UserId ";
 			sqlSelectQuery += " LEFT OUTER JOIN DataFile AS DataFile ON " + experiment.getExpDbTableNameId() + ".DataFileId = DataFile.DataFileId ";
@@ -160,10 +163,11 @@ public class ExperimentUtil {
 			for(int i=0; experimentFields != null && i<experimentFields.size(); i++)
 				sqlSelectQuery +=  experiment.getExpDbTableNameId() + "." + experimentFields.get(i).getExpDbFieldNameId() + " AS '" + experimentFields.get(i).getExpFieldName() + "',";
 			
-			sqlSelectQuery += experiment.getExpDbTableNameId() + ".Comments AS Comments," + experiment.getExpDbTableNameId() + ".CreatedDate AS CreatedDate, ";
+			sqlSelectQuery += "Cm.CmName AS 'Contract Manufacturer'," +experiment.getExpDbTableNameId() + ".Comments AS Comments," + experiment.getExpDbTableNameId() + ".CreatedDate AS CreatedDate, ";
 			sqlSelectQuery += experiment.getExpDbTableNameId() + ".LastModifiedDate AS LastModifiedDate, CreatedByUser.UserName AS CreatedBy, LastModifiedByUser.UserName AS LastModifiedBy, ";
 			sqlSelectQuery += " DataFile.DataFileName AS FileName, CONCAT(FileRepo.FileRepoHost, FileRepo.FileRepoPath) AS Location ";
 			sqlSelectQuery += " FROM " + experiment.getExpDbTableNameId();
+			sqlSelectQuery += " LEFT OUTER JOIN ContractManufacturer AS Cm ON " + experiment.getExpDbTableNameId() + ".CmId = Cm.CmId ";
 			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS CreatedByUser ON " + experiment.getExpDbTableNameId() + ".CreatedBy = CreatedByUser.UserId ";
 			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS LastModifiedByUser ON " + experiment.getExpDbTableNameId() + ".LastModifiedBy = CreatedByUser.UserId ";
 			sqlSelectQuery += " LEFT OUTER JOIN DataFile AS DataFile ON " + experiment.getExpDbTableNameId() + ".DataFileId = DataFile.DataFileId ";

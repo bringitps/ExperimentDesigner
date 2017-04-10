@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name="XmlDataLoadExecutionResult")
@@ -30,6 +31,7 @@ public class XmlDataLoadExecutionResult {
 	private Boolean xmlDataLoadExecException;
 	
 	@Column(name="XmlDataLoadExecExceptionDetails")
+	@Type(type="text")
 	private String xmlDataLoadExecExeptionDetails;
 	
 	@Column(name="XmlDataLoadExecTime")

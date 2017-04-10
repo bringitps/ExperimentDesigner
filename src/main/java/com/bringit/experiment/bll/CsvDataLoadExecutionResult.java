@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name="CsvDataLoadExecutionResult")
@@ -30,10 +31,8 @@ public class CsvDataLoadExecutionResult {
 	private Boolean csvDataLoadExecException;
 	
 	@Column(name="CsvDataLoadExecExceptionDetails")
+	@Type(type="text")
 	private String csvDataLoadExecExeptionDetails;
-	
-	@Column(name="CsvDataLoadExecExceptionFile")
-	private String csvDataLoadExecExeptionFile;
 	
 	@Column(name="CsvDataLoadExecTime")
 	private Date csvDataLoadExecTime;
@@ -53,20 +52,18 @@ public class CsvDataLoadExecutionResult {
 		this.csvDataLoadExecId = null;
 		this.csvDataLoadExecException = null;
 		this.csvDataLoadExecExeptionDetails = null;
-		this.csvDataLoadExecExeptionFile = null;
 		this.csvDataLoadExecTime = null;
 		this.csvDataLoadTotalRecords = null;
 		this.dataFile = null;
 		this.csvTemplate = null;
 	}
 
-	public CsvDataLoadExecutionResult(Integer csvDataLoadExecId, boolean csvDataLoadExecException,
-			String csvDataLoadExecExeptionDetails, String csvDataLoadExecExeptionFile, Date csvDataLoadExecTime,
+	public CsvDataLoadExecutionResult(Integer csvDataLoadExecId, Boolean csvDataLoadExecException,
+			String csvDataLoadExecExeptionDetails, Date csvDataLoadExecTime,
 			Integer csvDataLoadTotalRecords, DataFile dataFile, CsvTemplate csvTemplate) {
 		this.csvDataLoadExecId = csvDataLoadExecId;
 		this.csvDataLoadExecException = csvDataLoadExecException;
 		this.csvDataLoadExecExeptionDetails = csvDataLoadExecExeptionDetails;
-		this.csvDataLoadExecExeptionFile = csvDataLoadExecExeptionFile;
 		this.csvDataLoadExecTime = csvDataLoadExecTime;
 		this.csvDataLoadTotalRecords = csvDataLoadTotalRecords;
 		this.dataFile = dataFile;
@@ -81,11 +78,11 @@ public class CsvDataLoadExecutionResult {
 		this.csvDataLoadExecId = csvDataLoadExecId;
 	}
 
-	public boolean getCsvDataLoadExecException() {
+	public Boolean getCsvDataLoadExecException() {
 		return csvDataLoadExecException;
 	}
 
-	public void setCsvDataLoadExecException(boolean csvDataLoadExecException) {
+	public void setCsvDataLoadExecException(Boolean csvDataLoadExecException) {
 		this.csvDataLoadExecException = csvDataLoadExecException;
 	}
 
@@ -113,10 +110,6 @@ public class CsvDataLoadExecutionResult {
 		this.csvDataLoadTotalRecords = csvDataLoadTotalRecords;
 	}
 
-	public void setCsvDataLoadExecException(Boolean csvDataLoadExecException) {
-		this.csvDataLoadExecException = csvDataLoadExecException;
-	}
-
 	public DataFile getDataFile() {
 		return dataFile;
 	}
@@ -132,14 +125,5 @@ public class CsvDataLoadExecutionResult {
 	public void setCsvTemplate(CsvTemplate csvTemplate) {
 		this.csvTemplate = csvTemplate;
 	}
-
-	public String getCsvDataLoadExecExeptionFile() {
-		return csvDataLoadExecExeptionFile;
-	}
-
-	public void setCsvDataLoadExecExeptionFile(String csvDataLoadExecExeptionFile) {
-		this.csvDataLoadExecExeptionFile = csvDataLoadExecExeptionFile;
-	}
-
 	
 }

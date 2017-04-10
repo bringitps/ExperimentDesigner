@@ -119,18 +119,23 @@ public class ExperimentParser {
 	        		            }
 
 	                			reader.close();
-
-	                		    if(exceptionRowColumns != "")
+	                			System.out.println("Exception Row Columns: " + exceptionRowColumns);
+	                			
+	                		    if(!exceptionRowColumns.isEmpty())
 	                		    {
+		                			System.out.println("Returning Ex Details");
 	                		    	respObj.setCode(104);
 	                	      		respObj.setDescription("Exceptions at casting data. Details: "+exceptionRowColumns);
 	                	      		respObj.setDetail("Exceptions at casting data.");
 
-		                			csvResult.setCsvDataLoadExecException(true);
+	                	    	    respObj.setCsvInsertColumns(null);
+	                	    	    respObj.setCsvInsertValues(null);
+	                	    	    
+		                			/*csvResult.setCsvDataLoadExecException(true);
 		                			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
 		                			csvResult.setCsvDataLoadExecTime(new Date());
 		                			csvResult.setCsvDataLoadExecExeptionFile(filename);
-		                			csvResultDao.addCsvDataLoadExecutionResult(csvResult);
+		                			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
 
 		                			return respObj;
 	                		    }
@@ -142,42 +147,42 @@ public class ExperimentParser {
 	                    		respObj.setCode(104);
 	                    		respObj.setDescription("There are no COLUMNS associated with the CsvTemplate: "+template.getCsvTemplateName());
 	                    		respObj.setDetail("NullPointerException");
-	                			csvResult.setCsvDataLoadExecException(true);
+	                			/*csvResult.setCsvDataLoadExecException(true);
 	                			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
 	                			csvResult.setCsvDataLoadExecTime(new Date());
 	                			csvResult.setCsvDataLoadExecExeptionFile(filename);
-	                			csvResultDao.addCsvDataLoadExecutionResult(csvResult);
+	                			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
 	                    		return respObj;  
 	                    	}
         				}else{
         	        		respObj.setCode(101);
         	        		respObj.setDescription("Experiment Object received is null.");
         	        		respObj.setDetail("NullPointerException");
-        	    			csvResult.setCsvDataLoadExecException(true);
+        	    			/*csvResult.setCsvDataLoadExecException(true);
         	    			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
         	    			csvResult.setCsvDataLoadExecTime(new Date());
-        	    			csvResultDao.addCsvDataLoadExecutionResult(csvResult);
+        	    			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
         	        		return respObj;  
         	        	}
         			}else{
                 		respObj.setCode(103);
                 		respObj.setDescription("There is no Template associated with the Experiment");
                 		respObj.setDetail("NullPointerException");
-            			csvResult.setCsvDataLoadExecException(true);
+            			/*csvResult.setCsvDataLoadExecException(true);
             			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
             			csvResult.setCsvDataLoadExecTime(new Date());
             			csvResult.setCsvDataLoadExecExeptionFile(filename);
-            			csvResultDao.addCsvDataLoadExecutionResult(csvResult);
+            			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
                 		return respObj;  
                 	}
         		}else{
             		respObj.setCode(102);
             		respObj.setDescription("CSV file received is null.");
             		respObj.setDetail("NullPointerException");
-        			csvResult.setCsvDataLoadExecException(true);
+        			/*csvResult.setCsvDataLoadExecException(true);
         			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
         			csvResult.setCsvDataLoadExecTime(new Date());
-        			csvResultDao.addCsvDataLoadExecutionResult(csvResult);
+        			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
             		return respObj;  
             	}
         	
@@ -185,10 +190,10 @@ public class ExperimentParser {
     		respObj.setCode(100);
     		respObj.setDescription("Unknown error, check for details.");
     		respObj.setDetail(e+e.getMessage());
-			csvResult.setCsvDataLoadExecException(true);
+			/*csvResult.setCsvDataLoadExecException(true);
 			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
 			csvResult.setCsvDataLoadExecTime(new Date());
-			csvResultDao.addCsvDataLoadExecutionResult(csvResult);
+			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
     		return respObj;
         }
 	}
@@ -563,7 +568,7 @@ public class ExperimentParser {
 			}
 	     }
 
-	     if(exceptionNodes != "")
+	     if(!exceptionNodes.isEmpty())
 	     {
 	    	respObj.setCode(104);
       		respObj.setDescription("Exceptions at casting data. Details: "+exceptionNodes);
@@ -608,14 +613,20 @@ public class ExperimentParser {
 	{
 		if(fieldType.contains("date"))
 		{
+			/*System.out.println("Field Type: " + fieldType + " Field Value: " + fieldValue + " Contains / :" +fieldValue.contains("/"));
 			if(fieldValue.contains("/"))
+			{
+				System.out.println("Cast Validation failed");
 				return false;
+			}*/
+			
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			try {
 				df.parse(fieldValue);
 			} catch (Property.ReadOnlyException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.out.println("Cast Validation failed");
 				return false;
 		} catch (ConversionException e) {
 				// TODO Auto-generated catch block
@@ -624,6 +635,7 @@ public class ExperimentParser {
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.out.println("Cast Validation failed");
 				return false;
 			}
 		}

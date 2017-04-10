@@ -23,6 +23,7 @@ import com.bringit.experiment.bll.DataFile;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.FilesRepository;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.XmlDataLoadExecutionResult;
 import com.bringit.experiment.bll.CsvDataLoadExecutionResult;
 import com.bringit.experiment.bll.CsvTemplate;
 import com.bringit.experiment.dao.BatchExperimentRecordsInsertDao;
@@ -153,6 +154,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 			dataFile.setLastModifiedBy(sessionUser);
 			new DataFileDao().addDataFile(dataFile);
 			
+			System.out.println("Parse CSV Response" + parseCsvResponse.getCode() );
 			if(parseCsvResponse.getCode() == 0)
 			{
 				this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 1 of 3. Result (OK)\n");
@@ -228,6 +230,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign{
 				csvDataLoadExecResult.setCsvDataLoadExecTime(new Date());
 				csvDataLoadExecResult.setCsvDataLoadTotalRecords(0);
 				csvDataLoadExecResult.setCsvTemplate(csvTemplate);
+				
 				new CsvDataLoadExecutionResultDao().addCsvDataLoadExecutionResult(csvDataLoadExecResult);
 				
 				//Save File into Execptioned Folder (Rename)

@@ -270,9 +270,6 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 			
 			this.xmlt.setLastModifiedBy(sessionUser);
 			this.xmlt.setModifiedDate(new Date());
-			this.xmlt.setXmlTemplateExecStartDate(this.startXmlTstart.getValue());
-			this.xmlt.setXmlTemplateExecEndDate(this.endXmlTstart.getValue());
-			this.xmlt.setXmlTemplateExecStartHour((int) this.cbxStartHour.getValue());
 			
 
 			this.xmlt.setXmlTemplateNotScheduled(chxNotScheduled.getValue());
@@ -283,6 +280,12 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 				this.xmlt.setXmlTemplateExecStartDate(null);
 				this.xmlt.setXmlTemplateExecEndDate(null);
 				this.xmlt.setXmlTemplateExecStartHour(null);
+			}
+			else
+			{
+				this.xmlt.setXmlTemplateExecStartDate(this.startXmlTstart.getValue());
+				this.xmlt.setXmlTemplateExecEndDate(this.endXmlTstart.getValue());
+				this.xmlt.setXmlTemplateExecStartHour((int) this.cbxStartHour.getValue());
 			}
 			
 			

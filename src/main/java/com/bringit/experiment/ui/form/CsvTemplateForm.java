@@ -110,7 +110,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				dtCsvTend.setEnabled(!csvt.getCsvTemplateNotScheduled());
 				dtCsvTstart.setEnabled(!csvt.getCsvTemplateNotScheduled());				
 			}
-			
+						
 			
 			this.csvCols = new CsvTemplateColumnsDao().getAllCsvTemplateColumnssByTemplateId(csvt.getCsvTemplateId());
 			this.expFields = new ExperimentFieldDao().getActiveExperimentFields(csvt.getExperiment());
@@ -246,9 +246,6 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			System.out.println("Job Exec Repeat Value Selected: " + this.csvt.getJobExecRepeat().getJobExecRepeatId());
 			this.csvt.setLastModifiedBy(sessionUser);
 			this.csvt.setModifiedDate(new Date());
-			this.csvt.setCsvTemplateExecStartDate(this.dtCsvTstart.getValue());
-			this.csvt.setCsvTemplateExecEndDate(this.dtCsvTend.getValue());
-			this.csvt.setCsvTemplateExecStartHour((int) this.cbxStartHour.getValue());
 			
 			this.csvt.setCsvTemplateNotScheduled(chxNotScheduled.getValue());
 			
@@ -258,6 +255,12 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				this.csvt.setCsvTemplateExecStartDate(null);
 				this.csvt.setCsvTemplateExecEndDate(null);
 				this.csvt.setCsvTemplateExecStartHour(null);
+			}
+			else
+			{
+				this.csvt.setCsvTemplateExecStartDate(this.dtCsvTstart.getValue());
+				this.csvt.setCsvTemplateExecEndDate(this.dtCsvTend.getValue());
+				this.csvt.setCsvTemplateExecStartHour((int) this.cbxStartHour.getValue());
 			}
 			
 			if(this.csvt.getCsvTemplateId() != null ) {

@@ -60,13 +60,11 @@ public class ExperimentParser {
 	    respObj.setCsvInsertValues(null);
 	    String csvColumns ="";
 	    List<String> csvValues = new ArrayList<String>();
-    	CsvDataLoadExecutionResult csvResult = new CsvDataLoadExecutionResult();
-    	CsvDataLoadExecutionResultDao csvResultDao = new CsvDataLoadExecutionResultDao();
+
         CSVReader reader = null;
         try {
         	
         		if(csvFile != null){
-        			//String filename = csvFile.getName();
 
         			//Verify if there is a template and nodes for the experiment.
         			CsvTemplateColumnsDao nodeDao = new CsvTemplateColumnsDao();
@@ -76,10 +74,8 @@ public class ExperimentParser {
 	        				//get the nodes:
 	        				List<CsvTemplateColumns> columns = nodeDao.getAllCsvTemplateColumnssByTemplateId(template.getCsvTemplateId());
 	        				if(columns != null){
-					        	//SysUserDao sysUserDao = new SysUserDao();
-					        	//SysUser user = sysUserDao.getUserByUserName("bit_seko");
-		        				//DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	        		            reader = new CSVReader(new InputStreamReader(csvFile));
+
+	        					reader = new CSVReader(new InputStreamReader(csvFile));
 	        		            // we assume the first line is the header
 	        		            String[] header = reader.readNext();
 
@@ -130,13 +126,7 @@ public class ExperimentParser {
 
 	                	    	    respObj.setCsvInsertColumns(null);
 	                	    	    respObj.setCsvInsertValues(null);
-	                	    	    
-		                			/*csvResult.setCsvDataLoadExecException(true);
-		                			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
-		                			csvResult.setCsvDataLoadExecTime(new Date());
-		                			csvResult.setCsvDataLoadExecExeptionFile(filename);
-		                			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
-
+	                	    	
 		                			return respObj;
 	                		    }
 
@@ -147,54 +137,32 @@ public class ExperimentParser {
 	                    		respObj.setCode(104);
 	                    		respObj.setDescription("There are no COLUMNS associated with the CsvTemplate: "+template.getCsvTemplateName());
 	                    		respObj.setDetail("NullPointerException");
-	                			/*csvResult.setCsvDataLoadExecException(true);
-	                			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
-	                			csvResult.setCsvDataLoadExecTime(new Date());
-	                			csvResult.setCsvDataLoadExecExeptionFile(filename);
-	                			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
-	                    		return respObj;  
+	                			return respObj;  
 	                    	}
         				}else{
         	        		respObj.setCode(101);
         	        		respObj.setDescription("Experiment Object received is null.");
         	        		respObj.setDetail("NullPointerException");
-        	    			/*csvResult.setCsvDataLoadExecException(true);
-        	    			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
-        	    			csvResult.setCsvDataLoadExecTime(new Date());
-        	    			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
-        	        		return respObj;  
+        	    			return respObj;  
         	        	}
         			}else{
                 		respObj.setCode(103);
                 		respObj.setDescription("There is no Template associated with the Experiment");
                 		respObj.setDetail("NullPointerException");
-            			/*csvResult.setCsvDataLoadExecException(true);
-            			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
-            			csvResult.setCsvDataLoadExecTime(new Date());
-            			csvResult.setCsvDataLoadExecExeptionFile(filename);
-            			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
-                		return respObj;  
+            			return respObj;  
                 	}
         		}else{
             		respObj.setCode(102);
             		respObj.setDescription("CSV file received is null.");
             		respObj.setDetail("NullPointerException");
-        			/*csvResult.setCsvDataLoadExecException(true);
-        			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
-        			csvResult.setCsvDataLoadExecTime(new Date());
-        			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
-            		return respObj;  
+        			return respObj;  
             	}
         	
         } catch (IOException e) {
     		respObj.setCode(100);
     		respObj.setDescription("Unknown error, check for details.");
     		respObj.setDetail(e+e.getMessage());
-			/*csvResult.setCsvDataLoadExecException(true);
-			csvResult.setCsvDataLoadExecExeptionDetails(respObj.getDescription());
-			csvResult.setCsvDataLoadExecTime(new Date());
-			csvResultDao.addCsvDataLoadExecutionResult(csvResult);*/
-    		return respObj;
+			return respObj;
         }
 	}
 
@@ -504,12 +472,14 @@ public class ExperimentParser {
 								String fieldType = xRefFieldDBType.get(j);
 								String fieldValue = xmlValueElement.getAttribute(attributeName).trim();
 								boolean isValidData = validateFieldType(fieldType, fieldValue);
-								exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss\n": ".\n");
-
+								
 								if(isValidData)
 									xRefDBFieldValues.get(j).attachFieldValue(xmlValueElement.getAttribute(attributeName).trim());
 								else
-		    						xRefDBFieldValues.get(j).attachFieldValue(null);
+								{
+									xRefDBFieldValues.get(j).attachFieldValue(null);
+									exceptionNodes += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Loop Node '" + xRefXmlNodeSlashFormat.get(j) + "' #" + xRefDBFieldValues.get(j).getFieldValues().size() + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss\n": ".\n");
+								}
 							}
 							else
 	    						xRefDBFieldValues.get(j).attachFieldValue(null);
@@ -612,14 +582,7 @@ public class ExperimentParser {
 	private boolean validateFieldType(String fieldType, String fieldValue)
 	{
 		if(fieldType.contains("date"))
-		{
-			/*System.out.println("Field Type: " + fieldType + " Field Value: " + fieldValue + " Contains / :" +fieldValue.contains("/"));
-			if(fieldValue.contains("/"))
-			{
-				System.out.println("Cast Validation failed");
-				return false;
-			}*/
-			
+		{			
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			try {
 				df.parse(fieldValue);

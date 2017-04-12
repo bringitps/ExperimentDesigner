@@ -91,6 +91,8 @@ public class MainForm extends MainFormDesign {
 			{
 				if(sysRoleSession.getRoleMenuAccess() != null && !sysRoleSession.getRoleMenuAccess().trim().isEmpty())
 				{
+					//-- Starts Hide/Show Not granted or granted Menu Items --//
+					
 					List<String> mnuAccessTrimmed = new ArrayList<String>();
 					List<String> mnuParentToKeep = new ArrayList<String>();
 					
@@ -166,6 +168,8 @@ public class MainForm extends MainFormDesign {
 					
 					for(int i=0; i<mainMenuWithoutParentItemIds.size(); i++)
 						treeMainMenu.removeItem(mainMenuWithoutParentItemIds.get(i));
+
+					//-- Finishes Hide/Show Not granted or granted Menu Items --//
 					
 					treeMainMenu.setVisible(true);		
 					

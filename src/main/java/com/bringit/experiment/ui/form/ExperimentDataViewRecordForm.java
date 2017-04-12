@@ -335,7 +335,8 @@ public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign
 			expFieldValueUpdateLog.setExpNewValue(newValue != null ? newValue : "");
 			expFieldValueUpdateLog.setExpOldCreatedDate(oldDate);
 			expFieldValueUpdateLog.setExpOldValue(oldValue != null ? oldValue : "");
-			new ExperimentFieldValueUpdateLogDao().addExperimentFieldValueUpdateLog(expFieldValueUpdateLog);
+			if(!isCommentsFieldUpdate || (isCommentsFieldUpdate && (!newValue.isEmpty() || (newValue.isEmpty() && !oldValue.equals("null")))))
+				new ExperimentFieldValueUpdateLogDao().addExperimentFieldValueUpdateLog(expFieldValueUpdateLog);
 		}
 	}
 }

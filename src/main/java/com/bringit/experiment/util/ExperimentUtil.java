@@ -215,7 +215,7 @@ public class ExperimentUtil {
 
 	public static String buildSqlSelectQueryExperimentChangesLog(String ExperimentId, String dbRecordId)
 	{
-		String sqlSelectQuery = "SELECT CASE ExpFieldValueUpdateLog.DbTableRecordCommentsUpdate WHEN 1 THEN 'Comments' ELSE ExpField.ExpFieldName END AS 'Updated Field', ";
+		String sqlSelectQuery = "SELECT ExpFieldValueUpdateLog.ExpFieldValueUpdateId AS Id, CASE ExpFieldValueUpdateLog.DbTableRecordCommentsUpdate WHEN 1 THEN 'Comments' ELSE ExpField.ExpFieldName END AS 'Updated Field', ";
 		sqlSelectQuery += " ExpFieldValueUpdateLog.ExpOldCreatedDate AS 'Previous Modification Date', ";
 		sqlSelectQuery += " ExpFieldValueUpdateLog.ExpOldValue AS 'Previous Value', ";
 		sqlSelectQuery += " ExpFieldValueUpdateLog.ExpNewCreatedDate AS 'New Modification Date', "; 

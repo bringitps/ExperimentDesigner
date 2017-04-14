@@ -22,11 +22,11 @@ public class VaadinControls {
 					vaadinTable.addContainerProperty(dbVwMetaData.getColumnLabel(i+1), String.class, null);
 				 
 			    while (dbVwResultSet.next()) {
-			    	Object[] itemValues = new Object[dbVwMetaData.getColumnCount()];
+			    	String[] itemValues = new String[dbVwMetaData.getColumnCount()];
 			    	for(int i=0; i<dbVwMetaData.getColumnCount(); i++)
-			    		itemValues[i] = dbVwResultSet.getString(i+1);
+			    		itemValues[i] = dbVwResultSet.getString(dbVwMetaData.getColumnLabel(i+1));
 			    	
-			    vaadinTable.addItem(itemValues, dbVwResultSet.getString(columnIdIndex));
+			    	vaadinTable.addItem(itemValues, dbVwResultSet.getString(columnIdIndex));
 			    } 
 		    
 			}catch (SQLException e) {

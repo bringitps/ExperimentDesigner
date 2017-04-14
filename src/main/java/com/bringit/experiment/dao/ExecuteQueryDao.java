@@ -88,8 +88,10 @@ public class ExecuteQueryDao {
 		String dbPassword = configuration.getProperty("dbpassword");
 		try {
 			Connection conn = Connect.getConnection(dbHost, dbPort, dbDatabase, dbUsername, dbPassword);
-		    Statement stmt = conn.createStatement();
+			
+			Statement stmt = conn.createStatement();
 		    rs = stmt.executeQuery(sqlSelectQuery);
+		    
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -133,7 +135,7 @@ public class ExecuteQueryDao {
 		
 			for(int i=0; spParameters!=null && i<spParameters.size(); i++)		
 				preparedStmt.setString((i+1), spParameters.get(i));
-			
+			preparedStmt.setFetchSize(10000);
 			rs = preparedStmt.executeQuery();
 			return rs;
 		}

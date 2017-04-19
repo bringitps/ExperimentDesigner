@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.bringit.experiment.bll.ContractManufacturer;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
@@ -216,11 +218,14 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 	{
 		if(tblTargetDataReport.getItemIds() != null)
 		{
-			final ExcelExport xlsExport;
-			xlsExport = new ExcelExport(tblTargetDataReport, targetRpt.getTargetReportName().trim());
-			xlsExport.setExportFileName(targetRpt.getTargetReportName().trim() + ".xls");
-			xlsExport.setDisplayTotals(false);
+			System.out.println("Starting export: " + new Date());
+			
+			ExcelExport xlsExport = new ExcelExport(tblTargetDataReport, new XSSFWorkbook(), targetRpt.getTargetReportName().trim(), null, targetRpt.getTargetReportName().trim() + ".xlsx", false);
+			xlsExport.setMimeType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+			xlsExport.setUseTableFormatPropertyValue(false);
 			xlsExport.export();
+			
+			System.out.println("Finishing export: " + new Date());			
 		}
 	}
 }

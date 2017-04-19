@@ -1,6 +1,6 @@
 CREATE VIEW vwCsvDataLoadExecutionResult as
 SELECT  
-CsvDataLoadExecutionResult.CsvTemplateId AS 'Id',
+CsvDataLoadExecutionResult.CsvDataLoadExecId AS 'Id',
 CsvDataLoadExecutionResult.CsvDataLoadExecTime AS 'Execution Date',
 DataFile.DataFileName AS 'FileName',
 CONCAT(FileRepo.FileRepoHost, FileRepo.FileRepoPath) AS 'Location',

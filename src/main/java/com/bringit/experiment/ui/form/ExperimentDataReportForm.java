@@ -3,7 +3,10 @@ package com.bringit.experiment.ui.form;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
@@ -211,11 +214,14 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 	{
 		if(this.tblExperimentDataReport.getItemIds() != null)
 		{
-			final ExcelExport xlsExport;
-			xlsExport = new ExcelExport(tblExperimentDataReport, this.lblExperimentTitle.getValue().trim());
-			xlsExport.setExportFileName(this.lblExperimentTitle.getValue().trim() + ".xls");
-			xlsExport.setDisplayTotals(false);
+			System.out.println("Starting export: " + new Date());
+			
+			ExcelExport xlsExport = new ExcelExport(tblExperimentDataReport, new XSSFWorkbook(), lblExperimentTitle.getValue().trim(), null, lblExperimentTitle.getValue().trim() + ".xlsx", false);
+			xlsExport.setMimeType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+			xlsExport.setUseTableFormatPropertyValue(false);
 			xlsExport.export();
+			System.out.println("Finishing export: " + new Date());
+			
 		}
 	}
 	
@@ -254,4 +260,5 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 		this.getUI().addWindow(dataViewRecordChangesHistoryModalWindow);
 	
 	}
+
 }

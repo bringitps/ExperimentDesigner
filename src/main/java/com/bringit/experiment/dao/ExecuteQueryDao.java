@@ -89,7 +89,7 @@ public class ExecuteQueryDao {
 		try {
 			Connection conn = Connect.getConnection(dbHost, dbPort, dbDatabase, dbUsername, dbPassword);
 			
-			Statement stmt = conn.createStatement();
+			Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		    rs = stmt.executeQuery(sqlSelectQuery);
 		    
 		} catch (SQLException e) {

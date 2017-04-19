@@ -3,6 +3,7 @@ package com.bringit.experiment;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpSession;
@@ -73,6 +74,7 @@ public class WebApplication extends UI {
 	
 	@Override
 	protected void init(VaadinRequest vaadinRequest) {
+		UI.getCurrent().setLocale(new Locale.Builder().setLanguage("en").setRegion("US").build());
 		buildContent();
 	}
 
@@ -323,7 +325,7 @@ public class WebApplication extends UI {
 	
 	
 	@WebServlet(urlPatterns = "/*", name = "WebApplicationServlet", asyncSupported = true)
-	@VaadinServletConfiguration(ui = WebApplication.class, productionMode = false, widgetset = "com.bringit.experiment.widgetset.VaadinchartsWidgetset")
+	@VaadinServletConfiguration(ui = WebApplication.class, productionMode = true, widgetset = "com.bringit.experiment.widgetset.VaadinchartsWidgetset")
 	public static class WebApplicationServlet extends VaadinServlet {
 	}
 	

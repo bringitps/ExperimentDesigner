@@ -34,6 +34,12 @@ public class TargetReport {
 	@Column(name="TargetReportName")
 	private String targetReportName;
 
+	@Column(name="TargetReportDbRptTableNameId")
+	private String targetReportDbRptTableNameId;
+	
+	@Column(name="TargetReportDbRptTableLastUpdate")
+	private String targetReportDbRptTableLastUpdate;
+	
 	@Column(name="TargetReportDescription")
 	@Type(type="text")
 	private String targetReportDescription;
@@ -104,6 +110,22 @@ public class TargetReport {
 
 	public void setTargetReportName(String targetReportName) {
 		this.targetReportName = targetReportName;
+	}
+
+	public String getTargetReportDbRptTableNameId() {
+		return targetReportDbRptTableNameId;
+	}
+
+	public void setTargetReportDbRptTableNameId(String targetReportDbRptTableNameId) {
+		this.targetReportDbRptTableNameId = targetReportDbRptTableNameId;
+	}
+
+	public String getTargetReportDbRptTableLastUpdate() {
+		return targetReportDbRptTableLastUpdate;
+	}
+
+	public void setTargetReportDbRptTableLastUpdate(String targetReportDbRptTableLastUpdate) {
+		this.targetReportDbRptTableLastUpdate = targetReportDbRptTableLastUpdate;
 	}
 
 	public String getTargetReportDescription() {

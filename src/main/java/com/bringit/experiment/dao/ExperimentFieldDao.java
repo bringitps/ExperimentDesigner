@@ -243,4 +243,58 @@ public class ExperimentFieldDao {
 		return successfulExecution;
     }
     
+    public boolean updateDBRptTableField(ExperimentField experimentField)
+    {
+
+    	String query = null;
+    	boolean successfulExecution = true;
+
+		Config configuration = new Config();
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			if(experimentField.isExpFieldIsActive())
+			{
+				query = " IF NOT EXISTS (SELECT * ";
+				query += " FROM INFORMATION_SCHEMA.COLUMNS WHERE ";
+				query += " TABLE_NAME = '" + experimentField.getExperiment().getExpDbRptTableNameId() + "' ";
+				query +=  " AND COLUMN_NAME = '" + experimentField.getExpDbFieldNameId() + "') ";
+				query +=  " ALTER TABLE " + experimentField.getExperiment().getExpDbRptTableNameId() + " "; 
+				query +=  " ADD " + experimentField.getExpDbFieldNameId() + " " + experimentField.getExpFieldType() + ";";
+				
+			}
+			else
+			{
+				query = " IF EXISTS (SELECT * ";
+				query += " FROM INFORMATION_SCHEMA.COLUMNS WHERE ";
+				query += " TABLE_NAME = '" + experimentField.getExperiment().getExpDbRptTableNameId() + "' ";
+				query +=  " AND COLUMN_NAME = '" + experimentField.getExpDbFieldNameId() + "') ";
+				query +=  " ALTER TABLE '" + experimentField.getExperiment().getExpDbRptTableNameId() + "' "; 
+				query +=  " DROP COLUMN '" + experimentField.getExpDbFieldNameId() + "';";
+			}
+		}
+    	else
+    		return false;
+		
+		Transaction trns = null;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
+        
+        try {
+            trns = session.beginTransaction();
+            session.createSQLQuery(query).executeUpdate();
+            session.getTransaction().commit();
+        } catch (RuntimeException e) {
+            if (trns != null) {
+                trns.rollback();
+            }
+            successfulExecution = false;
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+		return successfulExecution;
+    }
+    
+    
 }

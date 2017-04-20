@@ -30,7 +30,13 @@ public class Experiment {
 
 	@Column(name="ExpDbTableNameId")
 	private String expDbTableNameId;
+
+	@Column(name="ExpDbRptTableNameId")
+	private String expDbRptTableNameId;
 	
+	@Column(name="ExpDbRptTableLastUpdate")
+	private String expDbRptTableLastUpdate;
+		
 	@Column(name="ExpIsActive")
 	private Boolean expIsActive;
 	
@@ -110,6 +116,22 @@ public class Experiment {
 
 	public void setExpDbTableNameId(String expDbTableNameId) {
 		this.expDbTableNameId = expDbTableNameId;
+	}
+
+	public String getExpDbRptTableNameId() {
+		return expDbRptTableNameId;
+	}
+
+	public void setExpDbRptTableNameId(String expDbRptTableNameId) {
+		this.expDbRptTableNameId = expDbRptTableNameId;
+	}
+
+	public String getExpDbRptTableLastUpdate() {
+		return expDbRptTableLastUpdate;
+	}
+
+	public void setExpDbRptTableLastUpdate(String expDbRptTableLastUpdate) {
+		this.expDbRptTableLastUpdate = expDbRptTableLastUpdate;
 	}
 
 	public boolean isExpIsActive() {

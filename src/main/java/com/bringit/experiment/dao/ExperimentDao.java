@@ -198,4 +198,81 @@ public class ExperimentDao {
         }
 		return successfulExecution;
     }
+    
+    public boolean deleteDBRptTable(Experiment experiment)
+    {
+    	String query = null;
+    	boolean successfulExecution = true;
+    	
+		Config configuration = new Config();
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			query = " IF EXISTS (SELECT * FROM sysobjects WHERE name='" + experiment.getExpDbRptTableNameId() + "' AND xtype='U') ";
+			query += " DROP TABLE " + experiment.getExpDbRptTableNameId() + ";";
+		}
+    	else
+    		return false;
+
+		Transaction trns = null;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+        try {
+            trns = session.beginTransaction();
+            session.createSQLQuery(query).executeUpdate();
+            session.getTransaction().commit();
+        } catch (RuntimeException e) {
+            if (trns != null) {
+                trns.rollback();
+            }
+            successfulExecution = false;
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+		return successfulExecution;    
+    }
+    
+    public boolean updateDBRptTable(Experiment experiment)
+    {
+    	String query = null;
+    	boolean successfulExecution = true;
+    	
+		Config configuration = new Config();
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			query = " IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='" + experiment.getExpDbRptTableNameId() + "' AND xtype='U') ";
+			query += " CREATE TABLE " + experiment.getExpDbRptTableNameId();
+			query += " (RecordId int IDENTITY(1,1) NOT NULL PRIMARY KEY,";
+			query += " Comments text ,";
+			query += " CmName varchar(255),";
+			query += " CreatedBy varchar(255) ,";
+			query += " LastModifiedBy varchar(255),";
+			query += " DataFileName varchar(255),";
+			query += " CreatedDate datetime ,";
+			query += " LastModifiedDate datetime);";
+		}
+    	else
+    		return false;
+
+		Transaction trns = null;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+        try {
+            trns = session.beginTransaction();
+            session.createSQLQuery(query).executeUpdate();
+            session.getTransaction().commit();
+        } catch (RuntimeException e) {
+            if (trns != null) {
+                trns.rollback();
+            }
+            successfulExecution = false;
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+		return successfulExecution;
+    }
+    
 }

@@ -633,6 +633,8 @@ public class ExperimentForm extends ExperimentDesign {
 			else
 				this.experiment.setExperimentType(null);
 			
+			this.experiment.setExpDbRptTableNameId("rpt#" + this.experiment.getExpDbTableNameId());
+			
 			ExperimentDao expDao = new ExperimentDao();
 			
 			if(this.experiment.getExpId() != null )
@@ -646,6 +648,8 @@ public class ExperimentForm extends ExperimentDesign {
 			}
 			
 			expDao.updateDBDataTable(experiment);
+			expDao.deleteDBRptTable(experiment);
+			expDao.updateDBRptTable(experiment);
 			
 			//Save ExperimentFields
 			ExperimentFieldDao expfieldDao = new ExperimentFieldDao();
@@ -679,8 +683,9 @@ public class ExperimentForm extends ExperimentDesign {
 				}
 				else
 					expfieldDao.addExperimentField(experimentField);
-				
+
 				expfieldDao.updateDBDataTableField(experimentField);
+				expfieldDao.updateDBRptTableField(experimentField);
 			}
 			saveImages();
 			if(tempImageFile!=null){

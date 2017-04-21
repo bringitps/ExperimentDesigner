@@ -2,9 +2,13 @@ package com.bringit.experiment.ui.form;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -15,11 +19,18 @@ import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.ui.design.ExperimentDataReportDesign;
+import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.ExperimentUtil;
 import com.bringit.experiment.util.VaadinControls;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.converter.StringToDateConverter;
+import com.vaadin.data.util.converter.StringToDoubleConverter;
+import com.vaadin.data.util.sqlcontainer.SQLContainer;
+import com.vaadin.data.util.sqlcontainer.connection.SimpleJDBCConnectionPool;
+import com.vaadin.data.util.sqlcontainer.query.TableQuery;
+import com.vaadin.data.util.sqlcontainer.query.generator.MSSQLGenerator;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -49,7 +60,10 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 		experimentFields = new ExperimentFieldDao().getActiveExperimentFields(experiment);
 		
 		this.lblExperimentTitle.setValue(" -" + experiment.getExpName());
-		String sqlSelectQuery =  ExperimentUtil.buildSqlSelectQueryByExperiment(experiment, experimentFields);
+		
+		bindExperimentRptTable();
+		
+		/*String sqlSelectQuery =  ExperimentUtil.buildSqlSelectQueryByExperiment(experiment, experimentFields);
 		ResultSet experimentDataResults = new ExecuteQueryDao().getSqlSelectQueryResults(sqlSelectQuery);
 		if(experimentDataResults != null)
 		{
@@ -57,6 +71,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 			VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxExperimentDataReportFilters, experimentDataResults);
 			VaadinControls.bindDbViewDateFiltersToVaadinComboBox(cbxDateFieldsFilter, experimentDataResults);
 		}
+		*/
 		
 		if(cbxDateFieldsFilter.getItemIds().size() <= 0)
 			gridDateFilters.setVisible(false);
@@ -259,6 +274,109 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 		dataViewRecordChangesHistoryModalWindow.center();
 		this.getUI().addWindow(dataViewRecordChangesHistoryModalWindow);
 	
+	}
+	
+	private void bindExperimentRptTable()
+	{
+		Config configuration = new Config();
+		
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			String dbHost = configuration.getProperty("dbhost");
+			String dbPort = configuration.getProperty("dbport");
+			String dbDatabase = configuration.getProperty("dbdatabase");
+			String dbUsername = configuration.getProperty("dbusername");
+			String dbPassword = configuration.getProperty("dbpassword");
+			
+			SimpleJDBCConnectionPool connectionPool;
+		    SQLContainer vaadinTblContainer;
+		    
+		    try {
+		    	connectionPool = new SimpleJDBCConnectionPool("com.microsoft.sqlserver.jdbc.SQLServerDriver",
+						"jdbc:sqlserver://"+dbHost+":"+dbPort+";databaseName="+dbDatabase,
+						dbUsername, dbPassword);
+		    
+		    	TableQuery tblQuery = new TableQuery(experiment.getExpDbRptTableNameId(), connectionPool, new MSSQLGenerator());
+				tblQuery.setVersionColumn("RecordId");
+				
+				vaadinTblContainer = new SQLContainer(tblQuery);
+
+				tblExperimentDataReport.setContainerDataSource(vaadinTblContainer);
+				
+				if(experimentFields!= null)
+				{
+					String[] expFieldDbId = new String[experimentFields.size()+3];
+					
+					expFieldDbId[0] = "RecordId";
+					tblExperimentDataReport.setColumnHeader("RecordId", "Id");
+					tblExperimentDataReport.setConverter("RecordId", new StringToDoubleConverter() {
+					    @Override
+					    protected NumberFormat getFormat(Locale locale) {
+					    	NumberFormat format = NumberFormat.getNumberInstance();
+					    	format.setGroupingUsed(false);
+					    	return format;
+					    }
+					});
+					
+					
+					for(int i=0; i<experimentFields.size(); i++)
+					{
+						expFieldDbId[i+1] = experimentFields.get(i).getExpDbFieldNameId();
+						tblExperimentDataReport.setColumnHeader(experimentFields.get(i).getExpDbFieldNameId(), experimentFields.get(i).getExpFieldName());
+					
+						
+						if(experimentFields.get(i).getExpFieldType().toLowerCase().contains("float") || 
+								experimentFields.get(i).getExpFieldType().toLowerCase().contains("decimal") || 
+								experimentFields.get(i).getExpFieldType().toLowerCase().contains("int"))
+						{
+							tblExperimentDataReport.setConverter(experimentFields.get(i).getExpDbFieldNameId(), new StringToDoubleConverter() {
+							    @Override
+							    protected NumberFormat getFormat(Locale locale) {
+							    	NumberFormat format = NumberFormat.getNumberInstance();
+							    	format.setGroupingUsed(false);
+							    	return format;
+							    }
+							});
+							
+						}
+						
+						if(experimentFields.get(i).getExpFieldType().toLowerCase().contains("date"))
+						{
+							tblExperimentDataReport.setConverter(experimentFields.get(i).getExpDbFieldNameId(), new StringToDateConverter() {
+							    @Override
+							    protected DateFormat getFormat(Locale locale) {
+									return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+							    }
+							});
+						}
+					}
+
+					expFieldDbId[expFieldDbId.length-2] = "CreatedDate";
+					expFieldDbId[expFieldDbId.length-1] = "LastModifiedDate";
+						    
+					tblExperimentDataReport.setConverter("CreatedDate", new StringToDateConverter() {
+						 @Override
+						    protected DateFormat getFormat(Locale locale) {
+								return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						    }
+					});
+
+					tblExperimentDataReport.setConverter("LastModifiedDate", new StringToDateConverter() {
+						 @Override
+						    protected DateFormat getFormat(Locale locale) {
+								return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						    }
+					});
+					
+					
+					tblExperimentDataReport.setVisibleColumns(expFieldDbId);
+				}
+				
+		    } catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		    
+		}
 	}
 
 }

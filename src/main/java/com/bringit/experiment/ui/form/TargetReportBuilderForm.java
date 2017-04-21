@@ -256,6 +256,10 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			
 			buildTargetReport(targetRptColGroups, targetRptColumns);
 			
+			String prevDbRptTable = this.targetReport.getTargetReportDbRptTableNameId();
+			String currDbRptTable = this.targetReport.getTargetReportName().replaceAll(" ", "_");
+			this.targetReport.setTargetReportDbRptTableNameId("targetrpt#" + currDbRptTable);
+			
 			if(this.targetReport.getTargetReportId() != null)
 				new TargetReportDao().updateTargetReport(this.targetReport);
 			else
@@ -282,6 +286,12 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 					new TargetColumnDao().addTargetColumn(targetRptColumns.get(i));
 			}
 
+			if(prevDbRptTable != null)
+				new TargetReportDao().deleteDBRptTableByName(prevDbRptTable);
+	
+			new TargetReportDao().deleteDBRptTable(this.targetReport);
+			new TargetReportDao().updateDBRptTable(this.targetReport);
+			
 			if(isNewRecord)
 			{
 				WebApplication webApp = (WebApplication)this.getParent().getParent();

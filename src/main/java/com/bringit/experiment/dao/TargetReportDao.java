@@ -7,9 +7,12 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.TargetColumn;
+import com.bringit.experiment.bll.TargetColumnGroup;
 import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.dal.HibernateUtil;
+import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
 public class TargetReportDao {
@@ -135,6 +138,145 @@ public class TargetReportDao {
             session.close();
         }
         return targetReports;
+    }
+    
+
+    public boolean deleteDBRptTableByName(String dbRptTableName)
+    {
+    	String query = null;
+    	boolean successfulExecution = true;
+    	
+		Config configuration = new Config();
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			query = " IF EXISTS (SELECT * FROM sysobjects WHERE name='" + dbRptTableName + "' AND xtype='U') ";
+			query += " DROP TABLE " + dbRptTableName + ";";
+		}
+    	else
+    		return false;
+
+		Transaction trns = null;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+        try {
+            trns = session.beginTransaction();
+            session.createSQLQuery(query).executeUpdate();
+            session.getTransaction().commit();
+        } catch (RuntimeException e) {
+            if (trns != null) {
+                trns.rollback();
+            }
+            successfulExecution = false;
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+		return successfulExecution;    
+    }
+
+    public boolean deleteDBRptTable(TargetReport targetRpt)
+    {
+    	String query = null;
+    	boolean successfulExecution = true;
+    	
+		Config configuration = new Config();
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			query = " IF EXISTS (SELECT * FROM sysobjects WHERE name='" + targetRpt.getTargetReportDbRptTableNameId() + "' AND xtype='U') ";
+			query += " DROP TABLE " + targetRpt.getTargetReportDbRptTableNameId() + ";";
+		}
+    	else
+    		return false;
+
+		Transaction trns = null;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+        try {
+            trns = session.beginTransaction();
+            session.createSQLQuery(query).executeUpdate();
+            session.getTransaction().commit();
+        } catch (RuntimeException e) {
+            if (trns != null) {
+                trns.rollback();
+            }
+            successfulExecution = false;
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+		return successfulExecution;    
+    }
+    
+    public boolean updateDBRptTable(TargetReport targetRpt)
+    {
+    	String query = null;
+    	boolean successfulExecution = true;
+    	
+    	List<TargetColumnGroup> targetRptColGroups = new TargetColumnGroupDao().getTargetColumnGroupsByReportId(targetRpt.getTargetReportId());
+    	List<String> dbRptTableCols = new ArrayList<String>();
+    	List<String> dbRptTableTypes = new ArrayList<String>();
+
+    	for(int i=0; i<targetRptColGroups.size(); i++)
+    	{
+    		List<TargetColumn> targetRptCols = new TargetColumnDao().getTargetColumnsByColGroupById(targetRptColGroups.get(i).getTargetColumnGroupId());
+    		
+    		for(int j=0; j<targetRptCols.size(); j++)
+    		{
+    			dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"));
+    			dbRptTableTypes.add(targetRptCols.get(j).getExperimentField().getExpFieldType());
+    			
+    			if(!targetRptCols.get(j).getTargetColumnIsInfo())
+    			{
+    				dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_result" );
+        			dbRptTableTypes.add("varchar(20)");    				
+    			}
+    		}
+    	}
+
+		dbRptTableCols.add("Result" );
+		dbRptTableTypes.add("varchar(20)");
+		
+		Config configuration = new Config();
+		
+		
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			String csvTableCols = "";
+			for(int i=0; i<dbRptTableCols.size(); i++)
+			{
+				csvTableCols += dbRptTableCols.get(i) + " " + dbRptTableTypes.get(i);
+				
+				if((i+1) < dbRptTableCols.size())
+					csvTableCols += ","; 
+			}
+			
+			query = " IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='" + targetRpt.getTargetReportDbRptTableNameId() + "' AND xtype='U') ";
+			query += " CREATE TABLE " + targetRpt.getTargetReportDbRptTableNameId();
+			query += " (" + csvTableCols + ");";
+		}
+    	else
+    		return false;
+
+		Transaction trns = null;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+        try {
+            trns = session.beginTransaction();
+            session.createSQLQuery(query).executeUpdate();
+            session.getTransaction().commit();
+        } catch (RuntimeException e) {
+            if (trns != null) {
+                trns.rollback();
+            }
+            successfulExecution = false;
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+		return successfulExecution;
     }
     
 }

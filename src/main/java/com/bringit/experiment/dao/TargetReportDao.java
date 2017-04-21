@@ -254,7 +254,7 @@ public class TargetReportDao {
 			
 			query = " IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='" + targetRpt.getTargetReportDbRptTableNameId() + "' AND xtype='U') ";
 			query += " CREATE TABLE " + targetRpt.getTargetReportDbRptTableNameId();
-			query += " (" + csvTableCols + ");";
+			query += " (RecordId int NOT NULL PRIMARY KEY," + csvTableCols + ");";
 		}
     	else
     		return false;

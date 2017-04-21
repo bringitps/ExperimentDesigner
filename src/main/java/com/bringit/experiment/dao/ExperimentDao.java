@@ -243,8 +243,8 @@ public class ExperimentDao {
 		{
 			query = " IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='" + experiment.getExpDbRptTableNameId() + "' AND xtype='U') ";
 			query += " CREATE TABLE " + experiment.getExpDbRptTableNameId();
-			query += " (RecordId int IDENTITY(1,1) NOT NULL PRIMARY KEY,";
-			query += " Comments text ,";
+			query += " (RecordId int,";
+			query += " Comments text,";
 			query += " CmName varchar(255),";
 			query += " CreatedBy varchar(255) ,";
 			query += " LastModifiedBy varchar(255),";

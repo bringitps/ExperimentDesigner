@@ -1,12 +1,15 @@
 package com.bringit.experiment.ui.form;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import com.bringit.experiment.bll.ContractManufacturer;
 import com.bringit.experiment.bll.Experiment;
@@ -21,6 +24,7 @@ import com.bringit.experiment.dao.TargetColumnDao;
 import com.bringit.experiment.dao.TargetColumnGroupDao;
 import com.bringit.experiment.dao.TargetReportDao;
 import com.bringit.experiment.ui.design.TargetDataChartDesign;
+import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.VaadinControls;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
@@ -38,6 +42,15 @@ import com.vaadin.addon.charts.model.style.Style;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.converter.StringToDateConverter;
+import com.vaadin.data.util.converter.StringToDoubleConverter;
+import com.vaadin.data.util.filter.Between;
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.Like;
+import com.vaadin.data.util.sqlcontainer.SQLContainer;
+import com.vaadin.data.util.sqlcontainer.connection.SimpleJDBCConnectionPool;
+import com.vaadin.data.util.sqlcontainer.query.TableQuery;
+import com.vaadin.data.util.sqlcontainer.query.generator.MSSQLGenerator;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.colorpicker.Color;
 import com.vaadin.ui.Button;
@@ -51,6 +64,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 	Experiment experiment = new Experiment();
 	List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
 	List<ContractManufacturer> contractManufacturers = new ArrayList<ContractManufacturer>();
+	private SQLContainer vaadinTblContainer;
 	
 	public TargetDataChartForm(TargetReport targetRpt, Experiment experiment, List<ExperimentField> experimentFields, List<ContractManufacturer> contractManufacturers, Object selectedDateFieldName, Date fromDate, Date toDate, Object selectedCm, Object selectedExpFieldName, String expFieldValue)
 	{
@@ -60,7 +74,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 		this.contractManufacturers = contractManufacturers;
 		
 		this.tblTargetDataReport.setVisible(false);
-		
+		/*
 		cbxDateFieldsFilter.setContainerDataSource(null);
 		cbxExpFieldFilter.setContainerDataSource(null);
 
@@ -96,11 +110,77 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 			cbxContractManufacturer.setItemCaption(contractManufacturers.get(i).getCmId(), contractManufacturers.get(i).getCmName());
 		}
 		cbxContractManufacturer.setInvalidAllowed(false);
-		
+		*/
 
-		List<TargetColumn> targetColumns = new ArrayList<TargetColumn>();
+	//	List<TargetColumn> targetColumns = new ArrayList<TargetColumn>();
 		List<TargetColumnGroup> targetColumnGroups = new TargetColumnGroupDao().getTargetColumnGroupsByReportId(targetRpt.getTargetReportId());
 		
+		List<String> dbRptTableCols = new ArrayList<String>();
+    	List<String> dbRptTableTypes = new ArrayList<String>();
+    	
+		dbRptTableCols.add("RecordId" );
+		dbRptTableTypes.add("int");
+		
+    	for(int i=0; i<targetColumnGroups.size(); i++)
+    	{
+    		List<TargetColumn> targetRptCols = new TargetColumnDao().getTargetColumnsByColGroupById(targetColumnGroups.get(i).getTargetColumnGroupId());
+    		
+    		for(int j=0; j<targetRptCols.size(); j++)
+    		{
+    			dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"));
+    			dbRptTableTypes.add(targetRptCols.get(j).getExperimentField().getExpFieldType());
+    		
+    			if(!targetRptCols.get(j).getTargetColumnIsInfo())
+    			{
+    				dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Result" );
+        			dbRptTableTypes.add("varchar(20)");    
+        			
+        			cbxValueX.addItem(targetRptCols.get(j).getTargetColumnLabel());    				
+    				cbxValueY.addItem(targetRptCols.get(j).getTargetColumnLabel());
+    			}
+    		}
+    	}
+    	
+		dbRptTableCols.add("Result");
+		dbRptTableTypes.add("varchar(20)");
+		
+		cbxExpFieldFilter.setContainerDataSource(null);
+		cbxDateFieldsFilter.setContainerDataSource(null);
+		
+		for(int i=0; i<dbRptTableCols.size(); i++)
+		{
+			if(dbRptTableTypes.get(i).toLowerCase().startsWith("varchar") || dbRptTableTypes.get(i).toLowerCase().startsWith("char")
+					|| dbRptTableTypes.get(i).toLowerCase().startsWith("text") ||dbRptTableTypes.get(i).toLowerCase().startsWith("nvarchar") 
+					|| dbRptTableTypes.get(i).toLowerCase().startsWith("nchar") || dbRptTableTypes.get(i).toLowerCase().startsWith("ntext"))
+			{
+				cbxExpFieldFilter.addItem(dbRptTableCols.get(i));
+				cbxExpFieldFilter.setItemCaption(dbRptTableCols.get(i), dbRptTableCols.get(i).replaceAll("_", " "));
+			}
+			else if(dbRptTableTypes.get(i).toLowerCase().contains("date"))
+			{
+				cbxDateFieldsFilter.addItem(dbRptTableCols.get(i));
+				cbxDateFieldsFilter.setItemCaption(dbRptTableCols.get(i), dbRptTableCols.get(i).replaceAll("_", " "));
+			}			
+		}
+		
+		cbxDateFieldsFilter.addItem("CreatedDate");
+		cbxDateFieldsFilter.setItemCaption("CreatedDate", "Created Date");
+
+		if(cbxDateFieldsFilter.size() == 1)
+			cbxDateFieldsFilter.select("CreatedDate");				
+	
+		cbxDateFieldsFilter.addItem("LastModifiedDate");
+		cbxDateFieldsFilter.setItemCaption("LastModifiedDate", "Last Modified Date");
+		
+		contractManufacturers = new ContractManufacturerDao().getAllContractManufacturers();
+		for(int i=0; contractManufacturers!=null && i<contractManufacturers.size(); i++)
+		{
+			cbxContractManufacturer.addItem(contractManufacturers.get(i).getCmName());
+			cbxContractManufacturer.setItemCaption(contractManufacturers.get(i).getCmName(), contractManufacturers.get(i).getCmName());
+		}
+		cbxContractManufacturer.setInvalidAllowed(false);
+		
+		/*
 		for(int i=0; targetColumnGroups!=null && i<targetColumnGroups.size(); i++)
 		{
 			List<TargetColumn> targetGroupCols = new TargetColumnDao().getTargetColumnsByColGroupById(targetColumnGroups.get(i).getTargetColumnGroupId());
@@ -120,13 +200,14 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 				cbxValueY.setItemCaption(targetColumns.get(i).getTargetColumnId(), targetColumns.get(i).getTargetColumnLabel());
 			}
 		}
+		*/
 		
 		cbxValueX.addValueChangeListener(new ValueChangeListener() {
 
 			@Override
 			public void valueChange(ValueChangeEvent event) {
 				if(cbxValueX.getValue()!=null){
-					TargetColumn selectedTargetColumn = new TargetColumnDao().getTargetColumnById((Integer)cbxValueX.getValue());
+					TargetColumn selectedTargetColumn = new TargetColumnDao().getTargetColumnByLabel((String)cbxValueX.getValue());
 					txtOffsetValueX.setValue(selectedTargetColumn.getTargetColumnOffset().toString());
 					txtTargetValueX.setValue(selectedTargetColumn.getTargetColumnGoalValue().toString());
 				}
@@ -139,7 +220,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 			@Override
 			public void valueChange(ValueChangeEvent event) {
 				if(cbxValueY.getValue()!=null){
-					TargetColumn selectedTargetColumn = new TargetColumnDao().getTargetColumnById((Integer)cbxValueY.getValue());
+					TargetColumn selectedTargetColumn = new TargetColumnDao().getTargetColumnByLabel((String)cbxValueY.getValue());
 					txtOffsetValueY.setValue(selectedTargetColumn.getTargetColumnOffset().toString());
 					txtTargetValueY.setValue(selectedTargetColumn.getTargetColumnGoalValue().toString());
 				}
@@ -173,6 +254,156 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 
 	private void buildTargetChart()
 	{
+		bindTargetReportRptTable();
+		
+		//System.out.println("Filtering Data...");
+		vaadinTblContainer.removeAllContainerFilters();
+		
+		if(cbxDateFieldsFilter.getValue() != null && dtFilter1.getValue() != null && dtFilter2.getValue() != null)
+		{
+			Date dateFilterValue1 = dtFilter1.getValue();
+			Date dateFilterValue2 = dtFilter2.getValue();
+
+			dateFilterValue2.setHours(23);
+			dateFilterValue2.setMinutes(59);
+			dateFilterValue2.setSeconds(59);
+			vaadinTblContainer.addContainerFilter(new Between(cbxDateFieldsFilter.getValue(), dateFilterValue1, dateFilterValue2)); 	
+			
+		}
+		
+		if(cbxExpFieldFilter.getValue() != null )
+			vaadinTblContainer.addContainerFilter(new Like(cbxExpFieldFilter.getValue(), "%" + txtExpFieldFilter.getValue().trim() + "%")); 	
+		
+		if(cbxContractManufacturer.getValue() != null )
+			vaadinTblContainer.addContainerFilter(new Compare.Equal("CmName",cbxContractManufacturer.getValue())); 	
+	
+		layoutChart.removeAllComponents();
+		
+		Chart targetChart = new Chart(ChartType.SCATTER);
+		targetChart.setSizeFull();
+
+		Configuration targetChartConf = targetChart.getConfiguration();
+		targetChartConf.setTitle(targetRpt.getTargetReportName());
+		targetChartConf.getLegend().setEnabled(false);
+		targetChartConf.setExporting(true);
+		
+		Tooltip tooltip = new Tooltip();
+		tooltip.setShared(true);
+	    tooltip.setFormatter("this.point.name");
+	    targetChartConf.setTooltip(tooltip);
+		
+		//--- Start: Building Pass Rectangle --//
+		
+		double minValueX = Double.parseDouble(txtTargetValueX.getValue()) -  Double.parseDouble(txtOffsetValueX.getValue());
+		double minValueY = Double.parseDouble(txtTargetValueY.getValue()) -  Double.parseDouble(txtOffsetValueY.getValue());
+		double maxValueX = Double.parseDouble(txtTargetValueX.getValue()) +  Double.parseDouble(txtOffsetValueX.getValue());
+		double maxValueY = Double.parseDouble(txtTargetValueY.getValue()) +  Double.parseDouble(txtOffsetValueY.getValue());
+		
+		DataSeries passAreaSeries = new DataSeries();
+		passAreaSeries.setName("Pass Area");
+		passAreaSeries.add(new DataSeriesItem(minValueX,minValueY));
+	    passAreaSeries.add(new DataSeriesItem(minValueX,maxValueY));
+	    passAreaSeries.add(new DataSeriesItem(maxValueX,maxValueY));
+	    passAreaSeries.add(new DataSeriesItem(maxValueX,minValueY));
+	    passAreaSeries.add(new DataSeriesItem(minValueX,minValueY));
+
+        PlotOptionsSpline plotTargetRectangle = new PlotOptionsSpline();
+        plotTargetRectangle.setTurboThreshold(0);
+        plotTargetRectangle.setColor(new SolidColor(Color.MAGENTA.getCSS()));
+        passAreaSeries.setPlotOptions(plotTargetRectangle);
+        targetChartConf.addSeries(passAreaSeries);
+		//--- End: Building Pass Rectangle --//
+
+        
+        //--- Start: Building Values Points --//
+        DataSeries valuesSeries = new DataSeries();
+			    
+
+		DataSeriesItem pointTargetValue = new DataSeriesItem( Double.parseDouble(txtTargetValueX.getValue()), Double.parseDouble(txtTargetValueY.getValue()));
+		pointTargetValue.setName("Target Value");
+		pointTargetValue.setColor(new SolidColor(Color.GREEN.getCSS()));
+		Marker markerTargetValue = new Marker();
+		markerTargetValue.setSymbol(MarkerSymbolEnum.DIAMOND);
+		markerTargetValue.setRadius(10);
+		pointTargetValue.setMarker(markerTargetValue);
+		valuesSeries.add(pointTargetValue);
+			
+	    Marker markerPointValue = new Marker();
+	    markerPointValue.setSymbol(MarkerSymbolEnum.DIAMOND);
+	    markerPointValue.setRadius(5);
+	    //markerPointValue.setFillColor(new SolidColor(Color.MAGENTA.getCSS()));
+	    DataSeriesItem newValue = new DataSeriesItem( Double.parseDouble(txtTargetValueX.getValue()), Double.parseDouble(txtTargetValueY.getValue()));
+	  
+	    String[] tblColumnHeadersMtx = tblTargetDataReport.getColumnHeaders();
+	    String[] tblColumnIdsMtx = tblTargetDataReport.getColumnHeaders();
+	    
+
+	    Collection propertyIds = tblTargetDataReport.getContainerDataSource().getContainerPropertyIds();
+	    Integer cnt=0;
+		for (Object propertyId : propertyIds) 
+		{
+			tblColumnIdsMtx[cnt] = propertyId.toString().trim();
+			cnt++;
+		}		
+		
+		String colXName = cbxValueX.getValue().toString().trim();
+		String colYName = cbxValueY.getValue().toString().trim();
+
+		String valueX = "";
+		String toolTipHeaderX = "";
+		String valueY = "";
+		String toolTipHeaderY = "";
+		
+		String toolTipBody = "";
+		
+	    Collection itemIds = tblTargetDataReport.getContainerDataSource().getItemIds();
+		cnt=1;
+		for (Object itemIdObj : itemIds) 
+		{	
+			toolTipBody = "";
+
+			for(int i=0; i<tblColumnHeadersMtx.length; i++)
+			{
+				if(tblColumnHeadersMtx[i].trim().equals(colXName))
+				{
+					valueX = tblTargetDataReport.getContainerProperty(itemIdObj, tblColumnIdsMtx[i]).getValue().toString();
+					toolTipHeaderX = "<b>" + colXName + " [X]:</b> " + valueX;
+				}
+				if(tblColumnHeadersMtx[i].trim().equals(colYName))
+				{
+					valueY = tblTargetDataReport.getContainerProperty(itemIdObj, tblColumnIdsMtx[i]).getValue().toString();
+					toolTipHeaderY = "<b>" + colYName + " [X]:</b> " + valueY;
+				}
+				
+				if(!tblColumnHeadersMtx[i].trim().equals(colXName) && !tblColumnHeadersMtx[i].trim().equals(colYName))
+					toolTipBody +=  tblColumnHeadersMtx[i].trim() + ": " + tblTargetDataReport.getContainerProperty(itemIdObj, tblColumnIdsMtx[i]).getValue() + "<br>";
+			}
+			
+			if(valueX != null && valueY != null && !valueX.isEmpty() && !valueY.isEmpty())
+			{
+				newValue = new DataSeriesItem(Double.parseDouble(valueX), Double.parseDouble(valueY));
+				newValue.setId(cnt.toString());
+				newValue.setColor(new SolidColor(Color.BLUE.getCSS()));
+				newValue.setName(toolTipHeaderX+"<br>"+toolTipHeaderY+"<br><br>"+toolTipBody);
+				valuesSeries.add(newValue);
+			}
+			
+			cnt++;
+		}
+	    		
+		PlotOptionsScatter plotValues = new PlotOptionsScatter();
+		plotValues.setTurboThreshold(0);
+		valuesSeries.setPlotOptions(plotValues);
+	    targetChartConf.addSeries(valuesSeries);
+	    
+		//--- End: Building Values Points --//
+	    
+	    tblTargetDataReport.setVisibleColumns(new Object[] {cbxValueX.getValue().toString().replaceAll(" ", "_"), cbxValueY.getValue().toString().trim().replaceAll(" ", "_")});
+		tblTargetDataReport.setVisible(true);
+		lblChartInstruction.setVisible(false);		
+		layoutChart.addComponent(targetChart);
+		
+		
 		/*
 		 * spTargetReportBuilder 
 	 		@TargetReportId NVARCHAR(MAX),
@@ -185,6 +416,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 			@ExpFieldValue NVARCHAR(MAX)
 		 */
 		
+		/*	
 		String dateFieldName = "";
 		String fromDate = "";
 		String toDate = "";
@@ -359,6 +591,111 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 		}
 		else
 			this.getUI().showNotification("No data found for selected criteria.", Type.WARNING_MESSAGE);
+		*/
 	}
+	
+
+	private void bindTargetReportRptTable()
+	{
+		Config configuration = new Config();
+		
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+		{
+			String dbHost = configuration.getProperty("dbhost");
+			String dbPort = configuration.getProperty("dbport");
+			String dbDatabase = configuration.getProperty("dbdatabase");
+			String dbUsername = configuration.getProperty("dbusername");
+			String dbPassword = configuration.getProperty("dbpassword");
+			
+			SimpleJDBCConnectionPool connectionPool;
+		    
+		    try {
+		    	connectionPool = new SimpleJDBCConnectionPool("com.microsoft.sqlserver.jdbc.SQLServerDriver",
+						"jdbc:sqlserver://"+dbHost+":"+dbPort+";databaseName="+dbDatabase,
+						dbUsername, dbPassword);
+		    
+		    	TableQuery tblQuery = new TableQuery(targetRpt.getTargetReportDbRptTableNameId(), connectionPool, new MSSQLGenerator());
+				tblQuery.setVersionColumn("RecordId");
+
+				vaadinTblContainer = new SQLContainer(tblQuery);
+				
+				tblTargetDataReport.setContainerDataSource(vaadinTblContainer);
+				
+				List<TargetColumnGroup> targetRptColGroups = new TargetColumnGroupDao().getTargetColumnGroupsByReportId(targetRpt.getTargetReportId());
+				List<String> dbRptTableCols = new ArrayList<String>();
+		    	List<String> dbRptTableTypes = new ArrayList<String>();
+		    	
+				dbRptTableCols.add("RecordId" );
+				dbRptTableTypes.add("int");
+				
+		    	for(int i=0; i<targetRptColGroups.size(); i++)
+		    	{
+		    		List<TargetColumn> targetRptCols = new TargetColumnDao().getTargetColumnsByColGroupById(targetRptColGroups.get(i).getTargetColumnGroupId());
+		    		
+		    		for(int j=0; j<targetRptCols.size(); j++)
+		    		{
+		    			dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"));
+		    			dbRptTableTypes.add(targetRptCols.get(j).getExperimentField().getExpFieldType());
+		    		
+		    			if(!targetRptCols.get(j).getTargetColumnIsInfo())
+		    			{
+		    				dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Result" );
+		        			dbRptTableTypes.add("varchar(20)");    				
+		    			}
+		    		}
+		    	}
+		    	
+				dbRptTableCols.add("Result");
+				dbRptTableTypes.add("varchar(20)");
+				
+				
+				for(int i=0; i<dbRptTableCols.size(); i++)
+				{
+					tblTargetDataReport.setColumnHeader(dbRptTableCols.get(i), dbRptTableCols.get(i).replaceAll("_", " "));
+					
+					if(dbRptTableTypes.get(i).toLowerCase().contains("float") || 
+							dbRptTableTypes.get(i).toLowerCase().contains("decimal") || 
+							dbRptTableTypes.get(i).toLowerCase().contains("int"))
+					{
+						tblTargetDataReport.setConverter(dbRptTableCols.get(i), new StringToDoubleConverter() {
+						    @Override
+						    protected NumberFormat getFormat(Locale locale) {
+						    	NumberFormat format = NumberFormat.getNumberInstance();
+						    	format.setGroupingUsed(false);
+						    	return format;
+						    }
+						});
+						
+					}
+					
+					if(dbRptTableTypes.get(i).toLowerCase().contains("date"))
+					{
+						tblTargetDataReport.setConverter(dbRptTableCols.get(i), new StringToDateConverter() {
+						    @Override
+						    protected DateFormat getFormat(Locale locale) {
+								return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						    }
+						});
+					}
+				}
+				
+				tblTargetDataReport.setColumnHeader("RecordId", "Id");
+				
+				String[] targetRptCols = new String[dbRptTableCols.size()];
+				for(int i=0; i<dbRptTableCols.size(); i++)
+					targetRptCols[i] = dbRptTableCols.get(i);
+				
+				//Visible columns should be determined by selected Values for X and Y 
+				//tblTargetDataReport.setVisibleColumns(targetRptCols);
+				
+				
+		    } catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		    
+		}
+	}
+
+	
 	
 }

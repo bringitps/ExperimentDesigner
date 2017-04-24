@@ -229,7 +229,7 @@ public class TargetReportDao {
     			
     			if(!targetRptCols.get(j).getTargetColumnIsInfo())
     			{
-    				dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_result" );
+    				dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Result" );
         			dbRptTableTypes.add("varchar(20)");    				
     			}
     		}
@@ -254,7 +254,9 @@ public class TargetReportDao {
 			
 			query = " IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='" + targetRpt.getTargetReportDbRptTableNameId() + "' AND xtype='U') ";
 			query += " CREATE TABLE " + targetRpt.getTargetReportDbRptTableNameId();
-			query += " (RecordId int NOT NULL PRIMARY KEY," + csvTableCols + ");";
+			query += " (RecordId int NOT NULL PRIMARY KEY, Comments text, CmName varchar(255),";
+			query += " CreatedBy varchar(255), LastModifiedBy varchar(255), CreatedDate datetime,";
+			query += " LastModifiedDate datetime, DataFileName varchar(255)," + csvTableCols + ");";
 		}
     	else
     		return false;

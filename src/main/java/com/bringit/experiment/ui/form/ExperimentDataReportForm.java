@@ -1,6 +1,5 @@
 package com.bringit.experiment.ui.form;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -14,19 +13,17 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
-import com.bringit.experiment.dao.DataBaseViewDao;
-import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.ui.design.ExperimentDataReportDesign;
 import com.bringit.experiment.util.Config;
-import com.bringit.experiment.util.ExperimentUtil;
-import com.bringit.experiment.util.VaadinControls;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.converter.StringToDateConverter;
 import com.vaadin.data.util.converter.StringToDoubleConverter;
+import com.vaadin.data.util.filter.Between;
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.Like;
 import com.vaadin.data.util.sqlcontainer.SQLContainer;
 import com.vaadin.data.util.sqlcontainer.connection.SimpleJDBCConnectionPool;
 import com.vaadin.data.util.sqlcontainer.query.TableQuery;
@@ -34,16 +31,12 @@ import com.vaadin.data.util.sqlcontainer.query.generator.MSSQLGenerator;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.Window.CloseEvent;
+
 import com.vaadin.addon.tableexport.ExcelExport;
 
 //import com.vaadin.addon.tableexport.TableExport;
@@ -53,15 +46,50 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 	Experiment experiment = new Experiment();
 	List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
 	int selectedRecordId = -1;
-	
+	private SQLContainer vaadinTblContainer;
+    
 	public ExperimentDataReportForm(int experimentId)
 	{
 		experiment = new ExperimentDao().getExperimentById(experimentId);
 		experimentFields = new ExperimentFieldDao().getActiveExperimentFields(experiment);
 		
-		this.lblExperimentTitle.setValue(" -" + experiment.getExpName());
+		this.lblExperimentTitle.setValue(" - " + experiment.getExpName());
 		
 		bindExperimentRptTable();
+
+		cbxExperimentDataReportFilters.setContainerDataSource(null);
+		cbxDateFieldsFilter.setContainerDataSource(null);
+		
+		for(int i=0; experimentFields !=null && i<experimentFields.size(); i++)
+		{
+			if(experimentFields.get(i).getExpFieldType().startsWith("varchar") || experimentFields.get(i).getExpFieldType().startsWith("char")
+					|| experimentFields.get(i).getExpFieldType().startsWith("text") ||experimentFields.get(i).getExpFieldType().startsWith("nvarchar") 
+					|| experimentFields.get(i).getExpFieldType().startsWith("nchar") || experimentFields.get(i).getExpFieldType().startsWith("ntext"))
+			{
+				cbxExperimentDataReportFilters.addItem(experimentFields.get(i).getExpDbFieldNameId());
+				cbxExperimentDataReportFilters.setItemCaption(experimentFields.get(i).getExpDbFieldNameId(), experimentFields.get(i).getExpFieldName());
+
+				if(cbxExperimentDataReportFilters.size() == 1)
+					cbxExperimentDataReportFilters.select(experimentFields.get(i).getExpDbFieldNameId());
+			}
+			else if(experimentFields.get(i).getExpFieldType().contains("date"))
+			{
+				cbxDateFieldsFilter.addItem(experimentFields.get(i).getExpDbFieldNameId());
+				cbxDateFieldsFilter.setItemCaption(experimentFields.get(i).getExpDbFieldNameId(), experimentFields.get(i).getExpFieldName());
+
+				if(cbxDateFieldsFilter.size() == 1)
+					cbxDateFieldsFilter.select(experimentFields.get(i).getExpDbFieldNameId());				
+			}
+		}
+		
+		cbxDateFieldsFilter.addItem("CreatedDate");
+		cbxDateFieldsFilter.setItemCaption("CreatedDate", "Created Date");
+
+		if(cbxDateFieldsFilter.size() == 1)
+			cbxDateFieldsFilter.select("CreatedDate");				
+	
+		cbxDateFieldsFilter.addItem("LastModifiedDate");
+		cbxDateFieldsFilter.setItemCaption("LastModifiedDate", "Last Modified Date");
 		
 		/*String sqlSelectQuery =  ExperimentUtil.buildSqlSelectQueryByExperiment(experiment, experimentFields);
 		ResultSet experimentDataResults = new ExecuteQueryDao().getSqlSelectQueryResults(sqlSelectQuery);
@@ -151,6 +179,67 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 	
 	private void filterExperimentDataResults()
 	{
+		//System.out.println("Filtering Data...");
+		vaadinTblContainer.removeAllContainerFilters();
+		
+		if(this.chxDateFilters.getValue() && this.cbxDateFieldsFilter.getValue() != null && this.cbxDateFilterOperators.getValue() != null
+				&& this.dtFilter1.getValue() != null)
+		{
+			if(this.cbxDateFilterOperators.getValue().equals("between") && this.dtFilter2.getValue() == null)
+			{
+				this.getUI().showNotification("From Date and To Date should be set.", Type.WARNING_MESSAGE);
+				return;
+			}
+			
+			Date dateFilterValue1 = this.dtFilter1.getValue();
+			Date dateFilterValue2 = this.dtFilter2.getValue();
+
+			if(this.cbxDateFilterOperators.getValue().equals("between"))
+			{
+				dateFilterValue2.setHours(23);
+				dateFilterValue2.setMinutes(59);
+				dateFilterValue2.setSeconds(59);
+				vaadinTblContainer.addContainerFilter(new Between(this.cbxDateFieldsFilter.getValue(), dateFilterValue1, dateFilterValue2)); 	
+			}
+			else
+			{
+				String sqlDateFilterOperator = "";
+				
+				 switch (this.cbxDateFilterOperators.getValue().toString().trim()) 
+				 {
+		         	case "on":
+						vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
+						break;
+		         	case "before":
+						vaadinTblContainer.addContainerFilter(new Compare.Less(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
+						break;
+		         	case "after":  
+		         		dateFilterValue1.setHours(23);
+		         		dateFilterValue1.setMinutes(59);
+		         		dateFilterValue1.setSeconds(59);
+		         		vaadinTblContainer.addContainerFilter(new Compare.Greater(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
+						break;
+		         	case "onorbefore":  
+		         		dateFilterValue1.setHours(23);
+		         		dateFilterValue1.setMinutes(59);
+		         		dateFilterValue1.setSeconds(59);
+		         		vaadinTblContainer.addContainerFilter(new Compare.LessOrEqual(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
+						break;
+		         	case "onorafter":  
+		         		vaadinTblContainer.addContainerFilter(new Compare.GreaterOrEqual(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
+						break;
+				 }
+			}
+		}
+		
+		if(this.cbxExperimentDataReportFilters.getValue() != null )
+		{
+			Like like = new Like(this.cbxExperimentDataReportFilters.getValue(), "%" + this.txtSearch.getValue().trim() + "%");
+			vaadinTblContainer.addContainerFilter(like); 	
+		}
+		
+		
+        /*
 		if(this.cbxDateFieldsFilter.getValue() != null && this.cbxDateFilterOperators.getValue() != null
 				&& this.dtFilter1.getValue() != null)
 		{
@@ -183,7 +272,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 			if(experimentDataResults != null)
 				VaadinControls.bindDbViewRsToVaadinTable(tblExperimentDataReport, experimentDataResults, 1);
 		}
-		
+		*/
 	}
 	
 	private void fillCbxDateFilterOperators()
@@ -223,6 +312,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 		this.cbxDateFilterOperators.setEnabled(enabled);
 		this.dtFilter1.setEnabled(enabled);
 		this.dtFilter2.setEnabled(enabled);
+		this.btnOkDateFilters.setEnabled(enabled);
 	}
 	
 	private void exportExperimentDataReportToExcel()
@@ -289,7 +379,6 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 			String dbPassword = configuration.getProperty("dbpassword");
 			
 			SimpleJDBCConnectionPool connectionPool;
-		    SQLContainer vaadinTblContainer;
 		    
 		    try {
 		    	connectionPool = new SimpleJDBCConnectionPool("com.microsoft.sqlserver.jdbc.SQLServerDriver",
@@ -300,7 +389,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 				tblQuery.setVersionColumn("RecordId");
 				
 				vaadinTblContainer = new SQLContainer(tblQuery);
-
+				
 				tblExperimentDataReport.setContainerDataSource(vaadinTblContainer);
 				
 				if(experimentFields!= null)

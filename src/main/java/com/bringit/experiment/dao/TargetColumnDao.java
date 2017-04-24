@@ -114,6 +114,28 @@ public class TargetColumnDao {
         return targetField;
     }
     
+
+    @SuppressWarnings("unused")
+	public TargetColumn getTargetColumnByLabel(String targetColumnLabel) {
+    	TargetColumn targetField = null;
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            String queryString = "from TargetColumn where TargetColumnLabel = :targetColLabel";
+            Query query = session.createQuery(queryString);
+            query.setString("targetColLabel", targetColumnLabel);
+            targetField = (TargetColumn) query.uniqueResult();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return targetField;
+    }
+    
     @SuppressWarnings({ "unchecked", "unused" })
    	public List<TargetColumn> getTargetColumnsByColGroupById(int targetRptColumnGroupId) {
            List<TargetColumn> targetColumns = new ArrayList<TargetColumn>();

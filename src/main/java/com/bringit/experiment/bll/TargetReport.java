@@ -38,7 +38,7 @@ public class TargetReport {
 	private String targetReportDbRptTableNameId;
 	
 	@Column(name="TargetReportDbRptTableLastUpdate")
-	private String targetReportDbRptTableLastUpdate;
+	private Date targetReportDbRptTableLastUpdate;
 	
 	@Column(name="TargetReportDescription")
 	@Type(type="text")
@@ -120,11 +120,11 @@ public class TargetReport {
 		this.targetReportDbRptTableNameId = targetReportDbRptTableNameId;
 	}
 
-	public String getTargetReportDbRptTableLastUpdate() {
+	public Date getTargetReportDbRptTableLastUpdate() {
 		return targetReportDbRptTableLastUpdate;
 	}
 
-	public void setTargetReportDbRptTableLastUpdate(String targetReportDbRptTableLastUpdate) {
+	public void setTargetReportDbRptTableLastUpdate(Date targetReportDbRptTableLastUpdate) {
 		this.targetReportDbRptTableLastUpdate = targetReportDbRptTableLastUpdate;
 	}
 

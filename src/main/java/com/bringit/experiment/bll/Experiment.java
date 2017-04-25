@@ -35,7 +35,7 @@ public class Experiment {
 	private String expDbRptTableNameId;
 	
 	@Column(name="ExpDbRptTableLastUpdate")
-	private String expDbRptTableLastUpdate;
+	private Date expDbRptTableLastUpdate;
 		
 	@Column(name="ExpIsActive")
 	private Boolean expIsActive;
@@ -126,11 +126,11 @@ public class Experiment {
 		this.expDbRptTableNameId = expDbRptTableNameId;
 	}
 
-	public String getExpDbRptTableLastUpdate() {
+	public Date getExpDbRptTableLastUpdate() {
 		return expDbRptTableLastUpdate;
 	}
 
-	public void setExpDbRptTableLastUpdate(String expDbRptTableLastUpdate) {
+	public void setExpDbRptTableLastUpdate(Date expDbRptTableLastUpdate) {
 		this.expDbRptTableLastUpdate = expDbRptTableLastUpdate;
 	}
 

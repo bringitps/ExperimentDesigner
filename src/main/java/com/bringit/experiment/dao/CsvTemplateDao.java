@@ -1,16 +1,15 @@
 package com.bringit.experiment.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.bringit.experiment.bll.ContractManufacturer;
+import com.bringit.experiment.bll.CsvTemplate;
+import com.bringit.experiment.dal.HibernateUtil;
+import com.bringit.experiment.util.HibernateXmlConfigSupport;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.CsvTemplate;
-import com.bringit.experiment.bll.XmlTemplate;
-import com.bringit.experiment.dal.HibernateUtil;
-import com.bringit.experiment.util.HibernateXmlConfigSupport;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CsvTemplateDao {
 
@@ -215,6 +214,24 @@ public class CsvTemplateDao {
 	        try {
 	            trns = session.beginTransaction();
 	            csvTemplates = session.createQuery("from CsvTemplate where CmId = :id").setInteger("id", ContractManufacturerId).list();
+	        } catch (RuntimeException e) {
+	            e.printStackTrace();
+	        } finally {
+	            session.flush();
+	            session.close();
+	        }
+	        return csvTemplates;
+	    }
+
+	 @SuppressWarnings({ "unchecked", "unused" })
+		public List<CsvTemplate> getAllCsvTemplatesByContractManager(List<ContractManufacturer> contractManufacturerList)  {
+	        List<CsvTemplate> csvTemplates = new ArrayList<CsvTemplate>();
+	        Transaction trns = null;
+	        Session session = HibernateUtil.getSessionFactory().openSession();
+			//Session session = HibernateUtil.openSession(dialectXmlFile);
+	        try {
+	            trns = session.beginTransaction();
+	            csvTemplates = session.createQuery("from CsvTemplate where CsvTemplateIsActive='true' and contractManufacturer in :id").setParameterList("id", contractManufacturerList).list();
 	        } catch (RuntimeException e) {
 	            e.printStackTrace();
 	        } finally {

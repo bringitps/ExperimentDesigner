@@ -1,41 +1,32 @@
 package com.bringit.experiment.ui.form;
 
+import com.bringit.experiment.bll.CmForSysRole;
+import com.bringit.experiment.bll.ContractManufacturer;
+import com.bringit.experiment.bll.SysRole;
+import com.bringit.experiment.dao.CmForSysRoleDao;
+import com.bringit.experiment.dao.ContractManufacturerDao;
+import com.bringit.experiment.dao.SysRoleDao;
+import com.bringit.experiment.dao.UserRoleDao;
+import com.bringit.experiment.ui.design.SysRoleConfigDesign;
+import com.vaadin.data.Item;
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.event.ShortcutListener;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.OptionGroup;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.Tree;
+import com.vaadin.ui.VerticalLayout;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
-
-import com.bringit.experiment.bll.JobExecutionRepeat;
-import com.bringit.experiment.bll.SysRole;
-import com.bringit.experiment.dao.JobExecutionRepeatDao;
-import com.bringit.experiment.dao.SysRoleDao;
-import com.bringit.experiment.dao.UserRoleDao;
-import com.bringit.experiment.dao.XmlTemplateDao;
-import com.bringit.experiment.ui.design.SysRoleConfigDesign;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Validator;
-import com.vaadin.data.Validator.InvalidValueException;
-import com.vaadin.event.ShortcutAction;
-import com.vaadin.event.ShortcutListener;
-import com.vaadin.server.Sizeable.Unit;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.ListSelect;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.Tree;
-import com.vaadin.ui.TwinColSelect;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.OptionGroup;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table;
+import java.util.stream.Collectors;
 
 public class SysRoleConfigForm extends SysRoleConfigDesign {
 
@@ -106,6 +97,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 		tblSysRole.addContainerProperty("Description", TextField.class, null);
 		tblSysRole.addContainerProperty("Default Role?", CheckBox.class, null);
 		tblSysRole.addContainerProperty("Menu Access", Panel.class, null);
+		tblSysRole.addContainerProperty("Contract Manufacturer", Panel.class, null);
 		tblSysRole.setEditable(true);
 		tblSysRole.setPageLength(0);
 		tblSysRole.setColumnWidth("*", 20);
@@ -119,15 +111,18 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 		else
 			cbxSysRoleFilters.select(filterName.trim());
 		
-		Object[] itemValues = new Object[5];
+		Object[] itemValues = new Object[6];
 
 		List<SysRole> sysRoles = new SysRoleDao().getAllSysRoles();
 		
 		for(int i=0; sysRoles != null && i<sysRoles.size(); i++)
 		{
-			if(filterName.isEmpty() || (filterName.trim().equals("Name") && sysRoles.get(i).getRoleName().toLowerCase().contains(filterValue.trim().toLowerCase()))
-				|| (filterName.trim().equals("Description") && sysRoles.get(i).getRoleDescription().toLowerCase().contains(filterValue.trim().toLowerCase())))
-			{	
+			if (filterName.isEmpty() || (filterName.trim().equals("Name") && sysRoles.get(i).getRoleName().toLowerCase().contains(filterValue.trim().toLowerCase()))
+				|| (filterName.trim().equals("Description")
+				&& sysRoles.get(i).getRoleDescription().toLowerCase().contains(filterValue.trim().toLowerCase())))
+
+			{
+
 				CheckBox chxSelect = new CheckBox();
 				chxSelect.setVisible(false);
 				chxSelect.setWidth(10, Unit.PIXELS);
@@ -162,7 +157,18 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 				pnlMnuAccess.setWidth(100, Unit.PERCENTAGE);
 				pnlMnuAccess.setStyleName("well");
 				pnlMnuAccess.setCaption("");
-				    
+
+
+				Panel pnlCntManufacturer = new Panel("Contract Manufacturer");
+				VerticalLayout layoutPnlCntManufacturer = new VerticalLayout();
+				OptionGroup optGrpCntManufacturer = new OptionGroup();
+				optGrpCntManufacturer.setMultiSelect(true);
+				optGrpCntManufacturer.setStyleName("small");
+				pnlCntManufacturer.setHeight(200, Unit.PIXELS);
+				pnlCntManufacturer.setWidth(100, Unit.PERCENTAGE);
+				pnlCntManufacturer.setStyleName("well");
+				pnlCntManufacturer.setCaption("");
+
 				
 			    for (Object id : treeMainMenu.getItemIds()) 
 			    {
@@ -185,14 +191,20 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 								optGrpMnuAccess.select(treeMainMenu.getParent(id).toString() + " / " + id);
 						}
 					}					
-			    }		
-			    
-			    layoutPnlMnuAccess.addComponent(optGrpMnuAccess);
+			    }
+
+				setContractManagerOptions(optGrpCntManufacturer, sysRoles.get(i));
+
+				layoutPnlMnuAccess.addComponent(optGrpMnuAccess);
 				pnlMnuAccess.setContent(layoutPnlMnuAccess);
+
+				layoutPnlCntManufacturer.addComponent(optGrpCntManufacturer);
+				pnlCntManufacturer.setContent(layoutPnlCntManufacturer);
 				    
 				itemValues[4] = pnlMnuAccess;
-				
-				if(!sysRoles.get(i).getRoleName().equals("sys_admin"))
+				itemValues[5] = pnlCntManufacturer;
+
+				if (!sysRoles.get(i).getRoleName().equals("sys_admin"))
 					tblSysRole.addItem(itemValues, sysRoles.get(i).getRoleId());
 			}
 		}
@@ -200,7 +212,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 		
 	private void addSysRoleRow()
 	{
-		Object[] itemValues = new Object[5];
+		Object[] itemValues = new Object[6];
 		
 		CheckBox chxSelect = new CheckBox();
 		chxSelect.setVisible(false);
@@ -232,6 +244,17 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 		pnlMnuAccess.setWidth(100, Unit.PERCENTAGE);
 		pnlMnuAccess.setStyleName("well");
 		pnlMnuAccess.setCaption("");
+
+
+		Panel pnlContManager = new Panel("Contract Manufacturer");
+		VerticalLayout layoutPnlContManager = new VerticalLayout();
+		OptionGroup optGrpContManager = new OptionGroup();
+		optGrpContManager.setMultiSelect(true);
+		optGrpContManager.setStyleName("small");
+		pnlContManager.setHeight(200, Unit.PIXELS);
+		pnlContManager.setWidth(100, Unit.PERCENTAGE);
+		pnlContManager.setStyleName("well");
+		pnlContManager.setCaption("");
 		    
 	    for (Object id : treeMainMenu.getItemIds()) 
 	    {
@@ -253,96 +276,138 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 	    
 	    layoutPnlMnuAccess.addComponent(optGrpMnuAccess);
 		pnlMnuAccess.setContent(layoutPnlMnuAccess);
+
+		setContractManagerOptions(optGrpContManager, null);
+
+		layoutPnlContManager.addComponent(optGrpContManager);
+		pnlContManager.setContent(layoutPnlContManager);
 		    
 		itemValues[4] = pnlMnuAccess;
-		
+		itemValues[5] = pnlContManager;
+
 		this.lastNewItemId = this.lastNewItemId - 1;
 		tblSysRole.addItem(itemValues, this.lastNewItemId);
 		tblSysRole.select(this.lastNewItemId);
 	}
-	
 
-	private boolean isDynamicChildren(Collection<?> mnuItemChildren)
-	{
-		for (Object id : mnuItemChildren) 
-	    {
-			if(treeMainMenu.getItem(id).getItemProperty("isExperimentDataReport").getValue() == null 
+	private void setContractManagerOptions(OptionGroup optGrpContManager, SysRole sysRole) {
+
+		List selectedCM =  new ArrayList<>();
+		List<CmForSysRole> availableCmForSysRoles;
+		if (sysRole != null) {
+			availableCmForSysRoles = new CmForSysRoleDao().getListOfCmForSysRoleBysysRoleId(sysRole.getRoleId());
+			if (availableCmForSysRoles != null) {
+				availableCmForSysRoles.forEach(s -> selectedCM.add(s.getContractManufacturer().getCmName()));
+			}
+		}
+
+		List<ContractManufacturer> availableContractManufacturers;
+
+		availableContractManufacturers = new ContractManufacturerDao().getAllContractManufacturers();
+		if (availableContractManufacturers != null) {
+			for (ContractManufacturer contractManufacturer : availableContractManufacturers) {
+				optGrpContManager.addItem(contractManufacturer.getCmName());
+				if (selectedCM.indexOf(contractManufacturer.getCmName()) >= 0)
+					optGrpContManager.select(contractManufacturer.getCmName());
+			}
+		}
+	}
+
+	private boolean isDynamicChildren(Collection<?> mnuItemChildren) {
+		for (Object id : mnuItemChildren) {
+			if (treeMainMenu.getItem(id).getItemProperty("isExperimentDataReport").getValue() == null
 					&& (treeMainMenu.getItem(id).getItemProperty("isTargetReport").getValue() == null))
 				return false;
-	    }
+		}
 		return true;
 	}
-	private void deleteSysRoleRow()
-	{
+
+	private void deleteSysRoleRow() {
 		boolean hasUsersLinked = false;
-		if(tblSysRole.getValue() != null && (int)tblSysRole.getValue() > 0 )
-		{
-			if(new UserRoleDao().getUserRolesByRole(new SysRoleDao().getRoleById((int)tblSysRole.getValue())).size() <= 0)
-				dbIdOfItemsToDelete.add((int)tblSysRole.getValue());
+		if (tblSysRole.getValue() != null && (int) tblSysRole.getValue() > 0) {
+			if (new UserRoleDao().getUserRolesByRole(new SysRoleDao().getRoleById((int) tblSysRole.getValue())).size() <= 0)
+				dbIdOfItemsToDelete.add((int) tblSysRole.getValue());
 			else
 				hasUsersLinked = true;
 		}
-		
-		if(!hasUsersLinked && tblSysRole.getValue() != null)
-			tblSysRole.removeItem((int)tblSysRole.getValue());
-		else if(hasUsersLinked)
+
+		if (!hasUsersLinked && tblSysRole.getValue() != null)
+			tblSysRole.removeItem((int) tblSysRole.getValue());
+		else if (hasUsersLinked)
 			this.getUI().showNotification("User Role record can not be deleted. \nThere are Users linked.", Type.WARNING_MESSAGE);
-			
+
 	}
-		
-	private void saveSysRoleRows()
-	{
+
+	private void saveSysRoleRows() {
 		boolean validateRequiredFieldsResult = validateRequiredFields();
 		boolean validateDuplicatedNamesResult = validateDuplicatedNames();
 		boolean validateNonSysAdminNameResult = validateNonSysAdminName();
-		
-		if(validateRequiredFieldsResult && validateDuplicatedNamesResult && validateNonSysAdminNameResult)
-		{
+
+		if (validateRequiredFieldsResult && validateDuplicatedNamesResult && validateNonSysAdminNameResult) {
 			SysRoleDao sysRoleDao = new SysRoleDao();
-		
+
 			//Delete Items in DB
-			for(int i = 0; i<dbIdOfItemsToDelete.size(); i++)
-				sysRoleDao.deleteSysRole((int)dbIdOfItemsToDelete.get(i));
-		
+			for (int i = 0; i < dbIdOfItemsToDelete.size(); i++)
+				sysRoleDao.deleteSysRole((int) dbIdOfItemsToDelete.get(i));
+
 			Collection itemIds = tblSysRole.getContainerDataSource().getItemIds();
-			
-			for (Object itemIdObj : itemIds) 
-			{
-				int itemId = (int)itemIdObj;
+
+			for (Object itemIdObj : itemIds) {
+				int itemId = (int) itemIdObj;
 				Item tblRowItem = tblSysRole.getContainerDataSource().getItem(itemId);
-				
+
 				SysRole sysRole = new SysRole();
-				sysRole.setRoleName(((TextField)(tblRowItem.getItemProperty("Name").getValue())).getValue());
-				sysRole.setRoleDescription(((TextField)(tblRowItem.getItemProperty("Description").getValue())).getValue());
-				sysRole.setIsActiveDirectoryDefaultRole(((CheckBox)(tblRowItem.getItemProperty("Default Role?").getValue())).getValue());
-				
-				Panel pnlMnuAccess = ((Panel)(tblRowItem.getItemProperty("Menu Access").getValue()));
-				VerticalLayout layoutPnlMnuAccess = (VerticalLayout)pnlMnuAccess.getContent();
-				OptionGroup optGrpMnuAccess = (OptionGroup)layoutPnlMnuAccess.getComponent(0);
-				
-				Set<Item> selectedOptGrpMnuAccess = (Set<Item>)optGrpMnuAccess.getValue();
+				sysRole.setRoleName(((TextField) (tblRowItem.getItemProperty("Name").getValue())).getValue());
+				sysRole.setRoleDescription(((TextField) (tblRowItem.getItemProperty("Description").getValue())).getValue());
+				sysRole.setIsActiveDirectoryDefaultRole(((CheckBox) (tblRowItem.getItemProperty("Default Role?").getValue())).getValue());
+
+				Panel pnlMnuAccess = ((Panel) (tblRowItem.getItemProperty("Menu Access").getValue()));
+				VerticalLayout layoutPnlMnuAccess = (VerticalLayout) pnlMnuAccess.getContent();
+				OptionGroup optGrpMnuAccess = (OptionGroup) layoutPnlMnuAccess.getComponent(0);
+
+				Set<Item> selectedOptGrpMnuAccess = (Set<Item>) optGrpMnuAccess.getValue();
 				for (Object selectedOptionGroup : selectedOptGrpMnuAccess)
 					sysRole.setRoleMenuAccess((sysRole.getRoleMenuAccess() == null ? "" : sysRole.getRoleMenuAccess()) + selectedOptionGroup.toString() + "\n");
-				
-				if(itemId > 0)
-				{
+
+				Panel pnlCntManufacturer = ((Panel) (tblRowItem.getItemProperty("Contract Manufacturer").getValue()));
+				VerticalLayout layoutPnlCntManufacturer = (VerticalLayout) pnlCntManufacturer.getContent();
+				OptionGroup optGrpCntManufacturer = (OptionGroup) layoutPnlCntManufacturer.getComponent(0);
+
+
+
+				if (itemId > 0) {
 					sysRole.setRoleId(itemId);
 					sysRoleDao.updateSysRole(sysRole);
-				}
-				else
+				} else
 					sysRoleDao.addSysRole(sysRole);
+
+				Set<Item> selectedOptGrpCntManufacturer = (Set<Item>) optGrpCntManufacturer.getValue();
+				List<Integer> contractManufacturerList = new ArrayList<>();
+				for (Object selectedOptionGroup : selectedOptGrpCntManufacturer) {
+					System.out.println("selectedOptionGroup.toString() = " + selectedOptionGroup.toString());
+					List<ContractManufacturer> availableCmForSysRoles = new ContractManufacturerDao().getAllContractManufacturers();
+					if (availableCmForSysRoles != null) {
+
+						List<ContractManufacturer> contractManufacturerList1 = availableCmForSysRoles.stream()
+								.filter((contractManufacturer) -> contractManufacturer.getCmName().equalsIgnoreCase(selectedOptionGroup.toString()))
+								.collect(Collectors.toList());
+
+						contractManufacturerList1.forEach(x-> contractManufacturerList.add(x.getCmId()));
+					}
+				}
+
+				new CmForSysRoleDao().addUpdateCmForSysRoleList(contractManufacturerList, sysRole.getRoleId());
 			}
 
 			this.getUI().showNotification("Data Saved.", Type.HUMANIZED_MESSAGE);
 			cbxSysRoleFilters.select("Name");
 			txtSearch.setValue("");
-			loadTblData("","");
-		}
-		else if(!validateRequiredFieldsResult)
+			loadTblData("", "");
+		} else if (!validateRequiredFieldsResult)
 			this.getUI().showNotification("Name and Description must be set for New User Role Records", Type.WARNING_MESSAGE);
-		else if(!validateDuplicatedNamesResult)
+		else if (!validateDuplicatedNamesResult)
 			this.getUI().showNotification("Name of User Role can not be duplicated.", Type.WARNING_MESSAGE);
-		else if(!validateNonSysAdminNameResult)
+		else if (!validateNonSysAdminNameResult)
 			this.getUI().showNotification("'sys_admin' is Non-Eligible for Name.", Type.WARNING_MESSAGE);
 	}
 		

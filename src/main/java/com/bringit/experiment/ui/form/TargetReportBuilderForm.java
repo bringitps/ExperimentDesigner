@@ -278,8 +278,6 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				else
 					new TargetColumnGroupDao().addTargetColumnGroup(targetRptColGroups.get(i));
 			}
-			
-			//System.out.println("Target Report Column Group: " + targetRptColGroups.get(j));
 		
 			for(int i=0; i<targetRptColumns.size(); i++)
 			{

@@ -633,6 +633,7 @@ public class ExperimentForm extends ExperimentDesign {
 			else
 				this.experiment.setExperimentType(null);
 			
+			//New line added to store RPT Table name into Experiment entity
 			this.experiment.setExpDbRptTableNameId("rpt#" + this.experiment.getExpDbTableNameId());
 			
 			ExperimentDao expDao = new ExperimentDao();

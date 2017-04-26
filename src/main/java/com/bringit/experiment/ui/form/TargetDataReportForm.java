@@ -57,8 +57,10 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 	public TargetDataReportForm(Integer targetDataReportId)
 	{
 		targetRpt = new TargetReportDao().getTargetReportById(targetDataReportId);
-		lblTargetRptTitle.setValue(lblTargetRptTitle.getValue() + " - " + targetRpt.getTargetReportName());
-		
+		lblTargetRptTitle.setValue(lblTargetRptTitle.getValue() + " - " + targetRpt.getTargetReportName()); // Attach RPT Table last updated date 
+
+		//Add the button "Refresh Data Now" to run SP and get data refreshed 
+		//If this target data report is being refreshed hide "Refresh Data Now" button
 		/*
 		experimentFields = new ExperimentFieldDao().getActiveExperimentFields(targetRpt.getExperiment());
 		
@@ -164,7 +166,16 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		cbxContractManufacturer.setInvalidAllowed(false);
 	
 		bindTargetReportRptTable();
-
+				//To do:
+				//Include Container Filters to Table according to CM Restrictions
+				//1) Get Role of Session
+				//SysRole sysRoleSession = (SysRole)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
+				//2) Get CmNames String array 
+				//3) Set static filter to data loaded
+				//1 Container Filter by 1 CmName
+				//Equal Operator needs to be used vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
+				
+		
 		this.btnApplyFilters.addClickListener(new Button.ClickListener() {
 			
 			@Override

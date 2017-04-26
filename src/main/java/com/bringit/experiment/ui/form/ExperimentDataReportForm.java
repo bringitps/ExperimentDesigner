@@ -13,6 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
+import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.ui.design.ExperimentDataReportDesign;
@@ -31,6 +32,7 @@ import com.vaadin.data.util.sqlcontainer.query.generator.MSSQLGenerator;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
@@ -53,10 +55,24 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 		experiment = new ExperimentDao().getExperimentById(experimentId);
 		experimentFields = new ExperimentFieldDao().getActiveExperimentFields(experiment);
 		
-		this.lblExperimentTitle.setValue(" - " + experiment.getExpName());
+		this.lblExperimentTitle.setValue(" - " + experiment.getExpName()); // Attach RPT Table last updated date 
+		
+		//Add the button "Refresh Data Now" to run SP and get data refreshed 
+		//If this experiment data report is being refreshed hide "Refresh Data Now" button
 		
 		bindExperimentRptTable();
 
+
+		//To do:
+		//Include Container Filters to Table according to CM Restrictions
+		//1) Get Role of Session
+		//SysRole sysRoleSession = (SysRole)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
+		//2) Get CmNames String array 
+		//3) Set static filter to data loaded
+		//1 Container Filter by 1 CmName
+		//Equal Operator needs to be used vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
+		
+		
 		cbxExperimentDataReportFilters.setContainerDataSource(null);
 		cbxDateFieldsFilter.setContainerDataSource(null);
 		
@@ -237,7 +253,6 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign{
 			Like like = new Like(this.cbxExperimentDataReportFilters.getValue(), "%" + this.txtSearch.getValue().trim() + "%");
 			vaadinTblContainer.addContainerFilter(like); 	
 		}
-		
 		
         /*
 		if(this.cbxDateFieldsFilter.getValue() != null && this.cbxDateFilterOperators.getValue() != null

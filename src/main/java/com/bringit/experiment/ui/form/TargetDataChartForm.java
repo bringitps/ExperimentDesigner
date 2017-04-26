@@ -256,6 +256,17 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 	{
 		bindTargetReportRptTable();
 		
+		//To do:
+				//Include Container Filters to Table according to CM Restrictions
+				//1) Get Role of Session
+				//SysRole sysRoleSession = (SysRole)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
+				//2) Get CmNames String array 
+				//3) Set static filter to data loaded
+				//1 Container Filter by 1 CmName
+				//Equal Operator needs to be used vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
+				
+		
+		
 		//System.out.println("Filtering Data...");
 		vaadinTblContainer.removeAllContainerFilters();
 		

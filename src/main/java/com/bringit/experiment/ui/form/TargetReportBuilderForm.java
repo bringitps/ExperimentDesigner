@@ -258,6 +258,9 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			
 			String prevDbRptTable = this.targetReport.getTargetReportDbRptTableNameId();
 			String currDbRptTable = this.targetReport.getTargetReportName().replaceAll(" ", "_");
+			
+			//New line added to store RPT DB Table Name
+			//DB RPT Table Name = Target Report replacing spaces by "_"
 			this.targetReport.setTargetReportDbRptTableNameId("targetrpt#" + currDbRptTable);
 			
 			if(this.targetReport.getTargetReportId() != null)

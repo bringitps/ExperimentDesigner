@@ -1,17 +1,5 @@
 package com.bringit.experiment.ui.form;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.ExperimentFieldValueUpdateLog;
@@ -21,27 +9,32 @@ import com.bringit.experiment.dao.ExperimentFieldValueUpdateLogDao;
 import com.bringit.experiment.data.ResponseObj;
 import com.bringit.experiment.ui.design.ExperimentDataViewRecordDesign;
 import com.bringit.experiment.util.Config;
+import com.bringit.experiment.util.DateUtil;
 import com.bringit.experiment.util.ExperimentUtil;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.util.converter.Converter.ConversionException;
-import com.vaadin.event.ContextClickEvent;
-import com.vaadin.event.ContextClickEvent.ContextClickListener;
 import com.vaadin.server.VaadinService;
-import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Table.TableContextClickEvent;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.Tree;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.Window;
 
-public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign{
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign {
 
 	Integer recordId = -1;
 	Experiment experiment = new Experiment();
@@ -67,7 +60,7 @@ public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign
 		//this.lblExperimentTitle.setValue(" -" + experiment.getExpName());
 		
 		
-		String sqlSelectQuery = ExperimentUtil.buildEqualsFilteredSqlSelectQueryByExperiment(this.experiment, this.experimentFields, "Id", this.recordId.toString()); 
+		String sqlSelectQuery = ExperimentUtil.buildEqualsFilteredSqlSelectQueryByExperiment(this.experiment, this.experimentFields, "Id", this.recordId.toString());
 		ResultSet experimentDataRecordResults = new ExecuteQueryDao().getSqlSelectQueryResults(sqlSelectQuery);
 		if(experimentDataRecordResults != null)
 		{
@@ -204,15 +197,7 @@ public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign
 		List<String> updateRecordDbFieldValueXRef = new ArrayList<String>();
 		SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 		
-		Date updateDate = new Date();
-		DateFormat dfUpdateDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String updateDateStr = dfUpdateDate.format(updateDate);
-		try {
-			updateDate = dfUpdateDate.parse(updateDateStr);
-		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		Date updateDate = DateUtil.getDate();
 		
 		if(configuration.getProperty("dbms").equals("sqlserver"))
 		{

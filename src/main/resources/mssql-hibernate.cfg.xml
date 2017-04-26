@@ -1,53 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 
 <hibernate-configuration>
     <session-factory>
-        
-        <!-- Database connection settings -->  
-        <property name="connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>  
-        <property name="connection.url">jdbc:sqlserver://localhost:1433;database=ExperimentDesigner</property>  
-        <property name="connection.username">sa</property>  
-        <property name="connection.password">edgar1987</property>  
-  		
-  		<!-- JDBC connection pool (use the built-in) -->  
-        <property name="connection.pool_size">1</property>  
-  
-        <!-- SQL dialect -->  
-        <property name="dialect">org.hibernate.dialect.SQLServer2008Dialect</property>  
-  
-        <!-- Echo all executed SQL to stdout -->  
-        <property name="show_sql">true</property>  
-  
-        <!-- Update database schema on startup -->  
-        <property name="hbm2ddl.auto">update</property>  
-   
+
+        <!-- Database connection settings -->
+        <property name="connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
+        <property name="connection.url">jdbc:sqlserver://localhost:1433;database=ExperimentDesigner</property>
+        <property name="connection.username">sa</property>
+        <property name="connection.password">edgar1987</property>
+
+        <!-- JDBC connection pool (use the built-in) -->
+        <property name="connection.pool_size">1</property>
+
+        <!-- SQL dialect -->
+        <property name="dialect">org.hibernate.dialect.SQLServer2008Dialect</property>
+
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">true</property>
+
+        <!-- Update database schema on startup -->
+        <property name="hbm2ddl.auto">update</property>
+
         <property name="format_sql">true</property>
-   
+
         <property name="hibernate.enable_lazy_load_no_trans">true</property>
-    	
-    	 
-   		<property name="hibernate.current_session_context_class">thread</property>		
-		<property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
-		
-		
-		<!-- For singleton factory -->
-		<!-- <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</property>
-		-->
-		 
-		<!-- enable second level cache and query cache -->
-		<property name="hibernate.cache.use_second_level_cache">true</property>
-		<property name="hibernate.cache.use_query_cache">true</property>
- 		<property name="net.sf.ehcache.configurationResourceName">/myehcache.xml</property>
- 		     
+
+
+        <property name="hibernate.current_session_context_class">thread</property>
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory
+        </property>
+
+
+        <!-- For singleton factory -->
+        <!-- <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</property>
+        -->
+
+        <!-- enable second level cache and query cache -->
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.use_query_cache">true</property>
+        <property name="net.sf.ehcache.configurationResourceName">/myehcache.xml</property>
+
         <!-- Mapping for Classes using Annotations -->
-        <mapping class="com.bringit.experiment.bll.SysUser" />
-        <mapping class="com.bringit.experiment.bll.Experiment" />
-        <mapping class="com.bringit.experiment.bll.ExperimentField" />
-        <mapping class="com.bringit.experiment.bll.ExperimentType" />
-        <mapping class="com.bringit.experiment.bll.ExperimentImage" />
-        <mapping class="com.bringit.experiment.bll.ExperimentFieldValueUpdateLog" />
-        <mapping class="com.bringit.experiment.bll.UnitOfMeasure" />
+        <mapping class="com.bringit.experiment.bll.SysUser"/>
+        <mapping class="com.bringit.experiment.bll.Experiment"/>
+        <mapping class="com.bringit.experiment.bll.ExperimentField"/>
+        <mapping class="com.bringit.experiment.bll.ExperimentType"/>
+        <mapping class="com.bringit.experiment.bll.ExperimentImage"/>
+        <mapping class="com.bringit.experiment.bll.ExperimentFieldValueUpdateLog"/>
+        <mapping class="com.bringit.experiment.bll.UnitOfMeasure"/>
         <mapping class="com.bringit.experiment.bll.FilesRepository"/>
         <mapping class="com.bringit.experiment.bll.JobExecutionRepeat"/>
         <mapping class="com.bringit.experiment.bll.XmlDataLoadExecutionResult"/>
@@ -59,10 +61,11 @@
         <mapping class="com.bringit.experiment.bll.DataFile"/>
         <mapping class="com.bringit.experiment.bll.TargetReport"/>
         <mapping class="com.bringit.experiment.bll.TargetColumn"/>
-         <mapping class="com.bringit.experiment.bll.TargetColumnGroup"/>
-         <mapping class="com.bringit.experiment.bll.ContractManufacturer"/>
-         <mapping class="com.bringit.experiment.bll.SysRole" />
-         <mapping class="com.bringit.experiment.bll.UserRole" />
+        <mapping class="com.bringit.experiment.bll.TargetColumnGroup"/>
+        <mapping class="com.bringit.experiment.bll.ContractManufacturer"/>
+        <mapping class="com.bringit.experiment.bll.SysRole"/>
+        <mapping class="com.bringit.experiment.bll.UserRole"/>
+        <mapping class="com.bringit.experiment.bll.SysSmtp"/>
 
     </session-factory>
 </hibernate-configuration>

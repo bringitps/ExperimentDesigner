@@ -1,33 +1,23 @@
 package com.bringit.experiment.ui.form;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.rmi.Remote;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
+import com.bringit.experiment.bll.CmForSysRole;
+import com.bringit.experiment.bll.ContractManufacturer;
+import com.bringit.experiment.bll.CsvTemplate;
+import com.bringit.experiment.bll.CsvTemplateColumns;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.FilesRepository;
 import com.bringit.experiment.bll.JobExecutionRepeat;
+import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
-import com.bringit.experiment.bll.ContractManufacturer;
-import com.bringit.experiment.bll.CsvTemplate;
-import com.bringit.experiment.bll.CsvTemplateColumns;
+import com.bringit.experiment.dao.CmForSysRoleDao;
+import com.bringit.experiment.dao.ContractManufacturerDao;
+import com.bringit.experiment.dao.CsvTemplateColumnsDao;
+import com.bringit.experiment.dao.CsvTemplateDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.FilesRepositoryDao;
 import com.bringit.experiment.dao.JobExecutionRepeatDao;
-import com.bringit.experiment.dao.XmlTemplateDao;
-import com.bringit.experiment.dao.XmlTemplateNodeDao;
-import com.bringit.experiment.dao.ContractManufacturerDao;
-import com.bringit.experiment.dao.CsvTemplateColumnsDao;
-import com.bringit.experiment.dao.CsvTemplateDao;
 import com.bringit.experiment.remote.RemoteFileUtil;
 import com.bringit.experiment.ui.design.CsvTemplateDesign;
 import com.opencsv.CSVReader;
@@ -37,18 +27,23 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
-
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
-
 import com.vaadin.ui.Upload;
-
 import com.vaadin.ui.Upload.Receiver;
-import com.vaadin.ui.Panel;
-
 import com.vaadin.ui.Window;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 public class CsvTemplateForm extends CsvTemplateDesign {
 
@@ -57,14 +52,31 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	private List<FilesRepository> repos =  new FilesRepositoryDao().getAllFilesRepositorys();
 	private List<JobExecutionRepeat> jobs = new JobExecutionRepeatDao().getAllJobExecutionRepeats();
 	private List<Experiment> experiments = new ExperimentDao().getActiveExperiments();
-	private List<ContractManufacturer> contractManufacturers = new ContractManufacturerDao().getAllContractManufacturers();
+	private List<ContractManufacturer> contractManufacturers;
 	private int lastNewItemId = 0;
     private File tempFile;
     private List<ExperimentField> expFields;
 	private List<Integer> dbIdOfCsvTemplateNodeItemsToDelete = new ArrayList<Integer>();
+	SysRole sysRoleSession = (SysRole)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
+
+
+	private void loadSpecificContractManufacturer() {
+		contractManufacturers = new ArrayList<>();
+
+		if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
+			List<CmForSysRole> cmForSysRole =  new CmForSysRoleDao().getListOfCmForSysRoleBysysRoleId(sysRoleSession.getRoleId());
+			cmForSysRole.forEach(x-> contractManufacturers.add(x.getContractManufacturer()));
+		} else {
+			contractManufacturers = new ContractManufacturerDao().getAllContractManufacturers();
+		}
+
+
+	}
 
 	public CsvTemplateForm(int csvId)
 	{
+		loadSpecificContractManufacturer();
+
 		this.tblCsvCols.setContainerDataSource(null);
 		this.tblCsvCols.addContainerProperty("*", CheckBox.class, null);
 		this.tblCsvCols.addContainerProperty("Csv Column", TextField.class, null);

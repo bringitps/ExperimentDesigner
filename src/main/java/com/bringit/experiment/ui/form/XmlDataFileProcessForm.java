@@ -1,33 +1,16 @@
 package com.bringit.experiment.ui.form;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.commons.io.IOUtils;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
+import com.bringit.experiment.bll.CmForSysRole;
+import com.bringit.experiment.bll.ContractManufacturer;
 import com.bringit.experiment.bll.DataFile;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.FilesRepository;
+import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.XmlDataLoadExecutionResult;
 import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.dao.BatchExperimentRecordsInsertDao;
+import com.bringit.experiment.dao.CmForSysRoleDao;
 import com.bringit.experiment.dao.DataFileDao;
 import com.bringit.experiment.dao.XmlDataLoadExecutionResultDao;
 import com.bringit.experiment.dao.XmlTemplateDao;
@@ -40,25 +23,59 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Upload;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.Receiver;
+import com.vaadin.ui.Window;
+import org.apache.commons.io.IOUtils;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
-public class XmlDataFileProcessForm extends XmlDataFileProcessDesign{
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class XmlDataFileProcessForm extends XmlDataFileProcessDesign {
 
 	private File tempFile;
 	private InputStream isFile;
     private List<ExperimentField> expFields;
 	private Document xmlDocument = null;
-	private List<XmlTemplate> xmlTemplates = new XmlTemplateDao().getAllActiveXmlTemplates();
+	private List<XmlTemplate> xmlTemplates ;
 	private String loadedFileName = null;
 	private XmlTemplate xmlTemplate = new XmlTemplate();
-	
+	SysRole sysRoleSession = (SysRole)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
+
+
+	private void loadXmlTemplates () {
+		xmlTemplates = new ArrayList<>();
+
+		if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
+			List<CmForSysRole> cmForSysRole =  new CmForSysRoleDao().getListOfCmForSysRoleBysysRoleId(sysRoleSession.getRoleId());
+			List<ContractManufacturer> contractManufacturerList = new ArrayList<>();
+			cmForSysRole.forEach(x-> contractManufacturerList.add(x.getContractManufacturer()));
+			xmlTemplates = new XmlTemplateDao().getAllXmlTemplatesByCmId(contractManufacturerList);
+			System.out.println("xmlTemplates = " + xmlTemplates);
+		} else {
+			xmlTemplates = new XmlTemplateDao().getAllActiveXmlTemplates();
+		}
+	}
+
 	public XmlDataFileProcessForm()
 	{
+		loadXmlTemplates ();
 		uploadFile();
 		fillCombos();
 		btnRun.setEnabled(false);

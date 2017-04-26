@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head>
+ <body>
+  <vaadin-vertical-layout size-full>
+   <vaadin-panel style-name="scroll-divider well" size-full>
+    <vaadin-form-layout style-name="content" margin>
+     <vaadin-label style-name="h2" width="411px" plain-text>
+       Email Notification Settings 
+     </vaadin-label>
+     <vaadin-text-field required-error="The field is mandatory" caption="Primary Smtp Gateway" required style-name="tiny" _id="primarySmtpGateway"></vaadin-text-field>
+     <vaadin-text-field required-error="The field is mandatory" caption="SMTP Port" required style-name="tiny" _id="smtpPort"></vaadin-text-field>
+     <vaadin-text-field required-error="The field is mandatory" caption="SMP Login User" required style-name="tiny" _id="smtpLoginUser"></vaadin-text-field>
+     <vaadin-password-field required-error="The field is mandatory" caption="SMTP Login Password" required input-prompt="" style-name="tiny" responsive _id="smtpLoginPassword"></vaadin-password-field>
+     <vaadin-text-field caption="POP3 Server Address" style-name="tiny" _id="pop3ServerAddress"></vaadin-text-field>
+     <vaadin-text-field caption="Pop3 Port Number" style-name="tiny" _id="pop3PortNumber"></vaadin-text-field>
+     <vaadin-text-field caption="POP3 User Name" style-name="tiny" _id="pop3UserName"></vaadin-text-field>
+     <vaadin-password-field caption="Pop3 User Password" style-name="tiny" _id="pop3UserPassword"></vaadin-password-field>
+     <vaadin-text-field caption="Reply Address" style-name="tiny" _id="replyAddress"></vaadin-text-field>
+     <vaadin-text-field caption="Email To" style-name="tiny" _id="emailTo"></vaadin-text-field>
+     <vaadin-css-layout>
+      <vaadin-horizontal-layout responsive width-full height="36px">
+       <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="primary tiny" plain-text _id="btnSave">
+         Save 
+       </vaadin-button>
+       <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny" plain-text _id="btnCancel">
+         Cancel 
+       </vaadin-button>
+       <vaadin-button style-name="tiny" plain-text _id="btnSendEmail">
+         Send a test email 
+       </vaadin-button>
+      </vaadin-horizontal-layout>
+     </vaadin-css-layout>
+    </vaadin-form-layout>
+   </vaadin-panel>
+  </vaadin-vertical-layout>
+ </body>
+</html>

@@ -1,17 +1,13 @@
 package com.bringit.experiment.util;
 
+import com.bringit.experiment.bll.ContractManufacturer;
+import com.bringit.experiment.bll.Experiment;
+import com.bringit.experiment.bll.ExperimentField;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
-import com.bringit.experiment.bll.Experiment;
-import com.bringit.experiment.bll.ExperimentField;
-import com.bringit.experiment.bll.SysUser;
-import com.bringit.experiment.dao.ExperimentDao;
-import com.bringit.experiment.dao.ExperimentFieldDao;
-import com.bringit.experiment.ui.form.ExperimentManagementForm;
-import com.bringit.experiment.ui.form.XmlTemplateManagementForm;
 
 public class ExperimentUtil {
 
@@ -43,7 +39,48 @@ public class ExperimentUtil {
 		
 		return sqlSelectQuery;
 	}
-	
+
+	public static String buildSqlSelectQueryByExperiment(Experiment experiment,
+														 List<ExperimentField> experimentFields,
+														 List<ContractManufacturer> contractManufacturerList) {
+		String sqlSelectQuery = "";
+		Config configuration = new Config();
+		String cmId = "";
+		String cmQuery = "";
+		for (ContractManufacturer contractManufacturer : contractManufacturerList) {
+			if (!cmId.equalsIgnoreCase("")) {
+				cmId += ",";
+			}
+			cmId += contractManufacturer.getCmId();
+		}
+		if (!contractManufacturerList.isEmpty()) {
+			cmQuery += " and Cm.CmId in (" + cmId + ")";
+		}
+
+		if (configuration.getProperty("dbms").equals("sqlserver")) {
+			sqlSelectQuery = "SELECT " + experiment.getExpDbTableNameId() + ".RecordId AS Id,";
+			for (int i = 0; experimentFields != null && i < experimentFields.size(); i++)
+				sqlSelectQuery += experiment.getExpDbTableNameId() + "." + experimentFields.get(i).getExpDbFieldNameId() + " AS '" + experimentFields.get(i).getExpFieldName() + "',";
+
+			sqlSelectQuery += "Cm.CmName AS 'Contract Manufacturer'," + experiment.getExpDbTableNameId() + ".Comments," + experiment.getExpDbTableNameId() + ".CreatedDate, ";
+			sqlSelectQuery += experiment.getExpDbTableNameId() + ".LastModifiedDate, CreatedByUser.UserName AS CreatedBy, LastModifiedByUser.UserName AS LastModifiedBy, ";
+			sqlSelectQuery += " DataFile.DataFileName AS FileName, CONCAT(FileRepo.FileRepoHost, FileRepo.FileRepoPath) AS Location ";
+			sqlSelectQuery += " FROM " + experiment.getExpDbTableNameId();
+			sqlSelectQuery += " LEFT OUTER JOIN ContractManufacturer AS Cm ON " + experiment.getExpDbTableNameId() + ".CmId = Cm.CmId ";
+			sqlSelectQuery += cmQuery;
+			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS CreatedByUser ON " + experiment.getExpDbTableNameId() + ".CreatedBy = CreatedByUser.UserId ";
+			sqlSelectQuery += " LEFT OUTER JOIN SysUser AS LastModifiedByUser ON " + experiment.getExpDbTableNameId() + ".LastModifiedBy = CreatedByUser.UserId ";
+			sqlSelectQuery += " LEFT OUTER JOIN DataFile AS DataFile ON " + experiment.getExpDbTableNameId() + ".DataFileId = DataFile.DataFileId ";
+			sqlSelectQuery += " LEFT OUTER JOIN FilesRepository AS FileRepo ON DataFile.FileRepoId = FileRepo.FileRepoId ";
+			sqlSelectQuery += " ORDER BY " + experiment.getExpDbTableNameId() + ".LastModifiedDate DESC;";
+
+		} else
+			return null;
+
+		return sqlSelectQuery;
+	}
+
+
 	public static String buildFilteredSqlSelectQueryByExperiment(Experiment experiment, List<ExperimentField> experimentFields, String columnName, String filterValue)
 	{
 

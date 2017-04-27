@@ -4,6 +4,7 @@ import com.bringit.experiment.bll.SysSmtp;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.dao.SmtpDao;
 import com.bringit.experiment.ui.design.SmtpConfigDesign;
+import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.DateUtil;
 import com.bringit.experiment.util.SmtpUtil;
 import com.vaadin.server.VaadinService;
@@ -106,8 +107,10 @@ public class SmtpConfigForm extends SmtpConfigDesign {
 
         String emailAddress = this.emailTo.getValue();
         SmtpUtil smtpUtil = new SmtpUtil();
-        String body = "<html></head><body>Hello Sir/Ma'am,<br/>This is a test message from SMTP server with the below details.<br/><br/><span>[SMTP details like Log In User, SMTP Port, Reply Address, etc]</span><br/><br/>Regards,</body></html>" ;
-        String subject = "Test SMTP Mail";
+        Config configuration = new Config();
+        String body =configuration.getProperty("body");
+        String subject = configuration.getProperty("subject");
+
         if (lstEmailConfig.size() > 0) {
             Boolean status = smtpUtil.sendMail(body, emailAddress, subject, lstEmailConfig.get(0));
             if (status) {

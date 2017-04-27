@@ -10,21 +10,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import com.bringit.experiment.bll.*;
+import com.bringit.experiment.dao.*;
+import com.vaadin.server.VaadinService;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.bringit.experiment.bll.ContractManufacturer;
-import com.bringit.experiment.bll.Experiment;
-import com.bringit.experiment.bll.ExperimentField;
-import com.bringit.experiment.bll.TargetColumn;
-import com.bringit.experiment.bll.TargetColumnGroup;
-import com.bringit.experiment.bll.TargetReport;
-import com.bringit.experiment.dao.ContractManufacturerDao;
-import com.bringit.experiment.dao.DataBaseViewDao;
-import com.bringit.experiment.dao.ExecuteQueryDao;
-import com.bringit.experiment.dao.ExperimentFieldDao;
-import com.bringit.experiment.dao.TargetColumnDao;
-import com.bringit.experiment.dao.TargetColumnGroupDao;
-import com.bringit.experiment.dao.TargetReportDao;
 import com.bringit.experiment.ui.design.TargetDataReportDesign;
 import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.ExperimentUtil;
@@ -166,16 +156,28 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		cbxContractManufacturer.setInvalidAllowed(false);
 	
 		bindTargetReportRptTable();
-				//To do:
-				//Include Container Filters to Table according to CM Restrictions
-				//1) Get Role of Session
-				//SysRole sysRoleSession = (SysRole)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
-				//2) Get CmNames String array 
-				//3) Set static filter to data loaded
-				//1 Container Filter by 1 CmName
-				//Equal Operator needs to be used vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
-				
-		
+
+		//To do:
+		//Include Container Filters to Table according to CM Restrictions
+		//1) Get Role of Session
+		//SysRole sysRoleSession = (SysRole)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
+		//2) Get CmNames String array
+		//3) Set static filter to data loaded
+		//1 Container Filter by 1 CmName
+		//Equal Operator needs to be used vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
+
+
+
+		SysRole sysRoleSession = (SysRole) VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
+
+		if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
+			List<ContractManufacturer> contractManufacturers = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
+			for (ContractManufacturer con : contractManufacturers) {
+				vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), con.getCmName()));
+			}
+		}
+
+
 		this.btnApplyFilters.addClickListener(new Button.ClickListener() {
 			
 			@Override

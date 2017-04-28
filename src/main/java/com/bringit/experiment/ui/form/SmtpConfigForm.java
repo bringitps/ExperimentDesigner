@@ -27,7 +27,7 @@ public class SmtpConfigForm extends SmtpConfigDesign {
             sysSmtp = lstEmailConfig.get(0);
             this.primarySmtpGateway.setValue(sysSmtp.getSmtpGateway());
             this.smtpPort.setValue(sysSmtp.getSmtpPort().toString());
-            this.smtpLoginUser.setValue(sysSmtp.getSmtpLoginPassword());
+            this.smtpLoginUser.setValue(sysSmtp.getSmtpLoginUser());
             this.smtpLoginPassword.setValue(sysSmtp.getSmtpLoginPassword());
             this.pop3ServerAddress.setValue(sysSmtp.getPop3ServerAddress());
             this.pop3PortNumber.setValue(sysSmtp.getPop3PortNumber().toString());

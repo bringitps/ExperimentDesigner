@@ -5,13 +5,11 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import com.bringit.experiment.bll.*;
 import com.bringit.experiment.dao.*;
+import com.vaadin.data.util.filter.Or;
 import com.vaadin.server.VaadinService;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -172,12 +170,15 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		//3) Set static filter to data loaded
 		//1 Container Filter by 1 CmName
 		//Equal Operator needs to be used vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
-
+		List<Compare.Equal> filterList= new ArrayList<>();
 		if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
 			List<ContractManufacturer> contractManufacturersFilter = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
 			for (ContractManufacturer con : contractManufacturersFilter) {
-				vaadinTblContainer.addContainerFilter(new Compare.Equal("CmName", con.getCmName()));
+				filterList.add(new Compare.Equal("CmName", con.getCmName()));
+
 			}
+			vaadinTblContainer.addContainerFilter(new Or(filterList.toArray(new Compare.Equal[filterList.size()])));
+
 		}
 
 
@@ -205,8 +206,17 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 					vaadinTblContainer.addContainerFilter(new Like(cbxExpFieldFilter.getValue(), "%" + txtExpFieldFilter.getValue().trim() + "%")); 	
 				
 				if(cbxContractManufacturer.getValue() != null )
-					vaadinTblContainer.addContainerFilter(new Compare.Equal("CmName",cbxContractManufacturer.getValue())); 	
-				
+					vaadinTblContainer.addContainerFilter(new Compare.Equal("CmName",cbxContractManufacturer.getValue()));
+
+				List<Compare.Equal> filterList= new ArrayList<>();
+				if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
+					List<ContractManufacturer> contractManufacturersFilter = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
+					for (ContractManufacturer con : contractManufacturersFilter) {
+						filterList.add(new Compare.Equal("CmName", con.getCmName()));
+
+					}
+					vaadinTblContainer.addContainerFilter(new Or(filterList.toArray(new Compare.Equal[filterList.size()])));
+				}
 			}
 		});
 		

@@ -11,6 +11,7 @@ import java.util.Locale;
 
 import com.bringit.experiment.bll.*;
 import com.bringit.experiment.dao.CmForSysRoleDao;
+import com.vaadin.data.util.filter.Or;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.bringit.experiment.dao.ExperimentDao;
@@ -48,6 +49,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
     List<ExperimentField> experimentFields = new ArrayList<ExperimentField>();
     int selectedRecordId = -1;
     private SQLContainer vaadinTblContainer;
+    SysRole sysRoleSession = (SysRole) VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
 
     public ExperimentDataReportForm(int experimentId) {
         experiment = new ExperimentDao().getExperimentById(experimentId);
@@ -69,12 +71,14 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
         //1 Container Filter by 1 CmName
         //Equal Operator needs to be used vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
 
-        SysRole sysRoleSession = (SysRole) VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
+
+        List<Compare.Equal> filterList= new ArrayList<>();
         if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
             List<ContractManufacturer> contractManufacturers = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
             for (ContractManufacturer con : contractManufacturers) {
-                vaadinTblContainer.addContainerFilter(new Compare.Equal("CmName", con.getCmName()));
+                filterList.add(new Compare.Equal("CmName", con.getCmName()));
             }
+            vaadinTblContainer.addContainerFilter(new Or(filterList.toArray(new Compare.Equal[filterList.size()])));
         }
 
 
@@ -196,6 +200,14 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
     private void filterExperimentDataResults() {
         //System.out.println("Filtering Data...");
         vaadinTblContainer.removeAllContainerFilters();
+        List<Compare.Equal> filterList= new ArrayList<>();
+        if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
+            List<ContractManufacturer> contractManufacturers = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
+            for (ContractManufacturer con : contractManufacturers) {
+                filterList.add(new Compare.Equal("CmName", con.getCmName()));
+            }
+            vaadinTblContainer.addContainerFilter(new Or(filterList.toArray(new Compare.Equal[filterList.size()])));
+        }
 
         if (this.chxDateFilters.getValue() && this.cbxDateFieldsFilter.getValue() != null && this.cbxDateFilterOperators.getValue() != null
                 && this.dtFilter1.getValue() != null) {

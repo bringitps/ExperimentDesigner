@@ -250,7 +250,7 @@ public class CsvTemplateDao {
 	            trns = session.beginTransaction();
 	            String queryString = "from CsvTemplate where CsvTemplateIsActive = 'true' and CsvTemplateName = :name";
 	            Query query = session.createQuery(queryString);
-	            query.setString("csv", csvTemplateName);
+	            query.setString("name", csvTemplateName);
 	            csvTemplate = (CsvTemplate) query.uniqueResult();
 	        } catch (RuntimeException e) {
 	            e.printStackTrace();

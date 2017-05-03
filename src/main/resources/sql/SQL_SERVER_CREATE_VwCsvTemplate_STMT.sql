@@ -2,7 +2,7 @@ CREATE VIEW vwCsvTemplate as
 SELECT  CsvTemplate.CsvTemplateId AS 'Id',
  CsvTemplate.CsvTemplateName AS 'Name',
  Experiment.ExpName as 'Experiment',
-			  CMF.CmName as 'Contract Manofacturer',
+			  CMF.CmName as 'Contract Manufacturer',
               Job.JobExecRepeatName AS 'Exec Repeat',
               InFileRepo.FileRepoHost 'Inbound host', InFileRepo.FileRepoPath 'Inbound path', InFileProc.FileRepoHost AS 'Processed host', InFileProc.FileRepoPath AS 'Processed path', 
 			  InFileExce.FileRepoHost AS 'Exception host', InFileExce.FileRepoPath AS 'Exception path', CreatedByUser.UserName AS 'CreatedBy', 

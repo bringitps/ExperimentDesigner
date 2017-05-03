@@ -76,18 +76,117 @@ public class ExperimentParser {
 	        				if(columns != null){
 
 	        					reader = new CSVReader(new InputStreamReader(csvFile));
-	        		            // we assume the first line is the header
+	        		            
+	        					// we assume the first line is the header
 	        		            String[] header = reader.readNext();
+	        		            
+	        		            //--- Start ---//
+	        		            //Edgar B. 5/3/2017
+	        		            //Solution to Null Pointer and Mandatory Columns for CSV Processing
+	        		            List<String[]> csvFileLines = new ArrayList<String[]>();
+	        		            
+	        		            String[] csvFileLine;
+	        		            while ((csvFileLine = reader.readNext()) != null) 
+	        		            	csvFileLines.add(csvFileLine);
+	        		            
+	        		            reader.close();
+	        		            
+	        		            int totalLines = csvFileLines.size();	        		            
+	        		            System.out.println("Total Lines: " + totalLines);
+	        		            
+	        		            List<String> csvColumnNameMtx = new ArrayList<String>();
+	        		            List<String> csvColumnTypeMtx = new ArrayList<String>();
+	        		            List<String> csvColumnFieldDbIdXRefMtx = new ArrayList<String>();
+	        		            List<Integer> csvColumnPositionInFileMtx = new ArrayList<Integer>();
+	        		            List<String[]> csvColumnValuesMtx = new ArrayList<String[]>();
+	        		            
 
+	        		            for(int i=0; i < columns.size(); i++)
+	        		            {
+	        		            	csvColumnNameMtx.add(columns.get(i).getCsvTemplateColumnName());
+	        		            	csvColumnTypeMtx.add(columns.get(i).getExpField().getExpFieldType());
+	        		            	csvColumnFieldDbIdXRefMtx.add(columns.get(i).getExpField().getExpDbFieldNameId());
+	        		            	csvColumnPositionInFileMtx.add(-1);
+	        		            	csvColumnValuesMtx.add(new String[totalLines]);
+	        		            }        		            
+	        		            
+	        		            for(int i=0; i < header.length; i++)
+	        		            {
+		        		            System.out.println("Header (" + i + "): " + header[i]);
+		        		            
+	        		            	Integer csvColumnIndex = csvColumnNameMtx.indexOf(header[i]);
+	        		            	if(csvColumnIndex != -1)
+	        		            		csvColumnPositionInFileMtx.set(csvColumnIndex, i);	        		            	
+	        		            }
+	        		            
+	        		        	int rowCount = 1;	        		            	
+	        		            for(int i=0; i<csvFileLines.size(); i++)
+	        		            {
+	        		            	for(int j=0; j < columns.size(); j++)
+	 	        		            	csvColumnValuesMtx.get(j)[rowCount-1] = (csvColumnPositionInFileMtx.get(j) != -1) ?	csvFileLines.get(i)[csvColumnPositionInFileMtx.get(j)] : "";
+	 	        		            	
+	 	        		            rowCount ++;
+	        		            }
+	        		            
+	        		            System.out.println("Row Count: " + rowCount);
+	        		            
+	        		            
+	        		            //Validate Field & Types
+	        		   			String exceptionRowColumns = "";
+	        		            for(int i=0; i < columns.size(); i++)
+	        		            {
+	        		            	if(csvColumnPositionInFileMtx.get(i) != -1)
+	        		            	{
+	        		            		String fieldType = csvColumnTypeMtx.get(i);
+	        		            		for(int j=0; j<totalLines; j++)
+	        		            		{
+	        		            			rowCount = j+1;
+	        		            			if(!validateFieldType(fieldType, csvColumnValuesMtx.get(i)[j]))
+		            		            		exceptionRowColumns += "Invalid Data: " + csvColumnValuesMtx.get(i)[j] + ". Cast failed to " + fieldType + " Found in Column '" + csvColumnNameMtx.get(i) + "' Row #" + rowCount + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss\n": ".\n");
+		            		            	
+	        		            		}
+	        		            	}
+	        		            }
+
+	        		            if(exceptionRowColumns.isEmpty())
+	        		            {
+		        		            for(int i=0; i < columns.size(); i++)
+		        		            {
+		        		            	if(csvColumnPositionInFileMtx.get(i) != -1)
+		        		            		csvColumns+= csvColumnFieldDbIdXRefMtx.get(i) + ",";
+		        		            }
+		        		            
+		        		            respObj.setCsvInsertColumns(csvColumns.substring(0, csvColumns.length()-1));
+		        		            
+		        		            for(int i=0; i<totalLines; i++)
+        		            		{
+		        		            	String csvValuesLine = "";
+	            		            
+		        		            	for(int j=0; j < columns.size(); j++)
+			        		            {
+		        		            		if(csvColumnPositionInFileMtx.get(j) != -1)
+			        		            	{
+			        		            		String fieldType = csvColumnTypeMtx.get(j);
+			            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? csvColumnValuesMtx.get(j)[i] +"," : "'" + csvColumnValuesMtx.get(j)[i] + "',";
+		        		            		}
+			        		            }
+	            		            	csvValues.add(csvValuesLine.substring(0,csvValuesLine.length()-1));
+		            		            respObj.setCsvInsertValues(csvValues);		        		            	
+        		            		}		        		            
+	        		            }
+	        		            
+	        		            //--- End ---//
+	        		            /*
 	        		            ArrayList<ArrayList> arr = new ArrayList<ArrayList>();
 	        		            
 	        		            for (CsvTemplateColumns column : columns) {
 	        		            	ArrayList maping = new ArrayList();
-	        		            	maping.add( Arrays.asList(header).indexOf(column.getCsvTemplateColumnName()));
-	        		            	maping.add( column.getExpField().getExpDbFieldNameId());
+	        		            	maping.add(Arrays.asList(header).indexOf(column.getCsvTemplateColumnName()));
+	        		            	maping.add(column.getExpField().getExpDbFieldNameId());
 	        		            	maping.add(column.getExpField().getExpFieldType());
 	        		            	arr.add(maping);
 								}
+	        		            
 	        		            String[] line;
 	        		            for (int i = 0; i < arr.size(); i++)
 									csvColumns+=(String) arr.get(i).get(1)+",";
@@ -115,6 +214,7 @@ public class ExperimentParser {
 	        		            }
 
 	                			reader.close();
+	        		            */
 	                			System.out.println("Exception Row Columns: " + exceptionRowColumns);
 	                			
 	                		    if(!exceptionRowColumns.isEmpty())

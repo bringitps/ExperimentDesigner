@@ -139,8 +139,27 @@ public class TargetReportDao {
         }
         return targetReports;
     }
-    
 
+    @SuppressWarnings({ "unchecked", "unused" })
+	public List<TargetReport> getAllActiveTargetReportsByExperimentId(Integer experimentId) {
+        List<TargetReport> targetReports = new ArrayList<TargetReport>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		//Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            targetReports = session.createQuery("from TargetReport where TargetReportIsActive = 'true' and ExpId = " + experimentId).list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return targetReports;
+    }
+
+    
+    
     public boolean deleteDBRptTableByName(String dbRptTableName)
     {
     	String query = null;

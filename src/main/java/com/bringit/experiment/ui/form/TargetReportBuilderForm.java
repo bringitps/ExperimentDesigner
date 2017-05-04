@@ -14,6 +14,7 @@ import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.TargetColumn;
 import com.bringit.experiment.bll.TargetColumnGroup;
 import com.bringit.experiment.bll.TargetReport;
+import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.TargetColumnDao;
@@ -293,6 +294,13 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			new TargetReportDao().deleteDBRptTable(this.targetReport);
 			new TargetReportDao().updateDBRptTable(this.targetReport);
 			
+			Integer targetReportId = this.targetReport.getTargetReportId();
+          	List<String> spTargetRptParams = new ArrayList<String>();
+          	spTargetRptParams.add(targetReportId.toString());
+          	System.out.println("Before executing target report builder: " + targetReportId);
+            new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spTargetRptParams);
+          	System.out.println("After executing target report builder: " + targetReportId);
+          
 			if(isNewRecord)
 			{
 				WebApplication webApp = (WebApplication)this.getParent().getParent();

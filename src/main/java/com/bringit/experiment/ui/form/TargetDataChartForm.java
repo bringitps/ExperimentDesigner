@@ -123,9 +123,15 @@ public class TargetDataChartForm extends TargetDataChartDesign {
                 if (!targetRptCols.get(j).getTargetColumnIsInfo()) {
                     dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Result");
                     dbRptTableTypes.add("varchar(20)");
-
-                    cbxValueX.addItem(targetRptCols.get(j).getTargetColumnLabel());
-                    cbxValueY.addItem(targetRptCols.get(j).getTargetColumnLabel());
+                    
+                    String uomAbbreviation = targetRptCols.get(j).getExperimentField().getUnitOfMeasure() != null ? targetRptCols.get(j).getExperimentField().getUnitOfMeasure().getUomAbbreviation() : "";
+                    
+                    cbxValueX.addItem(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"));
+                    cbxValueX.setItemCaption(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"), targetRptCols.get(j).getTargetColumnLabel() + ( uomAbbreviation.isEmpty() ? "" : " [" + uomAbbreviation + "]"));
+                    
+                    cbxValueY.addItem(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"));
+                    cbxValueY.setItemCaption(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"), targetRptCols.get(j).getTargetColumnLabel() + ( uomAbbreviation.isEmpty() ? "" : " [" + uomAbbreviation + "]"));
+                    
                 }
             }
         }

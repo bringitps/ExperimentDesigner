@@ -352,10 +352,12 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 				List<TargetColumnGroup> targetRptColGroups = new TargetColumnGroupDao().getTargetColumnGroupsByReportId(targetRpt.getTargetReportId());
 				List<String> dbRptTableCols = new ArrayList<String>();
 		    	List<String> dbRptTableTypes = new ArrayList<String>();
+		    	List<String> dbRptTableUoms =  new ArrayList<String>();
 		    	
 				dbRptTableCols.add("RecordId" );
 				dbRptTableTypes.add("int");
-				
+				dbRptTableUoms.add("");			    			
+    			
 		    	for(int i=0; i<targetRptColGroups.size(); i++)
 		    	{
 		    		List<TargetColumn> targetRptCols = new TargetColumnDao().getTargetColumnsByColGroupById(targetRptColGroups.get(i).getTargetColumnGroupId());
@@ -364,23 +366,28 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		    		{
 		    			dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"));
 		    			dbRptTableTypes.add(targetRptCols.get(j).getExperimentField().getExpFieldType());
-		    		
+		    			dbRptTableUoms.add(targetRptCols.get(j).getExperimentField().getUnitOfMeasure() != null ? targetRptCols.get(j).getExperimentField().getUnitOfMeasure().getUomAbbreviation() : "");
+		    			
 		    			if(!targetRptCols.get(j).getTargetColumnIsInfo())
 		    			{
 		    				dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Result" );
-		        			dbRptTableTypes.add("varchar(20)");    				
+		        			dbRptTableTypes.add("varchar(20)");
+		        			dbRptTableUoms.add("");			    			
 		    			}
 		    		}
 		    	}
 		    	
 				dbRptTableCols.add("Result");
 				dbRptTableTypes.add("varchar(20)");
-				
-				
+				dbRptTableUoms.add("");			    			
+    			
 				for(int i=0; i<dbRptTableCols.size(); i++)
 				{
-					tblTargetDataReport.setColumnHeader(dbRptTableCols.get(i), dbRptTableCols.get(i).replaceAll("_", " "));
-					
+					if(dbRptTableUoms.get(i).isEmpty())
+						tblTargetDataReport.setColumnHeader(dbRptTableCols.get(i), dbRptTableCols.get(i).replaceAll("_", " "));
+					else
+						tblTargetDataReport.setColumnHeader(dbRptTableCols.get(i), dbRptTableCols.get(i).replaceAll("_", " ") + " [" + dbRptTableUoms.get(i) + "]");
+						
 					if(dbRptTableTypes.get(i).toLowerCase().contains("float") || 
 							dbRptTableTypes.get(i).toLowerCase().contains("decimal") || 
 							dbRptTableTypes.get(i).toLowerCase().contains("int"))

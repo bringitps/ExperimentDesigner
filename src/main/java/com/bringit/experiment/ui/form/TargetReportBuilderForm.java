@@ -220,8 +220,9 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		boolean validateReqFieldsResult = validateRequiredFields();
 		boolean validateNumberColsResult = validateNumberColsResult();
 		boolean validateDuplicatedColNamesResult = validateDuplicatedColNames();
+		boolean validateTargetColsNamesResult = validateTargetColsNames();
 		
-		if(validateTargetColCntResult && validateReqFieldsResult && validateNumberColsResult && validateDuplicatedColNamesResult)
+		if(validateTargetColCntResult && validateReqFieldsResult && validateNumberColsResult && validateDuplicatedColNamesResult && validateTargetColsNamesResult)
 		{
 			//Delete Records from DataBase
 			if(dbIdOfTargetColumnGroupsToDelete.size() > 0)
@@ -319,6 +320,8 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				this.getUI().showNotification("Please fill in all required Fields.", Type.WARNING_MESSAGE);
 			else if(!validateDuplicatedColNamesResult)
 				this.getUI().showNotification("Column names can not be duplicated.", Type.WARNING_MESSAGE);
+			else if(!validateTargetColsNamesResult)
+				this.getUI().showNotification("Only AlphaNumeric, Spaces and Underscores are allowed for Column names.", Type.WARNING_MESSAGE);
 		}	
 	}
 
@@ -895,7 +898,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			{	
 				int itemId = (int)itemIdObj;
 				Item tblRowItem = tblTargetReportColumns.getContainerDataSource().getItem(itemId);
-				String addedColName =((TextField)(tblRowItem.getItemProperty("Column Label").getValue())).getValue();
+				String addedColName =((TextField)(tblRowItem.getItemProperty("Column Label").getValue())).getValue().trim().toLowerCase();
 			
 				if(addedColNames.indexOf(addedColName) >= 0)
 				{
@@ -958,6 +961,33 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				}
 			}
 		}		
+		return true;
+	}
+
+	//New function added to validate Column Names
+	private boolean validateTargetColsNames()
+	{		
+		for(int i=0; i<this.tabColumnGroups.getComponentCount(); i++)
+		{
+			VerticalLayout colGroupLayout = (VerticalLayout)this.tabColumnGroups.getTab(i).getComponent();
+			HorizontalSplitPanel splitTblPanel = (HorizontalSplitPanel)colGroupLayout.getComponent(1);
+			Table tblTargetReportColumns = (Table)splitTblPanel.getFirstComponent();
+			
+			Collection itemIds = tblTargetReportColumns.getContainerDataSource().getItemIds();
+			for (Object itemIdObj : itemIds) 
+			{	
+				int itemId = (int)itemIdObj;
+				Item tblRowItem = tblTargetReportColumns.getContainerDataSource().getItem(itemId);
+				String addedColName =((TextField)(tblRowItem.getItemProperty("Column Label").getValue())).getValue().trim().toLowerCase();
+			
+				if(StringUtils.isEmpty(addedColName)) 
+					return false;
+					
+				if(!StringUtils.isAlphanumeric(addedColName.replaceAll("_", "").replaceAll(" ", "")))
+					return false;									
+			}
+		}
+		
 		return true;
 	}
 }

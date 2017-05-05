@@ -419,9 +419,12 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
 
                     for (int i = 0; i < experimentFields.size(); i++) {
                         expFieldDbId[i + 1] = experimentFields.get(i).getExpDbFieldNameId();
-                        tblExperimentDataReport.setColumnHeader(experimentFields.get(i).getExpDbFieldNameId(), experimentFields.get(i).getExpFieldName());
-
-
+                        
+                        if(experimentFields.get(i).getUnitOfMeasure() != null)
+                        	tblExperimentDataReport.setColumnHeader(experimentFields.get(i).getExpDbFieldNameId(), experimentFields.get(i).getExpFieldName() + " [" + experimentFields.get(i).getUnitOfMeasure().getUomAbbreviation() + "]");
+                        else	
+                        	tblExperimentDataReport.setColumnHeader(experimentFields.get(i).getExpDbFieldNameId(), experimentFields.get(i).getExpFieldName());
+                        
                         if (experimentFields.get(i).getExpFieldType().toLowerCase().contains("float") ||
                                 experimentFields.get(i).getExpFieldType().toLowerCase().contains("decimal") ||
                                 experimentFields.get(i).getExpFieldType().toLowerCase().contains("int")) {

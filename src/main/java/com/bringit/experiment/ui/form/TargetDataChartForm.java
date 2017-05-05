@@ -126,11 +126,11 @@ public class TargetDataChartForm extends TargetDataChartDesign {
                     
                     String uomAbbreviation = targetRptCols.get(j).getExperimentField().getUnitOfMeasure() != null ? targetRptCols.get(j).getExperimentField().getUnitOfMeasure().getUomAbbreviation() : "";
                     
-                    cbxValueX.addItem(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"));
-                    cbxValueX.setItemCaption(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"), targetRptCols.get(j).getTargetColumnLabel() + ( uomAbbreviation.isEmpty() ? "" : " [" + uomAbbreviation + "]"));
+                    cbxValueX.addItem(targetRptCols.get(j).getTargetColumnId());
+                    cbxValueX.setItemCaption(targetRptCols.get(j).getTargetColumnId(), targetRptCols.get(j).getTargetColumnLabel() + ( uomAbbreviation.isEmpty() ? "" : " [" + uomAbbreviation + "]"));
                     
-                    cbxValueY.addItem(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"));
-                    cbxValueY.setItemCaption(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"), targetRptCols.get(j).getTargetColumnLabel() + ( uomAbbreviation.isEmpty() ? "" : " [" + uomAbbreviation + "]"));
+                    cbxValueY.addItem(targetRptCols.get(j).getTargetColumnId());
+                    cbxValueY.setItemCaption(targetRptCols.get(j).getTargetColumnId(), targetRptCols.get(j).getTargetColumnLabel() + ( uomAbbreviation.isEmpty() ? "" : " [" + uomAbbreviation + "]"));
                     
                 }
             }
@@ -203,7 +203,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
             @Override
             public void valueChange(ValueChangeEvent event) {
                 if (cbxValueX.getValue() != null) {
-                    TargetColumn selectedTargetColumn = new TargetColumnDao().getTargetColumnByLabel((String) cbxValueX.getValue());
+                	TargetColumn selectedTargetColumn = new TargetColumnDao().getTargetColumnById((Integer) cbxValueX.getValue());                    
                     txtOffsetValueX.setValue(selectedTargetColumn.getTargetColumnOffset().toString());
                     txtTargetValueX.setValue(selectedTargetColumn.getTargetColumnGoalValue().toString());
                 }
@@ -216,7 +216,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
             @Override
             public void valueChange(ValueChangeEvent event) {
                 if (cbxValueY.getValue() != null) {
-                    TargetColumn selectedTargetColumn = new TargetColumnDao().getTargetColumnByLabel((String) cbxValueY.getValue());
+                    TargetColumn selectedTargetColumn = new TargetColumnDao().getTargetColumnById((Integer) cbxValueY.getValue());                    
                     txtOffsetValueY.setValue(selectedTargetColumn.getTargetColumnOffset().toString());
                     txtTargetValueY.setValue(selectedTargetColumn.getTargetColumnGoalValue().toString());
                 }
@@ -348,8 +348,14 @@ public class TargetDataChartForm extends TargetDataChartDesign {
             cnt++;
         }
 
-        String colXName = cbxValueX.getValue().toString().trim();
-        String colYName = cbxValueY.getValue().toString().trim();
+        TargetColumn targetColumnX = new TargetColumnDao().getTargetColumnById((Integer) cbxValueX.getValue());                    
+        TargetColumn targetColumnY = new TargetColumnDao().getTargetColumnById((Integer) cbxValueY.getValue());                    
+        
+        String colXName = targetColumnX.getTargetColumnLabel();
+        String colYName = targetColumnY.getTargetColumnLabel();
+        
+        //String colXName = cbxValueX.getCaption().toString().trim();
+        //String colYName = cbxValueY.getCaption().toString().trim();
 
         String valueX = "";
         String toolTipHeaderX = "";
@@ -364,6 +370,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
             toolTipBody = "";
 
             for (int i = 0; i < tblColumnHeadersMtx.length; i++) {
+            	
                 if (tblColumnHeadersMtx[i].trim().equals(colXName)) {
                     valueX = tblTargetDataReport.getContainerProperty(itemIdObj, tblColumnIdsMtx[i]).getValue().toString();
                     toolTipHeaderX = "<b>" + colXName + " [X]:</b> " + valueX;
@@ -395,7 +402,7 @@ public class TargetDataChartForm extends TargetDataChartDesign {
 
         //--- End: Building Values Points --//
 
-        tblTargetDataReport.setVisibleColumns(new Object[]{cbxValueX.getValue().toString().replaceAll(" ", "_"), cbxValueY.getValue().toString().trim().replaceAll(" ", "_")});
+        tblTargetDataReport.setVisibleColumns(new Object[]{targetColumnX.getTargetColumnLabel().replaceAll(" ", "_"), targetColumnY.getTargetColumnLabel().replaceAll(" ", "_")});
         tblTargetDataReport.setVisible(true);
         lblChartInstruction.setVisible(false);
         layoutChart.addComponent(targetChart);

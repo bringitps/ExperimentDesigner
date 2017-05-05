@@ -114,18 +114,19 @@ public class TargetColumnDao {
         return targetField;
     }
     
-
+    /*
     @SuppressWarnings("unused")
-	public TargetColumn getTargetColumnByLabel(String targetColumnLabel) {
+	public TargetColumn getTargetColumnByLabelAndTargetReportId(String targetColumnLabel, int targetRptId) {
     	TargetColumn targetField = null;
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		//Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String queryString = "from TargetColumn where TargetColumnLabel = :targetColLabel";
+            String queryString = "from TargetColumn INNER JOIN TargetColumnGroup ON TargetColumn.TargetColumnGroupId = TargetColumnGroup.TargetColumnGroupId where TargetColumn.TargetColumnLabel = :targetColLabel AND TargetColumnGroup.TargetReportId = :targetRptId";
             Query query = session.createQuery(queryString);
             query.setString("targetColLabel", targetColumnLabel);
+            query.setInteger("targetRptId", targetRptId);
             targetField = (TargetColumn) query.uniqueResult();
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -135,6 +136,7 @@ public class TargetColumnDao {
         }
         return targetField;
     }
+    */
     
     @SuppressWarnings({ "unchecked", "unused" })
    	public List<TargetColumn> getTargetColumnsByColGroupById(int targetRptColumnGroupId) {

@@ -216,6 +216,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
         ExperimentJobDataDao experimentJobDataDao = new ExperimentJobDataDao();
         experimentJobDataDao.experimentProcedureJob(this.experiment.getExpId());
         vaadinTblContainer.refresh();
+        experiment = new ExperimentDao().getExperimentById(experiment.getExpId());
         this.lblrefreshDate.setValue("Last Refresh Date: " + experiment.getExpDbRptTableLastUpdate());
     }
 

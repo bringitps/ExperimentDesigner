@@ -349,6 +349,7 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		TargetReportJobDataDao experimentJobDataDao = new TargetReportJobDataDao();
 		experimentJobDataDao.targetProcedureJob(this.targetRpt.getTargetReportId());
 		vaadinTblContainer.refresh();
+		targetRpt = new TargetReportDao().getTargetReportById(targetRpt.getTargetReportId());
 		lblLastRefreshDate.setValue("Last Refresh Date: " + targetRpt.getTargetReportDbRptTableLastUpdate());
 	}
 

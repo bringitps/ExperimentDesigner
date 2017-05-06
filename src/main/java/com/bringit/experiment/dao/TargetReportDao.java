@@ -288,9 +288,10 @@ public class TargetReportDao {
     public void executeTargetProcedure(TargetReportJobData TargetReportJobData, Integer targetId) {
 
         TargetReportJobDataDao TargetReportJobDataDao = new TargetReportJobDataDao();
+        String status = Constants.JOB_FINISHED;
         try {
             List<TargetReport> lstTarget = new ArrayList<>();
-            if (targetId == null || targetId<=0) {
+            if (targetId == null || targetId <= 0) {
                 lstTarget = this.getAllActiveTargetReports();
             } else {
                 lstTarget.add(this.getTargetReportById(targetId));
@@ -305,10 +306,12 @@ public class TargetReportDao {
                 target.setTargetReportDbRptTableLastUpdate(new Date());
                 this.updateTargetReport(target);
             }
-            TargetReportJobDataDao.updateTargetJobStatus(TargetReportJobData, Constants.JOB_FINISHED);
+            status = Constants.JOB_FINISHED;
         } catch (Exception ex) {
-            TargetReportJobDataDao.updateTargetJobStatus(TargetReportJobData, Constants.JOB_EXCEPTION);
+            status = Constants.JOB_EXCEPTION;
             ex.printStackTrace();
+        } finally {
+            TargetReportJobDataDao.updateTargetJobStatus(TargetReportJobData, status);
         }
     }
 }

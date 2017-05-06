@@ -269,6 +269,7 @@ public class ExperimentDao {
 
     public void executeExperimentProcedure(ExperimentJobData experimentJobData, Integer expId) {
         ExperimentJobDataDao experimentJobDataDao = new ExperimentJobDataDao();
+        String status= Constants.JOB_FINISHED;
         try {
             List<Experiment> lstExp = new ArrayList<>();
             List<String> lstExpBean;
@@ -285,13 +286,14 @@ public class ExperimentDao {
                 new ExecuteQueryDao().executeUpdateStoredProcedure("spExpData", lstExpBean);
 
                 exp.setExpDbRptTableLastUpdate(new Date());
-                this.updateDBDataTable(exp);
+                this.updateExperiment(exp);
             }
-
-            experimentJobDataDao.updateExperimentJobStatus(experimentJobData, Constants.JOB_FINISHED);
+            status = Constants.JOB_FINISHED;
         } catch (Exception ex) {
-            experimentJobDataDao.updateExperimentJobStatus(experimentJobData, Constants.JOB_EXCEPTION);
+            status = Constants.JOB_EXCEPTION;
             ex.printStackTrace();
+        } finally {
+            experimentJobDataDao.updateExperimentJobStatus(experimentJobData, status);
         }
     }
 

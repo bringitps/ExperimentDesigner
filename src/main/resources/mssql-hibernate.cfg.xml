@@ -67,6 +67,8 @@
         <mapping class="com.bringit.experiment.bll.UserRole"/>
         <mapping class="com.bringit.experiment.bll.SysSmtp"/>
         <mapping class="com.bringit.experiment.bll.CmForSysRole"/>
+        <mapping class="com.bringit.experiment.bll.ExperimentJobData"/>
+        <mapping class="com.bringit.experiment.bll.TargetReportJobData"/>
 
     </session-factory>
 </hibernate-configuration>

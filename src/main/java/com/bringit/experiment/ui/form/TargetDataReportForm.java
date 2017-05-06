@@ -55,7 +55,10 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 	public TargetDataReportForm(Integer targetDataReportId)
 	{
 		targetRpt = new TargetReportDao().getTargetReportById(targetDataReportId);
-		lblTargetRptTitle.setValue(lblTargetRptTitle.getValue() + " - " + targetRpt.getTargetReportName()); // Attach RPT Table last updated date 
+		lblTargetRptTitle.setValue(lblTargetRptTitle.getValue() + " - " + targetRpt.getTargetReportName()); // Attach RPT Table last updated date
+
+		if (targetRpt.getTargetReportDbRptTableLastUpdate() != null)
+			lblLastRefreshDate.setValue("Last Refresh Date: " + targetRpt.getTargetReportDbRptTableLastUpdate());
 
 		//Add the button "Refresh Data Now" to run SP and get data refreshed 
 		//If this target data report is being refreshed hide "Refresh Data Now" button
@@ -346,8 +349,7 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		TargetReportJobDataDao experimentJobDataDao = new TargetReportJobDataDao();
 		experimentJobDataDao.targetProcedureJob(this.targetRpt.getTargetReportId());
 		vaadinTblContainer.refresh();
-		String refreshDate = new Date().toString();
-		lblLastRefreshDate.setValue("Last Refresh Date: " + refreshDate);
+		lblLastRefreshDate.setValue("Last Refresh Date: " + targetRpt.getTargetReportDbRptTableLastUpdate());
 	}
 
 	private void bindTargetReportRptTable()

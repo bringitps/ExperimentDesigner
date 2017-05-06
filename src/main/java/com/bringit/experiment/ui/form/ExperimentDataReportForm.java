@@ -59,6 +59,9 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
 
         this.lblExperimentTitle.setValue(" - " + experiment.getExpName()); // Attach RPT Table last updated date
 
+        if (experiment.getExpDbRptTableLastUpdate() != null)
+            this.lblrefreshDate.setValue("Last Refresh Date: " + experiment.getExpDbRptTableLastUpdate());
+
         //Add the button "Refresh Data Now" to run SP and get data refreshed
         //If this experiment data report is being refreshed hide "Refresh Data Now" button
 
@@ -213,7 +216,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
         ExperimentJobDataDao experimentJobDataDao = new ExperimentJobDataDao();
         experimentJobDataDao.experimentProcedureJob(this.experiment.getExpId());
         vaadinTblContainer.refresh();
-        this.lblrefreshDate.setValue("Last Refresh Date: " + new Date());
+        this.lblrefreshDate.setValue("Last Refresh Date: " + experiment.getExpDbRptTableLastUpdate());
     }
 
     private void filterExperimentDataResults() {

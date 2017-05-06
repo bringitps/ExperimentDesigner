@@ -26,6 +26,8 @@ import com.vaadin.ui.declarative.Design;
 @SuppressWarnings("serial")
 public class TargetDataReportDesign extends VerticalLayout {
 	protected Label lblTargetRptTitle;
+	protected Button btnRefreshButton;
+	protected Label lblLastRefreshDate;
 	protected HorizontalLayout layoutApplyFilters;
 	protected Button btnApplyFilters;
 	protected HorizontalLayout layoutDateFilter;

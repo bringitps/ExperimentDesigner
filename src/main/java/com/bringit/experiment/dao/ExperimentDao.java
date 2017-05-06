@@ -1,27 +1,29 @@
 package com.bringit.experiment.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.bringit.experiment.bll.Experiment;
+import com.bringit.experiment.bll.ExperimentJobData;
+import com.bringit.experiment.dal.HibernateUtil;
+import com.bringit.experiment.util.Config;
+import com.bringit.experiment.util.Constants;
+import com.bringit.experiment.util.HibernateXmlConfigSupport;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.Experiment;
-import com.bringit.experiment.dal.HibernateUtil;
-import com.bringit.experiment.util.Config;
-import com.bringit.experiment.util.HibernateXmlConfigSupport;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class ExperimentDao {
 
-	private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
-	
-	public void addExperiment(Experiment exp) {
+    private String dialectXmlFile = new HibernateXmlConfigSupport().getHibernateDialectXmlConfigFile();
+
+    public void addExperiment(Experiment exp) {
 
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
-        
+        //Session session = HibernateUtil.openSession(dialectXmlFile);
+
         try {
             trns = session.beginTransaction();
             session.save(exp);
@@ -40,10 +42,10 @@ public class ExperimentDao {
     public void deleteExperiment(int expId) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		// Session session = HibernateUtil.openSession(dialectXmlFile);
+        // Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            Experiment exp = (Experiment)session.load(Experiment.class, new Integer(expId));
+            Experiment exp = (Experiment) session.load(Experiment.class, new Integer(expId));
             session.delete(exp);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
@@ -60,7 +62,7 @@ public class ExperimentDao {
     public void updateExperiment(Experiment exp) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
+        //Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             session.update(exp);
@@ -76,12 +78,12 @@ public class ExperimentDao {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "unused" })
-	public List<Experiment> getAllExperiments() {
+    @SuppressWarnings({"unchecked", "unused"})
+    public List<Experiment> getAllExperiments() {
         List<Experiment> experiments = new ArrayList<Experiment>();
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
+        //Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             experiments = session.createQuery("from Experiment").list();
@@ -93,13 +95,13 @@ public class ExperimentDao {
         }
         return experiments;
     }
-    
-    @SuppressWarnings({ "unchecked", "unused" })
-	public List<Experiment> getActiveExperiments() {
+
+    @SuppressWarnings({"unchecked", "unused"})
+    public List<Experiment> getActiveExperiments() {
         List<Experiment> experiments = new ArrayList<Experiment>();
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
+        //Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             experiments = session.createQuery("from Experiment where ExpIsActive = 'true'").list();
@@ -113,11 +115,11 @@ public class ExperimentDao {
     }
 
     @SuppressWarnings("unused")
-	public Experiment getExperimentById(int expId) {
+    public Experiment getExperimentById(int expId) {
         Experiment exp = null;
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		// Session session = HibernateUtil.openSession(dialectXmlFile);
+        // Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
             String queryString = "from Experiment where ExpId = :id";
@@ -132,16 +134,16 @@ public class ExperimentDao {
         }
         return exp;
     }
-    
+
     @SuppressWarnings("unused")
-	public Experiment getExperimentByName(String expName) {
+    public Experiment getExperimentByName(String expName) {
         Experiment exp = null;
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-		//Session session = HibernateUtil.openSession(dialectXmlFile);
+        //Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            String query = "from Experiment where ExpName ='"+expName.trim()+ "' and ExpIsActive = 'true'";
+            String query = "from Experiment where ExpName ='" + expName.trim() + "' and ExpIsActive = 'true'";
             exp = (Experiment) (session.createQuery(query).list()).get(0);
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -151,37 +153,34 @@ public class ExperimentDao {
         }
         return exp;
     }
-    
-    public boolean updateDBDataTable(Experiment experiment)
-    {
-    	String query = null;
-    	boolean successfulExecution = true;
-    	
-		Config configuration = new Config();
-		if(configuration.getProperty("dbms").equals("sqlserver"))
-		{
-			query = " IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='" + experiment.getExpDbTableNameId() + "' AND xtype='U') ";
-			query += " CREATE TABLE " + experiment.getExpDbTableNameId();
-			query += " (RecordId int IDENTITY(1,1) NOT NULL PRIMARY KEY,";
-			query += " Comments text ,";
-			query += " CmId int ,";
-			query += " CreatedBy int ,";
-			query += " LastModifiedBy int ,";
-			query += " DataFileId int ,";
-			query += " CreatedDate datetime ,";
-			query += " LastModifiedDate datetime ,";
-			query += " FOREIGN KEY (CmId) REFERENCES ContractManufacturer(CmId) ON DELETE CASCADE, ";
-			query += " FOREIGN KEY (CreatedBy) REFERENCES SysUser(UserId), ";
-			query += " FOREIGN KEY (LastModifiedBy) REFERENCES SysUser(UserId), ";
-			query += " FOREIGN KEY (DataFileId) REFERENCES DataFile(DataFileId));";
-		}
-    	else
-    		return false;
 
-		Transaction trns = null;
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		// Session session = HibernateUtil.openSession(dialectXmlFile);
-        
+    public boolean updateDBDataTable(Experiment experiment) {
+        String query = null;
+        boolean successfulExecution = true;
+
+        Config configuration = new Config();
+        if (configuration.getProperty("dbms").equals("sqlserver")) {
+            query = " IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='" + experiment.getExpDbTableNameId() + "' AND xtype='U') ";
+            query += " CREATE TABLE " + experiment.getExpDbTableNameId();
+            query += " (RecordId int IDENTITY(1,1) NOT NULL PRIMARY KEY,";
+            query += " Comments text ,";
+            query += " CmId int ,";
+            query += " CreatedBy int ,";
+            query += " LastModifiedBy int ,";
+            query += " DataFileId int ,";
+            query += " CreatedDate datetime ,";
+            query += " LastModifiedDate datetime ,";
+            query += " FOREIGN KEY (CmId) REFERENCES ContractManufacturer(CmId) ON DELETE CASCADE, ";
+            query += " FOREIGN KEY (CreatedBy) REFERENCES SysUser(UserId), ";
+            query += " FOREIGN KEY (LastModifiedBy) REFERENCES SysUser(UserId), ";
+            query += " FOREIGN KEY (DataFileId) REFERENCES DataFile(DataFileId));";
+        } else
+            return false;
+
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        // Session session = HibernateUtil.openSession(dialectXmlFile);
+
         try {
             trns = session.beginTransaction();
             session.createSQLQuery(query).executeUpdate();
@@ -196,26 +195,23 @@ public class ExperimentDao {
             session.flush();
             session.close();
         }
-		return successfulExecution;
+        return successfulExecution;
     }
-    
-    public boolean deleteDBRptTable(Experiment experiment)
-    {
-    	String query = null;
-    	boolean successfulExecution = true;
-    	
-		Config configuration = new Config();
-		if(configuration.getProperty("dbms").equals("sqlserver"))
-		{
-			query = " IF EXISTS (SELECT * FROM sysobjects WHERE name='" + experiment.getExpDbRptTableNameId() + "' AND xtype='U') ";
-			query += " DROP TABLE " + experiment.getExpDbRptTableNameId() + ";";
-		}
-    	else
-    		return false;
 
-		Transaction trns = null;
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		
+    public boolean deleteDBRptTable(Experiment experiment) {
+        String query = null;
+        boolean successfulExecution = true;
+
+        Config configuration = new Config();
+        if (configuration.getProperty("dbms").equals("sqlserver")) {
+            query = " IF EXISTS (SELECT * FROM sysobjects WHERE name='" + experiment.getExpDbRptTableNameId() + "' AND xtype='U') ";
+            query += " DROP TABLE " + experiment.getExpDbRptTableNameId() + ";";
+        } else
+            return false;
+
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+
         try {
             trns = session.beginTransaction();
             session.createSQLQuery(query).executeUpdate();
@@ -230,34 +226,30 @@ public class ExperimentDao {
             session.flush();
             session.close();
         }
-		return successfulExecution;    
+        return successfulExecution;
     }
-    
-    public boolean updateDBRptTable(Experiment experiment)
-    {
-    	String query = null;
-    	boolean successfulExecution = true;
-    	
-		Config configuration = new Config();
-		if(configuration.getProperty("dbms").equals("sqlserver"))
-		{
-			query = " IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='" + experiment.getExpDbRptTableNameId() + "' AND xtype='U') ";
-			query += " CREATE TABLE " + experiment.getExpDbRptTableNameId();
-			query += " (RecordId int NOT NULL PRIMARY KEY,";
-			query += " Comments text,";
-			query += " CmName varchar(255),";
-			query += " CreatedBy varchar(255) ,";
-			query += " LastModifiedBy varchar(255),";
-			query += " DataFileName varchar(255),";
-			query += " CreatedDate datetime ,";
-			query += " LastModifiedDate datetime);";
-		}
-    	else
-    		return false;
 
-		Transaction trns = null;
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		
+    public boolean updateDBRptTable(Experiment experiment) {
+        String query = null;
+        boolean successfulExecution = true;
+        Config configuration = new Config();
+        if (configuration.getProperty("dbms").equals("sqlserver")) {
+            query = " IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='" + experiment.getExpDbRptTableNameId() + "' AND xtype='U') ";
+            query += " CREATE TABLE " + experiment.getExpDbRptTableNameId();
+            query += " (RecordId int NOT NULL PRIMARY KEY,";
+            query += " Comments text,";
+            query += " CmName varchar(255),";
+            query += " CreatedBy varchar(255) ,";
+            query += " LastModifiedBy varchar(255),";
+            query += " DataFileName varchar(255),";
+            query += " CreatedDate datetime ,";
+            query += " LastModifiedDate datetime);";
+        } else
+            return false;
+
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+
         try {
             trns = session.beginTransaction();
             session.createSQLQuery(query).executeUpdate();
@@ -272,7 +264,35 @@ public class ExperimentDao {
             session.flush();
             session.close();
         }
-		return successfulExecution;
+        return successfulExecution;
     }
-    
+
+    public void executeExperimentProcedure(ExperimentJobData experimentJobData, Integer expId) {
+        ExperimentJobDataDao experimentJobDataDao = new ExperimentJobDataDao();
+        try {
+            List<Experiment> lstExp = new ArrayList<>();
+            List<String> lstExpBean;
+
+            if (expId == null || expId <= 0) {
+                lstExp = this.getActiveExperiments();
+            } else {
+                lstExp.add(this.getExperimentById(expId));
+            }
+
+            for (Experiment exp : lstExp) {
+                lstExpBean = new ArrayList<>();
+                lstExpBean.add(exp.getExpId().toString());
+                new ExecuteQueryDao().executeUpdateStoredProcedure("spExpData", lstExpBean);
+
+                exp.setExpDbRptTableLastUpdate(new Date());
+                this.updateDBDataTable(exp);
+            }
+
+            experimentJobDataDao.updateExperimentJobStatus(experimentJobData, Constants.JOB_FINISHED);
+        } catch (Exception ex) {
+            experimentJobDataDao.updateExperimentJobStatus(experimentJobData, Constants.JOB_EXCEPTION);
+            ex.printStackTrace();
+        }
+    }
+
 }

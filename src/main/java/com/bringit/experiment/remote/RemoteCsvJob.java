@@ -1,12 +1,13 @@
 package com.bringit.experiment.remote;
 
-import com.bringit.experiment.bll.*;
+import com.bringit.experiment.bll.CsvDataLoadExecutionResult;
+import com.bringit.experiment.bll.CsvTemplate;
+import com.bringit.experiment.bll.DataFile;
+import com.bringit.experiment.bll.FilesRepository;
+import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.dao.BatchExperimentRecordsInsertDao;
 import com.bringit.experiment.dao.CsvDataLoadExecutionResultDao;
 import com.bringit.experiment.dao.DataFileDao;
-import com.bringit.experiment.dao.ExecuteQueryDao;
-import com.bringit.experiment.dao.TargetReportDao;
-import com.bringit.experiment.dao.XmlDataLoadExecutionResultDao;
 import com.bringit.experiment.data.ExperimentParser;
 import com.bringit.experiment.data.ResponseObj;
 import com.bringit.experiment.util.Config;
@@ -16,13 +17,18 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPFile;
-import org.quartz.*;
-import org.w3c.dom.Document;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -116,23 +122,7 @@ public class RemoteCsvJob implements Job {
 	                            saveExecutionResult(dataFile, file.getFilename(), jobData, false, "", totalRecords);
 	                            
 	                            System.out.println("Removed file from SFTP server");
-	                            
-	                            //Temporal solution to get data refreshed into replication tables
-	                            //To be removed once Scheduled Jobs get data refreshed and Refresh Now button are working
-	                            Integer experimentId = jobData.getExperiment().getExpId();
-	                            List<String> spExpParams = new ArrayList<String>();
-	                            spExpParams.add(experimentId.toString());
-	                            new ExecuteQueryDao().executeStoredProcedure("spExpData", spExpParams);
-	                            
-	                            List<TargetReport> targetReportsForExperiment = new TargetReportDao().getAllActiveTargetReportsByExperimentId(experimentId);
-	                            for(int i=0; targetReportsForExperiment != null && i<targetReportsForExperiment.size(); i++)
-	                            {
-	                            	Integer targetReportId = targetReportsForExperiment.get(i).getTargetReportId();
-	                            	List<String> spTargetRptParams = new ArrayList<String>();
-	                            	spTargetRptParams.add(targetReportId.toString());
-	  	                            new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spTargetRptParams);
-	  	                        }
-	                            
+
 	                        } else {
 	                            // Send file to Exception
 	                            moveFileToRepo(exceptionRepo, copyStream, file.getFilename());
@@ -229,22 +219,6 @@ public class RemoteCsvJob implements Job {
 		                        saveExecutionResult(dataFile, ftpFile.getName(), jobData, false, "", totalRecords);
 	                            System.out.println("Removed file from FTP server");
 	                            
-	                            //Temporal solution to get data refreshed into replication tables
-	                            //To be removed once Scheduled Jobs get data refreshed and Refresh Now button are working
-	                            Integer experimentId = jobData.getExperiment().getExpId();
-	                            List<String> spExpParams = new ArrayList<String>();
-	                            spExpParams.add(experimentId.toString());
-	                            new ExecuteQueryDao().executeStoredProcedure("spExpData", spExpParams);
-	                            
-	                            List<TargetReport> targetReportsForExperiment = new TargetReportDao().getAllActiveTargetReportsByExperimentId(experimentId);
-	                            for(int i=0; targetReportsForExperiment != null && i<targetReportsForExperiment.size(); i++)
-	                            {
-	                            	Integer targetReportId = targetReportsForExperiment.get(i).getTargetReportId();
-	                            	List<String> spTargetRptParams = new ArrayList<String>();
-	                            	spTargetRptParams.add(targetReportId.toString());
-	  	                            new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spTargetRptParams);
-	  	                        }
-	                            
 	                        } else {
 	                            // Send file to Exception
 	                            moveFileToRepo(exceptionRepo, copyStream, ftpFile.getName());
@@ -336,22 +310,6 @@ public class RemoteCsvJob implements Job {
 		                        saveExecutionResult(dataFile, file.getName(), jobData, false, "", totalRecords);
 		                        System.out.println("Removed file from local server");
 
-	                            //Temporal solution to get data refreshed into replication tables
-	                            //To be removed once Scheduled Jobs get data refreshed and Refresh Now button are working
-	                            Integer experimentId = jobData.getExperiment().getExpId();
-	                            List<String> spExpParams = new ArrayList<String>();
-	                            spExpParams.add(experimentId.toString());
-	                            new ExecuteQueryDao().executeStoredProcedure("spExpData", spExpParams);
-	                            
-	                            List<TargetReport> targetReportsForExperiment = new TargetReportDao().getAllActiveTargetReportsByExperimentId(experimentId);
-	                            for(int i=0; targetReportsForExperiment != null && i<targetReportsForExperiment.size(); i++)
-	                            {
-	                            	Integer targetReportId = targetReportsForExperiment.get(i).getTargetReportId();
-	                            	List<String> spTargetRptParams = new ArrayList<String>();
-	                            	spTargetRptParams.add(targetReportId.toString());
-	  	                            new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spTargetRptParams);
-	  	                        }
-		                        
 		                    } else {
 		                        // Send file to Exception
 		                        moveFileToRepo(exceptionRepo, copyStream, file.getName());

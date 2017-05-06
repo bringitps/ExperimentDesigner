@@ -4,69 +4,85 @@
   <meta charset="UTF-8">
   <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
   <meta name="vaadin-version" content="7.7.0">
- </head> 
- <body> 
-  <vaadin-vertical-layout size-full> 
-   <vaadin-label style-name="valo-menu" plain-text _id="lblTargetRptTitle">
-     Target Data Report 
-   </vaadin-label> 
-   <vaadin-horizontal-layout width="540px" height="40px" _id="layoutApplyFilters"> 
+ </head>
+ <body>
+  <vaadin-vertical-layout size-full>
+   <vaadin-horizontal-layout style-name="valo-menu" width-full :right>
+    <vaadin-grid-layout spacing width-full height="30px">
+     <row>
+      <column>
+       <vaadin-label width="400px" height="30px" plain-text _id="lblTargetRptTitle">
+         Target Data Report 
+       </vaadin-label>
+      </column>
+      <column>
+       <vaadin-button icon="fonticon://FontAwesome/f021" style-name="tiny native" width="110px" plain-text _id="btnRefreshButton">
+         Refresh Now 
+       </vaadin-button>
+      </column>
+      <column>
+       <vaadin-label responsive width="350px" height="30px" plain-text _id="lblLastRefreshDate"></vaadin-label>
+      </column>
+     </row>
+     <row></row>
+    </vaadin-grid-layout>
+   </vaadin-horizontal-layout>
+   <vaadin-horizontal-layout width="540px" height="40px" _id="layoutApplyFilters">
     <vaadin-button icon="fonticon://FontAwesome/f0b0" style-name="tiny native" plain-text _id="btnApplyFilters" :middle :right>
       Apply Filters 
-    </vaadin-button> 
-   </vaadin-horizontal-layout> 
-   <vaadin-horizontal-layout width-full _id="layoutDateFilter"> 
-    <vaadin-grid-layout width="540px" height="30px" _id="gridDateFilters"> 
-     <row> 
-      <column> 
-       <vaadin-combo-box input-prompt="Date Field Range" style-name="tiny" width="180px" _id="cbxDateFieldsFilter"> 
-        <option>Option 1</option> 
-        <option>Option 2</option> 
-        <option>Option 3</option> 
-       </vaadin-combo-box> 
-      </column> 
-      <column> 
-       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter1"></vaadin-popup-date-field> 
-      </column> 
-      <column> 
-       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter2" :right></vaadin-popup-date-field> 
-      </column> 
-     </row> 
-    </vaadin-grid-layout> 
-   </vaadin-horizontal-layout> 
-   <vaadin-horizontal-layout style-name="top-bar" width="540px" height="40px" _id="layoutExpField"> 
-    <vaadin-combo-box input-prompt="Experiment Filters" style-name="tiny" width="180px" _id="cbxExpFieldFilter" :middle></vaadin-combo-box> 
-    <vaadin-horizontal-layout width-full :middle :expand> 
-     <vaadin-text-field input-prompt="" style-name="tiny" width="320px" _id="txtExpFieldFilter" :right></vaadin-text-field> 
-    </vaadin-horizontal-layout> 
-   </vaadin-horizontal-layout> 
-   <vaadin-horizontal-layout style-name="top-bar" width="540px" height="40px" _id="layoutContractManufacturer"> 
-    <vaadin-combo-box input-prompt="Contract Manufacturer" style-name="tiny" width="180px" _id="cbxContractManufacturer" :middle></vaadin-combo-box> 
-   </vaadin-horizontal-layout> 
-   <vaadin-horizontal-layout width-full :right> 
-    <vaadin-grid-layout width-full height="30px"> 
-     <row> 
-      <column> 
+    </vaadin-button>
+   </vaadin-horizontal-layout>
+   <vaadin-horizontal-layout width-full _id="layoutDateFilter">
+    <vaadin-grid-layout width="540px" height="30px" _id="gridDateFilters">
+     <row>
+      <column>
+       <vaadin-combo-box input-prompt="Date Field Range" style-name="tiny" width="180px" _id="cbxDateFieldsFilter">
+        <option>Option 1</option>
+        <option>Option 2</option>
+        <option>Option 3</option>
+       </vaadin-combo-box>
+      </column>
+      <column>
+       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter1"></vaadin-popup-date-field>
+      </column>
+      <column>
+       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter2" :right></vaadin-popup-date-field>
+      </column>
+     </row>
+    </vaadin-grid-layout>
+   </vaadin-horizontal-layout>
+   <vaadin-horizontal-layout style-name="top-bar" width="540px" height="40px" _id="layoutExpField">
+    <vaadin-combo-box input-prompt="Experiment Filters" style-name="tiny" width="180px" _id="cbxExpFieldFilter" :middle></vaadin-combo-box>
+    <vaadin-horizontal-layout width-full :middle :expand>
+     <vaadin-text-field input-prompt="" style-name="tiny" width="320px" _id="txtExpFieldFilter" :right></vaadin-text-field>
+    </vaadin-horizontal-layout>
+   </vaadin-horizontal-layout>
+   <vaadin-horizontal-layout style-name="top-bar" width="540px" height="40px" _id="layoutContractManufacturer">
+    <vaadin-combo-box input-prompt="Contract Manufacturer" style-name="tiny" width="180px" _id="cbxContractManufacturer" :middle></vaadin-combo-box>
+   </vaadin-horizontal-layout>
+   <vaadin-horizontal-layout width-full :right>
+    <vaadin-grid-layout width-full height="30px">
+     <row>
+      <column>
        <vaadin-button icon="fonticon://FontAwesome/f201" style-name="tiny native" height="20px" plain-text _id="btnViewChart">
          View Chart 
-       </vaadin-button> 
-      </column> 
-      <column> 
+       </vaadin-button>
+      </column>
+      <column>
        <vaadin-button icon="fonticon://FontAwesome/f1c3" style-name="tiny native friendly" height="20px" plain-text _id="btnExportExcel" :right>
          Export to Excel 
-       </vaadin-button> 
-      </column> 
-     </row> 
-    </vaadin-grid-layout> 
-   </vaadin-horizontal-layout> 
-   <vaadin-css-layout style-name="content" size-full :expand> 
-    <vaadin-css-layout style-name="list" size-full> 
-     <vaadin-table selectable style-name="small" size-full _id="tblTargetDataReport"> 
-      <table> 
-      </table> 
-     </vaadin-table> 
-    </vaadin-css-layout> 
-   </vaadin-css-layout> 
-  </vaadin-vertical-layout>  
+       </vaadin-button>
+      </column>
+     </row>
+    </vaadin-grid-layout>
+   </vaadin-horizontal-layout>
+   <vaadin-css-layout style-name="content" size-full :expand>
+    <vaadin-css-layout style-name="list" size-full>
+     <vaadin-table selectable style-name="small" size-full _id="tblTargetDataReport">
+      <table></table>
+     </vaadin-table>
+    </vaadin-css-layout>
+   </vaadin-css-layout>
+  </vaadin-vertical-layout>
  </body>
 </html>

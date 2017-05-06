@@ -1,38 +1,47 @@
 package com.bringit.experiment.ui.form;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import com.bringit.experiment.bll.*;
-import com.bringit.experiment.dao.*;
-import com.vaadin.data.util.filter.Or;
-import com.vaadin.server.VaadinService;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
+import com.bringit.experiment.bll.CmForSysRole;
+import com.bringit.experiment.bll.ContractManufacturer;
+import com.bringit.experiment.bll.Experiment;
+import com.bringit.experiment.bll.ExperimentField;
+import com.bringit.experiment.bll.SysRole;
+import com.bringit.experiment.bll.TargetColumn;
+import com.bringit.experiment.bll.TargetColumnGroup;
+import com.bringit.experiment.bll.TargetReport;
+import com.bringit.experiment.dao.CmForSysRoleDao;
+import com.bringit.experiment.dao.ContractManufacturerDao;
+import com.bringit.experiment.dao.TargetColumnDao;
+import com.bringit.experiment.dao.TargetColumnGroupDao;
+import com.bringit.experiment.dao.TargetReportDao;
+import com.bringit.experiment.dao.TargetReportJobDataDao;
 import com.bringit.experiment.ui.design.TargetDataReportDesign;
 import com.bringit.experiment.util.Config;
-import com.bringit.experiment.util.ExperimentUtil;
-import com.bringit.experiment.util.VaadinControls;
 import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.data.util.converter.StringToDateConverter;
 import com.vaadin.data.util.converter.StringToDoubleConverter;
 import com.vaadin.data.util.filter.Between;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Like;
+import com.vaadin.data.util.filter.Or;
 import com.vaadin.data.util.sqlcontainer.SQLContainer;
 import com.vaadin.data.util.sqlcontainer.connection.SimpleJDBCConnectionPool;
 import com.vaadin.data.util.sqlcontainer.query.TableQuery;
 import com.vaadin.data.util.sqlcontainer.query.generator.MSSQLGenerator;
-import com.vaadin.server.Sizeable.Unit;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.CloseEvent;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class TargetDataReportForm extends TargetDataReportDesign{
 
@@ -50,6 +59,16 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 
 		//Add the button "Refresh Data Now" to run SP and get data refreshed 
 		//If this target data report is being refreshed hide "Refresh Data Now" button
+
+		btnRefreshButton.addClickListener(new Button.ClickListener() {
+
+			@Override
+			public void buttonClick(ClickEvent event) {
+				refreshData();
+			}
+
+		});
+
 		/*
 		experimentFields = new ExperimentFieldDao().getActiveExperimentFields(targetRpt.getExperiment());
 		
@@ -322,7 +341,15 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 
 		});
 	}
-	
+
+	private void refreshData() {
+		TargetReportJobDataDao experimentJobDataDao = new TargetReportJobDataDao();
+		experimentJobDataDao.targetProcedureJob(this.targetRpt.getTargetReportId());
+		vaadinTblContainer.refresh();
+		String refreshDate = new Date().toString();
+		lblLastRefreshDate.setValue("Last Refresh Date: " + refreshDate);
+	}
+
 	private void bindTargetReportRptTable()
 	{
 		Config configuration = new Config();

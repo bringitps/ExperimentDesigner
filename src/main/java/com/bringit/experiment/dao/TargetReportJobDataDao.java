@@ -9,9 +9,7 @@ import com.bringit.experiment.util.HibernateXmlConfigSupport;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class TargetReportJobDataDao {
 
@@ -145,7 +143,9 @@ public class TargetReportJobDataDao {
     }
 
 
-    public void targetProcedureJob(Integer targetId) {
+    public Map<String,Object> targetProcedureJob(Integer targetId) {
+
+        Map<String,Object> map= new HashMap<>();
         TargetReportDao targetDao = new TargetReportDao();
         TargetReportJobData targetReportJobData = new TargetReportJobData();
 
@@ -160,8 +160,10 @@ public class TargetReportJobDataDao {
             for (TargetReport targetReport : lstTarget) {
                 if (this.getActiveTargetJobs(targetReport.getTargetReportId()).size() <= 0) {
                     targetReportJobData = this.createJob(Constants.Auto, null, targetReport.getTargetReportId());
-                    targetDao.executeTargetProcedure(targetReportJobData, targetReport);
+                    map=targetDao.executeTargetProcedure(targetReportJobData, targetReport);
                 } else {
+                    map.put("statusMessage",Constants.JOB_NOT_EXECUTED );
+                    map.put("status","error");
                     targetReportJobData = this.createJob(Constants.Auto, null, targetReport.getTargetReportId());
                     this.updateTargetJobStatus(targetReportJobData, Constants.JOB_NOT_EXECUTED);
                 }
@@ -170,6 +172,7 @@ public class TargetReportJobDataDao {
 
             ex.printStackTrace();
         }
+        return map;
     }
 
 }

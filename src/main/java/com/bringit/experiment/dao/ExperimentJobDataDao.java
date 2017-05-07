@@ -9,9 +9,7 @@ import com.bringit.experiment.util.HibernateXmlConfigSupport;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class ExperimentJobDataDao {
 
@@ -144,30 +142,39 @@ public class ExperimentJobDataDao {
         experimentProcedureJob(null);
     }
 
-    public void experimentProcedureJob(Integer expId) {
+    public Map<String,Object> experimentProcedureJob(Integer expId) {
+
+        Map<String,Object> map= new HashMap<>();
+
         ExperimentDao experimentDao = new ExperimentDao();
         ExperimentJobData experimentJobData = new ExperimentJobData();
 
         try {
+
             List<Experiment> lstExp = new ArrayList<>();
             if (expId == null || expId <= 0) {
                 lstExp = experimentDao.getActiveExperiments();
             } else {
                 lstExp.add(experimentDao.getExperimentById(expId));
             }
+
             for (Experiment exp : lstExp) {
                 if (this.getActiveExperimentJobs(exp.getExpId()).size() <= 0) {
-                        experimentJobData = this.createJob(Constants.Auto, null, exp.getExpId());
-                        experimentDao.executeExperimentProcedure(experimentJobData, exp);
+                    experimentJobData = this.createJob(Constants.Auto, null, exp.getExpId());
+                    map= experimentDao.executeExperimentProcedure(experimentJobData, exp);
                 } else {
+                    map.put("statusMessage",Constants.JOB_NOT_EXECUTED );
+                    map.put("status","error");
                     experimentJobData = this.createJob(Constants.Auto, null, exp.getExpId());
                     this.updateExperimentJobStatus(experimentJobData, Constants.JOB_NOT_EXECUTED);
                 }
             }
-        } catch (Exception ex) {
 
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        return map;
     }
 
 

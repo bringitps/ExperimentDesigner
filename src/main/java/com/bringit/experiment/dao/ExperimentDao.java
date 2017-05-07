@@ -10,9 +10,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class ExperimentDao {
 
@@ -267,27 +265,34 @@ public class ExperimentDao {
         return successfulExecution;
     }
 
-    public void executeExperimentProcedure(ExperimentJobData experimentJobData, Experiment exp) {
+    public Map<String,Object> executeExperimentProcedure(ExperimentJobData experimentJobData, Experiment exp) {
+        Map<String,Object> map= new HashMap<>();
+
         ExperimentJobDataDao experimentJobDataDao = new ExperimentJobDataDao();
-        String status= Constants.JOB_FINISHED;
+        String statusMessage= Constants.JOB_FINISHED;
+        map.put("statusMessage", statusMessage);
+        map.put("status", "success");
+
         try {
-
                List<String> lstExpBean;
-
                 lstExpBean = new ArrayList<>();
                 lstExpBean.add(exp.getExpId().toString());
                 new ExecuteQueryDao().executeUpdateStoredProcedure("spExpData", lstExpBean);
-
                 exp.setExpDbRptTableLastUpdate(new Date());
                 this.updateExperiment(exp);
 
-            status = Constants.JOB_FINISHED;
+            statusMessage = Constants.JOB_FINISHED;
+
         } catch (Exception ex) {
-            status = Constants.JOB_EXCEPTION;
+            statusMessage = Constants.JOB_EXCEPTION;
+            map.put("statusMessage", statusMessage);
+            map.put("status", "error");
+
             ex.printStackTrace();
         } finally {
-            experimentJobDataDao.updateExperimentJobStatus(experimentJobData, status);
+            experimentJobDataDao.updateExperimentJobStatus(experimentJobData, statusMessage);
         }
+        return  map;
     }
 
 }

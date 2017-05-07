@@ -356,7 +356,6 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 	private void bindTargetReportRptTable()
 	{
 		Config configuration = new Config();
-		
 		if(configuration.getProperty("dbms").equals("sqlserver"))
 		{
 			String dbHost = configuration.getProperty("dbhost");

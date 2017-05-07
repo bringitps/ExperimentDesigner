@@ -1,8 +1,6 @@
 package com.bringit.experiment.dao;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import com.bringit.experiment.bll.*;
 import com.bringit.experiment.util.Constants;
@@ -285,10 +283,13 @@ public class TargetReportDao {
         return successfulExecution;
     }
 
-    public void executeTargetProcedure(TargetReportJobData TargetReportJobData, TargetReport target) {
-
+    public Map<String,Object> executeTargetProcedure(TargetReportJobData TargetReportJobData, TargetReport target) {
+        Map<String,Object> map= new HashMap<>();
         TargetReportJobDataDao TargetReportJobDataDao = new TargetReportJobDataDao();
-        String status = Constants.JOB_FINISHED;
+        String statusMessage = Constants.JOB_FINISHED;
+
+        map.put("statusMessage", statusMessage);
+        map.put("status", "success");
         try {
 
 
@@ -300,12 +301,17 @@ public class TargetReportDao {
             target.setTargetReportDbRptTableLastUpdate(new Date());
             this.updateTargetReport(target);
 
-            status = Constants.JOB_FINISHED;
+            statusMessage = Constants.JOB_FINISHED;
         } catch (Exception ex) {
-            status = Constants.JOB_EXCEPTION;
+            statusMessage = Constants.JOB_EXCEPTION;
+
+            map.put("statusMessage", statusMessage);
+            map.put("status", "error");
             ex.printStackTrace();
         } finally {
-            TargetReportJobDataDao.updateTargetJobStatus(TargetReportJobData, status);
+            TargetReportJobDataDao.updateTargetJobStatus(TargetReportJobData, statusMessage);
         }
+
+        return map;
     }
 }

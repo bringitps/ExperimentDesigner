@@ -40,10 +40,22 @@ public class ExperimentJobData {
 	private Boolean isAutoScheduler;  //0:Manual, 1:Auto
 
 	@Column(name="IsCompleted")
-	private Boolean isCompleted;  //0:Manual, 1:Auto
+	private Boolean isCompleted;
 
 	@Column(name="Status")
 	private String status;
+
+	@OneToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="ExpId", unique=false, updatable=false)
+	private Experiment expId;
+
+	public Experiment getExpId() {
+		return expId;
+	}
+
+	public void setExpId(Experiment expId) {
+		this.expId = expId;
+	}
 
 	public Integer getExpJobId() {
 		return expJobId;

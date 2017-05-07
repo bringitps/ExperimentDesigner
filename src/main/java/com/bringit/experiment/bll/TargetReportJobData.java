@@ -45,6 +45,18 @@ public class TargetReportJobData {
 	@Column(name="Status")
 	private String status;
 
+	@OneToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="TargetId", unique=false, updatable=false)
+	private TargetReport targetId;
+
+	public TargetReport getTargetId() {
+		return targetId;
+	}
+
+	public void setTargetId(TargetReport targetId) {
+		this.targetId = targetId;
+	}
+
 	public String getStatus() {
 		return status;
 	}

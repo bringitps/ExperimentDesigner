@@ -285,27 +285,21 @@ public class TargetReportDao {
         return successfulExecution;
     }
 
-    public void executeTargetProcedure(TargetReportJobData TargetReportJobData, Integer targetId) {
+    public void executeTargetProcedure(TargetReportJobData TargetReportJobData, TargetReport target) {
 
         TargetReportJobDataDao TargetReportJobDataDao = new TargetReportJobDataDao();
         String status = Constants.JOB_FINISHED;
         try {
-            List<TargetReport> lstTarget = new ArrayList<>();
-            if (targetId == null || targetId <= 0) {
-                lstTarget = this.getAllActiveTargetReports();
-            } else {
-                lstTarget.add(this.getTargetReportById(targetId));
-            }
+
 
             List<String> lstTargetBean;
-            for (TargetReport target : lstTarget) {
-                lstTargetBean = new ArrayList<>();
-                lstTargetBean.add(target.getTargetReportId().toString());
-                new ExecuteQueryDao().executeUpdateStoredProcedure("spTargetReportBuilder", lstTargetBean);
+            lstTargetBean = new ArrayList<>();
+            lstTargetBean.add(target.getTargetReportId().toString());
+            new ExecuteQueryDao().executeUpdateStoredProcedure("spTargetReportBuilder", lstTargetBean);
 
-                target.setTargetReportDbRptTableLastUpdate(new Date());
-                this.updateTargetReport(target);
-            }
+            target.setTargetReportDbRptTableLastUpdate(new Date());
+            this.updateTargetReport(target);
+
             status = Constants.JOB_FINISHED;
         } catch (Exception ex) {
             status = Constants.JOB_EXCEPTION;

@@ -1,6 +1,7 @@
 package com.bringit.experiment.dao;
 
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.bll.TargetReportJobData;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.Constants;
@@ -93,13 +94,13 @@ public class TargetReportJobDataDao {
     }
 
     @SuppressWarnings({"unchecked", "unused"})
-    public List<TargetReportJobData> getActiveTargetJobs() {
+    public List<TargetReportJobData> getActiveTargetJobs(Integer targetId) {
         List<TargetReportJobData> targetReportJobDatas = new ArrayList<TargetReportJobData>();
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            targetReportJobDatas = session.createQuery("from TargetReportJobData where IsCompleted=0").list();
+            targetReportJobDatas = session.createQuery("from TargetReportJobData where IsCompleted=0 and targetId="+targetId).list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
@@ -109,13 +110,20 @@ public class TargetReportJobDataDao {
         return targetReportJobDatas;
     }
 
-    public TargetReportJobData createJob(String type, SysUser sysUser) {
+    public TargetReportJobData createJob(String type, SysUser sysUser, Integer targetId) {
         TargetReportJobData targetReportJobData = new TargetReportJobData();
+        TargetReportDao targetReportDao= new TargetReportDao();
         targetReportJobData.setCreatedDate(new Date());
         targetReportJobData.setStatus(Constants.JOB_RUNNING);
         if (sysUser != null) {
             targetReportJobData.setCreatedBy(sysUser);
         }
+        if(targetId !=null) {
+            targetReportJobData.setTargetId(targetReportDao.getTargetReportById(targetId));
+        }else {
+            targetReportJobData.setTargetId(null);
+        }
+
         targetReportJobData.setIsCompleted(false);
         if ((Constants.Auto).equalsIgnoreCase(type)) {
             targetReportJobData.setIsAutoScheduler(true);
@@ -135,19 +143,31 @@ public class TargetReportJobDataDao {
     public void targetProcedureJob() {
         targetProcedureJob(null);
     }
+
+
     public void targetProcedureJob(Integer targetId) {
-        TargetReportJobData targetReportJobData = new TargetReportJobData();
         TargetReportDao targetDao = new TargetReportDao();
+        TargetReportJobData targetReportJobData = new TargetReportJobData();
+
         try {
-            if (this.getActiveTargetJobs().size() <= 0) {
-                targetReportJobData = this.createJob(Constants.Auto, null);
-                targetDao.executeTargetProcedure(targetReportJobData, targetId);
+            List<TargetReport> lstTarget = new ArrayList<>();
+            if (targetId == null || targetId <= 0) {
+                lstTarget = targetDao.getAllActiveTargetReports();
             } else {
-                targetReportJobData = this.createJob(Constants.Auto, null);
-                this.updateTargetJobStatus(targetReportJobData, Constants.JOB_NOT_EXECUTED);
+                lstTarget.add(targetDao.getTargetReportById(targetId));
+            }
+
+            for (TargetReport targetReport : lstTarget) {
+                if (this.getActiveTargetJobs(targetReport.getTargetReportId()).size() <= 0) {
+                    targetReportJobData = this.createJob(Constants.Auto, null, targetReport.getTargetReportId());
+                    targetDao.executeTargetProcedure(targetReportJobData, targetReport);
+                } else {
+                    targetReportJobData = this.createJob(Constants.Auto, null, targetReport.getTargetReportId());
+                    this.updateTargetJobStatus(targetReportJobData, Constants.JOB_NOT_EXECUTED);
+                }
             }
         } catch (Exception ex) {
-            this.updateTargetJobStatus(targetReportJobData, Constants.JOB_EXCEPTION);
+
             ex.printStackTrace();
         }
     }

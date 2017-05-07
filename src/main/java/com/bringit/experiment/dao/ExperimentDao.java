@@ -267,27 +267,20 @@ public class ExperimentDao {
         return successfulExecution;
     }
 
-    public void executeExperimentProcedure(ExperimentJobData experimentJobData, Integer expId) {
+    public void executeExperimentProcedure(ExperimentJobData experimentJobData, Experiment exp) {
         ExperimentJobDataDao experimentJobDataDao = new ExperimentJobDataDao();
         String status= Constants.JOB_FINISHED;
         try {
-            List<Experiment> lstExp = new ArrayList<>();
-            List<String> lstExpBean;
 
-            if (expId == null || expId <= 0) {
-                lstExp = this.getActiveExperiments();
-            } else {
-                lstExp.add(this.getExperimentById(expId));
-            }
+               List<String> lstExpBean;
 
-            for (Experiment exp : lstExp) {
                 lstExpBean = new ArrayList<>();
                 lstExpBean.add(exp.getExpId().toString());
                 new ExecuteQueryDao().executeUpdateStoredProcedure("spExpData", lstExpBean);
 
                 exp.setExpDbRptTableLastUpdate(new Date());
                 this.updateExperiment(exp);
-            }
+
             status = Constants.JOB_FINISHED;
         } catch (Exception ex) {
             status = Constants.JOB_EXCEPTION;

@@ -1,5 +1,6 @@
 package com.bringit.experiment.dao;
 
+import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentJobData;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.dal.HibernateUtil;
@@ -93,13 +94,13 @@ public class ExperimentJobDataDao {
     }
 
     @SuppressWarnings({"unchecked", "unused"})
-    public List<ExperimentJobData> getActiveExperimentJobs() {
+    public List<ExperimentJobData> getActiveExperimentJobs(Integer expId) {
         List<ExperimentJobData> experimentJobDatas = new ArrayList<ExperimentJobData>();
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            experimentJobDatas = session.createQuery("from ExperimentJobData where IsCompleted =0").list();
+            experimentJobDatas = session.createQuery("from ExperimentJobData where IsCompleted =0 and ExpId="+expId).list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
@@ -109,9 +110,15 @@ public class ExperimentJobDataDao {
         return experimentJobDatas;
     }
 
-    public ExperimentJobData createJob(String type, SysUser sysUser) {
+    public ExperimentJobData createJob(String type, SysUser sysUser, Integer expId) {
+        ExperimentDao experimentDao = new ExperimentDao();
         ExperimentJobData experimentJobData = new ExperimentJobData();
         experimentJobData.setCreatedDate(new Date());
+        if(expId!=null) {
+            experimentJobData.setExpId(experimentDao.getExperimentById(expId));
+        }else {
+            experimentJobData.setExpId(null);
+        }
         experimentJobData.setStatus(Constants.JOB_RUNNING);
         if (sysUser != null) {
             experimentJobData.setCreatedBy(sysUser);
@@ -142,17 +149,26 @@ public class ExperimentJobDataDao {
         ExperimentJobData experimentJobData = new ExperimentJobData();
 
         try {
-            if (this.getActiveExperimentJobs().size() <= 0) {
-                experimentJobData = this.createJob(Constants.Auto, null);
-                experimentDao.executeExperimentProcedure(experimentJobData, expId);
+            List<Experiment> lstExp = new ArrayList<>();
+            if (expId == null || expId <= 0) {
+                lstExp = experimentDao.getActiveExperiments();
             } else {
-                experimentJobData = this.createJob(Constants.Auto, null);
-                this.updateExperimentJobStatus(experimentJobData, Constants.JOB_NOT_EXECUTED);
+                lstExp.add(experimentDao.getExperimentById(expId));
+            }
+            for (Experiment exp : lstExp) {
+                if (this.getActiveExperimentJobs(exp.getExpId()).size() <= 0) {
+                        experimentJobData = this.createJob(Constants.Auto, null, exp.getExpId());
+                        experimentDao.executeExperimentProcedure(experimentJobData, exp);
+                } else {
+                    experimentJobData = this.createJob(Constants.Auto, null, exp.getExpId());
+                    this.updateExperimentJobStatus(experimentJobData, Constants.JOB_NOT_EXECUTED);
+                }
             }
         } catch (Exception ex) {
-            this.updateExperimentJobStatus(experimentJobData, Constants.JOB_EXCEPTION);
+
             ex.printStackTrace();
         }
     }
+
 
 }

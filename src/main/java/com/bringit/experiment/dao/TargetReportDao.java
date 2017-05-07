@@ -289,7 +289,7 @@ public class TargetReportDao {
         String statusMessage = Constants.JOB_FINISHED;
 
         map.put("statusMessage", statusMessage);
-        map.put("status", "success");
+        map.put("status", Constants.SUCCESS);
         try {
 
 
@@ -306,7 +306,7 @@ public class TargetReportDao {
             statusMessage = Constants.JOB_EXCEPTION;
 
             map.put("statusMessage", statusMessage);
-            map.put("status", "error");
+            map.put("status", Constants.ERROR);
             ex.printStackTrace();
         } finally {
             TargetReportJobDataDao.updateTargetJobStatus(TargetReportJobData, statusMessage);

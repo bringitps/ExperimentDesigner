@@ -10,6 +10,7 @@ import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.ExperimentJobDataDao;
 import com.bringit.experiment.ui.design.ExperimentDataReportDesign;
 import com.bringit.experiment.util.Config;
+import com.bringit.experiment.util.Constants;
 import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -29,6 +30,7 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.CloseEvent;
@@ -42,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 //import com.vaadin.addon.tableexport.TableExport;
 
@@ -214,10 +217,19 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
 
     private void refreshData() {
         ExperimentJobDataDao experimentJobDataDao = new ExperimentJobDataDao();
-        experimentJobDataDao.experimentProcedureJob(this.experiment.getExpId());
+        Map<String, Object> result = experimentJobDataDao.experimentProcedureJob(this.experiment.getExpId());
         vaadinTblContainer.refresh();
         experiment = new ExperimentDao().getExperimentById(experiment.getExpId());
         this.lblrefreshDate.setValue("Last Refresh Date: " + experiment.getExpDbRptTableLastUpdate());
+        if (Constants.SUCCESS == result.get("status")) {
+            this.getUI().showNotification("Experiment '" + experiment.getExpName() + "' has been Refresh Successfully.", Notification.Type.HUMANIZED_MESSAGE);
+        } else {
+            String msgToDisplay = result.get("statusMessage").toString();
+            if (Constants.JOB_NOT_EXECUTED.equalsIgnoreCase(msgToDisplay)) {
+                msgToDisplay = "same experiment is getting refresh by another user";
+            }
+            this.getUI().showNotification("Experiment '" + experiment.getExpName() + "' can't refresh due to "+ msgToDisplay + ".", Notification.Type.WARNING_MESSAGE);
+        }
     }
 
     private void filterExperimentDataResults() {

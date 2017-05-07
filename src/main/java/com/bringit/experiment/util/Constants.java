@@ -9,4 +9,6 @@ public class Constants {
     public static final String JOB_NOT_EXECUTED = "NOT_EXECUTED";
     public static final String JOB_EXCEPTION = "EXCEPTION";
     public static final String JOB_FINISHED = "FINISHED";
+    public static final String SUCCESS = "success";
+    public static final String ERROR = "error";
 }

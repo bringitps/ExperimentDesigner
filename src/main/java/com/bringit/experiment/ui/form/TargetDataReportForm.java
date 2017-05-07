@@ -16,6 +16,7 @@ import com.bringit.experiment.dao.TargetReportDao;
 import com.bringit.experiment.dao.TargetReportJobDataDao;
 import com.bringit.experiment.ui.design.TargetDataReportDesign;
 import com.bringit.experiment.util.Config;
+import com.bringit.experiment.util.Constants;
 import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.data.util.converter.StringToDateConverter;
 import com.vaadin.data.util.converter.StringToDoubleConverter;
@@ -30,6 +31,7 @@ import com.vaadin.data.util.sqlcontainer.query.generator.MSSQLGenerator;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.CloseEvent;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -42,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class TargetDataReportForm extends TargetDataReportDesign{
 
@@ -347,10 +350,20 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 
 	private void refreshData() {
 		TargetReportJobDataDao experimentJobDataDao = new TargetReportJobDataDao();
-		experimentJobDataDao.targetProcedureJob(this.targetRpt.getTargetReportId());
+		Map<String, Object> result = experimentJobDataDao.targetProcedureJob(this.targetRpt.getTargetReportId());
 		vaadinTblContainer.refresh();
 		targetRpt = new TargetReportDao().getTargetReportById(targetRpt.getTargetReportId());
 		lblLastRefreshDate.setValue("Last Refresh Date: " + targetRpt.getTargetReportDbRptTableLastUpdate());
+
+		if (Constants.SUCCESS == result.get("status")) {
+			this.getUI().showNotification("TargetReport '" + targetRpt.getTargetReportName() + "' has been Refresh Successfully.", Notification.Type.HUMANIZED_MESSAGE);
+		} else {
+			String msgToDisplay = result.get("statusMessage").toString();
+			if (Constants.JOB_NOT_EXECUTED.equalsIgnoreCase(msgToDisplay)) {
+				msgToDisplay = "same TargetReport is getting refresh by another user";
+			}
+			this.getUI().showNotification("TargetReport '" + targetRpt.getTargetReportName() + "' can't refresh due to "+ msgToDisplay + ".", Notification.Type.WARNING_MESSAGE);
+		}
 	}
 
 	private void bindTargetReportRptTable()

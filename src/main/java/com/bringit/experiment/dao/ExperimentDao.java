@@ -271,7 +271,7 @@ public class ExperimentDao {
         ExperimentJobDataDao experimentJobDataDao = new ExperimentJobDataDao();
         String statusMessage= Constants.JOB_FINISHED;
         map.put("statusMessage", statusMessage);
-        map.put("status", "success");
+        map.put("status", Constants.SUCCESS);
 
         try {
                List<String> lstExpBean;
@@ -286,7 +286,7 @@ public class ExperimentDao {
         } catch (Exception ex) {
             statusMessage = Constants.JOB_EXCEPTION;
             map.put("statusMessage", statusMessage);
-            map.put("status", "error");
+            map.put("status", Constants.ERROR);
 
             ex.printStackTrace();
         } finally {

@@ -163,7 +163,7 @@ public class TargetReportJobDataDao {
                     map=targetDao.executeTargetProcedure(targetReportJobData, targetReport);
                 } else {
                     map.put("statusMessage",Constants.JOB_NOT_EXECUTED );
-                    map.put("status","error");
+                    map.put("status",Constants.ERROR);
                     targetReportJobData = this.createJob(Constants.Auto, null, targetReport.getTargetReportId());
                     this.updateTargetJobStatus(targetReportJobData, Constants.JOB_NOT_EXECUTED);
                 }

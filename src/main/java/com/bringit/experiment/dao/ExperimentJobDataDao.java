@@ -164,7 +164,7 @@ public class ExperimentJobDataDao {
                     map= experimentDao.executeExperimentProcedure(experimentJobData, exp);
                 } else {
                     map.put("statusMessage",Constants.JOB_NOT_EXECUTED );
-                    map.put("status","error");
+                    map.put("status",Constants.ERROR);
                     experimentJobData = this.createJob(Constants.Auto, null, exp.getExpId());
                     this.updateExperimentJobStatus(experimentJobData, Constants.JOB_NOT_EXECUTED);
                 }

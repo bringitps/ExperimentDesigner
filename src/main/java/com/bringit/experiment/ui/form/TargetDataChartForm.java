@@ -46,6 +46,7 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.colorpicker.Color;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification.Type;
 
@@ -387,7 +388,13 @@ public class TargetDataChartForm extends TargetDataChartDesign {
             if (valueX != null && valueY != null && !valueX.isEmpty() && !valueY.isEmpty()) {
                 newValue = new DataSeriesItem(Double.parseDouble(valueX), Double.parseDouble(valueY));
                 newValue.setId(cnt.toString());
-                newValue.setColor(new SolidColor(Color.BLUE.getCSS()));
+                
+                newValue.setColor(new SolidColor("#228B22"));//Green for Passed Scatter Points
+                
+                if(minValueX > Double.parseDouble(valueX) || maxValueX < Double.parseDouble(valueX)	
+                		|| minValueY > Double.parseDouble(valueY) || maxValueY < Double.parseDouble(valueY))
+                	newValue.setColor(new SolidColor(Color.RED.getCSS()));
+                	
                 newValue.setName(toolTipHeaderX + "<br>" + toolTipHeaderY + "<br><br>" + toolTipBody);
                 valuesSeries.add(newValue);
             }
@@ -681,6 +688,18 @@ public class TargetDataChartForm extends TargetDataChartDesign {
                 for (int i = 0; i < dbRptTableCols.size(); i++)
                     targetRptCols[i] = dbRptTableCols.get(i);
 
+                tblTargetDataReport.setCellStyleGenerator(new Table.CellStyleGenerator() {
+				    @Override
+					public String getStyle(Table source, Object itemId, Object propertyId) {	
+				    					    	
+				    	Item item = source.getItem(itemId);
+				    	String testResult = (String) item.getItemProperty("Result").getValue();
+				    	if("pass".equals(testResult.trim().toLowerCase()))
+				    		return "highlight-green";
+				    	else 
+				    		return "highlight-red";				    	
+					}
+				    });
                 //Visible columns should be determined by selected Values for X and Y
                 //tblTargetDataReport.setVisibleColumns(targetRptCols);
 

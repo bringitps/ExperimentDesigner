@@ -1,0 +1,16 @@
+@import "../valo/styles.scss";
+
+@mixin mytheme {
+
+   // your styles go here
+
+	@include valo;
+	
+	.v-table-cell-content-highlight-green {
+  		background-color: #c6ecc6;
+		}
+		
+	.v-table-cell-content-highlight-red {
+  		background-color: #ffb3b3;
+	}
+}

@@ -18,6 +18,7 @@ import com.bringit.experiment.ui.design.TargetDataReportDesign;
 import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.Constants;
 import com.vaadin.addon.tableexport.ExcelExport;
+import com.vaadin.data.Item;
 import com.vaadin.data.util.converter.StringToDateConverter;
 import com.vaadin.data.util.converter.StringToDoubleConverter;
 import com.vaadin.data.util.filter.Between;
@@ -32,6 +33,7 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.CloseEvent;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -464,6 +466,24 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 				
 				tblTargetDataReport.setVisibleColumns(targetRptCols);
 				
+				
+				tblTargetDataReport.setCellStyleGenerator(new Table.CellStyleGenerator() {
+				    @Override
+					public String getStyle(Table source, Object itemId, Object propertyId) {	
+				    	
+				    	if(propertyId != null && "result".equals(propertyId.toString().trim().toLowerCase()))
+				    	{
+				    		Item item = source.getItem(itemId);
+				    		String testResult = (String) item.getItemProperty("Result").getValue();
+				    		if("pass".equals(testResult.trim().toLowerCase()))
+				    			return "highlight-green";
+				    		else 
+				    			return "highlight-red";
+				    	}
+				    	
+				    	return null;
+					}
+				    });
 				
 		    } catch (SQLException e) {
 				// TODO Auto-generated catch block

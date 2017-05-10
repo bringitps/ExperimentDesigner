@@ -7,14 +7,11 @@ import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.FilesRepository;
 import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
-import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.bll.XmlDataLoadExecutionResult;
 import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.dao.BatchExperimentRecordsInsertDao;
 import com.bringit.experiment.dao.CmForSysRoleDao;
 import com.bringit.experiment.dao.DataFileDao;
-import com.bringit.experiment.dao.ExecuteQueryDao;
-import com.bringit.experiment.dao.TargetReportDao;
 import com.bringit.experiment.dao.XmlDataLoadExecutionResultDao;
 import com.bringit.experiment.dao.XmlTemplateDao;
 import com.bringit.experiment.data.ExperimentParser;
@@ -202,22 +199,6 @@ public class XmlDataFileProcessForm extends XmlDataFileProcessDesign {
 						moveFileToRepo(processedRepo, isFile, loadedFileName);
 						dataFile.setFileRepoId(processedRepo);
 						new DataFileDao().updateDataFile(dataFile);
-						
-						//Temporal solution to get data refreshed into replication tables
-                        //To be removed once Scheduled Jobs get data refreshed and Refresh Now button are working
-                        Integer experimentId = xmlTemplate.getExperiment().getExpId();
-                        List<String> spExpParams = new ArrayList<String>();
-                        spExpParams.add(experimentId.toString());
-                        new ExecuteQueryDao().executeStoredProcedure("spExpData", spExpParams);
-                        
-                        List<TargetReport> targetReportsForExperiment = new TargetReportDao().getAllActiveTargetReportsByExperimentId(experimentId);
-                        for(int i=0; targetReportsForExperiment != null && i<targetReportsForExperiment.size(); i++)
-                        {
-                        	Integer targetReportId = targetReportsForExperiment.get(i).getTargetReportId();
-                        	List<String> spTargetRptParams = new ArrayList<String>();
-                        	spTargetRptParams.add(targetReportId.toString());
-	                            new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spTargetRptParams);
-	                    }
 					}
 				}	
 				else

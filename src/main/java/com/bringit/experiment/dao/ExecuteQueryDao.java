@@ -1,5 +1,9 @@
 package com.bringit.experiment.dao;
 
+import com.bringit.experiment.data.ResponseObj;
+import com.bringit.experiment.sql.connection.Connect;
+import com.bringit.experiment.util.Config;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -11,14 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import com.bringit.experiment.dal.HibernateUtil;
-import com.bringit.experiment.data.ResponseObj;
-import com.bringit.experiment.sql.connection.Connect;
-import com.bringit.experiment.util.Config;
-import com.bringit.experiment.util.HibernateXmlConfigSupport;
 
 public class ExecuteQueryDao {
 
@@ -113,33 +109,75 @@ public class ExecuteQueryDao {
 		String dbPassword = configuration.getProperty("dbpassword");
 		try {
 			Connection conn = Connect.getConnection(dbHost, dbPort, dbDatabase, dbUsername, dbPassword);
-			
+
 			String spSqlCall = "";
-			
+
 			if(configuration.getProperty("dbms").equals("sqlserver"))
 			{
 				spSqlCall = "EXEC " + spName + " ";
 				PreparedStatement ps = conn.prepareStatement(spSqlCall);
 				ps.setEscapeProcessing(true);
-				
-				for(int i=0; spParameters!=null && i<spParameters.size(); i++)		
+
+				for(int i=0; spParameters!=null && i<spParameters.size(); i++)
 				{
 					if((i+1)==spParameters.size())
-						spSqlCall += "?";			
+						spSqlCall += "?";
 					else
-						spSqlCall += "?,";				
+						spSqlCall += "?,";
 				}
 			}
 			PreparedStatement preparedStmt = conn.prepareStatement(spSqlCall);
 			preparedStmt.setEscapeProcessing(true);
-		
-			for(int i=0; spParameters!=null && i<spParameters.size(); i++)		
+
+			for(int i=0; spParameters!=null && i<spParameters.size(); i++)
 				preparedStmt.setString((i+1), spParameters.get(i));
 			preparedStmt.setFetchSize(10000);
 			rs = preparedStmt.executeQuery();
 			return rs;
 		}
 		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Integer executeUpdateStoredProcedure(String spName, List<String> spParameters) {
+		CallableStatement callableStatement = null;
+		ResultSet rs = null;
+
+		Config configuration = new Config();
+		String dbHost = configuration.getProperty("dbhost");
+		String dbPort = configuration.getProperty("dbport");
+		String dbDatabase = configuration.getProperty("dbdatabase");
+		String dbUsername = configuration.getProperty("dbusername");
+		String dbPassword = configuration.getProperty("dbpassword");
+		try {
+			Connection conn = Connect.getConnection(dbHost, dbPort, dbDatabase, dbUsername, dbPassword);
+
+			String spSqlCall = "";
+
+			if (configuration.getProperty("dbms").equals("sqlserver")) {
+				spSqlCall = "EXEC " + spName + " ";
+				PreparedStatement ps = conn.prepareStatement(spSqlCall);
+				ps.setEscapeProcessing(true);
+
+				for (int i = 0; spParameters != null && i < spParameters.size(); i++) {
+					if ((i + 1) == spParameters.size())
+						spSqlCall += "?";
+					else
+						spSqlCall += "?,";
+				}
+			}
+			PreparedStatement preparedStmt = conn.prepareStatement(spSqlCall);
+			preparedStmt.setEscapeProcessing(true);
+
+			for (int i = 0; spParameters != null && i < spParameters.size(); i++)
+				preparedStmt.setString((i + 1), spParameters.get(i));
+			preparedStmt.setFetchSize(10000);
+			return preparedStmt.executeUpdate();
+
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;

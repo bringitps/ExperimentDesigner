@@ -27,6 +27,8 @@ import com.vaadin.ui.declarative.Design;
 @SuppressWarnings("serial")
 public class ExperimentDataReportDesign extends VerticalLayout {
 	protected Label lblExperimentTitle;
+	protected Button btnRefreshButton;
+	protected Label lblrefreshDate;
 	protected TextField txtSearch;
 	protected ComboBox cbxExperimentDataReportFilters;
 	protected HorizontalLayout layoutDateFilter;

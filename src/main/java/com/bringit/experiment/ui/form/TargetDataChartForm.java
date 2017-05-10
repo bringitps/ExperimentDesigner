@@ -688,16 +688,43 @@ public class TargetDataChartForm extends TargetDataChartDesign {
                 for (int i = 0; i < dbRptTableCols.size(); i++)
                     targetRptCols[i] = dbRptTableCols.get(i);
 
+
+                double minValueX = Double.parseDouble(txtTargetValueX.getValue()) - Double.parseDouble(txtOffsetValueX.getValue());
+                double minValueY = Double.parseDouble(txtTargetValueY.getValue()) - Double.parseDouble(txtOffsetValueY.getValue());
+                double maxValueX = Double.parseDouble(txtTargetValueX.getValue()) + Double.parseDouble(txtOffsetValueX.getValue());
+                double maxValueY = Double.parseDouble(txtTargetValueY.getValue()) + Double.parseDouble(txtOffsetValueY.getValue());
+                
+                TargetColumn targetColumnX = new TargetColumnDao().getTargetColumnById((Integer) cbxValueX.getValue());                    
+                TargetColumn targetColumnY = new TargetColumnDao().getTargetColumnById((Integer) cbxValueY.getValue());                    
+                
+                String colXName = targetColumnX.getTargetColumnLabel();
+                String colYName = targetColumnY.getTargetColumnLabel();
+                
                 tblTargetDataReport.setCellStyleGenerator(new Table.CellStyleGenerator() {
 				    @Override
 					public String getStyle(Table source, Object itemId, Object propertyId) {	
 				    					    	
 				    	Item item = source.getItem(itemId);
+				    	Double valueX = null;
+				    	Double valueY = null;
+				    	
+				    	if(item.getItemProperty(colXName.replaceAll(" ", "_")) != null)
+				    		valueX = Double.parseDouble(item.getItemProperty(colXName.replaceAll(" ", "_")).getValue().toString());
+				    	
+				    	if(item.getItemProperty(colYName.replaceAll(" ", "_")) != null)
+				    		valueY = Double.parseDouble(item.getItemProperty(colYName.replaceAll(" ", "_")).getValue().toString());
+				    	    
+			                if(valueX != null && valueX != null  && (minValueX > valueX || maxValueX < valueX	
+			                		|| minValueY > valueY || maxValueY < valueY))
+			                	return "highlight-red";	
+			                else 
+			                	return "highlight-green";
+				    	/*
 				    	String testResult = (String) item.getItemProperty("Result").getValue();
 				    	if("pass".equals(testResult.trim().toLowerCase()))
 				    		return "highlight-green";
 				    	else 
-				    		return "highlight-red";				    	
+				    		return "highlight-red";*/				    	
 					}
 				    });
                 //Visible columns should be determined by selected Values for X and Y

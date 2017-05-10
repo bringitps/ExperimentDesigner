@@ -241,6 +241,12 @@ public class ExperimentDataViewRecordForm extends ExperimentDataViewRecordDesign
 		ResponseObj updateRecordRespObj = new ExecuteQueryDao().executeUpdateQuery(sqlUpdateQuery);
 		if(updateRecordRespObj.getCode() == 0)
 		{
+			
+			List<String> spParams = new ArrayList<String>();
+			spParams.add(this.experiment.getExpId().toString());
+			spParams.add(this.recordId.toString());
+			new ExecuteQueryDao().executeUpdateStoredProcedure("spRecordUpdate", spParams);
+			
 			Date lastModifiedDate = new Date();
 			
 			int lastModifiedDateXRefIndex = recordColumnLabelXRef.indexOf("LastModifiedDate");

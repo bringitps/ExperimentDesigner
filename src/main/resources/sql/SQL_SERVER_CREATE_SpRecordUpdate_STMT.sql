@@ -1,6 +1,7 @@
-CREATE PROCEDURE [spExpData]
+CREATE PROCEDURE [dbo].[spRecordUpdate]
 
-@ExperimentId NVARCHAR(MAX)
+@ExperimentId NVARCHAR(MAX),
+@RecordId NVARCHAR(MAX)
 
 AS
 
@@ -32,8 +33,8 @@ SELECT @Fields = STUFF(
 							WHERE ExpId = @ExperimentId
                             FOR xml path('')
                         ), 1, 0, ''),
- @Delete = 'TRUNCATE TABLE ' + @RptTable,
- @Query = 'INSERT INTO ' + @RptTable + '(RecordId, Comments, CmName, CreatedBy, LastModifiedBy, CreatedDate, LastModifiedDate, DataFileName, ' + LEFT(@Fields, LEN(@Fields) - 1) + ')' +' SELECT ExpTb.RecordId, ExpTb.Comments, Cm.CmName, CreatedBy.UserFullName, LastMod.UserFullName, ExpTb.CreatedDate, ExpTb.LastModifiedDate, Df.DataFileName, ' + LEFT(@Fields, LEN(@Fields) - 1) + ' FROM ' + @Table + ' AS ExpTb LEFT JOIN SysUser AS CreatedBy ON ExpTb.CreatedBy = CreatedBy.UserId LEFT JOIN SysUser AS LastMod ON ExpTb.LastModifiedBy = LastMod.UserId LEFT JOIN ContractManufacturer AS Cm ON ExpTb.CmId = Cm.CmId LEFT JOIN DataFile AS Df On ExpTb.DataFileId = Df.DataFileId'
+ @Delete = 'DELETE FROM ' + @RptTable + ' WHERE RecordId = ' + @RecordId,
+ @Query = 'INSERT INTO ' + @RptTable + '(RecordId, Comments, CmName, CreatedBy, LastModifiedBy, CreatedDate, LastModifiedDate, DataFileName, ' + LEFT(@Fields, LEN(@Fields) - 1) + ')' +' SELECT ExpTb.RecordId, ExpTb.Comments, Cm.CmName, CreatedBy.UserFullName, LastMod.UserFullName, ExpTb.CreatedDate, GETDATE(), Df.DataFileName, ' + LEFT(@Fields, LEN(@Fields) - 1) + ' FROM ' + @Table + ' AS ExpTb LEFT JOIN SysUser AS CreatedBy ON ExpTb.CreatedBy = CreatedBy.UserId LEFT JOIN SysUser AS LastMod ON ExpTb.LastModifiedBy = LastMod.UserId LEFT JOIN ContractManufacturer AS Cm ON ExpTb.CmId = Cm.CmId LEFT JOIN DataFile AS Df On ExpTb.DataFileId = Df.DataFileId' + ' WHERE ExpTb.RecordId = ' + @RecordId
 --SELECT @Query;
 --SELECT @Delete;
 EXECUTE sp_executesql @Delete;

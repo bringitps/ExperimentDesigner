@@ -118,6 +118,26 @@ public class TargetReportDao {
         return targetReport;
     }
 
+    @SuppressWarnings("unused")
+    public TargetReport getTargetReportByName(String targetReportName) {
+        TargetReport targetReport = null;
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+
+        try {
+            trns = session.beginTransaction();
+            String queryString = "from TargetReport where TargetReportName = :targetReportName";
+            Query query = session.createQuery(queryString);
+            query.setString("targetReportName", targetReportName);
+            targetReport = (TargetReport) query.uniqueResult();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return targetReport;
+    }
 
     @SuppressWarnings({"unchecked", "unused"})
     public List<TargetReport> getAllActiveTargetReports() {

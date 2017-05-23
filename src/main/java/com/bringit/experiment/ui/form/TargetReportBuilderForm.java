@@ -178,6 +178,13 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			btnDeleteLayout.setEnabled(true);	
 		}
 		
+		this.txtTargetRptName.addValidator(new Validator() {
+			public void validate(Object value) throws InvalidValueException {
+                if(!StringUtils.isAlphanumeric(((String) value).trim().replaceAll("_", "").replaceAll(" ", "")))
+                    throw new InvalidValueException("Only AlphaNumeric characters, Spaces and Underscores are allowed for Target Report Name");
+            }
+            
+        });
 		
 	}
 
@@ -221,8 +228,9 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		boolean validateNumberColsResult = validateNumberColsResult();
 		boolean validateDuplicatedColNamesResult = validateDuplicatedColNames();
 		boolean validateTargetColsNamesResult = validateTargetColsNames();
+		boolean validateTargetReportNameResult = validateTargetReportName();
 		
-		if(validateTargetColCntResult && validateReqFieldsResult && validateNumberColsResult && validateDuplicatedColNamesResult && validateTargetColsNamesResult)
+		if(validateTargetColCntResult && validateReqFieldsResult && validateNumberColsResult && validateDuplicatedColNamesResult && validateTargetColsNamesResult && validateTargetReportNameResult)
 		{
 			//Delete Records from DataBase
 			if(dbIdOfTargetColumnGroupsToDelete.size() > 0)
@@ -321,7 +329,9 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			else if(!validateDuplicatedColNamesResult)
 				this.getUI().showNotification("Column names can not be duplicated.", Type.WARNING_MESSAGE);
 			else if(!validateTargetColsNamesResult)
-				this.getUI().showNotification("Only AlphaNumeric, Spaces and Underscores are allowed for Column names.", Type.WARNING_MESSAGE);
+				this.getUI().showNotification("Only AlphaNumeric characters, Spaces and Underscores are allowed for Column names.", Type.WARNING_MESSAGE);
+			else if(!validateTargetReportNameResult)
+				this.getUI().showNotification("Invalid Report name. \"Target Report\" is not allowed. Duplicated names are not allowed. Only AlphaNumeric characters, Spaces and Underscores are allowed.", Type.WARNING_MESSAGE);
 		}	
 	}
 
@@ -990,4 +1000,25 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 		
 		return true;
 	}
+
+	//New function added to validate Report Name
+	private boolean validateTargetReportName()
+	{
+		if(this.txtTargetRptName.getValue().toLowerCase().trim().equals("target report"))
+			return false;
+		
+		TargetReport existentTargetRpt = new TargetReportDao().getTargetReportByName(this.txtTargetRptName.getValue().trim());
+		
+		if(existentTargetRpt != null && (this.targetReport == null || (this.targetReport.getTargetReportId() != existentTargetRpt.getTargetReportId())))
+			return false;
+					
+		if(StringUtils.isEmpty(this.txtTargetRptName.getValue().trim())) 
+			return false;
+			
+		if(!StringUtils.isAlphanumeric(this.txtTargetRptName.getValue().trim().replaceAll("_", "").replaceAll(" ", "")))
+			return false;	
+		
+		return true;
+	}
+
 }

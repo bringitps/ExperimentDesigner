@@ -75,7 +75,11 @@ public class ExperimentParser {
 	        				List<CsvTemplateColumns> columns = nodeDao.getAllCsvTemplateColumnssByTemplateId(template.getCsvTemplateId());
 	        				if(columns != null){
 
+	        					System.out.println("Init: Parsing CSV file: " + csvFile);
+	        		            
 	        					reader = new CSVReader(new InputStreamReader(csvFile));
+
+	        					System.out.println("End: Parsing CSV file: " + csvFile);
 	        		            
 	        					// we assume the first line is the header
 	        		            String[] header = reader.readNext();
@@ -123,7 +127,12 @@ public class ExperimentParser {
 	        		            for(int i=0; i<csvFileLines.size(); i++)
 	        		            {
 	        		            	for(int j=0; j < columns.size(); j++)
-	 	        		            	csvColumnValuesMtx.get(j)[rowCount-1] = (csvColumnPositionInFileMtx.get(j) != -1) ?	csvFileLines.get(i)[csvColumnPositionInFileMtx.get(j)] : "";
+	        		            	{
+	        		            		if(csvFileLines.get(i).length > csvColumnPositionInFileMtx.get(j) && csvFileLines.get(i)[csvColumnPositionInFileMtx.get(j)] != null)
+	        		            			csvColumnValuesMtx.get(j)[rowCount-1] = (csvColumnPositionInFileMtx.get(j) != -1) ?	csvFileLines.get(i)[csvColumnPositionInFileMtx.get(j)] : "";
+	        		            		else
+	        		            			csvColumnValuesMtx.get(j)[rowCount-1] = "";	
+	    	        		        }
 	 	        		            	
 	 	        		            rowCount ++;
 	        		            }

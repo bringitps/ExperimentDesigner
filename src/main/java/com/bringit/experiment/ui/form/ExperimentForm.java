@@ -23,11 +23,13 @@ import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.ExperimentImage;
 import com.bringit.experiment.bll.ExperimentType;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.UnitOfMeasure;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.ExperimentImageDao;
 import com.bringit.experiment.dao.ExperimentTypeDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.UnitOfMeasureDao;
 import com.bringit.experiment.ui.design.ExperimentDesign;
 import com.bringit.experiment.util.Config;
@@ -103,8 +105,20 @@ public class ExperimentForm extends ExperimentDesign {
 	  
 	private List<StreamResource> imagesStreamResourceList;
 	  
+	private SystemSettings systemSettings;
+
 	public ExperimentForm(int experimentId)
-	{		
+	{	
+		//Rename entities
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		this.cbxExperimentType.setCaption(this.systemSettings.getExperimentLabel());
+		this.expElements.getTab(0).setCaption(this.systemSettings.getExperimentLabel() + " Images");
+		this.expElements.getTab(1).setCaption(this.systemSettings.getExperimentLabel() + " Fields");
+		this.btnDeleteImage.setCaption("Delete " + this.systemSettings.getExperimentLabel() + " Image");
+		this.btnAddField.setCaption("Add " + this.systemSettings.getExperimentLabel() + " Field");
+		this.btnDeleteField.setCaption("Delete " + this.systemSettings.getExperimentLabel() + " Field");
+		this.btnDelete.setCaption("Delete " + this.systemSettings.getExperimentLabel());
+		
 		expElements.setSelectedTab(1);
 
 		//Load Experiment Type Combo Box

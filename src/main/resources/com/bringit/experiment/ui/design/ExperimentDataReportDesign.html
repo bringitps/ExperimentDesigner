@@ -37,46 +37,45 @@
      <row></row> 
     </vaadin-grid-layout> 
    </vaadin-horizontal-layout> 
-   <vaadin-horizontal-layout style-name="top-bar" width-full height="40px"> 
-    <vaadin-horizontal-layout width-full :middle :expand> 
-     <vaadin-text-field icon="fonticon://FontAwesome/f002" input-prompt="Search" style-name="tiny inline-icon search" width-full _id="txtSearch"></vaadin-text-field> 
-    </vaadin-horizontal-layout> 
-    <vaadin-combo-box style-name="tiny" _id="cbxExperimentDataReportFilters" :middle></vaadin-combo-box> 
-   </vaadin-horizontal-layout> 
-   <vaadin-horizontal-layout width-full _id="layoutDateFilter"> 
-    <vaadin-grid-layout caption="Date Filters" width="680px" height="30px" _id="gridDateFilters"> 
+   <vaadin-horizontal-layout width="870px" _id="filterControlLayout" :middle> 
+    <vaadin-grid-layout spacing width-full height="35px" _id="filterControlGrid" :middle> 
      <row> 
       <column> 
-       <vaadin-check-box _id="chxDateFilters" :middle :center></vaadin-check-box> 
+       <vaadin-button icon="fonticon://FontAwesome/f0b0" style-name="friendly" height="25px" plain-text _id="btnAddFilters" :middle>
+         + 
+       </vaadin-button> 
       </column> 
       <column> 
-       <vaadin-combo-box style-name="tiny" width="150px" _id="cbxDateFieldsFilter"> 
-        <option>Option 1</option> 
-        <option>Option 2</option> 
-        <option>Option 3</option> 
-       </vaadin-combo-box> 
-      </column> 
-      <column> 
-       <vaadin-combo-box style-name="tiny" width="150px" _id="cbxDateFilterOperators"> 
-        <option>Option 1</option> 
-        <option>Option 2</option> 
-        <option>Option 3</option> 
-       </vaadin-combo-box> 
-      </column> 
-      <column> 
-       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter1"></vaadin-popup-date-field> 
-      </column> 
-      <column> 
-       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter2"></vaadin-popup-date-field> 
-      </column> 
-      <column> 
-       <vaadin-button style-name="tiny native" plain-text _id="btnOkDateFilters">
-         OK 
+       <vaadin-button icon="fonticon://FontAwesome/f0e7" style-name="tiny native" height="25px" plain-text _id="btnApplyFilters" :middle :right>
+         Apply Filters 
        </vaadin-button> 
       </column> 
      </row> 
     </vaadin-grid-layout> 
    </vaadin-horizontal-layout> 
+   <vaadin-panel style-name="borderless well tiny" width="870px" height="110px" _id="pnlFilterLayout"> 
+    <vaadin-grid-layout style-name="tiny" spacing width="855px" height="30px" _id="multiFilterGrid"> 
+     <row> 
+      <column> 
+       <vaadin-combo-box id="cbxExperimentField1" style-name="tiny" width="170px" height="25px" _id="cbxExperimentField1"></vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-combo-box id="cbxFilterOperator1" style-name="tiny" width="190px" height="25px" _id="cbxFilterOperator1"></vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-text-field id="txtStringFilter1" input-prompt="" style-name="tiny" width="230px" height="25px" _id="txtStringFilter1"></vaadin-text-field> 
+      </column> 
+      <column> 
+       <vaadin-combo-box id="cbxExpression1" style-name="tiny" width="70px" height="25px" _id="cbxExpression1"></vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-button icon="fonticon://FontAwesome/f0b0" style-name="danger" id="btnDeleteFilterRow1" height="25px" plain-text _id="btnDeleteFilterRow1">
+         x 
+       </vaadin-button> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-panel> 
    <vaadin-horizontal-layout width-full :right> 
     <vaadin-grid-layout width-full height="30px"> 
      <row> 

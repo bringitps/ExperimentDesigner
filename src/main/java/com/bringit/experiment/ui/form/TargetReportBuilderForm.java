@@ -11,12 +11,14 @@ import com.bringit.experiment.WebApplication;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.TargetColumn;
 import com.bringit.experiment.bll.TargetColumnGroup;
 import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.TargetColumnDao;
 import com.bringit.experiment.dao.TargetColumnGroupDao;
 import com.bringit.experiment.dao.TargetReportDao;
@@ -71,9 +73,13 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 	private List<Integer> dbIdOfTargetColumnGroupsToDelete = new ArrayList<Integer>();
 	private List<Integer> dbIdOfTargetColumnsToDelete = new ArrayList<Integer>();
 	
-	
+	private SystemSettings systemSettings;
+
 	public TargetReportBuilderForm(int targetReportId)
 	{	
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		this.cbxExperiment.setCaption(this.systemSettings.getExperimentLabel());
+		
 		enableComponents(false);
 		cbxExperiment.setNullSelectionAllowed(false);
 		colGroupLayout.setMargin(new MarginInfo(false, true, true, true));

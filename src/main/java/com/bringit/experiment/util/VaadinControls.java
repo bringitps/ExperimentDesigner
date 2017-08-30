@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import com.bringit.experiment.bll.SystemSettings;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Table;
 
@@ -11,6 +13,8 @@ public class VaadinControls {
 
 	public static void bindDbViewRsToVaadinTable(Table vaadinTable, ResultSet dbVwResultSet, int columnIdIndex)
 	{
+		SystemSettings systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		
 		vaadinTable.setContainerDataSource(null);
 		vaadinTable.removeAllItems();
 		
@@ -19,7 +23,14 @@ public class VaadinControls {
 				dbVwMetaData = dbVwResultSet.getMetaData();
 			
 				for(int i=0; i<dbVwMetaData.getColumnCount(); i++)
-					vaadinTable.addContainerProperty(dbVwMetaData.getColumnLabel(i+1), String.class, null);
+				{
+					String columnLabel = dbVwMetaData.getColumnLabel(i+1);
+
+					if("Experiment".equals(columnLabel))
+						columnLabel = systemSettings.getExperimentLabel();
+					
+					vaadinTable.addContainerProperty(columnLabel, String.class, null);
+				}
 				 
 			    while (dbVwResultSet.next()) {
 			    	String[] itemValues = new String[dbVwMetaData.getColumnCount()];

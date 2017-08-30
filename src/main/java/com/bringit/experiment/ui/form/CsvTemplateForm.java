@@ -10,6 +10,7 @@ import com.bringit.experiment.bll.FilesRepository;
 import com.bringit.experiment.bll.JobExecutionRepeat;
 import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.dao.CmForSysRoleDao;
 import com.bringit.experiment.dao.ContractManufacturerDao;
 import com.bringit.experiment.dao.CsvTemplateColumnsDao;
@@ -18,6 +19,7 @@ import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.FilesRepositoryDao;
 import com.bringit.experiment.dao.JobExecutionRepeatDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.remote.RemoteFileUtil;
 import com.bringit.experiment.ui.design.CsvTemplateDesign;
 import com.opencsv.CSVReader;
@@ -59,6 +61,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	private List<Integer> dbIdOfCsvTemplateNodeItemsToDelete = new ArrayList<Integer>();
 	SysRole sysRoleSession = (SysRole)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
 
+    private SystemSettings systemSettings;
 
 	private void loadSpecificContractManufacturer() {
 		contractManufacturers = new ArrayList<>();
@@ -75,12 +78,14 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 
 	public CsvTemplateForm(int csvId)
 	{
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		this.comboCsvTExperiment.setCaption(this.systemSettings.getExperimentLabel());
 		loadSpecificContractManufacturer();
 
 		this.tblCsvCols.setContainerDataSource(null);
 		this.tblCsvCols.addContainerProperty("*", CheckBox.class, null);
 		this.tblCsvCols.addContainerProperty("Csv Column", TextField.class, null);
-		this.tblCsvCols.addContainerProperty("Experiment Field", ComboBox.class, null);		
+		this.tblCsvCols.addContainerProperty(this.systemSettings.getExperimentLabel() + " Field", ComboBox.class, null);		
 		this.tblCsvCols.setPageLength(0);
 		fillCombos();
 		uploadFile();
@@ -318,10 +323,10 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				csvColumn.setCsvTemplateColumnName(((TextField)(tblRowItem.getItemProperty("Csv Column").getValue())).getValue());			
 				csvColumn.setCsvTemplate(csvt);
 				
-				if(((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue() != null){
+				if(((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue() != null){
 				
 					ExperimentField selectedExpField = new ExperimentField();
-					selectedExpField.setExpFieldId((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue());
+					selectedExpField.setExpFieldId((int)((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue());
 
 					csvColumn.setExpField(selectedExpField);
 				}
@@ -347,7 +352,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			else if(!validateReqFieldsResult)
 				this.getUI().showNotification("Please fill in all required Fields", Type.WARNING_MESSAGE);
 			else if(!validateNonRepeatedExperimentFieldsResult)
-				this.getUI().showNotification("You can not map 1 Experiment Field to 2 or more CSV Columns.", Type.WARNING_MESSAGE);
+				this.getUI().showNotification("You can not map 1 " + this.systemSettings.getExperimentLabel() + " Field to 2 or more CSV Columns.", Type.WARNING_MESSAGE);
 			else if(!validateCsvTemplateNameResult)
 				this.getUI().showNotification("Name is already selected for another Csv Template. Please rename CsvTemplate", Type.WARNING_MESSAGE);
 		
@@ -391,12 +396,12 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			int itemId = (int)itemIdObj;
 			Item tblRowItem = this.tblCsvCols.getContainerDataSource().getItem(itemId);
 			
-			if(((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue() != null)
+			if(((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue() != null)
 			{
-				if(selectedExpFields.indexOf(((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue())) > -1)
+				if(selectedExpFields.indexOf(((int)((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue())) > -1)
 					return false;
 				else
-					selectedExpFields.add(((int)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue()));
+					selectedExpFields.add(((int)((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue()));
 			}
 		}
 		return true;
@@ -480,7 +485,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.tblCsvCols.setContainerDataSource(null);
 			this.tblCsvCols.addContainerProperty("*", CheckBox.class, null);
 			this.tblCsvCols.addContainerProperty("Csv Column", TextField.class, null);
-			this.tblCsvCols.addContainerProperty("Experiment Field", ComboBox.class, null);		
+			this.tblCsvCols.addContainerProperty(this.systemSettings.getExperimentLabel() + " Field", ComboBox.class, null);		
 			this.tblCsvCols.setPageLength(0);
 			
 		}

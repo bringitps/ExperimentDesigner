@@ -4,13 +4,16 @@ import com.bringit.experiment.WebApplication;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.dao.ExperimentDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.TargetReportDao;
 import com.bringit.experiment.ui.design.MainFormDesign;
 import com.vaadin.data.Item;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.VaadinService;
+import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +23,7 @@ public class MainForm extends MainFormDesign {
 
     @SuppressWarnings("unused")
     private WebApplication webApplication;
+    private SystemSettings systemSettings;
     SysUser sysUserSession = (SysUser) VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 
 
@@ -27,6 +31,23 @@ public class MainForm extends MainFormDesign {
     public MainForm(WebApplication webApplication, String selectedForm) {
         this.webApplication = webApplication;
 
+        this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+        
+        treeMainMenu.setItemCaptionMode(ItemCaptionMode.EXPLICIT_DEFAULTS_ID);
+  		
+        for (Object id : treeMainMenu.getItemIds()) 
+        {
+    	  	if("Experiments".equals(id.toString().trim()))
+    	  		treeMainMenu.setItemCaption(id, this.systemSettings.getExperimentPluralLabel());
+    	
+    	  	if("Manage Experiments".equals(id.toString().trim()))
+    	  		treeMainMenu.setItemCaption(id, "Manage " + this.systemSettings.getExperimentPluralLabel());
+    	
+    	  	if("Experiment Types".equals(id.toString().trim()))
+    	  		treeMainMenu.setItemCaption(id, this.systemSettings.getExperimentTypePluralLabel());
+        }
+        
+        
         treeMainMenu.addContainerProperty("isExperimentDataReport", Boolean.class, null);
         treeMainMenu.addContainerProperty("experimentId", Integer.class, null);
 
@@ -68,6 +89,21 @@ public class MainForm extends MainFormDesign {
             setFormContent(selectedForm, null);
     }
 
+    public void updateMenuLabels()
+    {
+    	 for (Object id : treeMainMenu.getItemIds()) 
+         {
+     	  	if("Experiments".equals(id.toString().trim()))
+     	  		treeMainMenu.setItemCaption(id, this.systemSettings.getExperimentPluralLabel());
+     	
+     	  	if("Manage Experiments".equals(id.toString().trim()))
+     	  		treeMainMenu.setItemCaption(id, "Manage " + this.systemSettings.getExperimentPluralLabel());
+     	
+     	  	if("Experiment Types".equals(id.toString().trim()))
+     	  		treeMainMenu.setItemCaption(id, this.systemSettings.getExperimentTypePluralLabel());
+         }
+    }
+    
     public void updateMenuAccess() {
 
         SysRole sysRoleSession = (SysRole) VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
@@ -211,6 +247,10 @@ public class MainForm extends MainFormDesign {
                 case "smtp":
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new SmtpConfigForm());
+                    break;
+                case "general settings":
+                    formContentLayout.removeAllComponents();
+                    formContentLayout.addComponent(new SystemSettingsForm());
                     break;
                 default:
                     break;

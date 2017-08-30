@@ -5,9 +5,11 @@ import java.util.Collection;
 import java.util.List;
 
 import com.bringit.experiment.bll.ExperimentType;
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.UnitOfMeasure;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.ExperimentTypeDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.UnitOfMeasureDao;
 import com.bringit.experiment.ui.design.ExperimentTypeConfigDesign;
 import com.vaadin.data.Item;
@@ -27,8 +29,15 @@ public class ExperimentTypeConfigForm extends ExperimentTypeConfigDesign {
 	private int lastNewItemId = 0;
 	private List<Integer> dbIdOfItemsToDelete = new ArrayList<Integer>();
 
+    private SystemSettings systemSettings;
+    
 	public ExperimentTypeConfigForm()
 	{
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		this.lblFormTitle.setValue("- " + this.systemSettings.getExperimentTypeLabel());
+		this.btnAddExpType.setCaption("Add " + this.systemSettings.getExperimentTypeLabel());
+		this.btnDeleteExpType.setCaption("Delete " + this.systemSettings.getExperimentTypeLabel());
+		
 		loadTblData("","");
 		
 		this.btnAddExpType.addClickListener(new Button.ClickListener() {

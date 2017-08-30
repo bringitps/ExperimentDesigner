@@ -2,7 +2,9 @@ package com.bringit.experiment.ui.form;
 
 import java.sql.ResultSet;
 
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.dao.DataBaseViewDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.ui.design.ExperimentManagementDesign;
 import com.bringit.experiment.util.VaadinControls;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
@@ -20,8 +22,15 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
 public class ExperimentManagementForm extends ExperimentManagementDesign {
-	
+
+	private SystemSettings systemSettings;
+
 	public ExperimentManagementForm() {
+		
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		this.lblTitle.setValue("- " + this.systemSettings.getExperimentPluralLabel() + " Management");
+		
+		
 		ResultSet experimentViewResults = new DataBaseViewDao().getViewResults("vwExperiment");
 		
 		if(experimentViewResults != null)

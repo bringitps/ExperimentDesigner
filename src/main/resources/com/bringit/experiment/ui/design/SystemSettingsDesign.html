@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head> 
+ <body> 
+  <vaadin-vertical-layout style-name="well" responsive margin> 
+   <vaadin-vertical-layout height="50px"> 
+    <vaadin-grid-layout width="960px" height="40px"> 
+     <row> 
+      <column> 
+       <vaadin-grid-layout spacing width="100px" height="40px" :middle> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="tiny primary" plain-text _id="btnSave" :middle>
+            Save 
+          </vaadin-button> 
+         </column> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny" plain-text _id="btnCancel" :middle>
+            Cancel 
+          </vaadin-button> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout> 
+    <vaadin-form-layout margin-top="false" margin-bottom="false" _id="frmRenameSystemElements"> 
+     <vaadin-label style-name="h3" size-auto plain-text _id="lblSystemEntitiesLabels">
+       System Entity Labels 
+     </vaadin-label> 
+     <vaadin-text-field required-error="The field is mandatory" caption="Experiment" required style-name="tiny" value="Experiment" _id="txtExperimentLabel"></vaadin-text-field> 
+     <vaadin-text-field required-error="The field is mandatory" caption="Experiment (Plural)" required style-name="tiny" value="Experiments" _id="txtExperimentPluralLabel"></vaadin-text-field> 
+     <vaadin-text-field required-error="The field is mandatory" caption="Experiment Type" required style-name="tiny" value="Experiment Type" _id="txtExperimentTypeLabel"></vaadin-text-field> 
+     <vaadin-text-field required-error="The field is mandatory" caption="Experiment Types (Plural)" required style-name="tiny" value="Experiment Types" _id="txtExperimentTypePluralLabel"></vaadin-text-field> 
+    </vaadin-form-layout> 
+   </vaadin-vertical-layout> 
+  </vaadin-vertical-layout>  
+ </body>
+</html>

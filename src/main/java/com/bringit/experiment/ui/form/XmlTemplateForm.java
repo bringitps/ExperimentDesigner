@@ -8,6 +8,7 @@ import com.bringit.experiment.bll.FilesRepository;
 import com.bringit.experiment.bll.JobExecutionRepeat;
 import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.bll.XmlTemplateNode;
 import com.bringit.experiment.dao.CmForSysRoleDao;
@@ -16,6 +17,7 @@ import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.FilesRepositoryDao;
 import com.bringit.experiment.dao.JobExecutionRepeatDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.XmlTemplateDao;
 import com.bringit.experiment.dao.XmlTemplateNodeDao;
 import com.bringit.experiment.remote.RemoteFileUtil;
@@ -69,6 +71,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
     private Document xmlDocument;
     private List<Integer> dbIdOfXmlTemplateNodeItemsToDelete = new ArrayList<Integer>();
 
+    private SystemSettings systemSettings;
 
     private void loadSpecificContractManufacturer() {
         contractManufacturers = new ArrayList<>();
@@ -84,14 +87,17 @@ public class XmlTemplateForm extends XmlTemplateDesign {
     }
 
     public XmlTemplateForm(int xmlId) {
-        loadSpecificContractManufacturer();
+        
+    	this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		this.comboXmlTExperiment.setCaption(this.systemSettings.getExperimentLabel());
+    	loadSpecificContractManufacturer();
 
         this.tblXmlNodes.setContainerDataSource(null);
         this.tblXmlNodes.addContainerProperty("*", CheckBox.class, null);
         this.tblXmlNodes.addContainerProperty("Xml Node Name", TextArea.class, null);
         this.tblXmlNodes.addContainerProperty("Is Loop Node", CheckBox.class, null);
         this.tblXmlNodes.addContainerProperty("Is Attribute", CheckBox.class, null);
-        this.tblXmlNodes.addContainerProperty("Experiment Field", ComboBox.class, null);
+        this.tblXmlNodes.addContainerProperty(this.systemSettings.getExperimentLabel() + " Field", ComboBox.class, null);
         this.tblXmlNodes.setPageLength(0);
         fillCombos();
         uploadFile();
@@ -330,10 +336,10 @@ public class XmlTemplateForm extends XmlTemplateDesign {
                 xmlNode.setXmlTemplateNodeIsAttribute(((CheckBox) (tblRowItem.getItemProperty("Is Attribute").getValue())).getValue());
                 xmlNode.setXmlTemplate(xmlt);
 
-                if (((ComboBox) (tblRowItem.getItemProperty("Experiment Field").getValue())).getValue() != null) {
+                if (((ComboBox) (tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue() != null) {
 
                     ExperimentField selectedExpField = new ExperimentField();
-                    selectedExpField.setExpFieldId((int) ((ComboBox) (tblRowItem.getItemProperty("Experiment Field").getValue())).getValue());
+                    selectedExpField.setExpFieldId((int) ((ComboBox) (tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue());
                     xmlNode.setExpField(selectedExpField);
                 }
                 if (itemId > 0) {
@@ -355,7 +361,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
             else if (!validateUniqueLoopNodeResult)
                 this.getUI().showNotification("Only 1 Loop Node is allowed", Type.WARNING_MESSAGE);
             else if (!validateNonRepeatedExperimentFieldsResult)
-                this.getUI().showNotification("You can not map 1 Experiment Field to 2 or more Xml Node Value/Attribute.", Type.WARNING_MESSAGE);
+                this.getUI().showNotification("You can not map 1 " + this.systemSettings.getExperimentLabel() + " Field to 2 or more Xml Node Value/Attribute.", Type.WARNING_MESSAGE);
             else if (!validateXmlTemplateNameResult)
                 this.getUI().showNotification("Name is already selected for another Xml Template. Please rename XmlTemplate", Type.WARNING_MESSAGE);
         }
@@ -370,11 +376,11 @@ public class XmlTemplateForm extends XmlTemplateDesign {
             int itemId = (int) itemIdObj;
             Item tblRowItem = this.tblXmlNodes.getContainerDataSource().getItem(itemId);
 
-            if (((ComboBox) (tblRowItem.getItemProperty("Experiment Field").getValue())).getValue() != null) {
-                if (selectedExpFields.indexOf(((int) ((ComboBox) (tblRowItem.getItemProperty("Experiment Field").getValue())).getValue())) > -1)
+            if (((ComboBox) (tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue() != null) {
+                if (selectedExpFields.indexOf(((int) ((ComboBox) (tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue())) > -1)
                     return false;
                 else
-                    selectedExpFields.add(((int) ((ComboBox) (tblRowItem.getItemProperty("Experiment Field").getValue())).getValue()));
+                    selectedExpFields.add(((int) ((ComboBox) (tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue()));
             }
         }
         return true;
@@ -506,7 +512,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
             this.tblXmlNodes.addContainerProperty("Xml Node Name", TextArea.class, null);
             this.tblXmlNodes.addContainerProperty("Is Loop Node", CheckBox.class, null);
             this.tblXmlNodes.addContainerProperty("Is Attribute", CheckBox.class, null);
-            this.tblXmlNodes.addContainerProperty("Experiment Field", ComboBox.class, null);
+            this.tblXmlNodes.addContainerProperty(this.systemSettings.getExperimentLabel() + " Field", ComboBox.class, null);
             this.tblXmlNodes.setPageLength(0);
 
         }

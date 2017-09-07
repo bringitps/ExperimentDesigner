@@ -350,10 +350,14 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 
             if (this.xmlt.getXmlTemplateId() != null) {
                 new XmlTemplateDao().updateXmlTemplate(xmlt);
+                XmlTemplate xmltWithId = new XmlTemplateDao().getActiveXmlTemplateByName(this.txtXmlTName.getValue());
                 RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
 
-                if (xmlt.isXmlTemplateIsActive() && (xmlt.getXmlTemplateNotScheduled() == null || !xmlt.getXmlTemplateNotScheduled()))
-                    remoteFileUtil.updateJob(xmlt);
+                if (xmltWithId.isXmlTemplateIsActive() && (xmltWithId.getXmlTemplateNotScheduled() == null || !xmltWithId.getXmlTemplateNotScheduled()))
+                {
+                    remoteFileUtil.cancelJob(xmlt);
+                	remoteFileUtil.updateJob(xmltWithId);
+                }
                 else
                     remoteFileUtil.cancelJob(xmlt);
             } else {

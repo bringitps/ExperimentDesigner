@@ -118,6 +118,11 @@ public class RemoteCsvJob implements Job {
 
     	                    new DataFileDao().updateDataFile(dataFile);
     	                    
+    	                    try {
+	                            is.close();
+	                        } catch (IOException e) {
+	                            e.printStackTrace();
+	                        }
                         }
                         else
                         {	
@@ -280,6 +285,12 @@ public class RemoteCsvJob implements Job {
 
     	                    new DataFileDao().updateDataFile(dataFile);
     	                    
+    	                    // original stream has been read.  Need to get a new stream to move file.
+	                        try {
+	                            is.close();
+	                        } catch (IOException e) {
+	                            e.printStackTrace();
+	                        }
                         }
                         else
                         {
@@ -413,6 +424,8 @@ public class RemoteCsvJob implements Job {
             	//{
             	System.out.println("Next file: "+ file.getName());
             	
+            	System.out.println("File Filter Criteria: "+ fileFilterCriteria + " Regex: " + jobData.getCsvTemplateRegex() + " File Name: " + file.getName().replaceAll(".csv",""));
+            	
             	 if ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && file.getName().startsWith(jobData.getCsvTemplatePrefix()))
              			|| ("Suffix".equals(fileFilterCriteria) && file.getName().replaceAll(".csv","").endsWith(jobData.getCsvTemplateSuffix()))
              			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getCsvTemplateRegex(), file.getName().replaceAll(".csv",""))))
@@ -422,129 +435,139 @@ public class RemoteCsvJob implements Job {
 	                    InputStream is = new FileInputStream(file);
 	                    System.out.println("Reading input file and passing to parser: "+ file.getName());
 	
-	                    if(new DataFileDao().getDataFileByName(file.getName()) != null)
+	                    if(is != null)
 	                    {
-	                    	System.out.println(new Date().toString() + " Filename already processed: "+file.getName());
-   	                    
-	                        DataFile dataFile = new DataFile();
-	                        Date createdDate = new Date();
-	                        dataFile.setCreatedDate(createdDate);
-	                        dataFile.setLastModifiedDate(createdDate);
-	                        dataFile.setDataFileIsXml(true);
-	                        dataFile.setDataFileIsCsv(false);
-	                        dataFile.setDataFileName(file.getName());
-	                        new DataFileDao().addDataFile(dataFile);
-	
-	                        System.out.println(new Date().toString() + " Moving to Exception Folder");
+		                    if(new DataFileDao().getDataFileByName(file.getName()) != null)
+		                    {
+		                    	System.out.println(new Date().toString() + " Filename already processed: "+file.getName());
 	   	                    
-	                        moveFileToRepo(exceptionRepo, is, file.getName());
-	                        file.delete();
-	                        
-	                        System.out.println(new Date().toString() + " Removed from Inbound Folder");
-	   	                    
-	                        dataFile.setFileRepoId(exceptionRepo);
-	
-	                        saveExecutionResult(dataFile, null, dataFile, file.getName(), jobData, true, "Data File is already processed. File Name: " + file.getName(), 0, 0, 0);
-
-		                    new DataFileDao().updateDataFile(dataFile);
-		                   
-	                    }
-	                    else
-	                    {
-		                    DataFile dataFile = new DataFile();
-		                    Date createdDate = new Date();
-		                    dataFile.setCreatedDate(createdDate);
-		                    dataFile.setLastModifiedDate(createdDate);
-		                    dataFile.setDataFileIsXml(true);
-		                    dataFile.setDataFileIsCsv(false);
-		                    dataFile.setDataFileName(file.getName());
-	                        dataFile.setFileRepoId(outboundRepo);
-		                    new DataFileDao().addDataFile(dataFile);
+		                        DataFile dataFile = new DataFile();
+		                        Date createdDate = new Date();
+		                        dataFile.setCreatedDate(createdDate);
+		                        dataFile.setLastModifiedDate(createdDate);
+		                        dataFile.setDataFileIsXml(true);
+		                        dataFile.setDataFileIsCsv(false);
+		                        dataFile.setDataFileName(file.getName());
+		                        new DataFileDao().addDataFile(dataFile);
 		
-		                    dataFile = new DataFileDao().getDataFileByName(file.getName());
-		
-		                    ResponseObj localResponse = processFile(is, jobData, file.getName(), dataFile);
-		
-		                    is.close();
-		                    InputStream copyStream = new FileInputStream(file);
-		                    
-		                    DataFile dataFileProcessed = new DataFile();
-	            			DataFile dataFileException = new DataFile();
-	            			
-		                    if (0 == localResponse.getCode()) {
-		                       
-		                    	if(localResponse.getCsvRowException() != null && localResponse.getCsvRowException().size() > 0)
-	        					{
-	        						//Split files into 2 CSV files
-	        						splitCsvExceptionFiles(jobData.getProcessedFileRepo(), jobData.getExceptionFileRepo(), copyStream, file.getName(), localResponse);
-	        					
-	        						dataFileProcessed.setDataFileIsCsv(true);
-	        						dataFileProcessed.setDataFileName("Partial - " + file.getName());
-	        						dataFileProcessed.setFileRepoId(jobData.getProcessedFileRepo());
-	        						new DataFileDao().addDataFile(dataFileProcessed);
-	        												
-	        						dataFileException.setDataFileIsCsv(true);
-	        						dataFileException.setDataFileName("Failed - " + file.getName());
-	        						dataFileException.setFileRepoId(jobData.getExceptionFileRepo());
-	        						new DataFileDao().addDataFile(dataFileException);
-	        					
-	                        		Integer totalRecords = localResponse.getCsvInsertValues().size() + localResponse.getCsvRowException().size();
-	    							Integer processedRecords = localResponse.getCsvInsertValues().size();
-	    							Integer exceptionRecords = localResponse.getCsvRowException().size();
-	    							
-	    							dataFile.setFileRepoId(exceptionRepo);
-	    							new DataFileDao().updateDataFile(dataFile);
-	    							
-	    							saveExecutionResult(dataFile, dataFileProcessed, dataFileException, file.getName(), jobData, true, "Some records could not be processed.", totalRecords, processedRecords, exceptionRecords);
-	    							moveFileToRepo(exceptionRepo, copyStream, file.getName());	
-	    						}
-	    						else
-	    						{
-	    							Integer totalRecords = StringUtils.isNumeric(localResponse.getDetail().toString()) ? Integer.parseInt(localResponse.getDetail().toString()) : 0;
-		                            saveExecutionResult(dataFile, dataFile, null, file.getName(), jobData, false, "", totalRecords, totalRecords, 0);
-	    							moveFileToRepo(outboundRepo, copyStream, file.getName());					
-	    						}
-		                    	
-		                    	// Send file to outbound
-		                        //moveFileToRepo(outboundRepo, copyStream, file.getName());
+		                        System.out.println(new Date().toString() + " Moving to Exception Folder");
+		   	                    
+		                        moveFileToRepo(exceptionRepo, is, file.getName());
 		                        file.delete();
-		
-		                        //dataFile.setFileRepoId(outboundRepo);
-		                        //Integer totalRecords = StringUtils.isNumeric(localResponse.getDetail().toString()) ? Integer.parseInt(localResponse.getDetail().toString()) : 0;
-		                        //saveExecutionResult(dataFile, file.getName(), jobData, false, "", totalRecords);
-		                        System.out.println("Removed file from local server");
 		                        
-		                        //Getting data refreshed into replication tables
-	                            Integer experimentId = jobData.getExperiment().getExpId();
-	                            List<String> spExpParams = new ArrayList<String>();
-	                            spExpParams.add(experimentId.toString());
-	                            new ExecuteQueryDao().executeStoredProcedure("spExpData", spExpParams);
-	                            	                            
-	                            List<TargetReport> targetReportsForExperiment = new TargetReportDao().getAllActiveTargetReportsByExperimentId(experimentId);
-	                            for(int i=0; targetReportsForExperiment != null && i<targetReportsForExperiment.size(); i++)
-	                            {
-	                            	Integer targetReportId = targetReportsForExperiment.get(i).getTargetReportId();
-	                            	List<String> spTargetRptParams = new ArrayList<String>();
-	                            	spTargetRptParams.add(targetReportId.toString());
-	                            	new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spTargetRptParams);
-	                            }	
-
-		                    } else {
-		                        // Send file to Exception
-		                        moveFileToRepo(exceptionRepo, copyStream, file.getName());
-		                        file.delete();
-		
+		                        System.out.println(new Date().toString() + " Removed from Inbound Folder");
+		   	                    
 		                        dataFile.setFileRepoId(exceptionRepo);
-		                        saveExecutionResult(dataFile, null, dataFile, file.getName(), jobData, true, localResponse.getDescription(), 0, 0, 0);
-			                    System.out.println("Removed file from local server");
-		                    }
 		
-		                    copyStream.close();
-		                    new DataFileDao().updateDataFile(dataFile);
-		                    System.out.println("Data File Updated. Looking for new file");
-			                  
-		                    
-	                    }
+		                        saveExecutionResult(dataFile, null, dataFile, file.getName(), jobData, true, "Data File is already processed. File Name: " + file.getName(), 0, 0, 0);
+	
+			                    new DataFileDao().updateDataFile(dataFile);
+			                    
+			                    try {
+		                            is.close();
+		                        } catch (IOException e) {
+		                            e.printStackTrace();
+		                        }
+		                    }
+		                    else
+		                    {
+			                    DataFile dataFile = new DataFile();
+			                    Date createdDate = new Date();
+			                    dataFile.setCreatedDate(createdDate);
+			                    dataFile.setLastModifiedDate(createdDate);
+			                    dataFile.setDataFileIsXml(true);
+			                    dataFile.setDataFileIsCsv(false);
+			                    dataFile.setDataFileName(file.getName());
+		                        dataFile.setFileRepoId(outboundRepo);
+			                    new DataFileDao().addDataFile(dataFile);
+			
+			                    dataFile = new DataFileDao().getDataFileByName(file.getName());
+			
+			                    ResponseObj localResponse = processFile(is, jobData, file.getName(), dataFile);
+			
+			                    is.close();
+			                    InputStream copyStream = new FileInputStream(file);
+			                    
+			                    DataFile dataFileProcessed = new DataFile();
+		            			DataFile dataFileException = new DataFile();
+		            			
+			                    if (0 == localResponse.getCode()) {
+			                       
+			                    	if(localResponse.getCsvRowException() != null && localResponse.getCsvRowException().size() > 0)
+		        					{
+		        						//Split files into 2 CSV files
+		        						splitCsvExceptionFiles(jobData.getProcessedFileRepo(), jobData.getExceptionFileRepo(), copyStream, file.getName(), localResponse);
+		        					
+		        						dataFileProcessed.setDataFileIsCsv(true);
+		        						dataFileProcessed.setDataFileName("Partial - " + file.getName());
+		        						dataFileProcessed.setFileRepoId(jobData.getProcessedFileRepo());
+		        						new DataFileDao().addDataFile(dataFileProcessed);
+		        												
+		        						dataFileException.setDataFileIsCsv(true);
+		        						dataFileException.setDataFileName("Failed - " + file.getName());
+		        						dataFileException.setFileRepoId(jobData.getExceptionFileRepo());
+		        						new DataFileDao().addDataFile(dataFileException);
+		        					
+		                        		Integer totalRecords = localResponse.getCsvInsertValues().size() + localResponse.getCsvRowException().size();
+		    							Integer processedRecords = localResponse.getCsvInsertValues().size();
+		    							Integer exceptionRecords = localResponse.getCsvRowException().size();
+		    							
+		    							dataFile.setFileRepoId(exceptionRepo);
+		    							new DataFileDao().updateDataFile(dataFile);
+		    							
+		    							saveExecutionResult(dataFile, dataFileProcessed, dataFileException, file.getName(), jobData, true, "Some records could not be processed.", totalRecords, processedRecords, exceptionRecords);
+		    							copyStream.close(); //Already used for Split
+		    							
+		    							copyStream = new FileInputStream(file); //Reload file					                    
+		    							moveFileToRepo(exceptionRepo, copyStream, file.getName());	
+		    						}
+		    						else
+		    						{
+		    							Integer totalRecords = StringUtils.isNumeric(localResponse.getDetail().toString()) ? Integer.parseInt(localResponse.getDetail().toString()) : 0;
+			                            saveExecutionResult(dataFile, dataFile, null, file.getName(), jobData, false, "", totalRecords, totalRecords, 0);
+		    							moveFileToRepo(outboundRepo, copyStream, file.getName());					
+		    						}
+			                    	
+			                    	// Send file to outbound
+			                        //moveFileToRepo(outboundRepo, copyStream, file.getName());
+			                        file.delete();
+			
+			                        //dataFile.setFileRepoId(outboundRepo);
+			                        //Integer totalRecords = StringUtils.isNumeric(localResponse.getDetail().toString()) ? Integer.parseInt(localResponse.getDetail().toString()) : 0;
+			                        //saveExecutionResult(dataFile, file.getName(), jobData, false, "", totalRecords);
+			                        System.out.println("Removed file from local server");
+			                        
+			                        //Getting data refreshed into replication tables
+		                            Integer experimentId = jobData.getExperiment().getExpId();
+		                            List<String> spExpParams = new ArrayList<String>();
+		                            spExpParams.add(experimentId.toString());
+		                            new ExecuteQueryDao().executeStoredProcedure("spExpData", spExpParams);
+		                            	                            
+		                            List<TargetReport> targetReportsForExperiment = new TargetReportDao().getAllActiveTargetReportsByExperimentId(experimentId);
+		                            for(int i=0; targetReportsForExperiment != null && i<targetReportsForExperiment.size(); i++)
+		                            {
+		                            	Integer targetReportId = targetReportsForExperiment.get(i).getTargetReportId();
+		                            	List<String> spTargetRptParams = new ArrayList<String>();
+		                            	spTargetRptParams.add(targetReportId.toString());
+		                            	new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spTargetRptParams);
+		                            }	
+	
+			                    } else {
+			                        // Send file to Exception
+			                        moveFileToRepo(exceptionRepo, copyStream, file.getName());
+			                        file.delete();
+			
+			                        dataFile.setFileRepoId(exceptionRepo);
+			                        saveExecutionResult(dataFile, null, dataFile, file.getName(), jobData, true, localResponse.getDescription(), 0, 0, 0);
+				                    System.out.println("Removed file from local server");
+			                    }
+			
+			                    copyStream.close();
+			                    new DataFileDao().updateDataFile(dataFile);
+			                    System.out.println("Data File Updated. Looking for new file");
+				                
+		                    }
+	                    }	                    
 	                } catch (Exception e) {
 	                    System.out.println("Error processing local file: "+file.getName());
 	                }
@@ -602,6 +625,9 @@ public class RemoteCsvJob implements Job {
             //1)Parsing & Validation
             ResponseObj responseObj = new ExperimentParser().parseCSV(is, csvTemplate, filename);
 
+            if(responseObj.getCode() != 0)
+            	return responseObj;
+            
             //2)Batch Insert
             ResponseObj batchResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(responseObj.getCsvInsertColumns(),
                     responseObj.getCsvInsertValues(), null, csvTemplate, null, dataFile, csvTemplate.getExperiment(), iBatchSize);
@@ -625,7 +651,9 @@ public class RemoteCsvJob implements Job {
             return batchResponse;
 
         } catch (Exception ex) {
+        	
             System.out.println("Error parsing file: "+filename);
+            ex.printStackTrace();
             sendTransferError(csvTemplate, filename);
 
         }

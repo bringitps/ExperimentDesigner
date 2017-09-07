@@ -103,6 +103,15 @@ public class ExperimentParser {
 	        					// we assume the first line is the header
 	        		            String[] header = reader.readNext();
 	        		            
+	        		            if(header == null)
+	        		            {
+	        		            	respObj.setCode(100);
+	        		        		respObj.setDescription("File is empty.");
+	        		        		respObj.setDetail("File is empty.");
+		        		            reader.close();		        		            
+	        		    			return respObj;
+	        		            }
+	        		            
 	        		            //--- Start ---//
 	        		            //Edgar B. 5/3/2017
 	        		            //Solution to Null Pointer and Mandatory Columns for CSV Processing
@@ -419,6 +428,7 @@ public class ExperimentParser {
             	}
         	
         } catch (IOException e) {
+        	//System.out.println("Unknown error at parsing." + e.getMessage());
     		respObj.setCode(100);
     		respObj.setDescription("Unknown error, check for details.");
     		respObj.setDetail(e+e.getMessage());

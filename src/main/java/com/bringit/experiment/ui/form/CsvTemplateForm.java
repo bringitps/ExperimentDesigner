@@ -205,6 +205,8 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				
 				cbxExpFields.setNullSelectionAllowed(true);
 				cbxExpFields.addStyleName("tiny");
+				cbxExpFields.setId(this.csvCols.get(i).getCsvTemplateColumnId().toString()); //Id to be reused for DateTime mask logic
+				
 				if(this.csvCols.get(i).getExpField() != null)
 					cbxExpFields.setValue(this.csvCols.get(i).getExpField().getExpFieldId());
 				itemValues[2] = cbxExpFields;
@@ -225,6 +227,14 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				txtDateTimeMask.addStyleName("tiny");
 				txtDateTimeMask.setWidth(100, Unit.PERCENTAGE);
 				itemValues[4] = txtDateTimeMask;
+				
+				cbxExpFields.addValueChangeListener(new ValueChangeListener() {
+
+		            @Override
+		            public void valueChange(ValueChangeEvent event) {
+		            	onChangeExperimentField(cbxExpFields);
+		            }
+		        });
 				
 				this.tblCsvCols.addItem(itemValues, this.csvCols.get(i).getCsvTemplateColumnId());
 			}
@@ -400,11 +410,16 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			if(this.csvt.getCsvTemplateId() != null ) {
 				new CsvTemplateDao().updateCsvTemplate(csvt);
 				
+				CsvTemplate csvTemplateWithId = new CsvTemplateDao().getActiveCsvTemplateByName(this.txtCsvTName.getValue());
+				
 				// added logic to schedule the CSV Tempate
 				RemoteFileUtil remoteFileUtil = RemoteFileUtil.getInstance();
 				
-				if(csvt.isCsvTemplateIsActive() && (csvt.getCsvTemplateNotScheduled() == null || !csvt.getCsvTemplateNotScheduled()))
-					remoteFileUtil.updateJob(csvt);
+				if(csvTemplateWithId.isCsvTemplateIsActive() && (csvTemplateWithId.getCsvTemplateNotScheduled() == null || !csvTemplateWithId.getCsvTemplateNotScheduled()))
+				{
+					remoteFileUtil.cancelJob(csvt);
+					remoteFileUtil.updateJob(csvTemplateWithId);
+				}
 				else
 					remoteFileUtil.cancelJob(csvt);				
 			} else
@@ -744,6 +759,16 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			itemValues[4] = txtDateTimeMask;
 						
 			this.lastNewItemId = this.lastNewItemId - 1;
+
+			cbxExpFields.setId(""+this.lastNewItemId); //Id to be reused for DateTime mask logic
+			cbxExpFields.addValueChangeListener(new ValueChangeListener() {
+
+	            @Override
+	            public void valueChange(ValueChangeEvent event) {
+	            	onChangeExperimentField(cbxExpFields);
+	            }
+	        });
+			
 			this.tblCsvCols.addItem(itemValues, this.lastNewItemId);
 			
 		}
@@ -1140,4 +1165,10 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			}
 		}
 	}
+
+	private void onChangeExperimentField(ComboBox cbxExpFields)
+	{
+		System.out.println("Selected Item Id: " + cbxExpFields.getId());
+	}
+
 }

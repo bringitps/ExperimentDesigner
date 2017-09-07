@@ -28,27 +28,38 @@ public class CsvTemplateColumns {
 	@Column(name="CsvTemplateColumnName")
 	private String csvTemplateColumnName;
 	
+	@Column(name="CsvTemplateColumnMandatory")
+	private Boolean csvTemplateColumnMandatory;
+	
 	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="CsvTemplateId", unique=false, updatable=false)
+    @JoinColumn(name="CsvTemplateId", unique=false, updatable=true)
 	private CsvTemplate csvTemplate;
 	
 	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="ExpFieldId", unique=false, updatable=false)
+    @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
 	private ExperimentField expField;
 
+	@Column(name="CsvTemplateColumnDatetimeMask")
+	private String csvTemplateColumnDatetimeMask;
+	
 	public CsvTemplateColumns() {
 		this.csvTemplateColumnId = null;
 		this.csvTemplateColumnName = null;
+		this.csvTemplateColumnMandatory = null;
 		this.csvTemplate = null;
 		this.expField = null;
+		this.csvTemplateColumnDatetimeMask = null;
 	}
 	
-	public CsvTemplateColumns(Integer csvTemplateColumnId, String csvTemplateColumnName, CsvTemplate csvTemplate,
-			ExperimentField expField) {
+	public CsvTemplateColumns(Integer csvTemplateColumnId, String csvTemplateColumnName, 
+			Boolean csvTemplateColumnMandatory, CsvTemplate csvTemplate,
+			ExperimentField expField, String csvTemplateColumnDatetimeMask) {
 		this.csvTemplateColumnId = csvTemplateColumnId;
 		this.csvTemplateColumnName = csvTemplateColumnName;
+		this.csvTemplateColumnMandatory = csvTemplateColumnMandatory;
 		this.csvTemplate = csvTemplate;
 		this.expField = expField;
+		this.csvTemplateColumnDatetimeMask = csvTemplateColumnDatetimeMask;
 	}
 
 	public Integer getCsvTemplateColumnId() {
@@ -66,6 +77,14 @@ public class CsvTemplateColumns {
 	public void setCsvTemplateColumnName(String csvTemplateColumnName) {
 		this.csvTemplateColumnName = csvTemplateColumnName;
 	}
+	
+	public Boolean getCsvTemplateColumnMandatory() {
+		return csvTemplateColumnMandatory;
+	}
+
+	public void setCsvTemplateColumnMandatory(Boolean csvTemplateColumnMandatory) {
+		this.csvTemplateColumnMandatory = csvTemplateColumnMandatory;
+	}
 
 	public CsvTemplate getCsvTemplate() {
 		return csvTemplate;
@@ -82,4 +101,12 @@ public class CsvTemplateColumns {
 	public void setExpField(ExperimentField expField) {
 		this.expField = expField;
 	}
+
+	public String getCsvTemplateColumnDatetimeMask() {
+		return csvTemplateColumnDatetimeMask;
+	}
+
+	public void setCsvTemplateColumnDatetimeMask(String csvTemplateColumnDatetimeMask) {
+		this.csvTemplateColumnDatetimeMask = csvTemplateColumnDatetimeMask;
+	}	
 }

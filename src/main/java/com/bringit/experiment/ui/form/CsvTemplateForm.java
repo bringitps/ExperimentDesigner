@@ -4,6 +4,9 @@ import com.bringit.experiment.bll.CmForSysRole;
 import com.bringit.experiment.bll.ContractManufacturer;
 import com.bringit.experiment.bll.CsvTemplate;
 import com.bringit.experiment.bll.CsvTemplateColumns;
+import com.bringit.experiment.bll.CsvTemplateEnrichment;
+import com.bringit.experiment.bll.CustomList;
+import com.bringit.experiment.bll.CustomListValue;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.FilesRepository;
@@ -15,6 +18,9 @@ import com.bringit.experiment.dao.CmForSysRoleDao;
 import com.bringit.experiment.dao.ContractManufacturerDao;
 import com.bringit.experiment.dao.CsvTemplateColumnsDao;
 import com.bringit.experiment.dao.CsvTemplateDao;
+import com.bringit.experiment.dao.CsvTemplateEnrichmentDao;
+import com.bringit.experiment.dao.CustomListDao;
+import com.bringit.experiment.dao.CustomListValueDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.FilesRepositoryDao;
@@ -63,6 +69,11 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 
     private SystemSettings systemSettings;
 
+    private String[] csvTemplateColumns;
+    private List<Integer> enrichmentRuleItemIdToDelete = new ArrayList<Integer>();
+	
+    private int lastNewEnrichmentRuleItemId = 0;
+    
 	private void loadSpecificContractManufacturer() {
 		contractManufacturers = new ArrayList<>();
 
@@ -86,6 +97,8 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		this.tblCsvCols.addContainerProperty("*", CheckBox.class, null);
 		this.tblCsvCols.addContainerProperty("Csv Column", TextField.class, null);
 		this.tblCsvCols.addContainerProperty(this.systemSettings.getExperimentLabel() + " Field", ComboBox.class, null);		
+		this.tblCsvCols.addContainerProperty("Mandatory", CheckBox.class, null);
+		this.tblCsvCols.addContainerProperty("Datetime Format", TextField.class, null);
 		this.tblCsvCols.setPageLength(0);
 		fillCombos();
 		uploadFile();
@@ -114,7 +127,35 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			if(csvt.getProcessedFileRepo() != null) this.comboCsvoutRepo.setValue(csvt.getProcessedFileRepo().getFileRepoId());
 			if(csvt.getExceptionFileRepo() != null) this.comboCsvTerrRepo.setValue(csvt.getExceptionFileRepo().getFileRepoId());
 			this.txtCsvTComments.setValue(csvt.getCsvTemplateComments());
-			this.txtCsvTPrefix.setValue(csvt.getCsvTemplatePrefix());
+			
+			String opFilterSavedCriteria = "Prefix"; 
+			
+			if(csvt.getCsvTemplatePrefix() != null)
+			{
+				opFilterSavedCriteria = "Prefix"; 
+				this.txtCsvTFilterCriteria.setValue(csvt.getCsvTemplatePrefix());				
+			}
+			
+			if(csvt.getCsvTemplateSuffix() != null)
+			{
+				opFilterSavedCriteria = "Suffix"; 
+				this.txtCsvTFilterCriteria.setValue(csvt.getCsvTemplateSuffix());				
+			}
+			
+			if(csvt.getCsvTemplateRegex() != null)
+			{
+				opFilterSavedCriteria = "Regular"; 
+				this.txtCsvTFilterCriteria.setValue(csvt.getCsvTemplateRegex());				
+			}
+			
+			Collection itemIds = this.opFilterCriteriaType.getItemIds();
+			for (Object itemIdObj : itemIds) 
+			{
+				if(((String)itemIdObj).startsWith(opFilterSavedCriteria))
+					this.opFilterCriteriaType.select(itemIdObj);				
+			}
+			
+			
 			this.dtCsvTstart.setValue(csvt.getCsvTemplateExecStartDate());
 			this.dtCsvTend.setValue(csvt.getCsvTemplateExecEndDate());
 			this.cbxStartHour.setValue(csvt.getCsvTemplateExecStartHour());
@@ -130,9 +171,16 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 						
 			
 			this.csvCols = new CsvTemplateColumnsDao().getAllCsvTemplateColumnssByTemplateId(csvt.getCsvTemplateId());
+			if(this.csvCols != null)
+			{
+				this.csvTemplateColumns = new String[this.csvCols.size()];
+				for(int i=0; i<this.csvCols.size(); i++)
+					this.csvTemplateColumns[i] =  this.csvCols.get(i).getCsvTemplateColumnName();
+			}
+			
 			this.expFields = new ExperimentFieldDao().getActiveExperimentFields(csvt.getExperiment());
 			
-			Object[] itemValues = new Object[3];
+			Object[] itemValues = new Object[5];
 			for(int i=0; i<this.csvCols.size(); i++)
 			{		
 				
@@ -146,7 +194,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				txtCsvColName.addStyleName("tiny");
 				txtCsvColName.setWidth(100, Unit.PERCENTAGE);
 				itemValues[1] = txtCsvColName;
-
+				
 				ComboBox cbxExpFields = new ComboBox("");
 				for(int j=0; j<expFields.size(); j++)
 				{
@@ -161,10 +209,33 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 					cbxExpFields.setValue(this.csvCols.get(i).getExpField().getExpFieldId());
 				itemValues[2] = cbxExpFields;
 				
+				CheckBox chxMandatory = new CheckBox();
+				chxMandatory.addStyleName("tiny");
+				
+				if(this.csvCols.get(i).getCsvTemplateColumnMandatory() != null)
+					chxMandatory.setValue(this.csvCols.get(i).getCsvTemplateColumnMandatory());
+					
+				itemValues[3] = chxMandatory;
+				
+				TextField txtDateTimeMask = new TextField();
+				
+				if(this.csvCols.get(i).getCsvTemplateColumnDatetimeMask() != null)
+					txtDateTimeMask.setValue(this.csvCols.get(i).getCsvTemplateColumnDatetimeMask());
+				
+				txtDateTimeMask.addStyleName("tiny");
+				txtDateTimeMask.setWidth(100, Unit.PERCENTAGE);
+				itemValues[4] = txtDateTimeMask;
+				
 				this.tblCsvCols.addItem(itemValues, this.csvCols.get(i).getCsvTemplateColumnId());
 			}
 	
 		}
+		
+		//Added at 9/4
+		//Enrichment Rules feature added to Bit-Exp
+		loadTblEnrichmentRulesData();
+		
+		
 		comboCsvTExperiment.addValueChangeListener(new ValueChangeListener() {
 
 			@Override
@@ -213,6 +284,23 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 
 		});
 		
+		this.btnAddEnrichmentRule.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				addTblEnrichmentRule(null);
+			}
+
+		});
+		
+		this.btnDeleteEnrichmentRule.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				deleteTblEnrichmentRule();
+			}
+
+		});
 	}
 	
 	private void closeModalWindow()
@@ -223,13 +311,17 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	
 	@SuppressWarnings("deprecation")
 	protected void onSave() {
+
+		//System.out.println("Option Criteria Type Value: " + this.opFilterCriteriaType.getValue());
+		
 		Collection itemIds = this.tblCsvCols.getContainerDataSource().getItemIds();
 		boolean validateCsvTemplateNameResult = validateCsvTemplateName();		
 		boolean validateReqFieldsResult = validateRequiredFields();		
 		boolean validateNonRepeatedExperimentFieldsResult = validateNonRepeatedExperimentFields();
+		boolean validateCsvTemplateEnrichment = validateCsvTemplateEnrichment();
 		
 		//---Validate Required Fields---//
-		if(itemIds.size() > 0 && validateReqFieldsResult && validateNonRepeatedExperimentFieldsResult && validateCsvTemplateNameResult)
+		if(itemIds.size() > 0 && validateReqFieldsResult && validateNonRepeatedExperimentFieldsResult && validateCsvTemplateNameResult && validateCsvTemplateEnrichment)
 		{
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			
@@ -237,7 +329,32 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.csvt.setExperiment(new ExperimentDao().getExperimentById((int) this.comboCsvTExperiment.getValue()));
 			this.csvt.setCsvTemplateName(this.txtCsvTName.getValue());
 			this.csvt.setCsvTemplateIsActive(this.chxActive.getValue());
-			this.csvt.setCsvTemplatePrefix(this.txtCsvTPrefix.getValue());
+			
+			String opFilterSavedCriteria = this.opFilterCriteriaType.getValue().toString().trim(); 
+
+			if(opFilterSavedCriteria.startsWith("Prefix"))
+			{
+				this.csvt.setCsvTemplatePrefix(this.txtCsvTFilterCriteria.getValue());
+				this.csvt.setCsvTemplateSuffix(null);
+				this.csvt.setCsvTemplateRegex(null);				
+			}
+
+			if(opFilterSavedCriteria.startsWith("Suffix"))
+			{
+				this.csvt.setCsvTemplatePrefix(null);
+				this.csvt.setCsvTemplateSuffix(this.txtCsvTFilterCriteria.getValue());
+				this.csvt.setCsvTemplateRegex(null);				
+			}
+
+			if(opFilterSavedCriteria.startsWith("Regular"))
+			{
+				this.csvt.setCsvTemplatePrefix(null);
+				this.csvt.setCsvTemplateSuffix(null);
+				this.csvt.setCsvTemplateRegex(this.txtCsvTFilterCriteria.getValue());				
+			}
+			
+			//this.csvt.setCsvTemplatePrefix(this.txtCsvTFilterCriteria.getValue());
+			
 			this.csvt.setCsvTemplateComments(this.txtCsvTComments.getValue());
 			
 			this.csvt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvTerrRepo.getValue()));
@@ -321,15 +438,19 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				
 				CsvTemplateColumns csvColumn = new CsvTemplateColumns();
 				csvColumn.setCsvTemplateColumnName(((TextField)(tblRowItem.getItemProperty("Csv Column").getValue())).getValue());			
+				csvColumn.setCsvTemplateColumnMandatory(((CheckBox)(tblRowItem.getItemProperty("Mandatory").getValue())).getValue());
 				csvColumn.setCsvTemplate(csvt);
 				
-				if(((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue() != null){
-				
+				if(((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue() != null)
+				{
 					ExperimentField selectedExpField = new ExperimentField();
 					selectedExpField.setExpFieldId((int)((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue());
 
 					csvColumn.setExpField(selectedExpField);
 				}
+				else
+					csvColumn.setExpField(null);
+					
 				if(itemId > 0)
 				{
 					csvColumn.setCsvTemplateColumnId(itemId);
@@ -341,8 +462,59 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				
 			}
 			
+
+			//Added at 9/4
+			//Enrichment Rules feature added to Bit-Exp
+			Collection enrichmentRuleItemIds = this.tblEnrichmentRules.getContainerDataSource().getItemIds();
 			
-		
+			CsvTemplateEnrichmentDao csvTemplateEnrichmentDao = new CsvTemplateEnrichmentDao();
+			
+			for (Object enrichmentRuleItemIdObj : enrichmentRuleItemIds) 
+			{
+				int enrichmentRuleItemId = (int)enrichmentRuleItemIdObj;
+				Item tblEnrichmentRuleRowItem = this.tblEnrichmentRules.getContainerDataSource().getItem(enrichmentRuleItemId);
+				
+				CsvTemplateEnrichment csvTemplateEnrichment = new CsvTemplateEnrichment();
+				csvTemplateEnrichment.setCsvTemplate(csvt);
+				csvTemplateEnrichment.setCsvTemplateEnrichmentColumnNameSource(((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("CSV Column Source").getValue())).getValue().toString());			
+				csvTemplateEnrichment.setCsvTemplateEnrichmentOperation(((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("Operator").getValue())).getValue().toString());			
+				csvTemplateEnrichment.setCsvTemplateEnrichmentValue(((TextField)(tblEnrichmentRuleRowItem.getItemProperty("Value").getValue())).getValue().toString());			
+				csvTemplateEnrichment.setCsvTemplateEnrichmentType((((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("Enrichment Type").getValue())).getValue().toString()));			
+				
+				String customListValueStrId = "";
+				if(((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("List Value").getValue())).getValue() != null)
+					customListValueStrId = ((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("List Value").getValue())).getValue().toString();
+
+				if(!customListValueStrId.isEmpty())
+					csvTemplateEnrichment.setCustomListValue(new CustomListValueDao().getCustomListValueById(Integer.parseInt(customListValueStrId)));			
+				
+				csvTemplateEnrichment.setCsvTemplateEnrichmentStaticValue(((TextField)(tblEnrichmentRuleRowItem.getItemProperty("Static Value").getValue())).getValue().toString());			
+				
+				String experimentFieldDestinationStrId = "";
+				if(((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field Destination").getValue())).getValue() != null)
+					experimentFieldDestinationStrId = ((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field Destination").getValue())).getValue().toString();
+				
+				if(!experimentFieldDestinationStrId.isEmpty())
+					csvTemplateEnrichment.setExpFieldDestination(new ExperimentFieldDao().getExperimentFieldById(Integer.parseInt(experimentFieldDestinationStrId)));
+				
+				if(enrichmentRuleItemId > 0)
+				{
+					csvTemplateEnrichment.setCsvTemplateEnrichmentId(enrichmentRuleItemId);
+					csvTemplateEnrichmentDao.updateCsvTemplateEnrichment(csvTemplateEnrichment);
+				}
+				else
+					csvTemplateEnrichmentDao.addCsvTemplateEnrichment(csvTemplateEnrichment);
+			}
+			
+			if(this.enrichmentRuleItemIdToDelete.size() > 0)
+			{
+				for(int i=0; i<this.enrichmentRuleItemIdToDelete.size(); i++)
+				{
+					if(this.enrichmentRuleItemIdToDelete.get(i)>0)
+						csvTemplateEnrichmentDao.deleteCsvTemplateEnrichment(this.enrichmentRuleItemIdToDelete.get(i));
+				}
+			}
+			
 			closeModalWindow();
 		}
 		else
@@ -355,14 +527,16 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				this.getUI().showNotification("You can not map 1 " + this.systemSettings.getExperimentLabel() + " Field to 2 or more CSV Columns.", Type.WARNING_MESSAGE);
 			else if(!validateCsvTemplateNameResult)
 				this.getUI().showNotification("Name is already selected for another Csv Template. Please rename CsvTemplate", Type.WARNING_MESSAGE);
-		
+			else if(!validateCsvTemplateEnrichment)
+				this.getUI().showNotification("Please fill in all required Fields for Csv Template Enrichment", Type.WARNING_MESSAGE);
+			
 		}
 	}
 	
 	private boolean validateRequiredFields()
 	{
 		if(!this.txtCsvTName.isValid()) return false;
-		if(!this.txtCsvTPrefix.isValid()) return false;
+		if(!this.txtCsvTFilterCriteria.isValid()) return false;
 		if(!this.comboCsvoutRepo.isValid()) return false;
 		if(!this.comboCsvTerrRepo.isValid()) return false;
 		if(!this.comboCsvTinRepo.isValid()) return false;
@@ -407,6 +581,31 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		return true;
 	}
 	
+	private boolean validateCsvTemplateEnrichment()
+	{
+		Collection enrichmentRuleItemIds = this.tblEnrichmentRules.getContainerDataSource().getItemIds();
+		
+		for (Object enrichmentRuleItemIdObj : enrichmentRuleItemIds) 
+		{
+			int enrichmentRuleItemId = (int)enrichmentRuleItemIdObj;
+			Item tblEnrichmentRuleRowItem = this.tblEnrichmentRules.getContainerDataSource().getItem(enrichmentRuleItemId);
+			
+			String csvColumnSourceValue = "";
+			if(((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("CSV Column Source").getValue())).getValue() != null)
+				csvColumnSourceValue = ((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("CSV Column Source").getValue())).getValue().toString();
+			if(csvColumnSourceValue.isEmpty())
+				return false;
+			
+			String experimentFieldDestinationStrId = "";
+			if(((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field Destination").getValue())).getValue() != null)
+				experimentFieldDestinationStrId = ((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field Destination").getValue())).getValue().toString();
+			if(experimentFieldDestinationStrId.isEmpty())
+				return false;
+		}
+			
+		return true;
+	}
+	
 	@SuppressWarnings("deprecation")
 	private void uploadFile() {
 
@@ -438,8 +637,15 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 					reader = new CSVReader(new FileReader(tempFile));
 	    			if(reader != null)
 	    			{
-		            	fillNodes(reader.readNext());
-		            	comboCsvTExperiment.setEnabled(false);
+	    				String[] csvHeader = reader.readNext();
+	    				fillNodes(csvHeader);
+
+	    				//Added at 9/4
+	    				//Enrichment Rules feature added to Bit-Exp
+	    				csvTemplateColumns = csvHeader;
+	    				resetTblEnrichmentRulesData();
+		            	
+	    				comboCsvTExperiment.setEnabled(false);
 			            reader.close();
 	    			}
 	    		
@@ -456,7 +662,8 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	private void enableComponents(boolean b) {
 		this.txtCsvTName.setEnabled(b);
 		this.txtCsvTComments.setEnabled(b);
-		this.txtCsvTPrefix.setEnabled(b);
+		this.opFilterCriteriaType.setEnabled(b);
+		this.txtCsvTFilterCriteria.setEnabled(b);
 		this.cbxContractManufacturer.setEnabled(b);
 		this.comboCsvoutRepo.setEnabled(b);
 		this.comboCsvTerrRepo.setEnabled(b);
@@ -465,6 +672,8 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		this.upCsv.setEnabled(b);
 		this.comboCsvjobScheduler.setEnabled(b);
 		this.cbxStartHour.setEnabled(b);
+		
+		this.csvTEnrichmentRulesLayout.setEnabled(b);
 	}
 	
 	private void fillNodes(String[] columns) {
@@ -486,6 +695,8 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			this.tblCsvCols.addContainerProperty("*", CheckBox.class, null);
 			this.tblCsvCols.addContainerProperty("Csv Column", TextField.class, null);
 			this.tblCsvCols.addContainerProperty(this.systemSettings.getExperimentLabel() + " Field", ComboBox.class, null);		
+			this.tblCsvCols.addContainerProperty("Mandatory", CheckBox.class, null);
+			this.tblCsvCols.addContainerProperty("Datetime Format", TextField.class, null);
 			this.tblCsvCols.setPageLength(0);
 			
 		}
@@ -494,7 +705,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		Experiment expNew = expdao.getExperimentById((int)(this.comboCsvTExperiment.getValue()));
 		expFields = new ExperimentFieldDao().getActiveExperimentFields(expNew);
 	
-		Object[] itemValues = new Object[3];
+		Object[] itemValues = new Object[5];
 		for(int i=0; i<columns.length; i++)
 		{
 			CheckBox chxSelect = new CheckBox();
@@ -521,6 +732,17 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			cbxExpFields.addStyleName("tiny");
 			itemValues[2] = cbxExpFields;
 			
+
+			CheckBox chxMandatory = new CheckBox();
+			chxMandatory.addStyleName("tiny");
+			chxMandatory.setValue(false);				
+			itemValues[3] = chxMandatory;
+			
+			TextField txtDateTimeMask = new TextField();
+			txtDateTimeMask.addStyleName("tiny");
+			txtDateTimeMask.setWidth(100, Unit.PERCENTAGE);
+			itemValues[4] = txtDateTimeMask;
+						
 			this.lastNewItemId = this.lastNewItemId - 1;
 			this.tblCsvCols.addItem(itemValues, this.lastNewItemId);
 			
@@ -603,6 +825,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		}
 		
 	}
+	
 	private void onDelete()
 	{	 
 		this.csvt.setCsvTemplateIsActive(false);
@@ -619,4 +842,302 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		closeModalWindow();
     }
 	
+	private void loadTblEnrichmentRulesData()
+	{
+		this.tblEnrichmentRules.setContainerDataSource(null);
+		this.tblEnrichmentRules.setStyleName("small");
+		this.tblEnrichmentRules.addContainerProperty("*", CheckBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("CSV Column Source", ComboBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("Operator", ComboBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("Value", TextField.class, null);
+		this.tblEnrichmentRules.addContainerProperty("Enrichment Type", ComboBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("Custom List", ComboBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("List Value", ComboBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("Static Value", TextField.class, null);
+		this.tblEnrichmentRules.addContainerProperty(this.systemSettings.getExperimentLabel() + " Field Destination", ComboBox.class, null);
+		this.tblEnrichmentRules.setEditable(true);
+		this.tblEnrichmentRules.setPageLength(0);
+		this.tblEnrichmentRules.setColumnWidth("*", 20);
+		
+		if(this.csvt.getCsvTemplateId() != null && this.csvt.getCsvTemplateId() > -1)
+		{
+			List<CsvTemplateEnrichment> csvTemplateEnrichmentRules = new CsvTemplateEnrichmentDao().getAllCsvTemplateEnrichmentByTemplateId(this.csvt.getCsvTemplateId());
+			
+			for(int i=0; i<csvTemplateEnrichmentRules.size(); i++)
+				addTblEnrichmentRule(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentId());
+		}
+	}
+	
+	private void resetTblEnrichmentRulesData()
+	{
+		Collection enrichmentRuleItemIds = this.tblEnrichmentRules.getContainerDataSource().getItemIds();
+		
+		for (Object enrichmentRuleItemIdObj : enrichmentRuleItemIds) 
+			enrichmentRuleItemIdToDelete.add(Integer.parseInt(enrichmentRuleItemIdObj.toString()));
+		
+		this.tblEnrichmentRules.setContainerDataSource(null);
+		this.tblEnrichmentRules.setStyleName("small");
+		this.tblEnrichmentRules.addContainerProperty("*", CheckBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("CSV Column Source", ComboBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("Operator", ComboBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("Value", TextField.class, null);
+		this.tblEnrichmentRules.addContainerProperty("Enrichment Type", ComboBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("Custom List", ComboBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("List Value", ComboBox.class, null);
+		this.tblEnrichmentRules.addContainerProperty("Static Value", TextField.class, null);
+		this.tblEnrichmentRules.addContainerProperty(this.systemSettings.getExperimentLabel() + " Field Destination", ComboBox.class, null);
+		this.tblEnrichmentRules.setEditable(true);
+		this.tblEnrichmentRules.setPageLength(0);
+		this.tblEnrichmentRules.setColumnWidth("*", 20);		
+		
+		
+	}
+
+	private void addTblEnrichmentRule(Integer csvEnrichmentRuleId)
+	{
+		
+		Integer itemId = csvEnrichmentRuleId;
+		if(itemId == null)
+		{	
+			this.lastNewEnrichmentRuleItemId = this.lastNewEnrichmentRuleItemId - 1;
+			itemId = this.lastNewEnrichmentRuleItemId;
+		}
+		
+		Object[] itemValues = new Object[9];
+		
+		//Dummy Initial Column
+		CheckBox chxSelect = new CheckBox();
+		chxSelect.setStyleName("tiny");
+		chxSelect.setVisible(false);
+		itemValues[0] = chxSelect;
+		
+		//Fill CSV Column ComboBox
+		ComboBox cbxCsvColumnSource = new ComboBox("");
+		cbxCsvColumnSource.setStyleName("tiny");
+		cbxCsvColumnSource.setRequired(true);
+		cbxCsvColumnSource.setRequiredError("This field is required.");
+		for(int i=0; i<this.csvTemplateColumns.length; i++)
+		{
+			cbxCsvColumnSource.addItem(this.csvTemplateColumns[i]);
+			cbxCsvColumnSource.setItemCaption(this.csvTemplateColumns[i], this.csvTemplateColumns[i]);
+			cbxCsvColumnSource.setWidth(100, Unit.PERCENTAGE);
+		}
+		itemValues[1] = cbxCsvColumnSource;
+		
+				
+		//Fill Operator ComboBox
+		ComboBox cbxOperator = new ComboBox("");
+		cbxOperator.setContainerDataSource(null);
+		cbxOperator.setStyleName("tiny");		
+		cbxOperator.addItem("contains");
+		cbxOperator.setItemCaption("contains", "contains");
+		cbxOperator.addItem("doesnotcontain");
+		cbxOperator.setItemCaption("doesnotcontain", "does not contain");
+		cbxOperator.addItem("doesnotstartwith");
+		cbxOperator.setItemCaption("doesnotstartwith", "does not start with");
+		cbxOperator.addItem("endswith");
+		cbxOperator.setItemCaption("endswith", "ends with");
+		cbxOperator.addItem("is");
+		cbxOperator.setItemCaption("is", "is");
+		cbxOperator.addItem("isempty");
+		cbxOperator.setItemCaption("isempty", "is empty");
+		cbxOperator.addItem("isnot");
+		cbxOperator.setItemCaption("isnot", "is not");
+		cbxOperator.addItem("isnotempty");
+		cbxOperator.setItemCaption("isnotempty", "is not empty");
+		cbxOperator.addItem("startswith");
+		cbxOperator.setItemCaption("startswith", "starts with");
+		cbxOperator.addItem("matchesregex");
+		cbxOperator.setItemCaption("matchesregex", "matches Regular Expression");
+		cbxOperator.select("is");
+		itemValues[2] = cbxOperator;
+		
+		//Comparison Value TextField
+		TextField txtComparisonValue = new TextField();
+		txtComparisonValue.addStyleName("tiny");
+		txtComparisonValue.setWidth(100, Unit.PIXELS);
+		itemValues[3] = txtComparisonValue;
+		
+		//Fill Enrichment Type ComboBox
+		ComboBox cbxEnrichmentType = new ComboBox("");
+		cbxEnrichmentType.setContainerDataSource(null);
+		cbxEnrichmentType.setStyleName("tiny");		
+		cbxEnrichmentType.addItem("customlist");
+		cbxEnrichmentType.setItemCaption("customlist", "Custom List XREF");
+		cbxEnrichmentType.addItem("staticvalue");
+		cbxEnrichmentType.setItemCaption("staticvalue", "Static Value");
+		cbxEnrichmentType.select("customlist");
+		cbxEnrichmentType.setId(itemId.toString()); //Item Id to be reused on Change event
+
+		
+		itemValues[4] = cbxEnrichmentType;
+		
+		//Fill Custom List ComboBox
+		ComboBox cbxCustomList = new ComboBox("");
+		cbxCustomList.setContainerDataSource(null);
+		cbxCustomList.setStyleName("tiny");		
+		cbxCustomList.setId(itemId.toString()); //Item Id to be reused on Change event
+		List<CustomList> customLists = new CustomListDao().getAllCustomLists();
+
+		for(int i=0; i<customLists.size(); i++)
+		{
+			cbxCustomList.addItem(customLists.get(i).getCustomListId());
+			cbxCustomList.setItemCaption(customLists.get(i).getCustomListId(), customLists.get(i).getCustomListName());
+			cbxCustomList.setWidth(100, Unit.PERCENTAGE);
+		}
+		
+		
+		itemValues[5] = cbxCustomList;
+		
+		//Fill Custom List Value ComboBox
+		ComboBox cbxCustomListValue = new ComboBox("");
+		cbxCustomListValue.setContainerDataSource(null);
+		cbxCustomListValue.setStyleName("tiny");	
+		itemValues[6] = cbxCustomListValue;
+		
+		//Static Value TextField
+		TextField txtStaticValue = new TextField();
+		txtStaticValue.addStyleName("tiny");
+		txtStaticValue.setWidth(100, Unit.PIXELS);
+		txtStaticValue.setEnabled(false);
+		itemValues[7] = txtStaticValue;
+					
+		//Experiment Field ComboBox
+		ExperimentDao experimentDao = new ExperimentDao();
+		Experiment selectedExperiment = experimentDao.getExperimentById((int)(this.comboCsvTExperiment.getValue()));
+		List <ExperimentField> enrichmentExpFields = new ExperimentFieldDao().getActiveExperimentFields(selectedExperiment);
+		ComboBox cbxExperimentField = new ComboBox("");
+		cbxExperimentField.setStyleName("tiny");
+		cbxExperimentField.setRequired(true);
+		cbxExperimentField.setRequiredError("This field is required.");
+		for(int i=0; i<enrichmentExpFields.size(); i++)
+		{
+			cbxExperimentField.addItem(enrichmentExpFields.get(i).getExpFieldId());
+			cbxExperimentField.setItemCaption(enrichmentExpFields.get(i).getExpFieldId(), enrichmentExpFields.get(i).getExpFieldName() + " [ " + expFields.get(i).getExpFieldType() + " ]");
+			cbxExperimentField.setWidth(100, Unit.PERCENTAGE);
+		}
+		itemValues[8] = cbxExperimentField;
+		
+		if(itemId > 0)
+		{
+			CsvTemplateEnrichment csvTemplateEnrichment = new CsvTemplateEnrichmentDao().getCsvTemplateEnrichmentById(itemId);
+			cbxCsvColumnSource.setValue(csvTemplateEnrichment.getCsvTemplateEnrichmentColumnNameSource());
+			cbxOperator.setValue(csvTemplateEnrichment.getCsvTemplateEnrichmentOperation());
+			txtComparisonValue.setValue(csvTemplateEnrichment.getCsvTemplateEnrichmentValue());
+			cbxEnrichmentType.setValue(csvTemplateEnrichment.getCsvTemplateEnrichmentType());
+			
+			if(csvTemplateEnrichment.getCustomListValue() != null)
+			{	
+				cbxCustomList.setValue(csvTemplateEnrichment.getCustomListValue().getCustomList().getCustomListId());
+				List<CustomListValue> customListValues = new CustomListValueDao().getAllCustomListValuesByCustomList(new CustomListDao().getCustomListById(csvTemplateEnrichment.getCustomListValue().getCustomList().getCustomListId()));
+				for(int i=0; i<customListValues.size(); i++)
+				{
+					cbxCustomListValue.addItem(customListValues.get(i).getCustomListValueId());
+					cbxCustomListValue.setItemCaption(customListValues.get(i).getCustomListValueId(), customListValues.get(i).getCustomListValueString());
+				}
+				cbxCustomListValue.setValue(csvTemplateEnrichment.getCustomListValue().getCustomListValueId());
+			}
+			txtStaticValue.setValue(csvTemplateEnrichment.getCsvTemplateEnrichmentStaticValue());
+			cbxExperimentField.setValue(csvTemplateEnrichment.getExpFieldDestination().getExpFieldId());
+			
+			if("customlist".equals(cbxEnrichmentType.getValue()))
+			{
+				cbxCustomList.setEnabled(true);
+				cbxCustomListValue.setEnabled(true);
+				txtStaticValue.setEnabled(false);
+			}
+			else
+			{
+				cbxCustomList.setEnabled(false);
+				cbxCustomListValue.setEnabled(false);
+				txtStaticValue.setEnabled(true);
+			}
+			
+
+			
+		}
+		
+
+		cbxEnrichmentType.addValueChangeListener(new ValueChangeListener() {
+
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+            	onChangeEnrichmentType(cbxEnrichmentType);
+            }
+        });
+
+		cbxCustomList.addValueChangeListener(new ValueChangeListener() {
+
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+            	onChangeCustomList(cbxCustomList);
+            }
+        });
+		
+		
+		this.tblEnrichmentRules.addItem(itemValues, itemId);
+		
+	}
+	
+	private void deleteTblEnrichmentRule()
+	{
+		if(this.tblEnrichmentRules.getValue() != null)
+		{
+			if((int)this.tblEnrichmentRules.getValue() > 0)
+			{
+				//Validate that Custom List Value is not linked to another dependencies
+				this.enrichmentRuleItemIdToDelete.add((int)this.tblEnrichmentRules.getValue());
+			}
+			
+			this.tblEnrichmentRules.removeItem((int)this.tblEnrichmentRules.getValue());
+		}
+	}
+	
+	private void onChangeCustomList(ComboBox cbxCustomList)
+	{
+		Item tblEnrichmentRulesItem = this.tblEnrichmentRules.getItem(Integer.parseInt(cbxCustomList.getId()));
+		
+		ComboBox cbxCustomListValue = (ComboBox)tblEnrichmentRulesItem.getItemProperty("List Value").getValue();
+		cbxCustomListValue.setContainerDataSource(null);
+		
+		if(cbxCustomList.getValue() != null && !cbxCustomList.getValue().toString().isEmpty())
+		{
+			Integer selectedCustomListId = (Integer)cbxCustomList.getValue();
+			
+			List<CustomListValue> customListValues = new CustomListValueDao().getAllCustomListValuesByCustomList(new CustomListDao().getCustomListById(selectedCustomListId));
+			for(int i=0; i<customListValues.size(); i++)
+			{
+				cbxCustomListValue.addItem(customListValues.get(i).getCustomListValueId());
+				cbxCustomListValue.setItemCaption(customListValues.get(i).getCustomListValueId(), customListValues.get(i).getCustomListValueString());
+			}
+		}
+	}
+	
+	private void onChangeEnrichmentType(ComboBox cbxEnrichmentType)
+	{
+		Item tblEnrichmentRulesItem = this.tblEnrichmentRules.getItem(Integer.parseInt(cbxEnrichmentType.getId()));
+		
+		if(cbxEnrichmentType.getValue() != null && !cbxEnrichmentType.getValue().toString().isEmpty())
+		{
+			ComboBox cbxCustomList = (ComboBox)tblEnrichmentRulesItem.getItemProperty("Custom List").getValue();
+			ComboBox cbxCustomListValue = (ComboBox)tblEnrichmentRulesItem.getItemProperty("List Value").getValue();
+			TextField txtStaticValue = (TextField)tblEnrichmentRulesItem.getItemProperty("Static Value").getValue();
+			
+			if("customlist".equals(cbxEnrichmentType.getValue()))
+			{
+				cbxCustomList.setEnabled(true);
+				cbxCustomListValue.setEnabled(true);
+				txtStaticValue.setValue("");
+				txtStaticValue.setEnabled(false);
+			}
+			else
+			{
+				cbxCustomList.setValue(null);
+				cbxCustomList.setEnabled(false);
+				cbxCustomListValue.setValue(null);
+				cbxCustomListValue.setEnabled(false);
+				txtStaticValue.setEnabled(true);
+			}
+		}
+	}
 }

@@ -40,6 +40,12 @@ public class CsvTemplate {
 	@Column(name="CsvTemplatePrefix")
 	private String csvTemplatePrefix;
 
+	@Column(name="CsvTemplateSuffix")
+	private String csvTemplateSuffix;
+
+	@Column(name="CsvTemplateRegex")
+	private String csvTemplateRegex;
+	
 	@Column(name="CsvTemplateNotScheduled")
 	private Boolean csvTemplateNotScheduled;
 	
@@ -96,6 +102,8 @@ public class CsvTemplate {
 		this.CsvTemplateName = null;
 		this.csvTemplateComments = null;
 		this.csvTemplatePrefix = null;
+		this.csvTemplateSuffix = null;
+		this.csvTemplateRegex = null;
 		this.csvTemplateNotScheduled = null;
 		this.csvTemplateExecStartDate = null;
 		this.csvTemplateExecStartHour = null;
@@ -114,7 +122,8 @@ public class CsvTemplate {
 	
 	
 	public CsvTemplate(Integer csvTemplateId, Boolean csvTemplateIsActive, String csvTemplateName,
-			String csvTemplateComments, String csvTemplatePrefix, Boolean csvTemplateNotScheduled, Date csvTemplateExecStartDate,
+			String csvTemplateComments, String csvTemplatePrefix, String csvTemplateSuffix, String csvTemplateRegex, 
+			Boolean csvTemplateNotScheduled, Date csvTemplateExecStartDate,
 			Integer csvTemplateExecStartHour, Date csvTemplateExecEndDate, Date createdDate, Date modifiedDate,
 			ContractManufacturer contractManufacturer, FilesRepository inboundFileRepo,
 			FilesRepository processedFileRepo, FilesRepository exceptionFileRepo, JobExecutionRepeat jobExecRepeat,
@@ -124,6 +133,8 @@ public class CsvTemplate {
 		this.CsvTemplateName = csvTemplateName;
 		this.csvTemplateComments = csvTemplateComments;
 		this.csvTemplatePrefix = csvTemplatePrefix;
+		this.csvTemplateSuffix = csvTemplateSuffix;
+		this.csvTemplateRegex = csvTemplateRegex;
 		this.csvTemplateNotScheduled = csvTemplateNotScheduled;
 		this.csvTemplateExecStartDate = csvTemplateExecStartDate;
 		this.csvTemplateExecStartHour = csvTemplateExecStartHour;
@@ -171,6 +182,22 @@ public class CsvTemplate {
 
 	public void setCsvTemplatePrefix(String csvTemplatePrefix) {
 		this.csvTemplatePrefix = csvTemplatePrefix;
+	}
+
+	public String getCsvTemplateSuffix() {
+		return csvTemplateSuffix;
+	}
+
+	public void setCsvTemplateSuffix(String csvTemplateSuffix) {
+		this.csvTemplateSuffix = csvTemplateSuffix;
+	}
+
+	public String getCsvTemplateRegex() {
+		return csvTemplateRegex;
+	}
+
+	public void setCsvTemplateRegex(String csvTemplateRegex) {
+		this.csvTemplateRegex = csvTemplateRegex;
 	}
 
 	public Boolean getCsvTemplateNotScheduled() {

@@ -34,7 +34,7 @@
    </vaadin-vertical-layout> 
    <vaadin-vertical-layout width="960px" height="220px"> 
     <vaadin-vertical-layout style-name="CsvTemplateCRUDLayout" _id="crudLayout"> 
-     <vaadin-grid-layout spacing id="gridMainData" width-full height="215px"> 
+     <vaadin-grid-layout id="gridMainData" width-full height="215px"> 
       <row> 
        <column> 
         <vaadin-combo-box caption="Experiment:" required style-name="tiny" width-full _id="comboCsvTExperiment"></vaadin-combo-box> 
@@ -59,10 +59,10 @@
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-accordion style-name="tiny" width="960px" height="300px" _id="csvTJobAndMap"> 
+   <vaadin-accordion style-name="tiny" width="960px" height="310px" _id="csvTJobAndMap"> 
     <tab caption="Job Details" icon="fonticon://FontAwesome/f274" selected> 
      <vaadin-vertical-layout style-name="well" margin _id="csvTJobLayout"> 
-      <vaadin-grid-layout spacing width-full height="70px"> 
+      <vaadin-grid-layout spacing width-full height="60px"> 
        <row> 
         <column> 
          <vaadin-check-box caption="Not Scheduled" width-full _id="chxNotScheduled" :middle></vaadin-check-box> 
@@ -81,21 +81,36 @@
         </column> 
        </row> 
       </vaadin-grid-layout> 
-      <vaadin-grid-layout width-full height="125px"> 
+      <vaadin-grid-layout width-full height="110px"> 
        <row> 
         <column> 
-         <vaadin-combo-box caption="Inbound File Repository:" required style-name="small" width-full _id="comboCsvTinRepo"></vaadin-combo-box> 
+         <vaadin-combo-box caption="Inbound File Repository:" required style-name="tiny" width-full _id="comboCsvTinRepo" :bottom></vaadin-combo-box> 
         </column> 
         <column> 
-         <vaadin-text-field caption="Prefix:" style-name="small" width-full _id="txtCsvTPrefix"></vaadin-text-field> 
+         <vaadin-grid-layout size-full _id="gridFileNameFilterCriteria"> 
+          <row> 
+           <column> 
+            <vaadin-option-group primary-style-name="v-select-optiongroup-horizontal" style-name="horizontal small" width-full _id="opFilterCriteriaType"> 
+             <option selected>Prefix &nbsp;&nbsp;</option> 
+             <option>Suffix &nbsp;&nbsp;</option> 
+             <option>Regular Expression &nbsp;&nbsp;</option> 
+            </vaadin-option-group> 
+           </column> 
+          </row> 
+          <row> 
+           <column> 
+            <vaadin-text-field input-prompt="File filtering criteria" style-name="tiny" width-full _id="txtCsvTFilterCriteria" :bottom></vaadin-text-field> 
+           </column> 
+          </row> 
+         </vaadin-grid-layout> 
         </column> 
        </row> 
        <row> 
         <column> 
-         <vaadin-combo-box caption="Processed File Repository" required style-name="small" width-full _id="comboCsvoutRepo"></vaadin-combo-box> 
+         <vaadin-combo-box caption="Processed File Repository" required style-name="tiny" width-full _id="comboCsvoutRepo"></vaadin-combo-box> 
         </column> 
         <column> 
-         <vaadin-combo-box caption="Exception File Repository:" required style-name="small" width-full _id="comboCsvTerrRepo"></vaadin-combo-box> 
+         <vaadin-combo-box caption="Exception File Repository:" required style-name="tiny" width-full _id="comboCsvTerrRepo"></vaadin-combo-box> 
         </column> 
        </row> 
       </vaadin-grid-layout> 
@@ -107,6 +122,32 @@
        <table> 
        </table> 
       </vaadin-table> 
+     </vaadin-vertical-layout> 
+    </tab> 
+    <tab caption="Data Enrichment" icon="fonticon://FontAwesome/f1e0"> 
+     <vaadin-vertical-layout margin _id="csvTEnrichmentLayout"> 
+      <vaadin-vertical-layout _id="csvTEnrichmentRulesLayout"> 
+       <vaadin-grid-layout width-full height="40px" _id="gridEnrichmentRuleBtns"> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" plain-text _id="btnAddEnrichmentRule">
+            Add Enrichment Rule 
+          </vaadin-button> 
+         </column> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" plain-text _id="btnDeleteEnrichmentRule" :right>
+            Delete Enrichment Rule 
+          </vaadin-button> 
+         </column> 
+        </row> 
+        <row></row> 
+       </vaadin-grid-layout> 
+       <vaadin-panel _id="pnlEnrichmentRulesTbl"> 
+        <vaadin-table selectable style-name="tiny" immediate width-full height="130px" _id="tblEnrichmentRules"> 
+         <table></table> 
+        </vaadin-table> 
+       </vaadin-panel> 
+      </vaadin-vertical-layout> 
      </vaadin-vertical-layout> 
     </tab> 
    </vaadin-accordion> 

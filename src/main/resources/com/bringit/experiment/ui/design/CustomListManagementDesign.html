@@ -6,33 +6,28 @@
   <meta name="vaadin-version" content="7.7.0">
  </head> 
  <body> 
-  <vaadin-vertical-layout size-full> 
-   <vaadin-label style-name="valo-menu" plain-text>
-     - Csv Data File Load 
+  <vaadin-vertical-layout style-name="crud-template" responsive size-full> 
+   <vaadin-label style-name="valo-menu" plain-text _id="lblTitle">
+     - Custom List Management 
    </vaadin-label> 
    <vaadin-horizontal-layout style-name="top-bar" width-full height="50px"> 
     <vaadin-horizontal-layout width-full :middle :expand> 
      <vaadin-text-field icon="fonticon://FontAwesome/f002" input-prompt="Search" style-name="tiny inline-icon search" width-full _id="txtSearch"></vaadin-text-field> 
     </vaadin-horizontal-layout> 
-    <vaadin-combo-box style-name="tiny" _id="cbxCsvDataFileLoadsViewFilters" :middle></vaadin-combo-box> 
+    <vaadin-combo-box style-name="tiny" _id="cbxCustomListViewFilters" :middle></vaadin-combo-box> 
    </vaadin-horizontal-layout> 
-   <vaadin-grid-layout width-full height="40px" _id="gridButtons"> 
+   <vaadin-grid-layout width="100px" height="40px" _id="gridButtons"> 
     <row> 
      <column> 
-      <vaadin-button icon="fonticon://FontAwesome/f04b" style-name="tiny friendly" plain-text _id="btnProcessCsvDataFile">
-        Process Csv Data File 
-      </vaadin-button> 
-     </column> 
-     <column> 
-      <vaadin-button icon="fonticon://FontAwesome/f0f6" style-name="tiny native" plain-text _id="btnViewResultFiles" :right>
-        View Result Files 
+      <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" id="btnAddExperiment" plain-text _id="btnAddCustomList">
+        Add new 
       </vaadin-button> 
      </column> 
     </row> 
    </vaadin-grid-layout> 
    <vaadin-css-layout style-name="content" size-full :expand> 
     <vaadin-css-layout style-name="list" size-full> 
-     <vaadin-table selectable style-name="small" size-full _id="tblCsvDataFileLoads"> 
+     <vaadin-table selectable style-name="small" size-full _id="tblCustomList"> 
       <table> 
       </table> 
      </vaadin-table> 

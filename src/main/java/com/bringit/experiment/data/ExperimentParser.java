@@ -1,6 +1,12 @@
 package com.bringit.experiment.data;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.IsNull;
+import com.vaadin.data.util.filter.Like;
+import com.vaadin.data.util.filter.Not;
+import com.vaadin.ui.ComboBox;
+
 import org.apache.commons.beanutils.ConversionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -10,12 +16,14 @@ import org.w3c.dom.NodeList;
 import com.bringit.experiment.bll.CsvDataLoadExecutionResult;
 import com.bringit.experiment.bll.CsvTemplate;
 import com.bringit.experiment.bll.CsvTemplateColumns;
+import com.bringit.experiment.bll.CsvTemplateEnrichment;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.bll.XmlTemplateNode;
 import com.bringit.experiment.dao.CsvDataLoadExecutionResultDao;
 import com.bringit.experiment.dao.CsvTemplateColumnsDao;
+import com.bringit.experiment.dao.CsvTemplateEnrichmentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.XmlTemplateNodeDao;
 import com.opencsv.CSVReader;
@@ -28,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -65,7 +74,11 @@ public class ExperimentParser {
         try {
         	
         		if(csvFile != null){
-
+        			
+        			//Added at 9/4
+        			//Enrichment Rules feature added to Bit-Exp
+        			CsvTemplateEnrichmentDao csvTemplateEnrichmentDao = new CsvTemplateEnrichmentDao();
+        			
         			//Verify if there is a template and nodes for the experiment.
         			CsvTemplateColumnsDao nodeDao = new CsvTemplateColumnsDao();
         			if (template != null){
@@ -73,7 +86,13 @@ public class ExperimentParser {
         				if(exp != null){
 	        				//get the nodes:
 	        				List<CsvTemplateColumns> columns = nodeDao.getAllCsvTemplateColumnssByTemplateId(template.getCsvTemplateId());
-	        				if(columns != null){
+
+	        				//Added at 9/4
+	            			//Enrichment Rules feature added to Bit-Exp
+	            			List<CsvTemplateEnrichment> csvTemplateEnrichmentRules = csvTemplateEnrichmentDao.getAllCsvTemplateEnrichmentByTemplateId(template.getCsvTemplateId());
+	        				
+	        				
+	        				if(columns != null || csvTemplateEnrichmentRules != null){
 
 	        					System.out.println("Init: Parsing CSV file: " + csvFile);
 	        		            
@@ -98,26 +117,28 @@ public class ExperimentParser {
 	        		            int totalLines = csvFileLines.size();	        		            
 	        		            System.out.println("Total Lines: " + totalLines);
 	        		            
+	        		            List<Integer> exceptionRowMtx = new ArrayList<Integer>();
+	        		            List<String> exceptionRowDetailsMtx = new ArrayList<String>();
+
 	        		            List<String> csvColumnNameMtx = new ArrayList<String>();
+	        		            List<Boolean> csvColumnMandatoryMtx = new ArrayList<Boolean>();
 	        		            List<String> csvColumnTypeMtx = new ArrayList<String>();
 	        		            List<String> csvColumnFieldDbIdXRefMtx = new ArrayList<String>();
 	        		            List<Integer> csvColumnPositionInFileMtx = new ArrayList<Integer>();
 	        		            List<String[]> csvColumnValuesMtx = new ArrayList<String[]>();
-	        		            
 
 	        		            for(int i=0; i < columns.size(); i++)
 	        		            {
 	        		            	csvColumnNameMtx.add(columns.get(i).getCsvTemplateColumnName());
+	        		            	csvColumnMandatoryMtx.add(columns.get(i).getCsvTemplateColumnMandatory());
 	        		            	csvColumnTypeMtx.add(columns.get(i).getExpField().getExpFieldType());
 	        		            	csvColumnFieldDbIdXRefMtx.add(columns.get(i).getExpField().getExpDbFieldNameId());
 	        		            	csvColumnPositionInFileMtx.add(-1);
 	        		            	csvColumnValuesMtx.add(new String[totalLines]);
 	        		            }        		            
-	        		            
+	        		           
 	        		            for(int i=0; i < header.length; i++)
-	        		            {
-		        		            System.out.println("Header (" + i + "): " + header[i]);
-		        		            
+	        		            {		        		            
 	        		            	Integer csvColumnIndex = csvColumnNameMtx.indexOf(header[i]);
 	        		            	if(csvColumnIndex != -1)
 	        		            		csvColumnPositionInFileMtx.set(csvColumnIndex, i);	        		            	
@@ -138,8 +159,7 @@ public class ExperimentParser {
 	        		            }
 	        		            
 	        		            System.out.println("Row Count: " + rowCount);
-	        		            
-	        		            
+	        		            	        		            
 	        		            //Validate Field & Types
 	        		   			String exceptionRowColumns = "";
 	        		            for(int i=0; i < columns.size(); i++)
@@ -151,81 +171,211 @@ public class ExperimentParser {
 	        		            		{
 	        		            			rowCount = j+1;
 	        		            			if(!validateFieldType(fieldType, csvColumnValuesMtx.get(i)[j]))
-		            		            		exceptionRowColumns += "Invalid Data: " + csvColumnValuesMtx.get(i)[j] + ". Cast failed to " + fieldType + " Found in Column '" + csvColumnNameMtx.get(i) + "' Row #" + rowCount + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss\n": ".\n");
+	        		            			{
+	        		            				int exceptionRowMtxIndex = exceptionRowMtx.indexOf(j+1);
+	        		            				if(exceptionRowMtxIndex == -1)
+	        		            				{
+	        		            					exceptionRowMtx.add(rowCount);
+	        		            					exceptionRowDetailsMtx.add("Invalid Data: " + csvColumnValuesMtx.get(i)[j] + ". Cast failed to " + fieldType + " Found in Column '" + csvColumnNameMtx.get(i) + "'" + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss": "."));
+	        		            				}
+	        		            				else
+	        		            					exceptionRowDetailsMtx.set(exceptionRowMtxIndex, exceptionRowDetailsMtx.get(i) + " " + "Invalid Data: " + csvColumnValuesMtx.get(i)[j] + ". Cast failed to " + fieldType + " Found in Column '" + csvColumnNameMtx.get(i) + "'" + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss": "."));
+	        		            		
+	        		            				exceptionRowColumns += "Invalid Data: " + csvColumnValuesMtx.get(i)[j] + ". Cast failed to " + fieldType + " Found in Column '" + csvColumnNameMtx.get(i) + "' Row #" + rowCount + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss\n": ".\n");
+	        		            			}
 		            		            	
+	        		            			//Validate Mandatory fields
+	        		            			if(csvColumnValuesMtx.get(i)[j].isEmpty() && csvColumnMandatoryMtx.get(i) != null && csvColumnMandatoryMtx.get(i))
+	        		            			{
+	        		            				int exceptionRowMtxIndex = exceptionRowMtx.indexOf(j+1);
+	        		            				if(exceptionRowMtxIndex == -1)
+	        		            				{
+	        		            					exceptionRowMtx.add(rowCount);
+	        		            					exceptionRowDetailsMtx.add("Mandatory value missing for Column '" + csvColumnNameMtx.get(i) +"'.");
+	        		            				}
+	        		            				else
+	        		            					exceptionRowDetailsMtx.set(exceptionRowMtxIndex, exceptionRowDetailsMtx.get(i) + " " + "Mandatory value missing for Column '" + csvColumnNameMtx.get(i) +"'.");
+	        		            		
+	        		            			}
 	        		            		}
 	        		            	}
 	        		            }
 
-	        		            if(exceptionRowColumns.isEmpty())
-	        		            {
-		        		            for(int i=0; i < columns.size(); i++)
-		        		            {
-		        		            	if(csvColumnPositionInFileMtx.get(i) != -1)
-		        		            		csvColumns+= csvColumnFieldDbIdXRefMtx.get(i) + ",";
-		        		            }
+	        		            //if(exceptionRowColumns.isEmpty())
+	        		            //{
+	        		            	//Added at 9/4
+	        			            //Enrichment Rules feature added to Bit-Exp
+	        			            List<String> csvFileColumnNameMtx = new ArrayList<String>();
+	        		            	List<String[]> csvFileColumnValuesMtx = new ArrayList<String[]>();
+	        		            	 
+	        		            	for(int i=0; i < header.length; i++)
+	        		            	{
+	        		            		String[] csvColumnValues = new String[totalLines];
+	        		            		 
+	        		            		for(int j=0; j<totalLines; j++)
+	        		            			csvColumnValues[j] = (csvFileLines.get(j)[i] != null) ? csvFileLines.get(j)[i] : "";
+	     	        		            
+	     	        		            csvFileColumnNameMtx.add(header[i]);
+	     	        		        	csvFileColumnValuesMtx.add(csvColumnValues);
+	 	        		            }
+	        		            	
+	        		            	List<String> enrichExpFieldDbIdMtx = new ArrayList<String>();
+	        		            	List<String> enrichExpFieldTypeMtx = new ArrayList<String>();
+	        		            	List<String> enrichExpFieldLastCsvColumnMtx = new ArrayList<String>();
+	        		            	List<String[]> enrichExpFieldValuesMtx = new ArrayList<String[]>();
+	        		            	
+	        		            	for(int i=0; i<csvTemplateEnrichmentRules.size(); i++)
+	        		        		{
+	        		            		int enrichExpFieldMtxIndex = enrichExpFieldDbIdMtx.indexOf(csvTemplateEnrichmentRules.get(i).getExpFieldDestination().getExpDbFieldNameId());
+	        		            		if(enrichExpFieldMtxIndex == -1)
+	        		            		{
+	        		            			int csvFileColumnMtxIndex = csvFileColumnNameMtx.indexOf(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentColumnNameSource());
+	        		            			if(csvFileColumnMtxIndex != -1)
+	        		            			{
+	        		            				enrichExpFieldDbIdMtx.add(csvTemplateEnrichmentRules.get(i).getExpFieldDestination().getExpDbFieldNameId());
+	        		            				enrichExpFieldTypeMtx.add(csvTemplateEnrichmentRules.get(i).getExpFieldDestination().getExpFieldType());
+	        		            				enrichExpFieldLastCsvColumnMtx.add(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentColumnNameSource());
+	        		            				
+	        		            				enrichExpFieldValuesMtx.add(csvFileColumnValuesMtx.get(csvFileColumnMtxIndex));
+	        		            				enrichCsvColumn(csvTemplateEnrichmentRules.get(i), enrichExpFieldValuesMtx.get(enrichExpFieldValuesMtx.size() - 1));
+	    	        			            	
+	        		            			}
+	        		            		}
+	        		            		else
+	        		            		{
+	        		            			int csvFileColumnMtxIndex = csvFileColumnNameMtx.indexOf(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentColumnNameSource());
+	        		            			if(csvFileColumnMtxIndex != -1)
+	        		            			{
+	        		            				if(!enrichExpFieldLastCsvColumnMtx.get(enrichExpFieldMtxIndex).equals(csvFileColumnNameMtx.get(csvFileColumnMtxIndex)))
+	        		            				{
+	        		            					//New Column Enrichment
+	        		            					enrichExpFieldValuesMtx.set(i, csvFileColumnValuesMtx.get(csvFileColumnMtxIndex));
+	        		            				}
+        		            					
+	        		            				enrichCsvColumn(csvTemplateEnrichmentRules.get(i), enrichExpFieldValuesMtx.get(enrichExpFieldMtxIndex));
+	        		            			}
+	        		            		}
+	        		        		}
+	        		            	
+	        		            	for(int i=0; i<enrichExpFieldDbIdMtx.size(); i++)
+	        		            	{
+	        		            		int directMappingCsvIndex = csvColumnFieldDbIdXRefMtx.indexOf(enrichExpFieldDbIdMtx.get(i));
+	        		            		if(directMappingCsvIndex != -1)
+	        		            			csvColumnValuesMtx.set(directMappingCsvIndex, enrichExpFieldValuesMtx.get(i));
+	        		            		else
+	        		            		{
+	        		            			csvColumnNameMtx.add(null);
+	    	        		            	csvColumnTypeMtx.add(enrichExpFieldTypeMtx.get(i));
+	    	        		            	csvColumnFieldDbIdXRefMtx.add(enrichExpFieldDbIdMtx.get(i));
+	    	        		            	csvColumnPositionInFileMtx.add(0);
+	    	        		            	csvColumnValuesMtx.add(enrichExpFieldValuesMtx.get(i));
+	    	        		            }
+	        		            	}
+	        		            	
+	        		            	
+	        		            	/*
+	        		            	
+	        		                for(int i=0; i<enrichExpFieldDbIdMtx.size(); i++)
+	        		                {
+	        		                	System.out.println("Enriched Field: " + enrichExpFieldDbIdMtx.get(i));
+	        		                	System.out.println("Enriched Values:");
+	        		                	
+	        		                	for(int j=0; j<enrichExpFieldValuesMtx.get(i).length; j++)
+	        		                	{
+	        		                		System.out.println(enrichExpFieldValuesMtx.get(i)[j]);
+		        		                }
+	        		                }
+	        		            	
+	        		            	*/
+	        		            	
+	        		            	//Validate Field Types of Enriched Columns
+	        		            	String exceptionEnrichedRowColumns = "";
 		        		            
-		        		            respObj.setCsvInsertColumns(csvColumns.substring(0, csvColumns.length()-1));
-		        		            
-		        		            for(int i=0; i<totalLines; i++)
-        		            		{
-		        		            	String csvValuesLine = "";
-	            		            
-		        		            	for(int j=0; j < columns.size(); j++)
+	        		            	for(int i=0; i<enrichExpFieldDbIdMtx.size(); i++)
+	        		                {
+	        		                	String fieldType = enrichExpFieldTypeMtx.get(i);
+        		                		String csvFileColumn = enrichExpFieldLastCsvColumnMtx.get(i);
+        		                		
+	        		                	for(int j=0; j<enrichExpFieldValuesMtx.get(i).length; j++)
+	        		                	{
+	        		                		if(!validateFieldType(fieldType, enrichExpFieldValuesMtx.get(i)[j]))
+	        		                		{
+	        		                			int exceptionRowMtxIndex = exceptionRowMtx.indexOf(j+1);
+	        		            				if(exceptionRowMtxIndex == -1)
+	        		            				{
+	        		            					exceptionRowMtx.add(rowCount);
+	        		            					exceptionRowDetailsMtx.add("Invalid Data: " + csvColumnValuesMtx.get(i)[j] + ". Cast failed to " + fieldType + " Found in Column '" + csvColumnNameMtx.get(i) + "' Row #" + rowCount + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss": "."));
+	        		            				}
+	        		            				else
+	        		            					exceptionRowDetailsMtx.set(exceptionRowMtxIndex, exceptionRowDetailsMtx.get(i) + " " + "Invalid Data: " + csvColumnValuesMtx.get(i)[j] + ". Cast failed to " + fieldType + " Found in Column '" + csvColumnNameMtx.get(i) + "' Row #" + rowCount + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss": "."));
+	        		            		
+	        		                			exceptionEnrichedRowColumns += "Invalid Data: " + enrichExpFieldValuesMtx.get(i)[j] + ". Cast failed to " + fieldType + " Found in Column '" + csvFileColumn + "' Row #" + (j+1) + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss\n": ".\n");
+	        		                		}
+		            		            }
+	        		                	
+	        		                }
+	        		                
+	        		            	for(int i=0; i<exceptionRowMtx.size(); i++)
+	        		            	{
+	        		            		System.out.println("Exception Row#" + exceptionRowMtx.get(i) + " Exception Details: " + exceptionRowDetailsMtx.get(i) );
+	        		            	}
+	        		            	
+	        		            	//if(exceptionEnrichedRowColumns.isEmpty())
+	        		            	//{
+			        		            for(int i=0; i < csvColumnFieldDbIdXRefMtx.size(); i++)
 			        		            {
-		        		            		if(csvColumnPositionInFileMtx.get(j) != -1)
-			        		            	{
-			        		            		String fieldType = csvColumnTypeMtx.get(j);
-			            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? csvColumnValuesMtx.get(j)[i] +"," : "'" + csvColumnValuesMtx.get(j)[i] + "',";
-		        		            		}
+			        		            	if(csvColumnPositionInFileMtx.get(i) != -1)
+			        		            		csvColumns+= csvColumnFieldDbIdXRefMtx.get(i) + ",";
 			        		            }
-	            		            	csvValues.add(csvValuesLine.substring(0,csvValuesLine.length()-1));
-		            		            respObj.setCsvInsertValues(csvValues);		        		            	
-        		            		}		        		            
-	        		            }
+			        		            
+			        		            respObj.setCsvInsertColumns(csvColumns.substring(0, csvColumns.length()-1));
+			        		            
+			        		            for(int i=0; i<totalLines; i++)
+	        		            		{
+			        		            	String csvValuesLine = "";
+		            		            
+			        		            	for(int j=0; j < csvColumnFieldDbIdXRefMtx.size(); j++)
+				        		            {
+			        		            		if(csvColumnPositionInFileMtx.get(j) != -1)
+				        		            	{
+				        		            		String fieldType = csvColumnTypeMtx.get(j);
+				            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? csvColumnValuesMtx.get(j)[i] +"," : "'" + csvColumnValuesMtx.get(j)[i] + "',";
+			        		            		}
+				        		            }
+		            		            	
+			        		            	if(exceptionRowMtx.indexOf(i+1) == -1)
+			        		            	{
+			        		            		csvValues.add(csvValuesLine.substring(0,csvValuesLine.length()-1));
+			        		            		respObj.setCsvInsertValues(csvValues);
+			        		            	}
+	        		            		}
+			        		            
+			        		            if(exceptionRowMtx.size() > 0)
+			        		            {
+			        		            	respObj.setCsvRowException(exceptionRowMtx);
+			        		            	respObj.setCsvRowExceptionDetails(exceptionRowDetailsMtx);
+			        		            }
+	        		            	//}
+			        		        /*
+	        		            	else
+	        		            	{
+	        		            		System.out.println("Returning Ex Details");
+		                		    	respObj.setCode(104);
+		                	      		respObj.setDescription("Exceptions at casting data. Details: "+exceptionEnrichedRowColumns);
+		                	      		respObj.setDetail("Exceptions at casting data.");
+
+		                	    	    respObj.setCsvInsertColumns(null);
+		                	    	    respObj.setCsvInsertValues(null);
+		                	    	
+			                			return respObj;
+	        		            	}*/
+	        		            //}
 	        		            
 	        		            //--- End ---//
-	        		            /*
-	        		            ArrayList<ArrayList> arr = new ArrayList<ArrayList>();
 	        		            
-	        		            for (CsvTemplateColumns column : columns) {
-	        		            	ArrayList maping = new ArrayList();
-	        		            	maping.add(Arrays.asList(header).indexOf(column.getCsvTemplateColumnName()));
-	        		            	maping.add(column.getExpField().getExpDbFieldNameId());
-	        		            	maping.add(column.getExpField().getExpFieldType());
-	        		            	arr.add(maping);
-								}
-	        		            
-	        		            String[] line;
-	        		            for (int i = 0; i < arr.size(); i++)
-									csvColumns+=(String) arr.get(i).get(1)+",";
-
-	        		           respObj.setCsvInsertColumns(csvColumns.substring(0, csvColumns.length()-1));
-	        		           String fieldType = "";
-
-	        		   			String exceptionRowColumns = "";
-	        		   			int rowCount = 1;
-	        		            while ((line = reader.readNext()) != null) {
-	        		            	String csvValuesLine="";
-	            		            for (int i = 0; i < arr.size(); i++) {
-	            		            	fieldType= (String) arr.get(i).get(2);
-	            		            	String fieldValue = line[(int) arr.get(i).get(0)];
-
-	            		            	if(!validateFieldType(fieldType, fieldValue))
-	            		            		exceptionRowColumns += "Invalid Data: " + fieldValue + ". Cast failed to " + fieldType + " Found in Column '" + (String) arr.get(i).get(1) + "' Row #" + rowCount + (fieldType.contains("date") ?  " Allowed Date format: yyyy-MM-dd HH:mm:ss\n": ".\n");
-	            		            	
-	            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? line[(int) arr.get(i).get(0)]+"," : "'"+line[(int) arr.get(i).get(0)]+"',";
-	            		            }
-
-	            		            rowCount++;
-            		            	csvValues.add(csvValuesLine.substring(0,csvValuesLine.length()-1));
-	            		            respObj.setCsvInsertValues(csvValues);
-	        		            }
-
-	                			reader.close();
-	        		            */
 	                			System.out.println("Exception Row Columns: " + exceptionRowColumns);
 	                			
+	                			/*
 	                		    if(!exceptionRowColumns.isEmpty())
 	                		    {
 		                			System.out.println("Returning Ex Details");
@@ -238,6 +388,7 @@ public class ExperimentParser {
 	                	    	
 		                			return respObj;
 	                		    }
+	                		    */
 
 			        			return respObj;
 
@@ -737,5 +888,64 @@ public class ExperimentParser {
 		return true;
 
 	}
-
+	 
+	//Added at 9/4
+    //Enrichment Rules feature added to Bit-Exp
+	private void enrichCsvColumn(CsvTemplateEnrichment csvEnrichmentRule, String[] csvColumnValues)
+	{
+		String newEnrichedValue = csvEnrichmentRule.getCsvTemplateEnrichmentStaticValue();
+		if("customlist".equals(csvEnrichmentRule.getCsvTemplateEnrichmentType()))
+			newEnrichedValue = csvEnrichmentRule.getCustomListValue().getCustomListValueString();
+				
+		for(int j=0; j<csvColumnValues.length; j++)
+		{
+			//Apply Rules
+			switch (csvEnrichmentRule.getCsvTemplateEnrichmentOperation().trim()) 
+			{
+				case "contains":
+					if(csvColumnValues[j].toLowerCase().contains(csvEnrichmentRule.getCsvTemplateEnrichmentValue().toLowerCase()))
+						csvColumnValues[j] = newEnrichedValue;
+	                break;
+				case "doesnotcontain": 
+					if(!csvColumnValues[j].toLowerCase().contains(csvEnrichmentRule.getCsvTemplateEnrichmentValue().toLowerCase()))
+						csvColumnValues[j] = newEnrichedValue;
+	                break;
+				case "doesnotstartwith":
+	                if(!csvColumnValues[j].toLowerCase().startsWith(csvEnrichmentRule.getCsvTemplateEnrichmentValue().toLowerCase()))
+	                   	csvColumnValues[j] = newEnrichedValue;
+	                break;
+				case "endswith":
+					if(csvColumnValues[j].toLowerCase().endsWith(csvEnrichmentRule.getCsvTemplateEnrichmentValue().toLowerCase()))
+	                   	csvColumnValues[j] = newEnrichedValue;
+	                break;
+				case "is":
+	                if(csvColumnValues[j].toLowerCase().equals(csvEnrichmentRule.getCsvTemplateEnrichmentValue().toLowerCase()))
+	                   	csvColumnValues[j] = newEnrichedValue;
+	                break;
+	            case "isempty":
+	                if(csvColumnValues[j].isEmpty())
+	                	csvColumnValues[j] = newEnrichedValue;
+	                break;
+	            case "isnot":
+	                if(!csvColumnValues[j].toLowerCase().equals(csvEnrichmentRule.getCsvTemplateEnrichmentValue().toLowerCase()))
+	                   	csvColumnValues[j] = newEnrichedValue;
+	                break;
+	            case "isnotempty":
+	            	if(!csvColumnValues[j].isEmpty())
+	            		csvColumnValues[j] = newEnrichedValue;
+	                break;
+	            case "startswith":
+	            	if(csvColumnValues[j].toLowerCase().startsWith(csvEnrichmentRule.getCsvTemplateEnrichmentValue().toLowerCase()))
+	            		csvColumnValues[j] = newEnrichedValue;
+	                break;
+	            case "matchesregex":
+	            	if(Pattern.matches(csvEnrichmentRule.getCsvTemplateEnrichmentValue(),csvColumnValues[j]))
+	            		csvColumnValues[j] = newEnrichedValue;
+	                break;
+	    	}	
+			
+		}
+	}
+	
+	
 }

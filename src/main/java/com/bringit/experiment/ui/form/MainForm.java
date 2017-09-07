@@ -252,6 +252,10 @@ public class MainForm extends MainFormDesign {
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new SystemSettingsForm());
                     break;
+                case "custom lists":
+                    formContentLayout.removeAllComponents();
+                    formContentLayout.addComponent(new CustomListManagementForm());
+                    break;
                 default:
                     break;
             }

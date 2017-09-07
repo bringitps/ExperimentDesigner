@@ -22,6 +22,8 @@ import com.bringit.experiment.data.ResponseObj;
 import com.bringit.experiment.ui.design.CsvDataFileProcessDesign;
 import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.FTPUtil;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.VaadinService;
@@ -34,14 +36,19 @@ import com.vaadin.ui.Window;
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -165,10 +172,13 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 			DataFile dataFile = new DataFile();
 			dataFile.setCreatedBy(sessionUser);
 			dataFile.setDataFileIsCsv(true);
-			dataFile.setDataFileIsCsv(false);
 			dataFile.setDataFileName(loadedFileName);
 			dataFile.setLastModifiedBy(sessionUser);
+			dataFile.setFileRepoId(processedRepo);
 			new DataFileDao().addDataFile(dataFile);
+			
+			DataFile dataFileProcessed = new DataFile();
+			DataFile dataFileException = new DataFile();
 			
 			System.out.println("Parse CSV Response" + parseCsvResponse.getCode() );
 			if(parseCsvResponse.getCode() == 0)
@@ -186,6 +196,26 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 				
 				if(batchInsertResponse.getCode() == 0)
 				{
+					if(parseCsvResponse.getCsvRowException() != null && parseCsvResponse.getCsvRowException().size() > 0)
+					{
+						//Split files into 2 CSV files
+						splitCsvExceptionFiles(csvTemplate.getProcessedFileRepo(), csvTemplate.getExceptionFileRepo(), isFile, loadedFileName, parseCsvResponse);
+					
+						dataFileProcessed.setCreatedBy(sessionUser);
+						dataFileProcessed.setDataFileIsCsv(true);
+						dataFileProcessed.setDataFileName("Partial - " + loadedFileName);
+						dataFileProcessed.setLastModifiedBy(sessionUser);
+						dataFileProcessed.setFileRepoId(csvTemplate.getProcessedFileRepo());
+						new DataFileDao().addDataFile(dataFileProcessed);
+												
+						dataFileException.setCreatedBy(sessionUser);
+						dataFileException.setDataFileIsCsv(true);
+						dataFileException.setDataFileName("Failed - " + loadedFileName);
+						dataFileException.setLastModifiedBy(sessionUser);
+						dataFileException.setFileRepoId(csvTemplate.getExceptionFileRepo());
+						new DataFileDao().addDataFile(dataFileException);
+					}
+					
 					this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 2 of 3. Result (OK)\n");
 					this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Execution Details: " + batchInsertResponse.getDescription() + "\n");
 
@@ -203,10 +233,30 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 					//Save File into Processed Folder
 					if(isFile != null)
 					{
-						moveFileToRepo(processedRepo, isFile, loadedFileName);
-						dataFile.setFileRepoId(processedRepo);
-						new DataFileDao().updateDataFile(dataFile);
+						if(parseCsvResponse.getCsvRowException() != null && parseCsvResponse.getCsvRowException().size() > 0)
+						{
+							csvDataLoadExecResult.setCsvDataLoadExecException(true);
+							csvDataLoadExecResult.setCsvDataLoadExecExeptionDetails("Some records could not be processed.");
+							
+							csvDataLoadExecResult.setCsvDataLoadTotalRecords(parseCsvResponse.getCsvInsertValues().size() + parseCsvResponse.getCsvRowException().size());
+							csvDataLoadExecResult.setCsvDataLoadTotalRecordsException(parseCsvResponse.getCsvRowException().size());
+							csvDataLoadExecResult.setCsvDataLoadTotalRecordsProcessed(parseCsvResponse.getCsvInsertValues().size());
 
+							csvDataLoadExecResult.setDataFileProcessed(dataFileProcessed);
+							csvDataLoadExecResult.setDataFileException(dataFileException);
+
+							moveFileToRepo(csvTemplate.getExceptionFileRepo(), isFile, loadedFileName);
+						}
+						else
+						{
+							csvDataLoadExecResult.setCsvDataLoadTotalRecordsProcessed(parseCsvResponse.getCsvInsertValues().size());
+							csvDataLoadExecResult.setCsvDataLoadTotalRecordsException(0);
+							csvDataLoadExecResult.setDataFileProcessed(dataFile);	
+							moveFileToRepo(processedRepo, isFile, loadedFileName);						
+						}
+						
+						new CsvDataLoadExecutionResultDao().updateCsvDataLoadExecutionResult(csvDataLoadExecResult);
+												
                         //Getting data refreshed into replication tables
 						Integer experimentId = csvTemplate.getExperiment().getExpId();
 				        List<String> spExpParams = new ArrayList<String>();
@@ -233,6 +283,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 
 					CsvDataLoadExecutionResult csvDataLoadExecResult = new CsvDataLoadExecutionResult();
 					csvDataLoadExecResult.setDataFile(dataFile);
+					csvDataLoadExecResult.setDataFileException(dataFile);
 					csvDataLoadExecResult.setCsvDataLoadExecException(true);
 					csvDataLoadExecResult.setCsvDataLoadExecExeptionDetails(batchInsertResponse.getDescription());
 					csvDataLoadExecResult.setCsvDataLoadExecTime(new Date());
@@ -256,6 +307,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 				
 				CsvDataLoadExecutionResult csvDataLoadExecResult = new CsvDataLoadExecutionResult();
 				csvDataLoadExecResult.setDataFile(dataFile);
+				csvDataLoadExecResult.setDataFileException(dataFile);
 				csvDataLoadExecResult.setCsvDataLoadExecException(true);
 				csvDataLoadExecResult.setCsvDataLoadExecExeptionDetails(parseCsvResponse.getDescription());
 				csvDataLoadExecResult.setCsvDataLoadExecTime(new Date());
@@ -363,4 +415,73 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
         }
 
     }
+
+	private void splitCsvExceptionFiles(FilesRepository processedRepo, FilesRepository exceptionRepo, InputStream isCsv, String filename, ResponseObj parseCsvResponse)
+	{
+		ByteArrayOutputStream outExceptionCsv = new ByteArrayOutputStream();
+		ByteArrayOutputStream outPartialProcessedCsv = new ByteArrayOutputStream();
+		
+		CSVReader originalCsvReader = new CSVReader(new InputStreamReader(isCsv));
+		CSVWriter exceptionCsvWriter = new CSVWriter(new OutputStreamWriter(outExceptionCsv), ',');
+		CSVWriter partialProcessedCsvWriter = new CSVWriter(new OutputStreamWriter(outPartialProcessedCsv), ',');
+		String[] originalCsvEntry = null;
+		
+		int rowCount = 0;
+		try {
+			while ((originalCsvEntry = originalCsvReader.readNext()) != null) {
+			    String[] exceptionCsvEntry = new String[originalCsvEntry.length + 1];
+				
+				if(rowCount==0)
+				{
+					exceptionCsvEntry[0] = "Exception Details";
+
+				    for(int i=0; i<originalCsvEntry.length; i++)
+				    	exceptionCsvEntry[i+1] = originalCsvEntry[i];
+				    
+				    exceptionCsvWriter.writeNext(exceptionCsvEntry);
+				    partialProcessedCsvWriter.writeNext(originalCsvEntry);
+				}
+				else
+				{
+					int rowExceptionIndex = parseCsvResponse.getCsvRowException().indexOf(rowCount);
+					if(rowExceptionIndex == -1)
+					    partialProcessedCsvWriter.writeNext(originalCsvEntry);
+					else
+					{
+						exceptionCsvEntry[0] = parseCsvResponse.getCsvRowExceptionDetails().get(rowExceptionIndex);
+
+					    for(int i=0; i<originalCsvEntry.length; i++)
+					    	exceptionCsvEntry[i+1] = originalCsvEntry[i];
+					    
+					    exceptionCsvWriter.writeNext(exceptionCsvEntry);				
+					}
+					
+				}
+				rowCount++;
+			}
+			
+			originalCsvReader.close();
+			partialProcessedCsvWriter.close();
+			exceptionCsvWriter.close();
+			
+			//Saving Partial Processed File
+			moveFileToRepo(processedRepo, new ByteArrayInputStream(outPartialProcessedCsv.toByteArray()), "Partial - " + filename);
+			moveFileToRepo(exceptionRepo, new ByteArrayInputStream(outExceptionCsv.toByteArray()), "Failed - " + filename);
+			
+
+			/*
+			FileOutputStream fosExceptionCsv = new FileOutputStream(exceptionRepo.getFileRepoPath() + "/Failed - " + filename);
+			IOUtils.copy(new ByteArrayInputStream(outExceptionCsv.toByteArray()), fosExceptionCsv);
+			fosExceptionCsv.close();
+			
+			FileOutputStream fosPartialProcessedCsv = new FileOutputStream(processedRepo.getFileRepoPath() + "/Partial - " + filename);
+			IOUtils.copy(new ByteArrayInputStream(outPartialProcessedCsv.toByteArray()), fosPartialProcessedCsv);
+			fosPartialProcessedCsv.close();*/
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 }

@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head> 
+ <body> 
+  <vaadin-vertical-layout style-name="well" responsive margin> 
+   <vaadin-vertical-layout height="50px"> 
+    <vaadin-grid-layout width="960px" height="40px"> 
+     <row> 
+      <column> 
+       <vaadin-grid-layout width="100px" height="40px" :middle> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="tiny primary" plain-text _id="btnSave" :middle>
+            Save 
+          </vaadin-button> 
+         </column> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny" plain-text _id="btnCancel" :middle>
+            Cancel 
+          </vaadin-button> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout width-auto height="155px"> 
+    <vaadin-vertical-layout style-name="ExperimentCRUDLayout" width="960px" _id="crudLayout"> 
+     <vaadin-grid-layout spacing width="960px" _id="gridMainData"> 
+      <row> 
+       <column> 
+        <vaadin-text-field required-error="This field is mandatory." caption="Name:" required style-name="tiny" width-full _id="txtCustomListName"></vaadin-text-field> 
+       </column> 
+      </row> 
+     </vaadin-grid-layout> 
+     <vaadin-grid-layout spacing width="960px" height="30px" _id="gridDescription"> 
+      <row> 
+       <column> 
+        <vaadin-text-area caption="Description:" style-name="tiny" width-full height="45px" _id="txtCustomListDescription"></vaadin-text-area> 
+       </column> 
+      </row> 
+     </vaadin-grid-layout> 
+    </vaadin-vertical-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout width="960px"> 
+    <vaadin-accordion height="350px" _id="customListValues"> 
+     <tab caption="Values" icon="fonticon://FontAwesome/f0cb" selected> 
+      <vaadin-vertical-layout margin _id="customListValuesLayout"> 
+       <vaadin-grid-layout width-full height="40px" _id="gridCustomListValuesBtns"> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" plain-text _id="btnAddValue">
+            Add Value 
+          </vaadin-button> 
+         </column> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" plain-text _id="btnDeleteValue" :right>
+            Delete Value 
+          </vaadin-button> 
+         </column> 
+        </row> 
+        <row></row> 
+       </vaadin-grid-layout> 
+       <vaadin-panel height="200px" _id="pnlCustomListValues"> 
+        <vaadin-table selectable style-name="tiny" immediate width-full _id="tblCustomListValues"> 
+         <table></table> 
+        </vaadin-table> 
+       </vaadin-panel> 
+      </vaadin-vertical-layout> 
+     </tab> 
+    </vaadin-accordion> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout width="960px" height="40px"> 
+    <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" plain-text _id="btnDelete" :middle :right>
+      Delete Custom List 
+    </vaadin-button> 
+   </vaadin-vertical-layout> 
+  </vaadin-vertical-layout>  
+ </body>
+</html>

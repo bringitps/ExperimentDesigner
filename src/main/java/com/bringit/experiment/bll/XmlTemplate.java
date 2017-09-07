@@ -40,6 +40,12 @@ public class XmlTemplate {
 	@Column(name="XmlTemplatePrefix")
 	private String xmlTemplatePrefix;
 
+	@Column(name="XmlTemplateSuffix")
+	private String xmlTemplateSuffix;
+
+	@Column(name="XmlTemplateRegex")
+	private String xmlTemplateRegex;
+
 	@Column(name="XmlTemplateNotScheduled")
 	private Boolean xmlTemplateNotScheduled;
 	
@@ -96,6 +102,8 @@ public class XmlTemplate {
 		this.xmlTemplateName = null;
 		this.xmlTemplateComments = null;
 		this.xmlTemplatePrefix = null;
+		this.xmlTemplateSuffix = null;
+		this.xmlTemplateRegex = null;
 		this.xmlTemplateNotScheduled = null;
 		this.xmlTemplateExecStartDate = null;
 		this.xmlTemplateExecStartHour = null;
@@ -114,7 +122,8 @@ public class XmlTemplate {
 	
 
 	public XmlTemplate(Integer xmlTemplateId, Boolean xmlTemplateIsActive, String xmlTemplateName,
-			String xmlTemplateComments, String xmlTemplatePrefix, Boolean xmlTemplateNotScheduled, Date xmlTemplateExecStartDate,
+			String xmlTemplateComments, String xmlTemplatePrefix, String xmlTemplateSuffix, String xmlTemplateRegex, 
+			Boolean xmlTemplateNotScheduled, Date xmlTemplateExecStartDate,
 			Integer xmlTemplateExecStartHour, Date xmlTemplateExecEndDate, Date createdDate, Date modifiedDate,
 			ContractManufacturer contractManufacturer, FilesRepository inboundFileRepo,
 			FilesRepository processedFileRepo, FilesRepository exceptionFileRepo, JobExecutionRepeat jobExecRepeat,
@@ -124,6 +133,8 @@ public class XmlTemplate {
 		this.xmlTemplateName = xmlTemplateName;
 		this.xmlTemplateComments = xmlTemplateComments;
 		this.xmlTemplatePrefix = xmlTemplatePrefix;
+		this.xmlTemplateSuffix = xmlTemplateSuffix;
+		this.xmlTemplateRegex = xmlTemplateRegex;
 		this.xmlTemplateNotScheduled = xmlTemplateNotScheduled;
 		this.xmlTemplateExecStartDate = xmlTemplateExecStartDate;
 		this.xmlTemplateExecStartHour = xmlTemplateExecStartHour;
@@ -182,6 +193,22 @@ public class XmlTemplate {
 		this.xmlTemplatePrefix = xmlTemplatePrefix;
 	}
 
+	public String getXmlTemplateSuffix() {
+		return xmlTemplateSuffix;
+	}
+
+	public void setXmlTemplateSuffix(String xmlTemplateSuffix) {
+		this.xmlTemplateSuffix = xmlTemplateSuffix;
+	}
+
+	public String getXmlTemplateRegex() {
+		return xmlTemplateRegex;
+	}
+
+	public void setXmlTemplateRegex(String xmlTemplateRegex) {
+		this.xmlTemplateRegex = xmlTemplateRegex;
+	}
+	
 	public Boolean getXmlTemplateNotScheduled() {
 		return xmlTemplateNotScheduled;
 	}

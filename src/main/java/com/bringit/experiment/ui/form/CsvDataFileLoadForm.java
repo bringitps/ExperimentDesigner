@@ -44,6 +44,15 @@ public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 				filterDbViewResults();
 			}
 			});
+		
+		this.btnViewResultFiles.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				openFileProcessViewerModalWindow();
+			}
+		});
+		
 	}
 	
 	public void openProcessCsvDataFileModalWindow()
@@ -64,6 +73,23 @@ public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 			}
 		});
 		 this.getUI().addWindow(processCsvDataFileModalWindow);
+    }
+
+	public void openFileProcessViewerModalWindow()
+	{
+		if(this.tblCsvDataFileLoads.getValue() == null)
+			return;
+		
+		int selectedDataFileLoadId = Integer.parseInt(this.tblCsvDataFileLoads.getValue().toString());
+		
+		Window fileProcessViewerModalWindow = new Window("Csv Data File Load - Result Files");
+		fileProcessViewerModalWindow.setModal(true);
+		fileProcessViewerModalWindow.setResizable(false);
+		fileProcessViewerModalWindow.setContent(new DataFileProcessViewerForm(selectedDataFileLoadId, -1));
+		fileProcessViewerModalWindow.setWidth(993, Unit.PIXELS);
+		fileProcessViewerModalWindow.setHeight(310, Unit.PIXELS);
+		fileProcessViewerModalWindow.center();
+		this.getUI().addWindow(fileProcessViewerModalWindow);
     }
 	
 	private void filterDbViewResults()

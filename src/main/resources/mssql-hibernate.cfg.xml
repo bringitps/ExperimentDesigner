@@ -70,6 +70,9 @@
         <mapping class="com.bringit.experiment.bll.ExperimentJobData"/>
         <mapping class="com.bringit.experiment.bll.TargetReportJobData"/>
         <mapping class="com.bringit.experiment.bll.SystemSettings"/>
+ 		<mapping class="com.bringit.experiment.bll.CustomList"/>
+ 		<mapping class="com.bringit.experiment.bll.CustomListValue"/>
+ 		<mapping class="com.bringit.experiment.bll.CsvTemplateEnrichment"/>
 
     </session-factory>
 </hibernate-configuration>

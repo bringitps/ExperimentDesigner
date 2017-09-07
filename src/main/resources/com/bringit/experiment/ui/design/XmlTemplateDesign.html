@@ -82,10 +82,25 @@
       <vaadin-grid-layout spacing width-full height="125px"> 
        <row> 
         <column> 
-         <vaadin-combo-box caption="Inbound File Repository:" required style-name="tiny" width-full _id="comboXmlTinRepo"></vaadin-combo-box> 
+         <vaadin-combo-box caption="Inbound File Repository:" required style-name="tiny" width-full _id="comboXmlTinRepo" :bottom></vaadin-combo-box> 
         </column> 
         <column> 
-         <vaadin-text-field caption="File Prefix:" style-name="tiny" width-full _id="txtXmlTPrefix"></vaadin-text-field> 
+         <vaadin-grid-layout size-full _id="gridFileNameFilterCriteria"> 
+          <row> 
+           <column> 
+            <vaadin-option-group primary-style-name="v-select-optiongroup-horizontal" style-name="horizontal small" width-full _id="opFilterCriteriaType"> 
+             <option selected>Prefix &nbsp;&nbsp;</option> 
+             <option>Suffix &nbsp;&nbsp;</option> 
+             <option>Regular Expression &nbsp;&nbsp;</option> 
+            </vaadin-option-group> 
+           </column> 
+          </row> 
+          <row> 
+           <column> 
+            <vaadin-text-field input-prompt="File filtering criteria" style-name="tiny" width-full _id="txtXmlTFilterCriteria" :bottom></vaadin-text-field> 
+           </column> 
+          </row> 
+         </vaadin-grid-layout> 
         </column> 
        </row> 
        <row> 

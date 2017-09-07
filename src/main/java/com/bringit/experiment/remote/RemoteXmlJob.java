@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by msilay on 2/22/17.
@@ -51,6 +52,15 @@ public class RemoteXmlJob implements Job {
         JobDataMap jobDataMap = jobDetail.getJobDataMap();
         XmlTemplate jobData = (XmlTemplate) jobDataMap.get("jobData");
 
+        //File Filter Criteria
+        String fileFilterCriteria = "NoCriteria";
+        if(jobData.getXmlTemplatePrefix() != null)
+        	fileFilterCriteria = "Prefix";
+        if(jobData.getXmlTemplateSuffix() != null)
+        	fileFilterCriteria = "Suffix";
+        if(jobData.getXmlTemplateRegex() != null)
+        	fileFilterCriteria = "Regex";
+        
         FilesRepository filesRepository = jobData.getInboundFileRepo();
         FilesRepository outboundRepo = jobData.getProcessedFileRepo();
         FilesRepository exceptionRepo = jobData.getExceptionFileRepo();
@@ -64,7 +74,11 @@ public class RemoteXmlJob implements Job {
             List<ChannelSftp.LsEntry> files =  sftp.secureGetFileList(filesRepository.getFileRepoPath());
             for (ChannelSftp.LsEntry file: files) {
 
-                if (file.getFilename().endsWith(".xml") && (jobData.getXmlTemplatePrefix() == null || (jobData.getXmlTemplatePrefix() != null && jobData.getXmlTemplatePrefix().isEmpty()) || (jobData.getXmlTemplatePrefix() != null && file.getFilename().startsWith(jobData.getXmlTemplatePrefix())))) {
+                if (file.getFilename().endsWith(".xml") && ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && file.getFilename().startsWith(jobData.getXmlTemplatePrefix()))
+            			|| ("Suffix".equals(fileFilterCriteria) && file.getFilename().replaceAll(".xml","").endsWith(jobData.getXmlTemplateSuffix()))
+            			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getXmlTemplateRegex(), file.getFilename().replaceAll(".xml",""))))){
+            	
+            	//&& (jobData.getXmlTemplatePrefix() == null || (jobData.getXmlTemplatePrefix() != null && jobData.getXmlTemplatePrefix().isEmpty()) || (jobData.getXmlTemplatePrefix() != null && file.getFilename().startsWith(jobData.getXmlTemplatePrefix())))) {
                 	
                     InputStream is = sftp.secureGetFile(filesRepository.getFileRepoPath()+"/"+file.getFilename());
                     
@@ -159,6 +173,9 @@ public class RemoteXmlJob implements Job {
                     	sendTransferError(jobData, file.getFilename());
 	                }
                 }
+                else
+                  	System.out.println("File " + file.getFilename() + " does not match criteria for XML Template: " + jobData.getXmlTemplateName());
+                
             }
         } else if  (filesRepository.isFileRepoIsFtp()) {
             System.out.println("FTP Repo");
@@ -168,7 +185,10 @@ public class RemoteXmlJob implements Job {
             FTPFile[] ftpFiles = ftp.simpleGetFileList(filesRepository.getFileRepoPath());
             for (FTPFile ftpFile: ftpFiles) {
 
-                if (ftpFile.getName().endsWith(".xml") && (jobData.getXmlTemplatePrefix() == null || (jobData.getXmlTemplatePrefix() != null && jobData.getXmlTemplatePrefix().isEmpty()) || (jobData.getXmlTemplatePrefix() != null && ftpFile.getName().startsWith(jobData.getXmlTemplatePrefix())))) {
+                if (ftpFile.getName().endsWith(".xml") && ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && ftpFile.getName().startsWith(jobData.getXmlTemplatePrefix()))
+            			|| ("Suffix".equals(fileFilterCriteria) && ftpFile.getName().replaceAll(".xml","").endsWith(jobData.getXmlTemplateSuffix()))
+            			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getXmlTemplateRegex(), ftpFile.getName().replaceAll(".xml",""))))){ 
+                		//&& (jobData.getXmlTemplatePrefix() == null || (jobData.getXmlTemplatePrefix() != null && jobData.getXmlTemplatePrefix().isEmpty()) || (jobData.getXmlTemplatePrefix() != null && ftpFile.getName().startsWith(jobData.getXmlTemplatePrefix())))) {
                     System.out.println("FTP FILE: "+ftpFile.getName());
                     InputStream is = ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName());
                     if (is != null) {
@@ -280,6 +300,9 @@ public class RemoteXmlJob implements Job {
                         sendTransferError(jobData, ftpFile.getName());
                     }
                 }
+                else
+                  	System.out.println("File " + ftpFile.getName() + " does not match criteria for XML Template: " + jobData.getXmlTemplateName());
+                    
             }
 
         } else if (filesRepository.isFileRepoIsLocal()) {
@@ -289,8 +312,12 @@ public class RemoteXmlJob implements Job {
             List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, false);
             for (File file: files) {
 
-            	if(jobData.getXmlTemplatePrefix() == null || (jobData.getXmlTemplatePrefix() != null && jobData.getXmlTemplatePrefix().isEmpty()) || (jobData.getXmlTemplatePrefix() != null && file.getName().startsWith(jobData.getXmlTemplatePrefix())))
-            	{
+            	//if(jobData.getXmlTemplatePrefix() == null || (jobData.getXmlTemplatePrefix() != null && jobData.getXmlTemplatePrefix().isEmpty()) || (jobData.getXmlTemplatePrefix() != null && file.getName().startsWith(jobData.getXmlTemplatePrefix())))
+            	//{
+            	 if ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && file.getName().startsWith(jobData.getXmlTemplatePrefix()))
+             			|| ("Suffix".equals(fileFilterCriteria) && file.getName().replaceAll(".xml","").endsWith(jobData.getXmlTemplateSuffix()))
+             			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getXmlTemplateRegex(), file.getName().replaceAll(".xml",""))))
+            	 {
 	                try {
 	                    InputStream is = new FileInputStream(file);
 	                    System.out.println("Reading input file and passing to parser: "+ file.getName());
@@ -378,10 +405,14 @@ public class RemoteXmlJob implements Job {
 	                    System.out.println("Error processing local file: "+file.getName());
 	                }
             	}
+            	else
+                  	System.out.println("File " + file.getName() + " does not match criteria for XML Template: " + jobData.getXmlTemplateName());
+                
+                
             }
         }
 
-        System.out.println("JOB run..." + new Date());
+        System.out.println("JOB Execution finished. XML Template: " + jobData.getXmlTemplateName() + "  " +new Date());
     }
 
     private void moveFileToRepo(FilesRepository repo, InputStream is, String filename) {

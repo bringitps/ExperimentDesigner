@@ -130,7 +130,35 @@ public class XmlTemplateForm extends XmlTemplateDesign {
             if (xmlt.getExceptionFileRepo() != null)
                 this.comboXmlTerrRepo.setValue(xmlt.getExceptionFileRepo().getFileRepoId());
             this.txtXmlTComments.setValue(xmlt.getXmlTemplateComments());
-            this.txtXmlTPrefix.setValue(xmlt.getXmlTemplatePrefix());
+            
+            String opFilterSavedCriteria = "Prefix"; 
+			
+			if(xmlt.getXmlTemplatePrefix() != null)
+			{
+				opFilterSavedCriteria = "Prefix"; 
+				this.txtXmlTFilterCriteria.setValue(xmlt.getXmlTemplatePrefix());				
+			}
+			
+			if(xmlt.getXmlTemplateSuffix() != null)
+			{
+				opFilterSavedCriteria = "Suffix"; 
+				this.txtXmlTFilterCriteria.setValue(xmlt.getXmlTemplateSuffix());				
+			}
+			
+			if(xmlt.getXmlTemplateRegex() != null)
+			{
+				opFilterSavedCriteria = "Regular"; 
+				this.txtXmlTFilterCriteria.setValue(xmlt.getXmlTemplateRegex());				
+			}
+			
+			Collection itemIds = this.opFilterCriteriaType.getItemIds();
+			for (Object itemIdObj : itemIds) 
+			{
+				if(((String)itemIdObj).startsWith(opFilterSavedCriteria))
+					this.opFilterCriteriaType.select(itemIdObj);				
+			}
+			
+            //this.txtXmlTFilterCriteria.setValue(xmlt.getXmlTemplatePrefix());
             this.startXmlTstart.setValue(xmlt.getXmlTemplateExecStartDate());
             this.endXmlTstart.setValue(xmlt.getXmlTemplateExecEndDate());
 
@@ -262,7 +290,31 @@ public class XmlTemplateForm extends XmlTemplateDesign {
             this.xmlt.setExperiment(new ExperimentDao().getExperimentById((int) this.comboXmlTExperiment.getValue()));
             this.xmlt.setXmlTemplateName(this.txtXmlTName.getValue());
             this.xmlt.setXmlTemplateIsActive(this.chxActive.getValue());
-            this.xmlt.setXmlTemplatePrefix(this.txtXmlTPrefix.getValue());
+           
+            String opFilterSavedCriteria = this.opFilterCriteriaType.getValue().toString().trim(); 
+
+			if(opFilterSavedCriteria.startsWith("Prefix"))
+			{
+				this.xmlt.setXmlTemplatePrefix(this.txtXmlTFilterCriteria.getValue());
+				this.xmlt.setXmlTemplateSuffix(null);
+				this.xmlt.setXmlTemplateRegex(null);				
+			}
+
+			if(opFilterSavedCriteria.startsWith("Suffix"))
+			{
+				this.xmlt.setXmlTemplatePrefix(null);
+				this.xmlt.setXmlTemplateSuffix(this.txtXmlTFilterCriteria.getValue());
+				this.xmlt.setXmlTemplateRegex(null);				
+			}
+
+			if(opFilterSavedCriteria.startsWith("Regular"))
+			{
+				this.xmlt.setXmlTemplatePrefix(null);
+				this.xmlt.setXmlTemplateSuffix(null);
+				this.xmlt.setXmlTemplateRegex(this.txtXmlTFilterCriteria.getValue());				
+			}
+			
+            //this.xmlt.setXmlTemplatePrefix(this.txtXmlTFilterCriteria.getValue());
             this.xmlt.setXmlTemplateComments(this.txtXmlTComments.getValue());
             this.xmlt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmlTerrRepo.getValue()));
             this.xmlt.setProcessedFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboXmloutRepo.getValue()));
@@ -388,7 +440,7 @@ public class XmlTemplateForm extends XmlTemplateDesign {
 
     private boolean validateRequiredFields() {
         if (!this.txtXmlTName.isValid()) return false;
-        if (!this.txtXmlTPrefix.isValid()) return false;
+        if (!this.txtXmlTFilterCriteria.isValid()) return false;
         if (!this.comboXmloutRepo.isValid()) return false;
         if (!this.comboXmlTerrRepo.isValid()) return false;
         if (!this.comboXmlTinRepo.isValid()) return false;
@@ -483,7 +535,8 @@ public class XmlTemplateForm extends XmlTemplateDesign {
     private void enableComponents(boolean b) {
         this.txtXmlTName.setEnabled(b);
         this.txtXmlTComments.setEnabled(b);
-        this.txtXmlTPrefix.setEnabled(b);
+        this.opFilterCriteriaType.setEnabled(b);
+        this.txtXmlTFilterCriteria.setEnabled(b);
         this.cbxContractManufacturer.setEnabled(b);
         this.comboXmloutRepo.setEnabled(b);
         this.comboXmlTerrRepo.setEnabled(b);

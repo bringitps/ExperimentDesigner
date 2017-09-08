@@ -115,14 +115,15 @@ public class CsvTemplateColumnsDao {
         return csvTemplateColumns;
     }
 
-	public List<CsvTemplateColumns> getAllCsvTemplateColumnssByTemplateId(int csvTemplateId) {
+	public List<CsvTemplateColumns> getAllCsvTemplateColumnsMappingDetailsByTemplateId(int csvTemplateId) {
 		List<CsvTemplateColumns> nodes = new ArrayList<CsvTemplateColumns>();
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
 		// Session session = HibernateUtil.openSession(dialectXmlFile);
         try {
             trns = session.beginTransaction();
-            nodes = session.createQuery("from CsvTemplateColumns where CsvTemplateId ="+csvTemplateId + " and ExpFieldId is not null").list();
+            //nodes = session.createQuery("from CsvTemplateColumns where CsvTemplateId ="+csvTemplateId + " and ExpFieldId is not null").list();
+            nodes = session.createQuery("from CsvTemplateColumns where CsvTemplateId ="+csvTemplateId ).list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
@@ -132,5 +133,22 @@ public class CsvTemplateColumnsDao {
         return nodes;
 	}
 	
+	public List<CsvTemplateColumns> getAllCsvTemplateColumnssByTemplateId(int csvTemplateId) {
+		List<CsvTemplateColumns> nodes = new ArrayList<CsvTemplateColumns>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+		// Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            nodes = session.createQuery("from CsvTemplateColumns where CsvTemplateId ="+csvTemplateId + " and ExpFieldId is not null").list();
+            
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return nodes;
+	}
 	
 }

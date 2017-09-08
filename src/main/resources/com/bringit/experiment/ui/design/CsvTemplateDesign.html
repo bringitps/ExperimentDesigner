@@ -55,6 +55,9 @@
        <column> 
         <vaadin-text-area caption="Comments:" rows="2" style-name="tiny" width-full _id="txtCsvTComments"></vaadin-text-area> 
        </column> 
+       <column> 
+        <vaadin-check-box caption="Transform Text Files matching criteria to CSV" style-name="tiny" width-full _id="chxTransformTxt"></vaadin-check-box> 
+       </column> 
       </row> 
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
@@ -118,7 +121,7 @@
     </tab> 
     <tab caption="Csv Template Mapping" icon="fonticon://FontAwesome/f0e8"> 
      <vaadin-vertical-layout _id="csvTMapLayout"> 
-      <vaadin-table selectable style-name="tiny" immediate width-full height="220px" _id="tblCsvCols"> 
+      <vaadin-table selectable style-name="tiny" immediate width-full height="190px" _id="tblCsvCols"> 
        <table> 
        </table> 
       </vaadin-table> 
@@ -127,15 +130,15 @@
     <tab caption="Data Enrichment" icon="fonticon://FontAwesome/f1e0"> 
      <vaadin-vertical-layout margin _id="csvTEnrichmentLayout"> 
       <vaadin-vertical-layout _id="csvTEnrichmentRulesLayout"> 
-       <vaadin-grid-layout width-full height="40px" _id="gridEnrichmentRuleBtns"> 
+       <vaadin-grid-layout width-full height="25px" _id="gridEnrichmentRuleBtns"> 
         <row> 
          <column> 
-          <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" plain-text _id="btnAddEnrichmentRule">
+          <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" height="20px" plain-text _id="btnAddEnrichmentRule">
             Add Enrichment Rule 
           </vaadin-button> 
          </column> 
          <column> 
-          <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" plain-text _id="btnDeleteEnrichmentRule" :right>
+          <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" height="20px" plain-text _id="btnDeleteEnrichmentRule" :right>
             Delete Enrichment Rule 
           </vaadin-button> 
          </column> 
@@ -143,7 +146,7 @@
         <row></row> 
        </vaadin-grid-layout> 
        <vaadin-panel _id="pnlEnrichmentRulesTbl"> 
-        <vaadin-table selectable style-name="tiny" immediate width-full height="130px" _id="tblEnrichmentRules"> 
+        <vaadin-table selectable style-name="tiny" immediate width-full height="150px" _id="tblEnrichmentRules"> 
          <table></table> 
         </vaadin-table> 
        </vaadin-panel> 

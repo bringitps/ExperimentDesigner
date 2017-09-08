@@ -30,8 +30,10 @@ import com.bringit.experiment.remote.RemoteFileUtil;
 import com.bringit.experiment.ui.design.CsvTemplateDesign;
 import com.opencsv.CSVReader;
 import com.vaadin.data.Item;
+import com.vaadin.data.Validator;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -48,10 +50,14 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 
 public class CsvTemplateForm extends CsvTemplateDesign {
 
@@ -127,6 +133,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			if(csvt.getProcessedFileRepo() != null) this.comboCsvoutRepo.setValue(csvt.getProcessedFileRepo().getFileRepoId());
 			if(csvt.getExceptionFileRepo() != null) this.comboCsvTerrRepo.setValue(csvt.getExceptionFileRepo().getFileRepoId());
 			this.txtCsvTComments.setValue(csvt.getCsvTemplateComments());
+			if(csvt.getCsvTemplateTransformTxtFound() != null) this.chxTransformTxt.setValue(csvt.getCsvTemplateTransformTxtFound());
 			
 			String opFilterSavedCriteria = "Prefix"; 
 			
@@ -170,7 +177,10 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			}
 						
 			
-			this.csvCols = new CsvTemplateColumnsDao().getAllCsvTemplateColumnssByTemplateId(csvt.getCsvTemplateId());
+			//this.csvCols = new CsvTemplateColumnsDao().getAllCsvTemplateColumnssByTemplateId(csvt.getCsvTemplateId());
+			
+			this.csvCols = new CsvTemplateColumnsDao().getAllCsvTemplateColumnsMappingDetailsByTemplateId(csvt.getCsvTemplateId());
+			
 			if(this.csvCols != null)
 			{
 				this.csvTemplateColumns = new String[this.csvCols.size()];
@@ -182,8 +192,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			
 			Object[] itemValues = new Object[5];
 			for(int i=0; i<this.csvCols.size(); i++)
-			{		
-				
+			{	
 				CheckBox chxSelect = new CheckBox();
 				chxSelect.setVisible(false);
 				itemValues[0] = chxSelect;
@@ -226,6 +235,18 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				
 				txtDateTimeMask.addStyleName("tiny");
 				txtDateTimeMask.setWidth(100, Unit.PERCENTAGE);
+				if(this.csvCols.get(i).getExpField() != null && !this.csvCols.get(i).getExpField().getExpFieldType().contains("date"))
+					txtDateTimeMask.setEnabled(false);
+				
+				txtDateTimeMask.setId(this.csvCols.get(i).getCsvTemplateColumnId().toString()); //Id to be reused for DateTime mask logic
+				txtDateTimeMask.addValueChangeListener(new ValueChangeListener() {
+
+		            @Override
+		            public void valueChange(ValueChangeEvent event) {
+		            	onChangeDateTimeMask(txtDateTimeMask);
+		            }
+		        });
+				
 				itemValues[4] = txtDateTimeMask;
 				
 				cbxExpFields.addValueChangeListener(new ValueChangeListener() {
@@ -237,6 +258,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		        });
 				
 				this.tblCsvCols.addItem(itemValues, this.csvCols.get(i).getCsvTemplateColumnId());
+								
 			}
 	
 		}
@@ -329,9 +351,11 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		boolean validateReqFieldsResult = validateRequiredFields();		
 		boolean validateNonRepeatedExperimentFieldsResult = validateNonRepeatedExperimentFields();
 		boolean validateCsvTemplateEnrichment = validateCsvTemplateEnrichment();
+		boolean validateDateTimeMasksResult = validateDateTimeMasks();
 		
 		//---Validate Required Fields---//
-		if(itemIds.size() > 0 && validateReqFieldsResult && validateNonRepeatedExperimentFieldsResult && validateCsvTemplateNameResult && validateCsvTemplateEnrichment)
+		if(itemIds.size() > 0 && validateReqFieldsResult && validateNonRepeatedExperimentFieldsResult 
+				&& validateCsvTemplateNameResult && validateCsvTemplateEnrichment && validateDateTimeMasksResult)
 		{
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			
@@ -366,6 +390,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			//this.csvt.setCsvTemplatePrefix(this.txtCsvTFilterCriteria.getValue());
 			
 			this.csvt.setCsvTemplateComments(this.txtCsvTComments.getValue());
+			this.csvt.setCsvTemplateTransformTxtFound(this.chxTransformTxt.getValue());
 			
 			this.csvt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvTerrRepo.getValue()));
 			this.csvt.setProcessedFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvoutRepo.getValue()));
@@ -465,7 +490,10 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				}
 				else
 					csvColumn.setExpField(null);
-					
+				
+				csvColumn.setCsvTemplateColumnDatetimeMask(((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).getValue());
+				
+				
 				if(itemId > 0)
 				{
 					csvColumn.setCsvTemplateColumnId(itemId);
@@ -544,7 +572,8 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				this.getUI().showNotification("Name is already selected for another Csv Template. Please rename CsvTemplate", Type.WARNING_MESSAGE);
 			else if(!validateCsvTemplateEnrichment)
 				this.getUI().showNotification("Please fill in all required Fields for Csv Template Enrichment", Type.WARNING_MESSAGE);
-			
+			else if(!validateDateTimeMasksResult)
+				this.getUI().showNotification("Some Datetime Formats are invalid.", Type.WARNING_MESSAGE);
 		}
 	}
 	
@@ -618,6 +647,38 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				return false;
 		}
 			
+		return true;
+	}
+	
+	private boolean validateDateTimeMasks()
+	{
+		Collection itemIds = this.tblCsvCols.getContainerDataSource().getItemIds();
+		
+		for (Object itemIdObj : itemIds) 
+		{	
+			int itemId = (int)itemIdObj;
+			Item tblRowItem = this.tblCsvCols.getContainerDataSource().getItem(itemId);
+			if(((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())) != null)
+			{
+				String dateTimeMaskValue = ((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).getValue();
+				if(dateTimeMaskValue != null && !dateTimeMaskValue.isEmpty())
+				{
+					try
+					{					
+						DateFormat dateFormat = new SimpleDateFormat(dateTimeMaskValue);	
+						String dateStr = dateFormat.format(new Date());
+						Date dateConverted = new SimpleDateFormat(dateTimeMaskValue).parse(dateStr);
+						System.out.println("Date converted: " + dateConverted);					
+					}
+					catch(Exception e)
+					{
+						((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).selectAll();
+						((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).focus();
+						return false;
+					}
+				}
+			}
+		}
 		return true;
 	}
 	
@@ -756,6 +817,8 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			TextField txtDateTimeMask = new TextField();
 			txtDateTimeMask.addStyleName("tiny");
 			txtDateTimeMask.setWidth(100, Unit.PERCENTAGE);
+			txtDateTimeMask.setEnabled(false);
+
 			itemValues[4] = txtDateTimeMask;
 						
 			this.lastNewItemId = this.lastNewItemId - 1;
@@ -768,7 +831,16 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	            	onChangeExperimentField(cbxExpFields);
 	            }
 	        });
-			
+
+			txtDateTimeMask.setId(""+this.lastNewItemId); //Id to be reused for DateTime mask logic
+			txtDateTimeMask.addValueChangeListener(new ValueChangeListener() {
+
+	            @Override
+	            public void valueChange(ValueChangeEvent event) {
+	            	onChangeDateTimeMask(txtDateTimeMask);
+	            }
+	        });
+
 			this.tblCsvCols.addItem(itemValues, this.lastNewItemId);
 			
 		}
@@ -934,6 +1006,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		CheckBox chxSelect = new CheckBox();
 		chxSelect.setStyleName("tiny");
 		chxSelect.setVisible(false);
+		chxSelect.setHeight(20, Unit.PIXELS);
 		itemValues[0] = chxSelect;
 		
 		//Fill CSV Column ComboBox
@@ -947,6 +1020,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			cbxCsvColumnSource.setItemCaption(this.csvTemplateColumns[i], this.csvTemplateColumns[i]);
 			cbxCsvColumnSource.setWidth(100, Unit.PERCENTAGE);
 		}
+		cbxCsvColumnSource.setHeight(20, Unit.PIXELS);
 		itemValues[1] = cbxCsvColumnSource;
 		
 				
@@ -975,12 +1049,14 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		cbxOperator.addItem("matchesregex");
 		cbxOperator.setItemCaption("matchesregex", "matches Regular Expression");
 		cbxOperator.select("is");
+		cbxOperator.setHeight(20, Unit.PIXELS);
 		itemValues[2] = cbxOperator;
 		
 		//Comparison Value TextField
 		TextField txtComparisonValue = new TextField();
 		txtComparisonValue.addStyleName("tiny");
 		txtComparisonValue.setWidth(100, Unit.PIXELS);
+		txtComparisonValue.setHeight(20, Unit.PIXELS);
 		itemValues[3] = txtComparisonValue;
 		
 		//Fill Enrichment Type ComboBox
@@ -991,10 +1067,14 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		cbxEnrichmentType.setItemCaption("customlist", "Custom List XREF");
 		cbxEnrichmentType.addItem("staticvalue");
 		cbxEnrichmentType.setItemCaption("staticvalue", "Static Value");
+		cbxEnrichmentType.addItem("positivenumber");
+		cbxEnrichmentType.setItemCaption("positivenumber", "Cast to Positive Number");
+		cbxEnrichmentType.addItem("negativenumber");
+		cbxEnrichmentType.setItemCaption("negativenumber", "Cast to Negative Number");
 		cbxEnrichmentType.select("customlist");
 		cbxEnrichmentType.setId(itemId.toString()); //Item Id to be reused on Change event
 
-		
+		cbxEnrichmentType.setHeight(20, Unit.PIXELS);
 		itemValues[4] = cbxEnrichmentType;
 		
 		//Fill Custom List ComboBox
@@ -1011,13 +1091,15 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			cbxCustomList.setWidth(100, Unit.PERCENTAGE);
 		}
 		
-		
+
+		cbxCustomList.setHeight(20, Unit.PIXELS);
 		itemValues[5] = cbxCustomList;
 		
 		//Fill Custom List Value ComboBox
 		ComboBox cbxCustomListValue = new ComboBox("");
 		cbxCustomListValue.setContainerDataSource(null);
 		cbxCustomListValue.setStyleName("tiny");	
+		cbxCustomListValue.setHeight(20, Unit.PIXELS);
 		itemValues[6] = cbxCustomListValue;
 		
 		//Static Value TextField
@@ -1025,6 +1107,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		txtStaticValue.addStyleName("tiny");
 		txtStaticValue.setWidth(100, Unit.PIXELS);
 		txtStaticValue.setEnabled(false);
+		txtStaticValue.setHeight(20, Unit.PIXELS);
 		itemValues[7] = txtStaticValue;
 					
 		//Experiment Field ComboBox
@@ -1041,6 +1124,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			cbxExperimentField.setItemCaption(enrichmentExpFields.get(i).getExpFieldId(), enrichmentExpFields.get(i).getExpFieldName() + " [ " + expFields.get(i).getExpFieldType() + " ]");
 			cbxExperimentField.setWidth(100, Unit.PERCENTAGE);
 		}
+		cbxExperimentField.setHeight(20, Unit.PIXELS);
 		itemValues[8] = cbxExperimentField;
 		
 		if(itemId > 0)
@@ -1071,14 +1155,18 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				cbxCustomListValue.setEnabled(true);
 				txtStaticValue.setEnabled(false);
 			}
-			else
+			if("staticvalue".equals(cbxEnrichmentType.getValue()))
 			{
 				cbxCustomList.setEnabled(false);
 				cbxCustomListValue.setEnabled(false);
 				txtStaticValue.setEnabled(true);
 			}
-			
-
+			if(!"customlist".equals(cbxEnrichmentType.getValue()) && !"staticvalue".equals(cbxEnrichmentType.getValue()))
+			{
+				cbxCustomList.setEnabled(false);
+				cbxCustomListValue.setEnabled(false);
+				txtStaticValue.setEnabled(false);
+			}
 			
 		}
 		
@@ -1155,7 +1243,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				txtStaticValue.setValue("");
 				txtStaticValue.setEnabled(false);
 			}
-			else
+			if("staticvalue".equals(cbxEnrichmentType.getValue()))
 			{
 				cbxCustomList.setValue(null);
 				cbxCustomList.setEnabled(false);
@@ -1163,12 +1251,80 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				cbxCustomListValue.setEnabled(false);
 				txtStaticValue.setEnabled(true);
 			}
+			if(!"customlist".equals(cbxEnrichmentType.getValue()) && !"staticvalue".equals(cbxEnrichmentType.getValue()))
+			{
+				cbxCustomList.setValue(null);
+				cbxCustomList.setEnabled(false);
+				cbxCustomListValue.setValue(null);
+				cbxCustomListValue.setEnabled(false);
+				txtStaticValue.setValue("");
+				txtStaticValue.setEnabled(false);
+			}
+			
 		}
 	}
 
 	private void onChangeExperimentField(ComboBox cbxExpFields)
 	{
-		System.out.println("Selected Item Id: " + cbxExpFields.getId());
+		int tblRowItemId = Integer.parseInt(cbxExpFields.getId());
+		
+		Item tblRowItem = this.tblCsvCols.getContainerDataSource().getItem(tblRowItemId);
+		
+		if(((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())) != null && !((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())) .isEmpty())
+		{
+			int experimentFieldId = (int)((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue();
+			ExperimentField selectedExpField = new ExperimentFieldDao().getExperimentFieldById(experimentFieldId);
+			
+			if("datetime".equals(selectedExpField.getExpFieldType()))
+			{
+				((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).setValue("yyyy-MM-dd HH:mm:ss");
+				((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).setEnabled(true);
+			}
+			if("date".equals(selectedExpField.getExpFieldType()))
+			{
+				((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).setValue("yyyy-MM-dd");
+				((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).setEnabled(true);
+			}
+			if(!selectedExpField.getExpFieldType().contains("date"))
+			{
+				((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).setEnabled(false);
+				((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).setValue("");					
+			}			
+		}
+		else
+		{
+			((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).setEnabled(false);
+			((TextField)(tblRowItem.getItemProperty("Datetime Format").getValue())).setValue("");		
+		}
 	}
 
+	private void onChangeDateTimeMask(TextField txtDateTimeMask)
+	{
+		int tblRowItemId = Integer.parseInt(txtDateTimeMask.getId());
+		
+		Item tblRowItem = this.tblCsvCols.getContainerDataSource().getItem(tblRowItemId);
+		
+		if(((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())) != null)
+		{
+			int experimentFieldId = (int)((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue();
+			ExperimentField selectedExpField = new ExperimentFieldDao().getExperimentFieldById(experimentFieldId);
+			
+			if(selectedExpField.getExpFieldType().contains("date"))
+			{
+				try
+				{
+					DateFormat dateFormat = new SimpleDateFormat(txtDateTimeMask.getValue());	
+					String dateStr = dateFormat.format(new Date());
+					Date dateConverted = new SimpleDateFormat(txtDateTimeMask.getValue()).parse(dateStr);
+					System.out.println("Date converted: " + dateConverted);					
+				}
+				catch(Exception e)
+				{
+					this.getUI().showNotification("Invalid Format: " + txtDateTimeMask.getValue(), Type.WARNING_MESSAGE);
+					txtDateTimeMask.focus();
+					txtDateTimeMask.selectAll();
+				}
+			}
+		}
+	}
 }

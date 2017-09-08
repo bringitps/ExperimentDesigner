@@ -36,6 +36,9 @@ public class CsvTemplate {
 	@Column(name="CsvTemplateComments")
 	@Type(type="text")
 	private String csvTemplateComments;
+
+	@Column(name="CsvTemplateTransformTxtFound")
+	private Boolean csvTemplateTransformTxtFound;
 	
 	@Column(name="CsvTemplatePrefix")
 	private String csvTemplatePrefix;
@@ -101,6 +104,7 @@ public class CsvTemplate {
 		this.csvTemplateIsActive = null;
 		this.CsvTemplateName = null;
 		this.csvTemplateComments = null;
+		this.csvTemplateTransformTxtFound = null;
 		this.csvTemplatePrefix = null;
 		this.csvTemplateSuffix = null;
 		this.csvTemplateRegex = null;
@@ -122,7 +126,7 @@ public class CsvTemplate {
 	
 	
 	public CsvTemplate(Integer csvTemplateId, Boolean csvTemplateIsActive, String csvTemplateName,
-			String csvTemplateComments, String csvTemplatePrefix, String csvTemplateSuffix, String csvTemplateRegex, 
+			String csvTemplateComments,  Boolean csvTemplateTransformTxtFound, String csvTemplatePrefix, String csvTemplateSuffix, String csvTemplateRegex, 
 			Boolean csvTemplateNotScheduled, Date csvTemplateExecStartDate,
 			Integer csvTemplateExecStartHour, Date csvTemplateExecEndDate, Date createdDate, Date modifiedDate,
 			ContractManufacturer contractManufacturer, FilesRepository inboundFileRepo,
@@ -132,6 +136,7 @@ public class CsvTemplate {
 		this.csvTemplateIsActive = csvTemplateIsActive;
 		this.CsvTemplateName = csvTemplateName;
 		this.csvTemplateComments = csvTemplateComments;
+		this.csvTemplateTransformTxtFound = csvTemplateTransformTxtFound;
 		this.csvTemplatePrefix = csvTemplatePrefix;
 		this.csvTemplateSuffix = csvTemplateSuffix;
 		this.csvTemplateRegex = csvTemplateRegex;
@@ -175,6 +180,16 @@ public class CsvTemplate {
 	public void setCsvTemplateComments(String csvTemplateComments) {
 		this.csvTemplateComments = csvTemplateComments;
 	}
+	
+	public Boolean getCsvTemplateTransformTxtFound() {
+		return csvTemplateTransformTxtFound;
+	}
+
+
+	public void setCsvTemplateTransformTxtFound(Boolean csvTemplateTransformTxtFound) {
+		this.csvTemplateTransformTxtFound = csvTemplateTransformTxtFound;
+	}
+
 
 	public String getCsvTemplatePrefix() {
 		return csvTemplatePrefix;

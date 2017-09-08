@@ -34,6 +34,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,7 +74,31 @@ public class RemoteCsvJob implements Job {
         if (filesRepository.isFileRepoIsSftp()) {
             FTPUtil sftp = new FTPUtil(filesRepository.getFileRepoHost(), Integer.parseInt(filesRepository.getFileRepoPort()),
                     filesRepository.getFileRepoUser(), filesRepository.getFileRepoPass());
-
+            
+            if(jobData.getCsvTemplateTransformTxtFound() != null && jobData.getCsvTemplateTransformTxtFound())
+            {
+            	//Change file extension from TXT to CSV
+            	List<ChannelSftp.LsEntry> files =  sftp.secureGetFileList(filesRepository.getFileRepoPath());
+                
+                for (ChannelSftp.LsEntry file: files) {
+                	
+                    if (file.getFilename().endsWith(".txt") && ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && file.getFilename().startsWith(jobData.getCsvTemplatePrefix()))
+                    			|| ("Suffix".equals(fileFilterCriteria) && file.getFilename().replaceAll(".txt","").endsWith(jobData.getCsvTemplateSuffix()))
+                    			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getCsvTemplateRegex(), file.getFilename().replaceAll(".txt","")))))
+                    {
+                    	InputStream is = sftp.secureGetFile(filesRepository.getFileRepoPath()+"/"+file.getFilename());
+                        moveFileToRepo(filesRepository, is, file.getFilename());
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        sftp.secureRemoveFile(filesRepository.getFileRepoPath(), file.getFilename());   
+                        System.out.println("File renamed: " + file.getFilename());                 	
+                    }
+                }
+            }
+                        
             List<ChannelSftp.LsEntry> files =  sftp.secureGetFileList(filesRepository.getFileRepoPath());
             boolean filesProcessed = false;
             
@@ -153,6 +178,7 @@ public class RemoteCsvJob implements Job {
 	                        
 	                        if (0 == sftpResponse.getCode()) {
 	
+	                        	
 	                        	if(sftpResponse.getCsvRowException() != null && sftpResponse.getCsvRowException().size() > 0)
 	        					{
 	        						//Split files into 2 CSV files
@@ -168,10 +194,10 @@ public class RemoteCsvJob implements Job {
 	        						dataFileException.setFileRepoId(jobData.getExceptionFileRepo());
 	        						new DataFileDao().addDataFile(dataFileException);
 	        					
-	                        		Integer totalRecords = sftpResponse.getCsvInsertValues().size() + sftpResponse.getCsvRowException().size();
-	    							Integer processedRecords = sftpResponse.getCsvInsertValues().size();
-	    							Integer exceptionRecords = sftpResponse.getCsvRowException().size();
-	    							
+	        						Integer processedRecords =  (sftpResponse.getCsvInsertValues() != null ? sftpResponse.getCsvInsertValues().size() : 0);
+		        					Integer exceptionRecords =  (sftpResponse.getCsvRowException() != null ? sftpResponse.getCsvRowException().size() : 0);
+		        					Integer totalRecords = processedRecords + exceptionRecords;
+		        					
 	    							dataFile.setFileRepoId(exceptionRepo);
 	    							new DataFileDao().updateDataFile(dataFile);
 	    							
@@ -247,6 +273,29 @@ public class RemoteCsvJob implements Job {
             FTPUtil ftp = new FTPUtil(filesRepository.getFileRepoHost(), Integer.parseInt(filesRepository.getFileRepoPort()),
                     filesRepository.getFileRepoUser(), filesRepository.getFileRepoPass());
 
+            if(jobData.getCsvTemplateTransformTxtFound() != null && jobData.getCsvTemplateTransformTxtFound())
+            {
+            	//Change file extension from TXT to CSV
+            	FTPFile[] ftpFiles = ftp.simpleGetFileList(filesRepository.getFileRepoPath());
+            	 for (FTPFile ftpFile: ftpFiles) {
+            		 if (ftpFile.getName().endsWith(".txt") && ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && ftpFile.getName().startsWith(jobData.getCsvTemplatePrefix()))
+                 			|| ("Suffix".equals(fileFilterCriteria) && ftpFile.getName().replaceAll(".txt","").endsWith(jobData.getCsvTemplateSuffix()))
+                 			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getCsvTemplateRegex(), ftpFile.getName().replaceAll(".txt","")))))
+            		 {
+            			 InputStream is = ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName());
+                         moveFileToRepo(filesRepository, is, ftpFile.getName().replaceAll(".txt", ".csv"));
+                         try {
+                             is.close();
+                         } catch (IOException e) {
+                             e.printStackTrace();
+                         }
+                         ftp.deleteFile(ftpFile.getName(), filesRepository.getFileRepoPath());
+                         System.out.println("File renamed: " + ftpFile.getName());
+            		 }
+            	 } 
+            }
+            
+            
             FTPFile[] ftpFiles = ftp.simpleGetFileList(filesRepository.getFileRepoPath());
             boolean filesProcessed = false;
             for (FTPFile ftpFile: ftpFiles) {
@@ -340,10 +389,10 @@ public class RemoteCsvJob implements Job {
 	        						dataFileException.setFileRepoId(jobData.getExceptionFileRepo());
 	        						new DataFileDao().addDataFile(dataFileException);
 	        					
-	                        		Integer totalRecords = ftpResponse.getCsvInsertValues().size() + ftpResponse.getCsvRowException().size();
-	    							Integer processedRecords = ftpResponse.getCsvInsertValues().size();
-	    							Integer exceptionRecords = ftpResponse.getCsvRowException().size();
-	    							
+	        						Integer processedRecords =  (ftpResponse.getCsvInsertValues() != null ? ftpResponse.getCsvInsertValues().size() : 0);
+		        					Integer exceptionRecords =  (ftpResponse.getCsvRowException() != null ? ftpResponse.getCsvRowException().size() : 0);
+		        					Integer totalRecords = processedRecords + exceptionRecords;
+		        					
 	    							dataFile.setFileRepoId(exceptionRepo);
 	    							new DataFileDao().updateDataFile(dataFile);
 	    							
@@ -412,8 +461,42 @@ public class RemoteCsvJob implements Job {
             
         } else if (filesRepository.isFileRepoIsLocal()) {
             File dir = new File(filesRepository.getFileRepoPath());
+            
+            if(jobData.getCsvTemplateTransformTxtFound() != null && jobData.getCsvTemplateTransformTxtFound())
+            {
+            	//Change file extension from TXT to CSV
+            	String[] extensions = new String[] { "txt" };
+                System.out.println("Getting  all txt files in " + filesRepository.getFileRepoPath());
+                
+                List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, false);
+                boolean filesProcessed = false;
+                for (File file: files) {
+                	if ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && file.getName().startsWith(jobData.getCsvTemplatePrefix()))
+                 			|| ("Suffix".equals(fileFilterCriteria) && file.getName().replaceAll(".txt","").endsWith(jobData.getCsvTemplateSuffix()))
+                 			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getCsvTemplateRegex(), file.getName().replaceAll(".txt",""))))
+                	 {
+                		InputStream is = null;
+						try {
+							is = new FileInputStream(file);
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                		moveFileToRepo(filesRepository, is, file.getName().replaceAll(".txt", ".csv"));
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        file.delete();
+                        System.out.println("File renamed: " + file.getName());
+                	 }
+                }
+            }
+            
             String[] extensions = new String[] { "csv" };
             System.out.println("Getting  all csv files in " + filesRepository.getFileRepoPath());
+            
             List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, false);
             boolean filesProcessed = false;
             for (File file: files) {
@@ -508,10 +591,10 @@ public class RemoteCsvJob implements Job {
 		        						dataFileException.setFileRepoId(jobData.getExceptionFileRepo());
 		        						new DataFileDao().addDataFile(dataFileException);
 		        					
-		                        		Integer totalRecords = localResponse.getCsvInsertValues().size() + localResponse.getCsvRowException().size();
-		    							Integer processedRecords = localResponse.getCsvInsertValues().size();
-		    							Integer exceptionRecords = localResponse.getCsvRowException().size();
-		    							
+		        						Integer processedRecords =  (localResponse.getCsvInsertValues() != null ? localResponse.getCsvInsertValues().size() : 0);
+			        					Integer exceptionRecords =  (localResponse.getCsvRowException() != null ? localResponse.getCsvRowException().size() : 0);
+			        					Integer totalRecords = processedRecords + exceptionRecords;
+			        						
 		    							dataFile.setFileRepoId(exceptionRepo);
 		    							new DataFileDao().updateDataFile(dataFile);
 		    							
@@ -625,9 +708,9 @@ public class RemoteCsvJob implements Job {
             //1)Parsing & Validation
             ResponseObj responseObj = new ExperimentParser().parseCSV(is, csvTemplate, filename);
 
-            if(responseObj.getCode() != 0)
+            if(responseObj.getCode() != 0 || responseObj.getCsvInsertValues() == null || responseObj.getCsvInsertValues().size() <=0)
             	return responseObj;
-            
+                        
             //2)Batch Insert
             ResponseObj batchResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(responseObj.getCsvInsertColumns(),
                     responseObj.getCsvInsertValues(), null, csvTemplate, null, dataFile, csvTemplate.getExperiment(), iBatchSize);

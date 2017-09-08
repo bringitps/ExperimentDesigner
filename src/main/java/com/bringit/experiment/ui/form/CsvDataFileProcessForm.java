@@ -190,9 +190,15 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 				
 				Config configuration = new Config();
 				int insertBatchSize = Integer.parseInt(configuration.getProperty("batchinsert"));
+				ResponseObj batchInsertResponse = parseCsvResponse;
 				
-				ResponseObj batchInsertResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(parseCsvResponse.getCsvInsertColumns(),
+				if(parseCsvResponse.getCsvInsertValues() != null && parseCsvResponse.getCsvInsertValues().size() > 0)
+				{
+					batchInsertResponse = new BatchExperimentRecordsInsertDao().executeExperimentBatchRecordsInsert(parseCsvResponse.getCsvInsertColumns(),
 						parseCsvResponse.getCsvInsertValues(), null, csvTemplate, sessionUser, dataFile, csvTemplate.getExperiment(), insertBatchSize);
+				}
+				else
+					batchInsertResponse.setDescription("Some records could not be processed.");
 				
 				if(batchInsertResponse.getCode() == 0)
 				{
@@ -214,6 +220,8 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 						dataFileException.setLastModifiedBy(sessionUser);
 						dataFileException.setFileRepoId(csvTemplate.getExceptionFileRepo());
 						new DataFileDao().addDataFile(dataFileException);
+
+						batchInsertResponse.setDescription("Some records could not be processed.");
 					}
 					
 					this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 2 of 3. Result (OK)\n");
@@ -222,11 +230,16 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 					
 					this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 3 of 3. Saving Log Execution Information & Moving File\n");
 					
+					Integer totalRecordsProcessed =  (parseCsvResponse.getCsvInsertValues() != null ? parseCsvResponse.getCsvInsertValues().size() : 0);
+					Integer totalRecordsException =  (parseCsvResponse.getCsvRowException() != null ? parseCsvResponse.getCsvRowException().size() : 0);
+					Integer fileTotalRecords = totalRecordsProcessed + totalRecordsException;
+					
+					
 					CsvDataLoadExecutionResult csvDataLoadExecResult = new CsvDataLoadExecutionResult();
 					csvDataLoadExecResult.setDataFile(dataFile);
 					csvDataLoadExecResult.setCsvDataLoadExecException(false);
 					csvDataLoadExecResult.setCsvDataLoadExecTime(new Date());
-					csvDataLoadExecResult.setCsvDataLoadTotalRecords(parseCsvResponse.getCsvInsertValues().size());
+					csvDataLoadExecResult.setCsvDataLoadTotalRecords(fileTotalRecords);
 					csvDataLoadExecResult.setCsvTemplate(csvTemplate);
 					new CsvDataLoadExecutionResultDao().addCsvDataLoadExecutionResult(csvDataLoadExecResult);
 					
@@ -238,9 +251,9 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 							csvDataLoadExecResult.setCsvDataLoadExecException(true);
 							csvDataLoadExecResult.setCsvDataLoadExecExeptionDetails("Some records could not be processed.");
 							
-							csvDataLoadExecResult.setCsvDataLoadTotalRecords(parseCsvResponse.getCsvInsertValues().size() + parseCsvResponse.getCsvRowException().size());
-							csvDataLoadExecResult.setCsvDataLoadTotalRecordsException(parseCsvResponse.getCsvRowException().size());
-							csvDataLoadExecResult.setCsvDataLoadTotalRecordsProcessed(parseCsvResponse.getCsvInsertValues().size());
+							csvDataLoadExecResult.setCsvDataLoadTotalRecords(fileTotalRecords);
+							csvDataLoadExecResult.setCsvDataLoadTotalRecordsException(totalRecordsException);
+							csvDataLoadExecResult.setCsvDataLoadTotalRecordsProcessed(totalRecordsProcessed);
 
 							csvDataLoadExecResult.setDataFileProcessed(dataFileProcessed);
 							csvDataLoadExecResult.setDataFileException(dataFileException);

@@ -429,7 +429,7 @@ public class ExperimentParser {
 			        		            		if(csvColumnPositionInFileMtx.get(j) != -1)
 				        		            	{
 				        		            		String fieldType = csvColumnTypeMtx.get(j);
-				            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? csvColumnValuesMtx.get(j)[i] +"," : "'" + csvColumnValuesMtx.get(j)[i] + "',";
+				            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? csvColumnValuesMtx.get(j)[i] +"," : "'" + csvColumnValuesMtx.get(j)[i].replaceAll("'", "''") + "',";
 			        		            		}
 				        		            }
 		            		            	

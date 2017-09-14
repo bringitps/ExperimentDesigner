@@ -27,7 +27,7 @@ public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 		if(vwCsvDataLoadExecResults != null)
 		{
 			VaadinControls.bindDbViewRsToVaadinTable(tblCsvDataFileLoads, vwCsvDataLoadExecResults, 1);
-			tblCsvDataFileLoads.setSortContainerPropertyId("Id");
+			tblCsvDataFileLoads.setSortContainerPropertyId("Execution Date");
 			tblCsvDataFileLoads.setSortAscending(false);
 			VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxCsvDataFileLoadsViewFilters, vwCsvDataLoadExecResults);
 		}
@@ -103,7 +103,7 @@ public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 			if(experimentViewResults != null)
 			{
 				VaadinControls.bindDbViewRsToVaadinTable(tblCsvDataFileLoads, experimentViewResults, 1);
-				tblCsvDataFileLoads.setSortContainerPropertyId("Id");
+				tblCsvDataFileLoads.setSortContainerPropertyId("Execution Date");
 				tblCsvDataFileLoads.setSortAscending(false);
 			}
 		}

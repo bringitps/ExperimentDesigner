@@ -104,9 +104,9 @@ public class RemoteCsvJob implements Job {
             
             for (ChannelSftp.LsEntry file: files) {
             	
-                if (file.getFilename().endsWith(".csv") && ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && file.getFilename().startsWith(jobData.getCsvTemplatePrefix()))
-                			|| ("Suffix".equals(fileFilterCriteria) && file.getFilename().replaceAll(".csv","").endsWith(jobData.getCsvTemplateSuffix()))
-                			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getCsvTemplateRegex(), file.getFilename().replaceAll(".csv",""))))){
+                if (file.getFilename().toLowerCase().endsWith(".csv") && ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && file.getFilename().startsWith(jobData.getCsvTemplatePrefix()))
+                			|| ("Suffix".equals(fileFilterCriteria) && file.getFilename().replaceAll(".csv","").replaceAll(".CSV","").endsWith(jobData.getCsvTemplateSuffix()))
+                			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getCsvTemplateRegex(), file.getFilename().replaceAll(".csv","").replaceAll(".CSV",""))))){
                 	
                 	//&& (jobData.getCsvTemplatePrefix() == null || (jobData.getCsvTemplatePrefix() != null && jobData.getCsvTemplatePrefix().isEmpty()) || (jobData.getCsvTemplatePrefix() != null && file.getFilename().startsWith(jobData.getCsvTemplatePrefix())))) {
                     
@@ -300,9 +300,9 @@ public class RemoteCsvJob implements Job {
             boolean filesProcessed = false;
             for (FTPFile ftpFile: ftpFiles) {
 
-                if (ftpFile.getName().endsWith(".csv") && ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && ftpFile.getName().startsWith(jobData.getCsvTemplatePrefix()))
-            			|| ("Suffix".equals(fileFilterCriteria) && ftpFile.getName().replaceAll(".csv","").endsWith(jobData.getCsvTemplateSuffix()))
-            			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getCsvTemplateRegex(), ftpFile.getName().replaceAll(".csv",""))))){ 
+                if (ftpFile.getName().toLowerCase().endsWith(".csv") && ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && ftpFile.getName().startsWith(jobData.getCsvTemplatePrefix()))
+            			|| ("Suffix".equals(fileFilterCriteria) && ftpFile.getName().replaceAll(".csv","").replaceAll(".CSV","").endsWith(jobData.getCsvTemplateSuffix()))
+            			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getCsvTemplateRegex(), ftpFile.getName().replaceAll(".csv","").replaceAll(".CSV",""))))){ 
                 		//&& (jobData.getCsvTemplatePrefix() == null || (jobData.getCsvTemplatePrefix() != null && jobData.getCsvTemplatePrefix().isEmpty()) || (jobData.getCsvTemplatePrefix() != null && ftpFile.getName().startsWith(jobData.getCsvTemplatePrefix())))) {
 
                     InputStream is = ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName());
@@ -494,7 +494,7 @@ public class RemoteCsvJob implements Job {
                 }
             }
             
-            String[] extensions = new String[] { "csv" };
+            String[] extensions = new String[] { "csv", "CSV" };
             System.out.println("Getting  all csv files in " + filesRepository.getFileRepoPath());
             
             List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, false);
@@ -507,11 +507,11 @@ public class RemoteCsvJob implements Job {
             	//{
             	System.out.println("Next file: "+ file.getName());
             	
-            	System.out.println("File Filter Criteria: "+ fileFilterCriteria + " Regex: " + jobData.getCsvTemplateRegex() + " File Name: " + file.getName().replaceAll(".csv",""));
+            	System.out.println("File Filter Criteria: "+ fileFilterCriteria + " Regex: " + jobData.getCsvTemplateRegex() + " File Name: " + file.getName().replaceAll(".csv","").replaceAll(".CSV",""));
             	
             	 if ("NoCriteria".equals(fileFilterCriteria) || ("Prefix".equals(fileFilterCriteria) && file.getName().startsWith(jobData.getCsvTemplatePrefix()))
-             			|| ("Suffix".equals(fileFilterCriteria) && file.getName().replaceAll(".csv","").endsWith(jobData.getCsvTemplateSuffix()))
-             			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getCsvTemplateRegex(), file.getName().replaceAll(".csv",""))))
+             			|| ("Suffix".equals(fileFilterCriteria) && file.getName().replaceAll(".csv","").replaceAll(".CSV","").endsWith(jobData.getCsvTemplateSuffix()))
+             			|| ("Regex".equals(fileFilterCriteria) && Pattern.matches(jobData.getCsvTemplateRegex(), file.getName().replaceAll(".csv","").replaceAll(".CSV",""))))
             	 { 
                     try {
                     	filesProcessed = true;

@@ -1008,9 +1008,11 @@ public class ExperimentParser {
 		}
 		else if(fieldType.contains("float") || fieldType.contains("decimal"))
 		{
+			if("nan".equals(fieldValue.toString().toLowerCase()))
+				return false;
 			try
 			{
-				Float.parseFloat(fieldValue);
+				Float.parseFloat(fieldValue);	
 			}
 			catch(Exception e)
 			{
@@ -1019,9 +1021,12 @@ public class ExperimentParser {
 		}
 		else if(fieldType.contains("int"))
 		{
+			if("nan".equals(fieldValue.toString().toLowerCase()))
+				return false;
+			
 			try
 			{
-				Integer.parseInt(fieldValue);
+				Integer.parseInt(fieldValue);			
 			}
 			catch(Exception e)
 			{

@@ -66,7 +66,7 @@ public class ExperimentManagementForm extends ExperimentManagementDesign {
 	
 	public void openExperimentCRUDModalWindow(int ExperimentId)
 	{
-		 Window experimentCRUDModalWindow = new Window("Experiment");
+		 Window experimentCRUDModalWindow = new Window(this.systemSettings.getExperimentLabel());
 		 experimentCRUDModalWindow.setModal(true);
 		 experimentCRUDModalWindow.setResizable(false);
 		 experimentCRUDModalWindow.setContent(new ExperimentForm(ExperimentId));

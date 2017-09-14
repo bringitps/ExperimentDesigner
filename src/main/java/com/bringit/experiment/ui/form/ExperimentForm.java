@@ -111,7 +111,7 @@ public class ExperimentForm extends ExperimentDesign {
 	{	
 		//Rename entities
 		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
-		this.cbxExperimentType.setCaption(this.systemSettings.getExperimentLabel());
+		this.cbxExperimentType.setCaption(this.systemSettings.getExperimentTypeLabel());
 		this.expElements.getTab(0).setCaption(this.systemSettings.getExperimentLabel() + " Images");
 		this.expElements.getTab(1).setCaption(this.systemSettings.getExperimentLabel() + " Fields");
 		this.btnDeleteImage.setCaption("Delete " + this.systemSettings.getExperimentLabel() + " Image");
@@ -717,20 +717,20 @@ public class ExperimentForm extends ExperimentDesign {
 		else
 		{
 			if(itemIds.size() <= 0)
-				this.getUI().showNotification("Experiment must contain at least 1 Experiment Field", Type.WARNING_MESSAGE);
+				this.getUI().showNotification(this.systemSettings.getExperimentLabel() +  " must contain at least 1 " + this.systemSettings.getExperimentTypeLabel(), Type.WARNING_MESSAGE);
 			else if(!validateReqFieldsResult)
 				this.getUI().showNotification("Please fill in all required Fields", Type.WARNING_MESSAGE);
 			else if(!validateDbNameFieldsResult)
 				this.getUI().showNotification("Only AlphaNumeric and Underscores are allowed for DB Element Names", Type.WARNING_MESSAGE);
 			else if(!validateDuplicatedDbNameFieldsResult)
-				this.getUI().showNotification("Experiment Field DB Ids must be unique.", Type.WARNING_MESSAGE);
+				this.getUI().showNotification(this.systemSettings.getExperimentLabel() +  " Field DB Ids must be unique.", Type.WARNING_MESSAGE);
 			else if(!validateDuplicateDbTableNameResult)
 			{
 				this.getUI().showNotification("DB Table Name already exists.", Type.WARNING_MESSAGE);
 				this.txtExpDbTableNameId.selectAll();
 			}
 			else if(!validateRestrictedDbTableFieldsResult)
-				this.getUI().showNotification("'RecordId', 'Comments', 'CreatedBy', 'LastModifiedBy', 'DataFileId', 'CreatedDate', 'LastModifiedDate' are Non-Eligible for Experiment Field DB Ids.", Type.WARNING_MESSAGE);
+				this.getUI().showNotification("'RecordId', 'Comments', 'CreatedBy', 'LastModifiedBy', 'DataFileId', 'CreatedDate', 'LastModifiedDate' are Non-Eligible for " + this.systemSettings.getExperimentLabel() + " Field DB Ids.", Type.WARNING_MESSAGE);
 		}
     }
 	

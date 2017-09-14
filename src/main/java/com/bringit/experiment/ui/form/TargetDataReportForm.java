@@ -197,17 +197,22 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		//3) Set static filter to data loaded
 		//1 Container Filter by 1 CmName
 		//Equal Operator needs to be used vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
-		List<Compare.Equal> filterList= new ArrayList<>();
-		if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
-			List<ContractManufacturer> contractManufacturersFilter = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
-			for (ContractManufacturer con : contractManufacturersFilter) {
-				filterList.add(new Compare.Equal("CmName", con.getCmName()));
-
+		
+		 //If there is no Contract Manufacturer loaded into system, there should not have restrictions
+        List<ContractManufacturer> allContractManufacturersLoaded = new ContractManufacturerDao().getAllContractManufacturers();
+        if(allContractManufacturersLoaded != null && allContractManufacturersLoaded.size() >0)
+        { 
+			List<Compare.Equal> filterList= new ArrayList<>();
+			if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
+				List<ContractManufacturer> contractManufacturersFilter = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
+				for (ContractManufacturer con : contractManufacturersFilter) {
+					filterList.add(new Compare.Equal("CmName", con.getCmName()));
+	
+				}
+				vaadinTblContainer.addContainerFilter(new Or(filterList.toArray(new Compare.Equal[filterList.size()])));
+	
 			}
-			vaadinTblContainer.addContainerFilter(new Or(filterList.toArray(new Compare.Equal[filterList.size()])));
-
-		}
-
+        }
 
 		this.btnApplyFilters.addClickListener(new Button.ClickListener() {
 			
@@ -235,14 +240,19 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 				if(cbxContractManufacturer.getValue() != null )
 					vaadinTblContainer.addContainerFilter(new Compare.Equal("CmName",cbxContractManufacturer.getValue()));
 
-				List<Compare.Equal> filterList= new ArrayList<>();
-				if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
-					List<ContractManufacturer> contractManufacturersFilter = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
-					for (ContractManufacturer con : contractManufacturersFilter) {
-						filterList.add(new Compare.Equal("CmName", con.getCmName()));
-
+				 //If there is no Contract Manufacturer loaded into system, there should not have restrictions
+		        List<ContractManufacturer> allContractManufacturersLoaded = new ContractManufacturerDao().getAllContractManufacturers();
+		        if(allContractManufacturersLoaded != null && allContractManufacturersLoaded.size() >0)
+		        { 		        	
+					List<Compare.Equal> filterList= new ArrayList<>();
+					if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
+						List<ContractManufacturer> contractManufacturersFilter = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
+						for (ContractManufacturer con : contractManufacturersFilter) {
+							filterList.add(new Compare.Equal("CmName", con.getCmName()));
+	
+						}
+						vaadinTblContainer.addContainerFilter(new Or(filterList.toArray(new Compare.Equal[filterList.size()])));
 					}
-					vaadinTblContainer.addContainerFilter(new Or(filterList.toArray(new Compare.Equal[filterList.size()])));
 				}
 			}
 		});

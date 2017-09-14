@@ -4,10 +4,13 @@ import com.bringit.experiment.bll.ContractManufacturer;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.SysRole;
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.dao.CmForSysRoleDao;
+import com.bringit.experiment.dao.ContractManufacturerDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.ExperimentJobDataDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.ui.design.ExperimentDataReportDesign;
 import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.Constants;
@@ -26,8 +29,10 @@ import com.vaadin.data.util.filter.Not;
 import com.vaadin.data.util.filter.Or;
 import com.vaadin.data.util.sqlcontainer.SQLContainer;
 import com.vaadin.data.util.sqlcontainer.connection.SimpleJDBCConnectionPool;
+import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 import com.vaadin.data.util.sqlcontainer.query.TableQuery;
 import com.vaadin.data.util.sqlcontainer.query.generator.MSSQLGenerator;
+import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -52,6 +57,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -73,7 +79,15 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
     Integer filterCnt = 1;
     boolean filtersApplied = false;
     
+
+    private SystemSettings systemSettings;
+
+    
     public ExperimentDataReportForm(int experimentId) {
+    	
+		//Rename entities
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+    	
         experiment = new ExperimentDao().getExperimentById(experimentId);
         experimentFields = new ExperimentFieldDao().getActiveExperimentFields(experiment);
 
@@ -112,16 +126,20 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
         //1 Container Filter by 1 CmName
         //Equal Operator needs to be used vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
 
-
-        List<Compare.Equal> filterList= new ArrayList<>();
-        if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
-            List<ContractManufacturer> contractManufacturers = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
-            for (ContractManufacturer con : contractManufacturers) {
-                filterList.add(new Compare.Equal("CmName", con.getCmName()));
-            }
-            vaadinTblContainer.addContainerFilter(new Or(filterList.toArray(new Compare.Equal[filterList.size()])));
+        //If there is no Contract Manufacturer loaded into system, there should not have restrictions
+        List<ContractManufacturer> allContractManufacturersLoaded = new ContractManufacturerDao().getAllContractManufacturers();
+        if(allContractManufacturersLoaded != null && allContractManufacturersLoaded.size() >0)
+        {        
+	        List<Compare.Equal> filterList= new ArrayList<>();
+	        if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
+	            List<ContractManufacturer> contractManufacturers = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
+	                for (ContractManufacturer con : contractManufacturers) {
+		                filterList.add(new Compare.Equal("CmName", con.getCmName()));
+		            }
+		            vaadinTblContainer.addContainerFilter(new Or(filterList.toArray(new Compare.Equal[filterList.size()])));
+	        }
         }
-
+        
         for (int i = 0; experimentFields != null && i < experimentFields.size(); i++) 
         {
         	experimentFieldDbIdXRef.add(experimentFields.get(i).getExpDbFieldNameId());
@@ -397,13 +415,18 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
 				filterExpression = "and";
     	}
     	
-    	 if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
-             List<ContractManufacturer> contractManufacturers = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
-             for (ContractManufacturer con : contractManufacturers) {
-            	 orFilterList.add(new Compare.Equal("CmName", con.getCmName()));
-             }
-         }
-
+    	 //If there is no Contract Manufacturer loaded into system, there should not have restrictions
+        List<ContractManufacturer> allContractManufacturersLoaded = new ContractManufacturerDao().getAllContractManufacturers();
+        if(allContractManufacturersLoaded != null && allContractManufacturersLoaded.size() >0)
+        { 
+	    	 if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
+	             List<ContractManufacturer> contractManufacturers = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
+	             for (ContractManufacturer con : contractManufacturers) {
+	            	 orFilterList.add(new Compare.Equal("CmName", con.getCmName()));
+	             }
+	         }
+        }
+        
      	vaadinTblContainer.removeAllContainerFilters();
      	
         if(orFilterList.size() > 0)
@@ -555,15 +578,20 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
         Map<String, Object> result = experimentJobDataDao.experimentProcedureJob(this.experiment.getExpId());
         vaadinTblContainer.refresh();
         experiment = new ExperimentDao().getExperimentById(experiment.getExpId());
+        
         this.lblrefreshDate.setValue("Last Refresh Date: " + experiment.getExpDbRptTableLastUpdate());
+
+        Integer totalRecords = 1 + tblExperimentDataReport.size();
+        this.lblrefreshDate.setValue(this.lblrefreshDate.getValue() + "  [Total Records: " + totalRecords + "]"); 
+        
         if (Constants.SUCCESS == result.get("status")) {
-            this.getUI().showNotification("Experiment '" + experiment.getExpName() + "' has been Refresh Successfully.", Notification.Type.HUMANIZED_MESSAGE);
+            this.getUI().showNotification(this.systemSettings.getExperimentLabel() + " '" + experiment.getExpName() + "' has been Refresh Successfully.", Notification.Type.HUMANIZED_MESSAGE);
         } else {
             String msgToDisplay = result.get("statusMessage").toString();
             if (Constants.JOB_NOT_EXECUTED.equalsIgnoreCase(msgToDisplay)) {
                 msgToDisplay = "same experiment is getting refresh by another user";
             }
-            this.getUI().showNotification("Experiment '" + experiment.getExpName() + "' can't refresh due to "+ msgToDisplay + ".", Notification.Type.WARNING_MESSAGE);
+            this.getUI().showNotification(this.systemSettings.getExperimentLabel() + " '" + experiment.getExpName() + "' can't refresh due to "+ msgToDisplay + ".", Notification.Type.WARNING_MESSAGE);
         }
     }
 
@@ -734,12 +762,25 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
                         dbUsername, dbPassword);
 
                 TableQuery tblQuery = new TableQuery(experiment.getExpDbRptTableNameId(), connectionPool, new MSSQLGenerator());
-                tblQuery.setVersionColumn("RecordId");
-
+                //tblQuery.setVersionColumn("RecordId");
+                List<OrderBy> tblOrderByRecordId = Arrays.asList(new OrderBy("RecordId", false));
+                //tblQuery.setOrderBy(tblOrderByRecordId);
+                StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(experiment.getExpDbRptTableNameId(), null, tblOrderByRecordId, 0, 0, "COUNT(*)");
+                
+                //System.out.println(sh.getQueryString());
+                
+                
+                
                 vaadinTblContainer = new SQLContainer(tblQuery);
 
                 tblExperimentDataReport.setContainerDataSource(vaadinTblContainer);
-
+                
+                tblExperimentDataReport.setSortContainerPropertyId("RecordId");
+                tblExperimentDataReport.setSortAscending(false);
+                
+                Integer totalRecords = 1 + tblExperimentDataReport.size();
+                this.lblrefreshDate.setValue(this.lblrefreshDate.getValue() + "  [Total Records: " + totalRecords + "]"); 
+                
                 if (experimentFields != null) {
                     String[] expFieldDbId = new String[experimentFields.size() + 3];
 

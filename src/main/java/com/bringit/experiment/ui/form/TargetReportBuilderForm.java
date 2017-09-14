@@ -411,7 +411,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 					}
 					
 					targetRptColumn.setTargetColumnLabel(((TextField)(tblRowItem.getItemProperty("Column Label").getValue())).getValue());
-					targetRptColumn.setExperimentField(new ExperimentFieldDao().getExperimentFieldById((Integer)((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).getValue()));			
+					targetRptColumn.setExperimentField(new ExperimentFieldDao().getExperimentFieldById((Integer)((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue()));			
 					targetRptColumn.setTargetColumnGroup(targetRptColGroup);
 					targetRptColumn.setTargetColumnPosition(cntPosition);
 					targetRptColumns.add(targetRptColumn);
@@ -497,7 +497,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			Table tblTargetReportInfoColumns = new Table();
 			tblTargetReportInfoColumns.setContainerDataSource(null);
 			tblTargetReportInfoColumns.addContainerProperty("*", CheckBox.class, null);
-			tblTargetReportInfoColumns.addContainerProperty("Experiment Field", ComboBox.class, null);
+			tblTargetReportInfoColumns.addContainerProperty(this.systemSettings.getExperimentLabel() + " Field", ComboBox.class, null);
 			tblTargetReportInfoColumns.addContainerProperty("Column Label", TextField.class, null);
 			tblTargetReportInfoColumns.setPageLength(100);
 			tblTargetReportInfoColumns.setWidth(100, Unit.PERCENTAGE);
@@ -620,7 +620,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 			Table tblTargetReportColumns = new Table();
 			tblTargetReportColumns.setContainerDataSource(null);
 			tblTargetReportColumns.addContainerProperty("*", CheckBox.class, null);
-			tblTargetReportColumns.addContainerProperty("Experiment Field", ComboBox.class, null);
+			tblTargetReportColumns.addContainerProperty(this.systemSettings.getExperimentLabel() + " Field", ComboBox.class, null);
 			tblTargetReportColumns.addContainerProperty("Column Label", TextField.class, null);
 			tblTargetReportColumns.addContainerProperty("Offset ±", TextField.class, null);
 			tblTargetReportColumns.addContainerProperty("Goal", TextField.class, null);
@@ -887,7 +887,7 @@ public class TargetReportBuilderForm extends TargetReportBuilderDesign {
 				}
 		
 				if(((TextField)(tblRowItem.getItemProperty("Column Label").getValue())).getValue().isEmpty()) notEmpty = false;
-				if(!((ComboBox)(tblRowItem.getItemProperty("Experiment Field").getValue())).isValid()) notEmpty = false;			
+				if(!((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).isValid()) notEmpty = false;			
 			
 				if(!notEmpty)
 				{

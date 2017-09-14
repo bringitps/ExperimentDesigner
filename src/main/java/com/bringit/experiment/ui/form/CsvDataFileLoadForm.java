@@ -30,6 +30,7 @@ public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 			tblCsvDataFileLoads.setSortContainerPropertyId("Execution Date");
 			tblCsvDataFileLoads.setSortAscending(false);
 			VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxCsvDataFileLoadsViewFilters, vwCsvDataLoadExecResults);
+			cbxCsvDataFileLoadsViewFilters.setValue(null);
 		}
 		
 		btnProcessCsvDataFile.addClickListener(new Button.ClickListener() {
@@ -107,6 +108,9 @@ public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 				tblCsvDataFileLoads.setSortAscending(false);
 			}
 		}
+		
+		//tblCsvDataFileLoads.setSortContainerPropertyId("Execution Date");
+		//tblCsvDataFileLoads.setSortAscending(false);	
 	}
 	
 }

@@ -429,7 +429,7 @@ public class ExperimentParser {
 			        		            		if(csvColumnPositionInFileMtx.get(j) != -1)
 				        		            	{
 				        		            		String fieldType = csvColumnTypeMtx.get(j);
-				            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? csvColumnValuesMtx.get(j)[i] +"," : "'" + csvColumnValuesMtx.get(j)[i].replaceAll("'", "''") + "',";
+				            		            	csvValuesLine+=fieldType.toLowerCase().startsWith("float")||fieldType.toLowerCase().startsWith("decimal")||fieldType.toLowerCase().startsWith("int") ? ("nan".equals(csvColumnValuesMtx.get(j)[i].toString().toLowerCase()) ? "NULL" : csvColumnValuesMtx.get(j)[i]) +"," : "'" + csvColumnValuesMtx.get(j)[i].replaceAll("'", "''") + "',";
 			        		            		}
 				        		            }
 		            		            	
@@ -1008,8 +1008,9 @@ public class ExperimentParser {
 		}
 		else if(fieldType.contains("float") || fieldType.contains("decimal"))
 		{
-			if("nan".equals(fieldValue.toString().toLowerCase()))
-				return false;
+			//if("nan".equals(fieldValue.toString().toLowerCase()))
+			//	return false;
+			
 			try
 			{
 				Float.parseFloat(fieldValue);	
@@ -1021,8 +1022,8 @@ public class ExperimentParser {
 		}
 		else if(fieldType.contains("int"))
 		{
-			if("nan".equals(fieldValue.toString().toLowerCase()))
-				return false;
+			//if("nan".equals(fieldValue.toString().toLowerCase()))
+			//	return false;
 			
 			try
 			{

@@ -103,9 +103,25 @@ public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 
 			if(experimentViewResults != null)
 			{
+				this.tblCsvDataFileLoads.setContainerDataSource(null);
 				VaadinControls.bindDbViewRsToVaadinTable(tblCsvDataFileLoads, experimentViewResults, 1);
-				tblCsvDataFileLoads.setSortContainerPropertyId("Execution Date");
-				tblCsvDataFileLoads.setSortAscending(false);
+				this.tblCsvDataFileLoads.setSortContainerPropertyId("Execution Date");
+				this.tblCsvDataFileLoads.setSortAscending(true);
+				System.out.println("Sorted");
+				this.tblCsvDataFileLoads.setSortAscending(false);
+			}
+		}
+		else
+		{
+			ResultSet vwCsvDataLoadExecResults = new DataBaseViewDao().getViewResults("vwCsvDataLoadExecutionResult");
+			if(vwCsvDataLoadExecResults != null)
+			{
+				this.tblCsvDataFileLoads.setContainerDataSource(null);
+				VaadinControls.bindDbViewRsToVaadinTable(this.tblCsvDataFileLoads, vwCsvDataLoadExecResults, 1);
+				this.tblCsvDataFileLoads.setSortContainerPropertyId("Execution Date");
+				this.tblCsvDataFileLoads.setSortAscending(true);
+				System.out.println("Sorted");
+				this.tblCsvDataFileLoads.setSortAscending(false);
 			}
 		}
 		

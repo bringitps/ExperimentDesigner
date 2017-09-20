@@ -2,11 +2,14 @@ package com.bringit.experiment.ui.form;
 
 import java.sql.ResultSet;
 import java.sql.Types;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.annotations.Type;
 
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.dao.DataBaseViewDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.remote.RemoteFileUtil;
 import com.bringit.experiment.ui.design.ExperimentManagementDesign;
 import com.bringit.experiment.ui.design.XmlTemplateManagementDesign;
@@ -24,6 +27,7 @@ import com.vaadin.ui.Window.CloseEvent;
 public class XmlTemplateManagementForm extends XmlTemplateManagementDesign  {
 	
 	Integer selectedRecordId = -1;
+	private SystemSettings systemSettings;
 	
 	public XmlTemplateManagementForm() {
 		ResultSet vwXmlTemplateResults = new DataBaseViewDao().getViewResults("vwXmlTemplate");
@@ -32,6 +36,18 @@ public class XmlTemplateManagementForm extends XmlTemplateManagementDesign  {
 			VaadinControls.bindDbViewRsToVaadinTable(tblXmlTemplate, vwXmlTemplateResults, 1);
 			VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxXmlTemplateViewFilters, vwXmlTemplateResults);
 		}
+		
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		Collection cbxMenuItemIds = cbxXmlTemplateViewFilters.getContainerDataSource().getItemIds();
+			
+		for (Object cbxMenuItemId : cbxMenuItemIds) 
+		{	
+			if("Experiment".equals(cbxMenuItemId.toString().trim()))
+				cbxXmlTemplateViewFilters.setItemCaption(cbxMenuItemId, this.systemSettings.getExperimentLabel());
+     	  	
+     	  	if("Experiment Type".equals(cbxMenuItemId.toString().trim()))
+     	  		cbxXmlTemplateViewFilters.setItemCaption(cbxMenuItemId, this.systemSettings.getExperimentTypeLabel());
+     	}
 		
 		tblXmlTemplate.addItemClickListener(new ItemClickEvent.ItemClickListener() 
 	    {

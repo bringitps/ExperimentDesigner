@@ -97,7 +97,8 @@ public class ExperimentParser {
 
 	        					System.out.println("Init: Parsing CSV file: " + csvFile);
 	        		            
-	        					reader = new CSVReader(new InputStreamReader(csvFile, "UTF-8"));
+	        					reader = new CSVReader(new InputStreamReader(csvFile));
+	        					//reader = new CSVReader(new InputStreamReader(csvFile, "UTF-8"));
 
 	        					System.out.println("End: Parsing CSV file: " + csvFile);
 	        		            
@@ -248,13 +249,16 @@ public class ExperimentParser {
 	        		            	 
 	        		            	for(int i=0; i < header.length; i++)
 	        		            	{
-	        		            		String[] csvColumnValues = new String[totalLines];
+	        		            		if(!header[i].isEmpty() && header[i] != null)
+	        		            		{
+	        		            			String[] csvColumnValues = new String[totalLines];
 	        		            		 
-	        		            		for(int j=0; j<totalLines; j++)
-	        		            			csvColumnValues[j] = (csvFileLines.get(j)[i] != null) ? csvFileLines.get(j)[i] : "";
+	        		            			for(int j=0; j<totalLines; j++)
+	        		            				csvColumnValues[j] = (csvFileLines.get(j)[i] != null) ? csvFileLines.get(j)[i] : "";
 	     	        		            
-	     	        		            csvFileColumnNameMtx.add(header[i]);
-	     	        		        	csvFileColumnValuesMtx.add(csvColumnValues);
+	        		            				csvFileColumnNameMtx.add(header[i]);
+	        		            				csvFileColumnValuesMtx.add(csvColumnValues);
+	        		            		}
 	 	        		            }
 	        		            	
 	        		            	List<String> enrichExpFieldDbIdMtx = new ArrayList<String>();

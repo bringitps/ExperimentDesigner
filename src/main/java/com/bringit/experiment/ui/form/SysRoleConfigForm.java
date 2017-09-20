@@ -3,9 +3,11 @@ package com.bringit.experiment.ui.form;
 import com.bringit.experiment.bll.CmForSysRole;
 import com.bringit.experiment.bll.ContractManufacturer;
 import com.bringit.experiment.bll.SysRole;
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.dao.CmForSysRoleDao;
 import com.bringit.experiment.dao.ContractManufacturerDao;
 import com.bringit.experiment.dao.SysRoleDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.UserRoleDao;
 import com.bringit.experiment.ui.design.SysRoleConfigDesign;
 import com.vaadin.data.Item;
@@ -33,10 +35,12 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 	private int lastNewItemId = 0;
 	private List<Integer> dbIdOfItemsToDelete = new ArrayList<Integer>();
 	private Tree treeMainMenu;// = new ArrayList<String>();
-	
+	private SystemSettings systemSettings;
+	   
 	public SysRoleConfigForm(Tree treeMainMenu)
 	{
-
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+        
 		this.treeMainMenu = treeMainMenu;
 		
 		loadTblData("","");
@@ -179,6 +183,7 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 						{
 							optGrpMnuAccess.addItem(id);
 							optGrpMnuAccess.setItemIcon(id, treeMainMenu.getItemIcon(id));
+							
 							if(mnuAccessList.indexOf(id.toString()) >= 0)
 								optGrpMnuAccess.select(id);
 						}
@@ -193,6 +198,29 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 					}					
 			    }
 
+			    Collection menuItemIds = optGrpMnuAccess.getContainerDataSource().getItemIds();
+				
+				for (Object menuItemId : menuItemIds) 
+				{	
+					if("Experiments".equals(menuItemId.toString().trim()))
+						optGrpMnuAccess.setItemCaption(menuItemId, this.systemSettings.getExperimentPluralLabel());
+		     	
+		     	  	if("Manage Experiments".equals(menuItemId.toString().trim()))
+		     	  		optGrpMnuAccess.setItemCaption(menuItemId, "Manage " + this.systemSettings.getExperimentPluralLabel());
+		     	
+		     	  	if("Experiment Types".equals(menuItemId.toString().trim()))
+		     	  		optGrpMnuAccess.setItemCaption(menuItemId, this.systemSettings.getExperimentTypePluralLabel());
+		     	  	
+		    		if(menuItemId.toString().trim().startsWith("Experiments /"))
+						optGrpMnuAccess.setItemCaption(menuItemId, optGrpMnuAccess.getItemCaption(menuItemId).replace("Experiments /", this.systemSettings.getExperimentPluralLabel() + " /"));
+		     	
+		    		if(menuItemId.toString().trim().endsWith("/ Manage Experiments"))
+						optGrpMnuAccess.setItemCaption(menuItemId, optGrpMnuAccess.getItemCaption(menuItemId).replace("/ Manage Experiments", "/ Manage " + this.systemSettings.getExperimentPluralLabel()));
+		     	
+		    		if(menuItemId.toString().trim().endsWith("/ Experiment Types"))
+						optGrpMnuAccess.setItemCaption(menuItemId, optGrpMnuAccess.getItemCaption(menuItemId).replace("/ Experiment Types", "/ " + this.systemSettings.getExperimentTypePluralLabel()));
+		     	}
+			    			    
 				setContractManagerOptions(optGrpCntManufacturer, sysRoles.get(i));
 
 				layoutPnlMnuAccess.addComponent(optGrpMnuAccess);
@@ -273,6 +301,29 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 				}
 			}					
 	    }		
+	    
+	    Collection menuItemIds = optGrpMnuAccess.getContainerDataSource().getItemIds();
+		
+		for (Object menuItemId : menuItemIds) 
+		{	
+			if("Experiments".equals(menuItemId.toString().trim()))
+				optGrpMnuAccess.setItemCaption(menuItemId, this.systemSettings.getExperimentPluralLabel());
+     	
+     	  	if("Manage Experiments".equals(menuItemId.toString().trim()))
+     	  		optGrpMnuAccess.setItemCaption(menuItemId, "Manage " + this.systemSettings.getExperimentPluralLabel());
+     	
+     	  	if("Experiment Types".equals(menuItemId.toString().trim()))
+     	  		optGrpMnuAccess.setItemCaption(menuItemId, this.systemSettings.getExperimentTypePluralLabel());
+     
+    		if(menuItemId.toString().trim().startsWith("Experiments /"))
+				optGrpMnuAccess.setItemCaption(menuItemId, optGrpMnuAccess.getItemCaption(menuItemId).replace("Experiments /", this.systemSettings.getExperimentPluralLabel() + " /"));
+     	
+    		if(menuItemId.toString().trim().endsWith("/ Manage Experiments"))
+				optGrpMnuAccess.setItemCaption(menuItemId, optGrpMnuAccess.getItemCaption(menuItemId).replace("/ Manage Experiments", "/ Manage " + this.systemSettings.getExperimentPluralLabel()));
+     	
+    		if(menuItemId.toString().trim().endsWith("/ Experiment Types"))
+				optGrpMnuAccess.setItemCaption(menuItemId, optGrpMnuAccess.getItemCaption(menuItemId).replace("/ Experiment Types", "/ " + this.systemSettings.getExperimentTypePluralLabel()));
+     	}
 	    
 	    layoutPnlMnuAccess.addComponent(optGrpMnuAccess);
 		pnlMnuAccess.setContent(layoutPnlMnuAccess);

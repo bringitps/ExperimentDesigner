@@ -435,6 +435,10 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
     	if(andFilterList.size() > 0)
     		vaadinTblContainer.addContainerFilter(new And(andFilterList.toArray(new Filter[andFilterList.size()])));
     	
+    	Integer totalRecords = tblExperimentDataReport.size();
+    	if (experiment.getExpDbRptTableLastUpdate() != null)
+            this.lblrefreshDate.setValue("Last Refresh Date: " + experiment.getExpDbRptTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
+      
     	filtersApplied = true;        
     }
     
@@ -579,11 +583,10 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
         vaadinTblContainer.refresh();
         experiment = new ExperimentDao().getExperimentById(experiment.getExpId());
         
-        this.lblrefreshDate.setValue("Last Refresh Date: " + experiment.getExpDbRptTableLastUpdate());
-
-        Integer totalRecords = 1 + tblExperimentDataReport.size();
-        this.lblrefreshDate.setValue(this.lblrefreshDate.getValue() + "  [Total Records: " + totalRecords + "]"); 
-        
+        Integer totalRecords = tblExperimentDataReport.size();
+    	if (experiment.getExpDbRptTableLastUpdate() != null)
+            this.lblrefreshDate.setValue("Last Refresh Date: " + experiment.getExpDbRptTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
+              
         if (Constants.SUCCESS == result.get("status")) {
             this.getUI().showNotification(this.systemSettings.getExperimentLabel() + " '" + experiment.getExpName() + "' has been Refresh Successfully.", Notification.Type.HUMANIZED_MESSAGE);
         } else {
@@ -765,7 +768,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
                 //tblQuery.setVersionColumn("RecordId");
                 List<OrderBy> tblOrderByRecordId = Arrays.asList(new OrderBy("RecordId", false));
                 //tblQuery.setOrderBy(tblOrderByRecordId);
-                StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(experiment.getExpDbRptTableNameId(), null, tblOrderByRecordId, 0, 0, "COUNT(*)");
+                //StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(experiment.getExpDbRptTableNameId(), null, tblOrderByRecordId, 0, 0, "COUNT(*)");
                 
                 //System.out.println(sh.getQueryString());
                 
@@ -778,7 +781,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
                 tblExperimentDataReport.setSortContainerPropertyId("RecordId");
                 tblExperimentDataReport.setSortAscending(false);
                 
-                Integer totalRecords = 1 + tblExperimentDataReport.size();
+                Integer totalRecords = tblExperimentDataReport.size();
                 this.lblrefreshDate.setValue(this.lblrefreshDate.getValue() + "  [Total Records: " + totalRecords + "]"); 
                 
                 if (experimentFields != null) {

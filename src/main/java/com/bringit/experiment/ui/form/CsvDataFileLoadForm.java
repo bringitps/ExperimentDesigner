@@ -3,11 +3,14 @@ package com.bringit.experiment.ui.form;
 
 
 import java.sql.ResultSet;
+import java.util.Collection;
 import java.util.List;
 
 import com.bringit.experiment.bll.Experiment;
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.CsvTemplate;
 import com.bringit.experiment.dao.ExperimentDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.CsvTemplateDao;
 import com.bringit.experiment.dao.DataBaseViewDao;
 import com.bringit.experiment.ui.design.CsvDataFileLoadDesign;
@@ -21,6 +24,8 @@ import com.vaadin.ui.Window.CloseEvent;
 
 public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 
+	private SystemSettings systemSettings;
+	
 	public CsvDataFileLoadForm() {
 		
 		ResultSet vwCsvDataLoadExecResults = new DataBaseViewDao().getViewResults("vwCsvDataLoadExecutionResult");
@@ -32,6 +37,19 @@ public class CsvDataFileLoadForm extends CsvDataFileLoadDesign{
 			VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxCsvDataFileLoadsViewFilters, vwCsvDataLoadExecResults);
 			cbxCsvDataFileLoadsViewFilters.setValue(null);
 		}
+		
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		Collection cbxMenuItemIds = cbxCsvDataFileLoadsViewFilters.getContainerDataSource().getItemIds();
+			
+		for (Object cbxMenuItemId : cbxMenuItemIds) 
+		{	
+			if("Experiment".equals(cbxMenuItemId.toString().trim()))
+				cbxCsvDataFileLoadsViewFilters.setItemCaption(cbxMenuItemId, this.systemSettings.getExperimentLabel());
+     	  	
+     	  	if("Experiment Type".equals(cbxMenuItemId.toString().trim()))
+     	  		cbxCsvDataFileLoadsViewFilters.setItemCaption(cbxMenuItemId, this.systemSettings.getExperimentTypeLabel());
+     	}
+		
 		
 		btnProcessCsvDataFile.addClickListener(new Button.ClickListener() {
 			

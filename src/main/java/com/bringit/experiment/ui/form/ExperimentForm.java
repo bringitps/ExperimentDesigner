@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -959,7 +960,10 @@ public class ExperimentForm extends ExperimentDesign {
 		try {
 		
 			Integer rowCnt = 0;
-			reader = new CSVReader(new FileReader(tempCsvFile));
+			//reader = new CSVReader(new FileReader(tempCsvFile));
+			//reader = new CSVReader(new FileReader(tempCsvFile));
+			reader = new CSVReader(new InputStreamReader(new FileInputStream(tempCsvFile), "UTF-8"));
+		
 			if(reader != null)
 			{	
 				String[] csvRow = reader.readNext();
@@ -974,6 +978,7 @@ public class ExperimentForm extends ExperimentDesign {
 				{
 					if(rowCnt == 0)
 					{
+						System.out.println("First column : " + csvRow[0].trim().toLowerCase());
 						//Validate Headers: FieldName, DatabaseId, DatabaseType, UoM
 						if(csvRow[0] == null || (csvRow[0] != null && !csvRow[0].trim().toLowerCase().equals("fieldname")))
 					    {

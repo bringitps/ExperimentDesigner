@@ -46,9 +46,11 @@ import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Window;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -711,6 +713,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 				try {
 				
 					reader = new CSVReader(new FileReader(tempFile));
+					//reader = new CSVReader(new InputStreamReader(new FileInputStream(tempFile), "UTF-8"));
 	    			if(reader != null)
 	    			{
 	    				String[] csvHeader = reader.readNext();

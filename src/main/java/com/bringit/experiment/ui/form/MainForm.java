@@ -14,6 +14,8 @@ import com.vaadin.data.Item;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
+import com.vaadin.ui.Tree;
+import com.vaadin.ui.Tree.ItemStyleGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +47,8 @@ public class MainForm extends MainFormDesign {
     	
     	  	if("Experiment Types".equals(id.toString().trim()))
     	  		treeMainMenu.setItemCaption(id, this.systemSettings.getExperimentTypePluralLabel());
-        }
+       
+    	}
         
         
         treeMainMenu.addContainerProperty("isExperimentDataReport", Boolean.class, null);
@@ -54,7 +57,9 @@ public class MainForm extends MainFormDesign {
         for (Object id : treeMainMenu.rootItemIds()) {
             treeMainMenu.expandItemsRecursively(id);
         }
-
+        
+        treeMainMenu.collapseItem("Configuration");
+            
         List<Experiment> experimentsAvailable = new ExperimentDao().getActiveExperiments();
         if (experimentsAvailable != null) {
             for (int i = 0; i < experimentsAvailable.size(); i++) {

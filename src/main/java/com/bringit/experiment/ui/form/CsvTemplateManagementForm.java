@@ -1,9 +1,12 @@
 package com.bringit.experiment.ui.form;
 
 import java.sql.ResultSet;
+import java.util.Collection;
 import java.util.List;
 
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.dao.DataBaseViewDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.remote.RemoteFileUtil;
 import com.bringit.experiment.ui.design.ExperimentManagementDesign;
 import com.bringit.experiment.ui.design.CsvTemplateManagementDesign;
@@ -21,6 +24,8 @@ import com.vaadin.ui.Window.CloseEvent;
 public class CsvTemplateManagementForm extends CsvTemplateManagementDesign  {
 
 	Integer selectedRecordId = -1;
+	private SystemSettings systemSettings;
+
 	public CsvTemplateManagementForm() {
 		ResultSet vwCsvTemplateResults = new DataBaseViewDao().getViewResults("vwCsvTemplate");
 		if(vwCsvTemplateResults != null)
@@ -28,6 +33,21 @@ public class CsvTemplateManagementForm extends CsvTemplateManagementDesign  {
 			VaadinControls.bindDbViewRsToVaadinTable(tblCsvTemplate, vwCsvTemplateResults, 1);
 			VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxCsvTemplateViewFilters, vwCsvTemplateResults);
 		}
+		
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		Collection cbxMenuItemIds = cbxCsvTemplateViewFilters.getContainerDataSource().getItemIds();
+			
+		for (Object cbxMenuItemId : cbxMenuItemIds) 
+		{	
+			if("Experiment".equals(cbxMenuItemId.toString().trim()))
+				cbxCsvTemplateViewFilters.setItemCaption(cbxMenuItemId, this.systemSettings.getExperimentLabel());
+     	  	
+     	  	if("Experiment Type".equals(cbxMenuItemId.toString().trim()))
+     	  		cbxCsvTemplateViewFilters.setItemCaption(cbxMenuItemId, this.systemSettings.getExperimentTypeLabel());
+     	}
+		
+		
+		
 		
 		tblCsvTemplate.addItemClickListener(new ItemClickEvent.ItemClickListener() 
 	    {

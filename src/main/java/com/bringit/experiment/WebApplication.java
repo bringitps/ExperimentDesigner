@@ -86,7 +86,7 @@ public class WebApplication extends UI {
 		
 		//--- Loading BringIT Logo ---//
 	    String basePath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-	    FileResource imgResource = new FileResource(new File(basePath + "/WEB-INF/classes/images/logo_bring_2.png"));
+	    FileResource imgResource = new FileResource(new File(basePath + "/WEB-INF/classes/images/customer_logo.png"));
 	    Image imgLogo = new Image("", imgResource);
 	    
 		final VerticalLayout headerLayout = new VerticalLayout();

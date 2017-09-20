@@ -58,7 +58,7 @@ public class BatchExperimentRecordsInsertDao {
 								+ " VALUES (" + csvInsertValues.get(i) + "," + (sysUser != null ? ("'" + sysUser.getUserId() + "'") : ("NULL") ) + /*+ sysUser.getUserId() +*/ "," 
 								+ (sysUser != null ? ("'" + sysUser.getUserId() + "'") : ("NULL") ) + /*+ sysUser.getUserId() +*/  ",'" +  df.format(new Date()) + "','" +  df.format(new Date()) + "','"
 								+ dataFile.getDataFileId() +"'," + (contractManufacturerId != null ? ("'" + contractManufacturerId + "'") : ("NULL") )+");";
-						System.out.println("Query to execute: " + sqlQuery);
+						//System.out.println("Query to execute: " + sqlQuery);
 						stmt.addBatch(sqlQuery);
 						stmt.executeBatch();
 						stmt.close();
@@ -76,7 +76,7 @@ public class BatchExperimentRecordsInsertDao {
 								+ (sysUser != null ? ("'" + sysUser.getUserId() + "'") : ("NULL") ) + /*+ sysUser.getUserId() +*/ ",'" +  df.format(new Date()) + "','" +  df.format(new Date()) + "','"
 								+ dataFile.getDataFileId() +"'," + (contractManufacturerId != null ? ("'" + contractManufacturerId + "'") : ("NULL") )+");";
 						
-						System.out.println("New Query:" + sqlQuery);
+						//System.out.println("New Query:" + sqlQuery);
 						
 						stmt.addBatch(sqlQuery);	
 					}

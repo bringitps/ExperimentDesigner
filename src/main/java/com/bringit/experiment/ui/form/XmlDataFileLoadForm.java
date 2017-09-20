@@ -3,12 +3,15 @@ package com.bringit.experiment.ui.form;
 
 
 import java.sql.ResultSet;
+import java.util.Collection;
 import java.util.List;
 
 import com.bringit.experiment.bll.Experiment;
+import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.XmlTemplate;
 import com.bringit.experiment.dao.DataBaseViewDao;
 import com.bringit.experiment.dao.ExperimentDao;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.XmlTemplateDao;
 import com.bringit.experiment.ui.design.XmlDataFileLoadDesign;
 import com.bringit.experiment.util.VaadinControls;
@@ -21,6 +24,8 @@ import com.vaadin.ui.Window.CloseEvent;
 
 public class XmlDataFileLoadForm extends XmlDataFileLoadDesign{
 
+	private SystemSettings systemSettings;
+	
 	public XmlDataFileLoadForm() {
 
 		ResultSet vwXmlDataLoadExecResults = new DataBaseViewDao().getViewResults("vwXmlDataLoadExecutionResult");
@@ -29,6 +34,19 @@ public class XmlDataFileLoadForm extends XmlDataFileLoadDesign{
 			VaadinControls.bindDbViewRsToVaadinTable(tblXmlDataFileLoads, vwXmlDataLoadExecResults, 1);
 			VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxXmlDataFileLoadsViewFilters, vwXmlDataLoadExecResults);
 		}
+		
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		Collection cbxMenuItemIds = cbxXmlDataFileLoadsViewFilters.getContainerDataSource().getItemIds();
+			
+		for (Object cbxMenuItemId : cbxMenuItemIds) 
+		{	
+			if("Experiment".equals(cbxMenuItemId.toString().trim()))
+				cbxXmlDataFileLoadsViewFilters.setItemCaption(cbxMenuItemId, this.systemSettings.getExperimentLabel());
+     	  	
+     	  	if("Experiment Type".equals(cbxMenuItemId.toString().trim()))
+     	  		cbxXmlDataFileLoadsViewFilters.setItemCaption(cbxMenuItemId, this.systemSettings.getExperimentTypeLabel());
+     	}
+		
 		btnProcessXmlDataFile.addClickListener(new Button.ClickListener() {
 			
 			@Override

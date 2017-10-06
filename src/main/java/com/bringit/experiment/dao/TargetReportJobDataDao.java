@@ -150,6 +150,7 @@ public class TargetReportJobDataDao {
         TargetReportJobData targetReportJobData = new TargetReportJobData();
 
         try {
+        	System.out.println("Start of Refreshing Target Report data: " + new Date());
             List<TargetReport> lstTarget = new ArrayList<>();
             if (targetId == null || targetId <= 0) {
                 lstTarget = targetDao.getAllActiveTargetReports();
@@ -159,6 +160,7 @@ public class TargetReportJobDataDao {
 
             for (TargetReport targetReport : lstTarget) {
                 if (this.getActiveTargetJobs(targetReport.getTargetReportId()).size() <= 0) {
+                	System.out.println("Refreshing Target Report data: " + targetReport.getTargetReportName());
                     targetReportJobData = this.createJob(Constants.Auto, null, targetReport.getTargetReportId());
                     map=targetDao.executeTargetProcedure(targetReportJobData, targetReport);
                 } else {
@@ -168,6 +170,7 @@ public class TargetReportJobDataDao {
                     this.updateTargetJobStatus(targetReportJobData, Constants.JOB_NOT_EXECUTED);
                 }
             }
+        	System.out.println("End of Refreshing Target Report data: " + new Date());
         } catch (Exception ex) {
 
             ex.printStackTrace();

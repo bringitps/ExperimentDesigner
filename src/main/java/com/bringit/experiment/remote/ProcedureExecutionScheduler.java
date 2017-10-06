@@ -1,5 +1,7 @@
 package com.bringit.experiment.remote;
 
+import com.bringit.experiment.bll.SystemSettings;
+import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.job.ProcedureExecutionJob;
 import com.bringit.experiment.util.Config;
 import org.quartz.CronScheduleBuilder;
@@ -16,6 +18,8 @@ public class ProcedureExecutionScheduler {
     private static Scheduler scheduler;
     Config configuration = new Config();
 
+    SystemSettings sysSettings = new SystemSettingsDao().getCurrentSystemSettings();
+    
     public void start() {
         try {
             Config configuration = new Config();
@@ -28,13 +32,15 @@ public class ProcedureExecutionScheduler {
                     .newTrigger()
                     .withIdentity("procedureTrigger", "group1")
                     .withSchedule(
-//                            CronScheduleBuilder.cronSchedule("0 " + min + " " + hours + " * * ?"))
-                            CronScheduleBuilder.cronSchedule(configuration.getProperty("procedureCronExp")))
+                    		CronScheduleBuilder.cronSchedule("0 0 0/" + sysSettings.getVisualizationDataRefreshInterval() + " * * ?"))
+                            //CronScheduleBuilder.cronSchedule(configuration.getProperty("procedureCronExp")))
                     .build();
 
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.start();
-            scheduler.scheduleJob(job, trigger);
+           
+            if(sysSettings.getVisualizationDataRefreshInterval() != 0) 
+            	scheduler.scheduleJob(job, trigger);
 
         } catch (SchedulerException ex) {
 

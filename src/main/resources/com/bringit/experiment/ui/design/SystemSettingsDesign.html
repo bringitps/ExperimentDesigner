@@ -30,15 +30,22 @@
     </vaadin-grid-layout> 
    </vaadin-vertical-layout> 
    <vaadin-vertical-layout> 
-    <vaadin-form-layout margin-top="false" margin-bottom="false" _id="frmRenameSystemElements"> 
-     <vaadin-label style-name="h3" size-auto plain-text _id="lblSystemEntitiesLabels">
-       System Entity Labels 
-     </vaadin-label> 
-     <vaadin-text-field required-error="The field is mandatory" caption="Experiment" required style-name="tiny" value="Experiment" _id="txtExperimentLabel"></vaadin-text-field> 
-     <vaadin-text-field required-error="The field is mandatory" caption="Experiment (Plural)" required style-name="tiny" value="Experiments" _id="txtExperimentPluralLabel"></vaadin-text-field> 
-     <vaadin-text-field required-error="The field is mandatory" caption="Experiment Type" required style-name="tiny" value="Experiment Type" _id="txtExperimentTypeLabel"></vaadin-text-field> 
-     <vaadin-text-field required-error="The field is mandatory" caption="Experiment Types (Plural)" required style-name="tiny" value="Experiment Types" _id="txtExperimentTypePluralLabel"></vaadin-text-field> 
-    </vaadin-form-layout> 
+    <vaadin-tab-sheet style-name="framed compact" _id="tabSystemOptions"> 
+     <tab caption="System Entity Labels" selected> 
+      <vaadin-form-layout margin _id="frmRenameSystemElements"> 
+       <vaadin-text-field required-error="The field is mandatory" caption="Experiment" required style-name="tiny" value="Experiment" _id="txtExperimentLabel"></vaadin-text-field> 
+       <vaadin-text-field required-error="The field is mandatory" caption="Experiment (Plural)" required style-name="tiny" value="Experiments" _id="txtExperimentPluralLabel"></vaadin-text-field> 
+       <vaadin-text-field required-error="The field is mandatory" caption="Experiment Type" required style-name="tiny" value="Experiment Type" _id="txtExperimentTypeLabel"></vaadin-text-field> 
+       <vaadin-text-field required-error="The field is mandatory" caption="Experiment Types (Plural)" required style-name="tiny" value="Experiment Types" _id="txtExperimentTypePluralLabel"></vaadin-text-field> 
+      </vaadin-form-layout> 
+     </tab> 
+     <tab caption="Scheduled Data Refresh Options"> 
+      <vaadin-form-layout margin _id="frmScheduledDataRefreshOptions"> 
+       <vaadin-text-field required-error="The field is mandatory" caption="Visualization Data Refresh Interval (Hours)" required style-name="tiny" value="12" _id="txtRefreshDataInterval"></vaadin-text-field> 
+       <vaadin-text-field required-error="The field is mandatory" caption="Target Report Expiration (Days)" required style-name="tiny" value="7" _id="txtTargetReportAutoDeleteInterval"></vaadin-text-field> 
+      </vaadin-form-layout> 
+     </tab> 
+    </vaadin-tab-sheet> 
    </vaadin-vertical-layout> 
   </vaadin-vertical-layout>  
  </body>

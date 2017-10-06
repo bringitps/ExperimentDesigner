@@ -16,6 +16,9 @@ public class RemoteFileListener implements ServletContextListener {
 
         ProcedureExecutionScheduler procedureExecutionScheduler= new ProcedureExecutionScheduler();
         procedureExecutionScheduler.shutdown();
+        
+        TargetReportDeleteScheduler targetReportDeleteScheduler = new TargetReportDeleteScheduler();
+        targetReportDeleteScheduler.shutdown();
     }
 
     @Override
@@ -31,6 +34,9 @@ public class RemoteFileListener implements ServletContextListener {
 
             ProcedureExecutionScheduler procedureExecutionScheduler= new ProcedureExecutionScheduler();
             procedureExecutionScheduler.start();
+            
+            TargetReportDeleteScheduler targetReportDeleteScheduler = new TargetReportDeleteScheduler();
+            targetReportDeleteScheduler.start();
 
         } catch (Exception ex) {
             System.out.println("Error stating Scheduler: "+ex);

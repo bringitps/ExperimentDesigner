@@ -37,7 +37,26 @@
      <vaadin-grid-layout id="gridMainData" width-full height="215px"> 
       <row> 
        <column> 
-        <vaadin-combo-box caption="Experiment:" required style-name="tiny" width-full _id="comboCsvTExperiment"></vaadin-combo-box> 
+        <vaadin-combo-box caption="Experiment:" required style-name="tiny" width="95%" _id="comboCsvTExperiment"></vaadin-combo-box> 
+       </column> 
+       <column> 
+        <vaadin-grid-layout size-full _id="gridAdditionalOptions"> 
+         <row> 
+          <column> 
+           <vaadin-check-box caption="Transform Text Files matching criteria to CSV" style-name="tiny" width-full _id="chxTransformTxt" :middle></vaadin-check-box> 
+          </column> 
+         </row> 
+         <row> 
+          <column> 
+           <vaadin-check-box caption="Csv with column names repeated" _id="chxColumnRepeat" :middle></vaadin-check-box> 
+          </column> 
+         </row> 
+        </vaadin-grid-layout> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-text-field caption="Name:" required style-name="tiny" width="95%" _id="txtCsvTName"></vaadin-text-field> 
        </column> 
        <column> 
         <vaadin-upload caption="Load Csv Layout File" style-name="tiny" immediate width-full _id="upCsv"></vaadin-upload> 
@@ -45,18 +64,10 @@
       </row> 
       <row> 
        <column> 
-        <vaadin-text-field caption="Name:" required style-name="tiny" width-full _id="txtCsvTName"></vaadin-text-field> 
+        <vaadin-text-area caption="Comments:" rows="2" style-name="tiny" width="95%" _id="txtCsvTComments"></vaadin-text-area> 
        </column> 
        <column> 
         <vaadin-combo-box caption="Contract Manufacturer" style-name="tiny" width-full _id="cbxContractManufacturer"></vaadin-combo-box> 
-       </column> 
-      </row> 
-      <row> 
-       <column> 
-        <vaadin-text-area caption="Comments:" rows="2" style-name="tiny" width-full _id="txtCsvTComments"></vaadin-text-area> 
-       </column> 
-       <column> 
-        <vaadin-check-box caption="Transform Text Files matching criteria to CSV" style-name="tiny" width-full _id="chxTransformTxt"></vaadin-check-box> 
        </column> 
       </row> 
      </vaadin-grid-layout> 

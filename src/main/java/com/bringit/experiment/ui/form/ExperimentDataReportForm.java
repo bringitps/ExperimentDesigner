@@ -7,6 +7,7 @@ import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.dao.CmForSysRoleDao;
 import com.bringit.experiment.dao.ContractManufacturerDao;
+import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
 import com.bringit.experiment.dao.ExperimentJobDataDao;
@@ -14,7 +15,7 @@ import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.ui.design.ExperimentDataReportDesign;
 import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.Constants;
-import com.vaadin.addon.tableexport.ExcelExport;
+import com.opencsv.CSVWriter;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -34,9 +35,9 @@ import com.vaadin.data.util.sqlcontainer.query.TableQuery;
 import com.vaadin.data.util.sqlcontainer.query.generator.MSSQLGenerator;
 import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.ShortcutAction;
-import com.vaadin.event.ShortcutListener;
+import com.vaadin.server.FileDownloader;
 import com.vaadin.server.Sizeable;
+import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -49,9 +50,13 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.CloseEvent;
 
-import org.apache.poi.util.Units;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -82,6 +87,11 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
 
     private SystemSettings systemSettings;
 
+    
+    private String sqlQuery = "";    
+    String firstWhereClause = "";
+    List<String> orSqlWhereClause = new ArrayList<String>();
+    List<String> andSqlWhereClause = new ArrayList<String>();
     
     public ExperimentDataReportForm(int experimentId) {
     	
@@ -117,16 +127,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
 
         bindExperimentRptTable();
 
-        //To do:
-        //Include Container Filters to Table according to CM Restrictions
-        //1) Get Role of Session
-        //SysRole sysRoleSession = (SysRole)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
-        //2) Get CmNames String array
-        //3) Set static filter to data loaded
-        //1 Container Filter by 1 CmName
-        //Equal Operator needs to be used vaadinTblContainer.addContainerFilter(new Compare.Equal(this.cbxDateFieldsFilter.getValue(), dateFilterValue1));
-
-        //If there is no Contract Manufacturer loaded into system, there should not have restrictions
+       //If there is no Contract Manufacturer loaded into system, there should not have restrictions
         List<ContractManufacturer> allContractManufacturersLoaded = new ContractManufacturerDao().getAllContractManufacturers();
         if(allContractManufacturersLoaded != null && allContractManufacturersLoaded.size() >0)
         {        
@@ -154,21 +155,6 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
         
         fillCbxExperimentFields(cbxExperimentField1);
     	
-        
-		/*String sqlSelectQuery =  ExperimentUtil.buildSqlSelectQueryByExperiment(experiment, experimentFields);
-		ResultSet experimentDataResults = new ExecuteQueryDao().getSqlSelectQueryResults(sqlSelectQuery);
-		if(experimentDataResults != null)
-		{
-			VaadinControls.bindDbViewRsToVaadinTable(tblExperimentDataReport, experimentDataResults, 1);
-			VaadinControls.bindDbViewStringFiltersToVaadinComboBox(cbxExperimentDataReportFilters, experimentDataResults);
-			VaadinControls.bindDbViewDateFiltersToVaadinComboBox(cbxDateFieldsFilter, experimentDataResults);
-		}
-		*/
-
-       
-        //enableDateFilterComponents(false);
-
-
         btnExportExcel.addClickListener(new Button.ClickListener() {
 
             @Override
@@ -239,9 +225,12 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
     private void applySelectedFilters()
     {
     	String filterExpression = null;
-        
+
     	List<Filter> orFilterList = new ArrayList<>();
     	List<Filter> andFilterList = new ArrayList<>();
+
+    	andSqlWhereClause =  new ArrayList<String>();
+    	orSqlWhereClause =  new ArrayList<String>();
     	
     	for(int i=0; i<multiFilterGrid.getRows(); i++)
     	{
@@ -298,112 +287,268 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
     			switch (cbxFilterOperatorField.getValue().toString().trim()) {
                 case "contains":
                    	if("and".equals(filterExpression))
-                   		andFilterList.add(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%"));//vaadinTblContainer.addContainerFilter(new And(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%")));
+                   	{                   		
+                   		andFilterList.add(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%"));
+                		andSqlWhereClause.add(cbxExperimentField.getValue() + " LIKE '%" + txtStringFilterField.getValue().trim() + "%'");
+                   	}
                 	else
-                		orFilterList.add(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%"));//vaadinTblContainer.addContainerFilter(new Or(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%")));
+                	{
+                		orFilterList.add(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%"));
+                		if(i==0)
+                			firstWhereClause = cbxExperimentField.getValue() + " LIKE '%" + txtStringFilterField.getValue().trim() + "%'";
+                		else
+                			orSqlWhereClause.add(cbxExperimentField.getValue() + " LIKE '%" + txtStringFilterField.getValue().trim() + "%'");
+                	}
                     break;
                 case "doesnotcontain": 
                 	if("and".equals(filterExpression))
-                		andFilterList.add(new Not(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%")));//vaadinTblContainer.addContainerFilter(new And(new Not(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%"))));
+                	{
+                		andFilterList.add(new Not(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%")));
+                		andSqlWhereClause.add(cbxExperimentField.getValue() + " NOT LIKE '%" + txtStringFilterField.getValue().trim() + "%'");
+                	}
                 	else
-                		orFilterList.add(new Not(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%")));//vaadinTblContainer.addContainerFilter(new Or(new Not(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%"))));
+                	{
+                		orFilterList.add(new Not(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim() + "%")));
+                		if(i==0)
+                			firstWhereClause = cbxExperimentField.getValue() + " NOT LIKE '%" + txtStringFilterField.getValue().trim() + "%'";
+                		else
+                			orSqlWhereClause.add(cbxExperimentField.getValue() + " NOT LIKE '%" + txtStringFilterField.getValue().trim() + "%'");
+                	}
                 	break;
                 case "doesnotstartwith":
             		if("and".equals(filterExpression))
-            			andFilterList.add(new Not(new Like(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim() + "%")));//vaadinTblContainer.addContainerFilter(new And(new Not(new Like(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim() + "%"))));
+            		{
+            			andFilterList.add(new Not(new Like(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim() + "%")));
+            			andSqlWhereClause.add(cbxExperimentField.getValue() + " NOT LIKE '" + txtStringFilterField.getValue().trim() + "%'");
+            		}
                 	else
-                		orFilterList.add(new Not(new Like(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim() + "%")));//vaadinTblContainer.addContainerFilter(new Or(new Not(new Like(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim() + "%"))));
+                	{
+                		orFilterList.add(new Not(new Like(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim() + "%")));
+                		if(i==0)
+                			firstWhereClause = cbxExperimentField.getValue() + " NOT LIKE '" + txtStringFilterField.getValue().trim() + "%'";
+                		else
+                			orSqlWhereClause.add(cbxExperimentField.getValue() + " NOT LIKE '" + txtStringFilterField.getValue().trim() + "%'");
+                	}
                 	break;
                 case "endswith":
               		if("and".equals(filterExpression))
-              			andFilterList.add(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim()));//vaadinTblContainer.addContainerFilter(new And(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim())));
+              		{
+              			andFilterList.add(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim()));
+              			andSqlWhereClause.add(cbxExperimentField.getValue() + "  LIKE '%" + txtStringFilterField.getValue().trim() + "'");
+                	}
                 	else
-                		orFilterList.add(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim()));//vaadinTblContainer.addContainerFilter(new Or(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim())));
+                	{
+                		orFilterList.add(new Like(cbxExperimentField.getValue(), "%" + txtStringFilterField.getValue().trim()));
+                		if(i==0)
+                			firstWhereClause = cbxExperimentField.getValue() + "  LIKE '%" + txtStringFilterField.getValue().trim() + "'";
+                		else
+                			orSqlWhereClause.add(cbxExperimentField.getValue() + "  LIKE '%" + txtStringFilterField.getValue().trim() + "'");
+                	}
                     break;
                 case "is":
             		if("and".equals(filterExpression))
-            			andFilterList.add(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim()));//vaadinTblContainer.addContainerFilter(new And(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim())));
+            		{
+            			andFilterList.add(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim()));
+              			andSqlWhereClause.add(cbxExperimentField.getValue() + "  = '" + txtStringFilterField.getValue().trim() + "'");
+            		}
                 	else
-                		orFilterList.add(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim()));//orFilters.add(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim()));
+                	{
+                		orFilterList.add(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim()));
+                		if(i==0)
+                			firstWhereClause = cbxExperimentField.getValue() + "  = '" + txtStringFilterField.getValue().trim() + "'";
+                		else
+                			orSqlWhereClause.add(cbxExperimentField.getValue() + "  = '" + txtStringFilterField.getValue().trim() + "'");
+                	}
                 	break;
                 case "isempty":
                 	if("and".equals(filterExpression))
-                		andFilterList.add(new IsNull(cbxExperimentField.getValue()));//vaadinTblContainer.addContainerFilter(new And(new IsNull(cbxExperimentField.getValue())));
+                	{
+                		List<Filter> emptyFilterList = new ArrayList<>();
+                		emptyFilterList.add(new IsNull(cbxExperimentField.getValue()));
+                		emptyFilterList.add(new Compare.Equal(cbxExperimentField.getValue(), ""));
+                		andFilterList.add(new Or(emptyFilterList.toArray(new Filter[emptyFilterList.size()])));
+                		andSqlWhereClause.add("(" + cbxExperimentField.getValue() + " IS NULL OR " + cbxExperimentField.getValue() + " = '')");
+                	}
                 	else
-                		orFilterList.add(new IsNull(cbxExperimentField.getValue()));//vaadinTblContainer.addContainerFilter(new Or(new IsNull(cbxExperimentField.getValue())));
+                	{
+                		List<Filter> emptyFilterList = new ArrayList<>();
+                		emptyFilterList.add(new IsNull(cbxExperimentField.getValue()));
+                		emptyFilterList.add(new Compare.Equal(cbxExperimentField.getValue(), ""));
+                		orFilterList.add(new Or(emptyFilterList.toArray(new Filter[emptyFilterList.size()])));                		
+                		if(i==0)
+                			firstWhereClause = "(" + cbxExperimentField.getValue() + " IS NULL OR " + cbxExperimentField.getValue() + " = '')";
+                		else
+                			orSqlWhereClause.add("(" + cbxExperimentField.getValue() + " IS NULL OR " + cbxExperimentField.getValue() + " = '')");
+                	}
                     break;
                 case "isnot":
             		if("and".equals(filterExpression))
-            			andFilterList.add(new Not(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim())));//vaadinTblContainer.addContainerFilter(new And(new Not(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim()))));
+            		{
+            			andFilterList.add(new Not(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim())));
+            			andSqlWhereClause.add(cbxExperimentField.getValue() + "  <> '" + txtStringFilterField.getValue().trim() + "'");
+                    }
                 	else
-                		orFilterList.add(new Not(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim())));//vaadinTblContainer.addContainerFilter(new Or(new Not(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim()))));
+                	{
+                		orFilterList.add(new Not(new Compare.Equal(cbxExperimentField.getValue(), txtStringFilterField.getValue().trim())));
+                		if(i==0)
+                			firstWhereClause = cbxExperimentField.getValue() + "  <> '" + txtStringFilterField.getValue().trim() + "'";
+                		else
+                			orSqlWhereClause.add(cbxExperimentField.getValue() + "  <> '" + txtStringFilterField.getValue().trim() + "'");
+                	}
                     break;
                 case "isnotempty":
                 	if("and".equals(filterExpression))
-                		andFilterList.add(new Not(new IsNull(cbxExperimentField.getValue())));//vaadinTblContainer.addContainerFilter(new And(new Not(new IsNull(cbxExperimentField.getValue()))));
+                	{
+                		List<Filter> notEmptyFilterList = new ArrayList<>();
+                		notEmptyFilterList.add(new Not(new IsNull(cbxExperimentField.getValue())));
+                		notEmptyFilterList.add(new Not(new Compare.Equal(cbxExperimentField.getValue(), "")));
+                		andFilterList.add(new And(notEmptyFilterList.toArray(new Filter[notEmptyFilterList.size()])));                		
+                		andSqlWhereClause.add("(" + cbxExperimentField.getValue() + " IS NOT NULL OR " + cbxExperimentField.getValue() + " <> '')");
+                	}
                 	else
-                		orFilterList.add(new Not(new IsNull(cbxExperimentField.getValue())));//vaadinTblContainer.addContainerFilter(new Or(new Not(new IsNull(cbxExperimentField.getValue()))));
+                	{
+                		List<Filter> notEmptyFilterList = new ArrayList<>();
+                		notEmptyFilterList.add(new Not(new IsNull(cbxExperimentField.getValue())));
+                		notEmptyFilterList.add(new Not(new Compare.Equal(cbxExperimentField.getValue(), "")));
+                		orFilterList.add(new And(notEmptyFilterList.toArray(new Filter[notEmptyFilterList.size()])));                		
+                		if(i==0)
+                			firstWhereClause = "(" + cbxExperimentField.getValue() + " IS NOT NULL OR " + cbxExperimentField.getValue() + " <> '')";
+                		else
+                			orSqlWhereClause.add("(" + cbxExperimentField.getValue() + " IS NOT NULL OR " + cbxExperimentField.getValue() + " <> '')");
+                	}
                     break;
                 case "startswith":
                    	if("and".equals(filterExpression))
-                   		andFilterList.add(new Like(cbxExperimentField.getValue(),  txtStringFilterField.getValue().trim() + "%"));//vaadinTblContainer.addContainerFilter(new And(new Like(cbxExperimentField.getValue(),  txtStringFilterField.getValue().trim() + "%")));
+                   	{
+                   		andFilterList.add(new Like(cbxExperimentField.getValue(),  txtStringFilterField.getValue().trim() + "%"));
+                   		andSqlWhereClause.add(cbxExperimentField.getValue() + " LIKE '" + txtStringFilterField.getValue().trim() + "%'");
+                	}	
                 	else
-                		orFilterList.add(new Like(cbxExperimentField.getValue(),  txtStringFilterField.getValue().trim() + "%"));//vaadinTblContainer.addContainerFilter(new Or(new Like(cbxExperimentField.getValue(),  txtStringFilterField.getValue().trim() + "%")));
+                	{
+                		orFilterList.add(new Like(cbxExperimentField.getValue(),  txtStringFilterField.getValue().trim() + "%"));
+                		if(i==0)
+                			firstWhereClause = cbxExperimentField.getValue() + " LIKE '" + txtStringFilterField.getValue().trim() + "%'";
+                		else
+                			orSqlWhereClause.add(cbxExperimentField.getValue() + " LIKE '" + txtStringFilterField.getValue().trim() + "%'");                		
+                	}
                 	break;
     			}
     		}
     		else
     		{
-    			Date dateFilterValue1 = fromDateFilterField.getValue();
-                Date dateFilterValue2 = toDateFilterField.getValue();
+    		    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    		    
+    			Date dateFilterValue1 = new Date(fromDateFilterField.getValue().getTime());
+                Date dateFilterValue2 = new Date(fromDateFilterField.getValue().getTime());
 
+                
                 if (cbxFilterOperatorField.getValue().equals("between")) {
+                    dateFilterValue2 = new Date(toDateFilterField.getValue().getTime());
                     dateFilterValue2.setHours(23);
                     dateFilterValue2.setMinutes(59);
                     dateFilterValue2.setSeconds(59);
                     if("and".equals(filterExpression))
-                    	andFilterList.add(new Between(cbxExperimentField.getValue(), dateFilterValue1, dateFilterValue2));//vaadinTblContainer.addContainerFilter(new And(new Between(cbxExperimentField.getValue(), dateFilterValue1, dateFilterValue2)));
+                    {
+                    	andFilterList.add(new Between(cbxExperimentField.getValue(), dateFilterValue1, dateFilterValue2));
+                		andSqlWhereClause.add(cbxExperimentField.getValue() + " BETWEEN '" + df.format(dateFilterValue1) + "' AND '" + df.format(dateFilterValue2) + "'");
+                    }
                     else
-                    	orFilterList.add(new Between(cbxExperimentField.getValue(), dateFilterValue1, dateFilterValue2));//vaadinTblContainer.addContainerFilter(new Or(new Between(cbxExperimentField.getValue(), dateFilterValue1, dateFilterValue2)));
+                    {
+                    	orFilterList.add(new Between(cbxExperimentField.getValue(), dateFilterValue1, dateFilterValue2));
+                    	if(i==0)
+                			firstWhereClause = cbxExperimentField.getValue() + " BETWEEN '" + df.format(dateFilterValue1) + "' AND '" + df.format(dateFilterValue2) + "'";
+                		else
+                			orSqlWhereClause.add(cbxExperimentField.getValue() + " BETWEEN '" + df.format(dateFilterValue1) + "' AND '" + df.format(dateFilterValue2) + "'");
+                    }
                 } else {
                     String sqlDateFilterOperator = "";
 
                     switch (cbxFilterOperatorField.getValue().toString().trim()) {
                         case "on":
+                        	dateFilterValue2.setHours(23);
+                            dateFilterValue2.setMinutes(59);
+                            dateFilterValue2.setSeconds(59);
+                       		
                            	if("and".equals(filterExpression))
-                           		andFilterList.add(new Compare.Equal(cbxExperimentField.getValue(), dateFilterValue1));//vaadinTblContainer.addContainerFilter(new And(new Compare.Equal(cbxExperimentField.getValue(), dateFilterValue1)));
+                           	{
+                              	andFilterList.add(new Between(cbxExperimentField.getValue(), dateFilterValue1, dateFilterValue2));
+                        		andSqlWhereClause.add(cbxExperimentField.getValue() + " BETWEEN '" + df.format(dateFilterValue1) + "' AND '" + df.format(dateFilterValue2) + "'");
+                            }
                            	else
-        	                	orFilterList.add(new Compare.Equal(cbxExperimentField.getValue(), dateFilterValue1));//vaadinTblContainer.addContainerFilter(new Or(new Compare.Equal(cbxExperimentField.getValue(), dateFilterValue1)));
+                           	{
+                              	orFilterList.add(new Between(cbxExperimentField.getValue(), dateFilterValue1, dateFilterValue2));
+                              	if(i==0)
+                        			firstWhereClause = cbxExperimentField.getValue() + " BETWEEN '" + df.format(dateFilterValue1) + "' AND '" + df.format(dateFilterValue2) + "'";
+                        		else
+                        			orSqlWhereClause.add(cbxExperimentField.getValue() + " BETWEEN '" + df.format(dateFilterValue1) + "' AND '" + df.format(dateFilterValue2) + "'");
+                           	}
         	                break;
                         case "before":
                          	if("and".equals(filterExpression))
-                         		andFilterList.add(new Compare.Less(cbxExperimentField.getValue(), dateFilterValue1));//vaadinTblContainer.addContainerFilter(new And(new Compare.Less(cbxExperimentField.getValue(), dateFilterValue1)));
+                         	{
+                         		andFilterList.add(new Compare.Less(cbxExperimentField.getValue(), dateFilterValue1));
+                           		andSqlWhereClause.add(cbxExperimentField.getValue() + " < '" + df.format(dateFilterValue1) + "'");
+                         	}
     	                    else
-    	                    	orFilterList.add(new Compare.Less(cbxExperimentField.getValue(), dateFilterValue1));//vaadinTblContainer.addContainerFilter(new Or(new Compare.Less(cbxExperimentField.getValue(), dateFilterValue1)));
+    	                    {
+    	                    	orFilterList.add(new Compare.Less(cbxExperimentField.getValue(), dateFilterValue1));
+    	                    	if(i==0)
+    	                			firstWhereClause = cbxExperimentField.getValue() + " < '" + df.format(dateFilterValue1) + "'";
+    	                		else
+    	                			orSqlWhereClause.add(cbxExperimentField.getValue() + " < '" + df.format(dateFilterValue1) + "'");
+    	                    }
     	                    break;
                         case "after":
-                            dateFilterValue1.setHours(23);
+                        	dateFilterValue1.setHours(23);
                             dateFilterValue1.setMinutes(59);
                             dateFilterValue1.setSeconds(59);
-                            if("and".equals(filterExpression))
-                            	andFilterList.add(new Compare.Greater(cbxExperimentField.getValue(), dateFilterValue1));//vaadinTblContainer.addContainerFilter(new And(new Compare.Greater(cbxExperimentField.getValue(), dateFilterValue1)));
+                       		if("and".equals(filterExpression))
+                            {
+                                andFilterList.add(new Compare.Greater(cbxExperimentField.getValue(), dateFilterValue1));
+                           		andSqlWhereClause.add(cbxExperimentField.getValue() + " > '" + df.format(dateFilterValue1) + "'");
+                            }
     	                    else
-    	                    	orFilterList.add(new Compare.Greater(cbxExperimentField.getValue(), dateFilterValue1));//vaadinTblContainer.addContainerFilter(new Or(new Compare.Greater(cbxExperimentField.getValue(), dateFilterValue1)));
+    	                    {
+                                orFilterList.add(new Compare.Greater(cbxExperimentField.getValue(), dateFilterValue1));
+                                if(i==0)
+                        			firstWhereClause = cbxExperimentField.getValue() + " > '" + df.format(dateFilterValue1) + "'";
+                        		else
+                        			orSqlWhereClause.add(cbxExperimentField.getValue() + " > '" + df.format(dateFilterValue1) + "'");
+    	                    }
     	                    break;
                         case "onorbefore":
-                            dateFilterValue1.setHours(23);
+                        	dateFilterValue1.setHours(23);
                             dateFilterValue1.setMinutes(59);
                             dateFilterValue1.setSeconds(59);
+                        	
                             if("and".equals(filterExpression))
-                            	andFilterList.add(new Compare.LessOrEqual(cbxExperimentField.getValue(), dateFilterValue1));//vaadinTblContainer.addContainerFilter(new And(new Compare.LessOrEqual(cbxExperimentField.getValue(), dateFilterValue1)));
+                            {
+                                andFilterList.add(new Compare.LessOrEqual(cbxExperimentField.getValue(), dateFilterValue1));
+                           		andSqlWhereClause.add(cbxExperimentField.getValue() + " <= '" + df.format(dateFilterValue1) + "'");
+                            }
     	                    else
-    	                    	orFilterList.add(new Compare.LessOrEqual(cbxExperimentField.getValue(), dateFilterValue1));//vaadinTblContainer.addContainerFilter(new Or(new Compare.LessOrEqual(cbxExperimentField.getValue(), dateFilterValue1)));
+    	                    {
+                            	orFilterList.add(new Compare.LessOrEqual(cbxExperimentField.getValue(), dateFilterValue1));
+                            	if(i==0)
+                        			firstWhereClause = cbxExperimentField.getValue() + " <= '" + df.format(dateFilterValue1) + "'";
+                        		else
+                        			orSqlWhereClause.add(cbxExperimentField.getValue() + " <= '" + df.format(dateFilterValue1) + "'");
+    	                    }
     	                    break;
                         case "onorafter":
                             if("and".equals(filterExpression))
-                            	andFilterList.add(new Compare.GreaterOrEqual(cbxExperimentField.getValue(), dateFilterValue1));//vaadinTblContainer.addContainerFilter(new And(new Compare.GreaterOrEqual(cbxExperimentField.getValue(), dateFilterValue1)));
+                            {
+                            	andFilterList.add(new Compare.GreaterOrEqual(cbxExperimentField.getValue(), dateFilterValue1));
+                           		andSqlWhereClause.add(cbxExperimentField.getValue() + " >= '" + df.format(dateFilterValue1) + "'");
+                            }
     	                    else
-    	                    	orFilterList.add(new Compare.GreaterOrEqual(cbxExperimentField.getValue(), dateFilterValue1));//vaadinTblContainer.addContainerFilter(new Or(new Compare.GreaterOrEqual(cbxExperimentField.getValue(), dateFilterValue1)));
+    	                    {
+    	                    	orFilterList.add(new Compare.GreaterOrEqual(cbxExperimentField.getValue(), dateFilterValue1));
+    	                    	if(i==0)
+    	                			firstWhereClause = cbxExperimentField.getValue() + " >= '" + df.format(dateFilterValue1) + "'";
+    	                		else
+    	                			orSqlWhereClause.add(cbxExperimentField.getValue() + " >= '" + df.format(dateFilterValue1) + "'");
+    	                    }
     	                    break;
                     }
                 }	    			
@@ -435,10 +580,58 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
     	if(andFilterList.size() > 0)
     		vaadinTblContainer.addContainerFilter(new And(andFilterList.toArray(new Filter[andFilterList.size()])));
     	
+    	 Config configuration = new Config();
+
+         if (configuration.getProperty("dbms").equals("sqlserver")) {
+             String dbHost = configuration.getProperty("dbhost");
+             String dbPort = configuration.getProperty("dbport");
+             String dbDatabase = configuration.getProperty("dbdatabase");
+             String dbUsername = configuration.getProperty("dbusername");
+             String dbPassword = configuration.getProperty("dbpassword");
+
+             SimpleJDBCConnectionPool connectionPool;
+
+             try {
+                 connectionPool = new SimpleJDBCConnectionPool("com.microsoft.sqlserver.jdbc.SQLServerDriver",
+                         "jdbc:sqlserver://" + dbHost + ":" + dbPort + ";databaseName=" + dbDatabase,
+                         dbUsername, dbPassword);
+                
+                 TableQuery tblQuery = new TableQuery(experiment.getExpDbRptTableNameId(), connectionPool, new MSSQLGenerator());
+                 List<OrderBy> tblOrderByRecordId = Arrays.asList(new OrderBy("RecordId", false));
+                 StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(experiment.getExpDbRptTableNameId(), null, tblOrderByRecordId, 0, 0, null);
+                 sqlQuery = sh.getQueryString();
+                 
+                 String sqlWhereClause = " WHERE " + firstWhereClause;
+                 
+                 for(int i=0; i < andSqlWhereClause.size(); i++)
+                 	 sqlWhereClause += " AND (" + andSqlWhereClause.get(i) + ")";
+                 
+                 for(int i=0; i < orSqlWhereClause.size(); i++)
+                 	 sqlWhereClause += " OR (" + orSqlWhereClause.get(i) + ")";
+                 
+                 String sqlColumnLabels = "";
+                 List<Object> asList = new ArrayList<Object>(Arrays.asList(tblExperimentDataReport.getVisibleColumns()));
+                 for(int i=0; i<asList.size(); i++)
+                 	sqlColumnLabels += "\"" + asList.get(i).toString() + "\" AS \"" +  tblExperimentDataReport.getColumnHeader(asList.get(i)) + "\",";
+                 
+                 sqlColumnLabels = sqlColumnLabels.substring(0, sqlColumnLabels.length() - 1);
+                 
+                 sqlQuery = sqlQuery.replace("SELECT *", "SELECT " + sqlColumnLabels);
+                 sqlQuery = sqlQuery.replace("ORDER BY", " " + sqlWhereClause + " ORDER BY");
+                 
+                 //System.out.println("Built Query: " + sqlQuery);
+                 
+             } catch (SQLException e) {
+                 // TODO Auto-generated catch block
+                 e.printStackTrace();
+             }
+         }
     	Integer totalRecords = tblExperimentDataReport.size();
     	if (experiment.getExpDbRptTableLastUpdate() != null)
             this.lblrefreshDate.setValue("Last Refresh Date: " + experiment.getExpDbRptTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
       
+    	
+    	
     	filtersApplied = true;        
     }
     
@@ -690,26 +883,21 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
     	cbxExperimentFields.setItemCaption("LastModifiedDate", "Last Modified Date");
     }    
     
-    /*
-    private void showFilter2(boolean visible) {
-        dtFilter2.setValue(null);
-        dtFilter2.setVisible(visible);
-    }
-
-    */
-
-    
     private void exportExperimentDataReportToExcel() {
         if (this.tblExperimentDataReport.getItemIds() != null) {
-            System.out.println("Starting export: " + new Date());
-
+        
+        	System.out.println("Starting export: " + new Date());
+        	/*
             ExcelExport xlsExport = new ExcelExport(tblExperimentDataReport, new XSSFWorkbook(), lblExperimentTitle.getValue().trim(), null, lblExperimentTitle.getValue().trim() + ".xlsx", false);
             xlsExport.setMimeType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             xlsExport.setUseTableFormatPropertyValue(false);
-            xlsExport.export();
+            xlsExport.export();*/
+        	
+        	
             System.out.println("Finishing export: " + new Date());
 
         }
+        
     }
 
     private void openDataViewRecordCRUDModalWindow(int experimentRecordId) {
@@ -768,9 +956,16 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
                 //tblQuery.setVersionColumn("RecordId");
                 List<OrderBy> tblOrderByRecordId = Arrays.asList(new OrderBy("RecordId", false));
                 //tblQuery.setOrderBy(tblOrderByRecordId);
-                //StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(experiment.getExpDbRptTableNameId(), null, tblOrderByRecordId, 0, 0, "COUNT(*)");
+                StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(experiment.getExpDbRptTableNameId(), null, tblOrderByRecordId, 0, 0, null);
+                sqlQuery = sh.getQueryString();
+                //System.out.println("SQL Query to Export Excel file: " + sqlQuery);
+                
+               
+                
                 
                 //System.out.println(sh.getQueryString());
+                
+                
                 
                 
                 
@@ -850,6 +1045,20 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
 
 
                     tblExperimentDataReport.setVisibleColumns(expFieldDbId);
+                    
+
+                    String sqlColumnLabels = "";
+                    List<Object> asList = new ArrayList<Object>(Arrays.asList(tblExperimentDataReport.getVisibleColumns()));
+                    for(int i=0; i<asList.size(); i++)
+                    	sqlColumnLabels += "\"" + asList.get(i).toString() + "\" AS \"" +  tblExperimentDataReport.getColumnHeader(asList.get(i)) + "\",";
+                    
+                    sqlColumnLabels = sqlColumnLabels.substring(0, sqlColumnLabels.length() - 1);
+                    
+                    sqlQuery = sqlQuery.replace("SELECT *", "SELECT " + sqlColumnLabels);
+                    
+                    sqlResultAttachCsvFileDownloaderToButton(this.btnExportExcel);
+                    
+                    
                 }
 
             } catch (SQLException e) {
@@ -858,5 +1067,40 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
             }
         }
     }
+
+	public void sqlResultAttachCsvFileDownloaderToButton(Button downloadBtn)
+	{	
+		 FileDownloader downloader = new FileDownloader(new StreamResource(
+                 new StreamResource.StreamSource() {
+                     @Override
+                     public InputStream getStream() {
+                    	InputStream is = null;
+                     	ResultSet experimentDataRecordResults = new ExecuteQueryDao().getSqlSelectQueryResults(sqlQuery);
+                 		if(experimentDataRecordResults != null)
+                 		{                 			
+                 			try {
+                 				ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
+             					CSVWriter writer = new CSVWriter(new OutputStreamWriter(csvOutputStream), ',',
+                     					CSVWriter.DEFAULT_QUOTE_CHARACTER, CSVWriter.NO_ESCAPE_CHARACTER, "\n");
+                 				Boolean includeHeaders = true;
+
+             					writer.writeAll(experimentDataRecordResults, includeHeaders);
+             					writer.close();
+             					
+             					is = new ByteArrayInputStream(csvOutputStream.toByteArray());
+             					
+             				} catch (SQLException | IOException e) {
+             					// TODO Auto-generated catch block
+             					e.printStackTrace();
+             				}
+
+                 			
+                       }
+                          return is;
+                     	}
+                 }, lblExperimentTitle.getValue().trim() + ".csv"));
+         downloader.extend(downloadBtn);
+		
+	}
 
 }

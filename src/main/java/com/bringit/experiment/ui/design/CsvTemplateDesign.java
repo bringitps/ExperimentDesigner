@@ -38,7 +38,9 @@ public class CsvTemplateDesign extends VerticalLayout {
 	protected TextField txtCsvTName;
 	protected ComboBox cbxContractManufacturer;
 	protected TextArea txtCsvTComments;
+	protected GridLayout gridAdditionalOptions;
 	protected CheckBox chxTransformTxt;
+	protected CheckBox chxColumnRepeat;
 	protected Accordion csvTJobAndMap;
 	protected VerticalLayout csvTJobLayout;
 	protected CheckBox chxNotScheduled;

@@ -40,6 +40,9 @@ public class CsvTemplate {
 	@Column(name="CsvTemplateTransformTxtFound")
 	private Boolean csvTemplateTransformTxtFound;
 	
+	@Column(name="CsvTemplateColumnsRepated")
+	private Boolean csvTemplateColumnsRepeated;
+		
 	@Column(name="CsvTemplatePrefix")
 	private String csvTemplatePrefix;
 
@@ -105,6 +108,7 @@ public class CsvTemplate {
 		this.CsvTemplateName = null;
 		this.csvTemplateComments = null;
 		this.csvTemplateTransformTxtFound = null;
+		this.csvTemplateColumnsRepeated = null;
 		this.csvTemplatePrefix = null;
 		this.csvTemplateSuffix = null;
 		this.csvTemplateRegex = null;
@@ -126,7 +130,8 @@ public class CsvTemplate {
 	
 	
 	public CsvTemplate(Integer csvTemplateId, Boolean csvTemplateIsActive, String csvTemplateName,
-			String csvTemplateComments,  Boolean csvTemplateTransformTxtFound, String csvTemplatePrefix, String csvTemplateSuffix, String csvTemplateRegex, 
+			String csvTemplateComments,  Boolean csvTemplateTransformTxtFound, Boolean csvTemplateColumnsRepeated, 
+			String csvTemplatePrefix, String csvTemplateSuffix, String csvTemplateRegex, 
 			Boolean csvTemplateNotScheduled, Date csvTemplateExecStartDate,
 			Integer csvTemplateExecStartHour, Date csvTemplateExecEndDate, Date createdDate, Date modifiedDate,
 			ContractManufacturer contractManufacturer, FilesRepository inboundFileRepo,
@@ -137,6 +142,7 @@ public class CsvTemplate {
 		this.CsvTemplateName = csvTemplateName;
 		this.csvTemplateComments = csvTemplateComments;
 		this.csvTemplateTransformTxtFound = csvTemplateTransformTxtFound;
+		this.csvTemplateColumnsRepeated = csvTemplateColumnsRepeated;
 		this.csvTemplatePrefix = csvTemplatePrefix;
 		this.csvTemplateSuffix = csvTemplateSuffix;
 		this.csvTemplateRegex = csvTemplateRegex;
@@ -185,12 +191,18 @@ public class CsvTemplate {
 		return csvTemplateTransformTxtFound;
 	}
 
-
 	public void setCsvTemplateTransformTxtFound(Boolean csvTemplateTransformTxtFound) {
 		this.csvTemplateTransformTxtFound = csvTemplateTransformTxtFound;
 	}
 
+	public Boolean getCsvTemplateColumnsRepeated() {
+		return csvTemplateColumnsRepeated;
+	}
 
+	public void setCsvTemplateColumnsRepeated(Boolean csvTemplateColumnsRepeated) {
+		this.csvTemplateColumnsRepeated = csvTemplateColumnsRepeated;
+	}
+	
 	public String getCsvTemplatePrefix() {
 		return csvTemplatePrefix;
 	}

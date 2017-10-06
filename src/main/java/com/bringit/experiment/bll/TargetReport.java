@@ -44,6 +44,18 @@ public class TargetReport {
 	@Type(type="text")
 	private String targetReportDescription;
 
+	@Column(name="TargetReportWhatIf")
+	private Boolean targetReportWhatIf;
+
+	 @JoinColumn(name="TargetReportWhatIfDateColumnLabel")
+	private String targetReportWhatIfDateColumnLabel;
+	
+	@Column(name="TargetReportWhatIfDateFrom")
+	private Date targetReportWhatIfDateFrom;
+	
+	@Column(name="TargetReportWhatIfDateTo")
+	private Date targetReportWhatIfDateTo;
+			
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExpId", unique=false, updatable=true)
 	private Experiment experiment;
@@ -53,6 +65,10 @@ public class TargetReport {
 	
 	@Column(name="ModifiedDate")
 	private Date modifiedDate;
+	
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="TargetReportWhatIfDateExpFieldId", unique=false, updatable=true)
+	private ExperimentField targetReportWhatIfDateExpField;
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="CreatedBy", unique=false, updatable=false)
@@ -67,6 +83,11 @@ public class TargetReport {
 		this.targetReportIsActive = null;
 		this.targetReportName = null;
 		this.targetReportDescription = null;
+		this.targetReportWhatIf = null;
+		this.targetReportWhatIfDateColumnLabel = null;
+		this.targetReportWhatIfDateFrom = null;
+		this.targetReportWhatIfDateTo = null;
+		this.targetReportWhatIfDateExpField = null;
 		this.experiment = null;
 		this.createdDate = null;
 		this.modifiedDate = null;
@@ -76,11 +97,17 @@ public class TargetReport {
 	
 	public TargetReport(Integer targetReportId, Boolean targetReportIsActive, String targetReportName,
 			String targetReportDescription, Experiment experiment, Date createdDate, Date modifiedDate,
-			SysUser createdBy, SysUser lastModifiedBy) {
+			Boolean targetReportWhatIf, String targetReportWhatIfDateColumnLabel, Date targetReportWhatIfDateFrom, Date targetReportWhatIfDateTo,
+			ExperimentField targetReportWhatIfDateExpField, SysUser createdBy, SysUser lastModifiedBy) {
 		this.targetReportId = targetReportId;
 		this.targetReportIsActive = targetReportIsActive;
 		this.targetReportName = targetReportName;
 		this.targetReportDescription = targetReportDescription;
+		this.targetReportWhatIf = targetReportWhatIf;
+		this.targetReportWhatIfDateColumnLabel = targetReportWhatIfDateColumnLabel;
+		this.targetReportWhatIfDateFrom = targetReportWhatIfDateFrom;
+		this.targetReportWhatIfDateTo = targetReportWhatIfDateTo;
+		this.targetReportWhatIfDateExpField = targetReportWhatIfDateExpField;
 		this.experiment = experiment;
 		this.createdDate = createdDate;
 		this.modifiedDate = modifiedDate;
@@ -136,6 +163,46 @@ public class TargetReport {
 		this.targetReportDescription = targetReportDescription;
 	}
 
+	public Boolean getTargetReportWhatIf() {
+		return targetReportWhatIf;
+	}
+
+	public void setTargetReportWhatIf(Boolean targetReportWhatIf) {
+		this.targetReportWhatIf = targetReportWhatIf;
+	}
+	
+	public String getTargetReportWhatIfDateColumnLabel() {
+		return targetReportWhatIfDateColumnLabel;
+	}
+
+	public void setTargetReportWhatIfDateColumnLabel(String targetReportWhatIfDateColumnLabel) {
+		this.targetReportWhatIfDateColumnLabel = targetReportWhatIfDateColumnLabel;
+	}
+
+	public ExperimentField getTargetReportWhatIfDateExpField() {
+		return targetReportWhatIfDateExpField;
+	}
+
+	public void setTargetReportWhatIfDateExpField(ExperimentField targetReportWhatIfDateExpField) {
+		this.targetReportWhatIfDateExpField = targetReportWhatIfDateExpField;
+	}
+
+	public Date getTargetReportWhatIfDateFrom() {
+		return targetReportWhatIfDateFrom;
+	}
+
+	public void setTargetReportWhatIfDateFrom(Date targetReportWhatIfDateFrom) {
+		this.targetReportWhatIfDateFrom = targetReportWhatIfDateFrom;
+	}
+	
+	public Date getTargetReportWhatIfDateTo() {
+		return targetReportWhatIfDateTo;
+	}
+
+	public void setTargetReportWhatIfDateTo(Date targetReportWhatIfDateTo) {
+		this.targetReportWhatIfDateTo = targetReportWhatIfDateTo;
+	}
+	
 	public Experiment getExperiment() {
 		return experiment;
 	}

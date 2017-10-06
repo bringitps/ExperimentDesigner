@@ -114,6 +114,32 @@ public class ExperimentParser {
 	        		    			return respObj;
 	        		            }
 	        		            
+	        		    
+	        		            if(template.getCsvTemplateColumnsRepeated() != null && template.getCsvTemplateColumnsRepeated())
+	        		            {
+	        		            	//Same column name scenario
+	        		            	List<String> addedCsvColumnNameMtx = new ArrayList<String>();
+	        		            	List<Integer> addedCsvColumnTimesMtx = new ArrayList<Integer>();
+	        		    		
+	        		            	for(int i=0; i<header.length; i++)
+	        		            	{
+	        		            		String csvColumnName = header[i];
+	        		            		Integer csvColumnAddedTimes = 0;
+	        		            		if(addedCsvColumnNameMtx.indexOf(header[i]) != -1)
+	        		            		{
+	        		            			csvColumnAddedTimes = addedCsvColumnTimesMtx.get(addedCsvColumnNameMtx.indexOf(csvColumnName));
+	        		            			csvColumnAddedTimes = csvColumnAddedTimes + 1;
+	        		            			addedCsvColumnTimesMtx.set(addedCsvColumnNameMtx.indexOf(header[i]), csvColumnAddedTimes);
+	        		            			header[i] = header[i]  + "_" + csvColumnAddedTimes;
+	        		            		}
+	        		            		else
+	        		            		{
+	        		            			addedCsvColumnNameMtx.add(header[i]);
+	        		            			addedCsvColumnTimesMtx.add(0);
+	        		            		}
+	        		    			}
+	        		            }
+	        		            
 	        		            //--- Start ---//
 	        		            //Edgar B. 5/3/2017
 	        		            //Solution to Null Pointer and Mandatory Columns for CSV Processing

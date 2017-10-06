@@ -136,6 +136,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			if(csvt.getExceptionFileRepo() != null) this.comboCsvTerrRepo.setValue(csvt.getExceptionFileRepo().getFileRepoId());
 			this.txtCsvTComments.setValue(csvt.getCsvTemplateComments());
 			if(csvt.getCsvTemplateTransformTxtFound() != null) this.chxTransformTxt.setValue(csvt.getCsvTemplateTransformTxtFound());
+			if(csvt.getCsvTemplateColumnsRepeated() != null) this.chxColumnRepeat.setValue(csvt.getCsvTemplateColumnsRepeated());
 			
 			String opFilterSavedCriteria = "Prefix"; 
 			
@@ -393,6 +394,7 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 			
 			this.csvt.setCsvTemplateComments(this.txtCsvTComments.getValue());
 			this.csvt.setCsvTemplateTransformTxtFound(this.chxTransformTxt.getValue());
+			this.csvt.setCsvTemplateColumnsRepeated(this.chxColumnRepeat.getValue());
 			
 			this.csvt.setExceptionFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvTerrRepo.getValue()));
 			this.csvt.setProcessedFileRepo(new FilesRepositoryDao().getFilesRepositoryById((int) this.comboCsvoutRepo.getValue()));
@@ -783,16 +785,34 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 		ExperimentDao expdao = new ExperimentDao();
 		Experiment expNew = expdao.getExperimentById((int)(this.comboCsvTExperiment.getValue()));
 		expFields = new ExperimentFieldDao().getActiveExperimentFields(expNew);
-	
+
+		//Same column name scenario
+		List<String> addedCsvColumnNameMtx = new ArrayList<String>();
+		List<Integer> addedCsvColumnTimesMtx = new ArrayList<Integer>();
+		
 		Object[] itemValues = new Object[5];
 		for(int i=0; i<columns.length; i++)
 		{
+			String csvColumnName = columns[i];
+			Integer csvColumnAddedTimes = 0;
+			
+			if(this.chxColumnRepeat.getValue() != null && this.chxColumnRepeat.getValue())
+			{
+				if(addedCsvColumnNameMtx.indexOf(columns[i]) != -1)
+				{
+					csvColumnAddedTimes = addedCsvColumnTimesMtx.get(addedCsvColumnNameMtx.indexOf(csvColumnName));
+					csvColumnAddedTimes = csvColumnAddedTimes + 1;
+				
+					csvColumnName = csvColumnName + "_" + csvColumnAddedTimes;
+				}
+			}
+			
 			CheckBox chxSelect = new CheckBox();
 			chxSelect.setVisible(false);
 			itemValues[0] = chxSelect;
 			
 			TextField txtCsvColName = new TextField();
-			txtCsvColName.setValue(columns[i]);
+			txtCsvColName.setValue(csvColumnName);
 			txtCsvColName.setReadOnly(true);
 			txtCsvColName.addStyleName("tiny");
 			txtCsvColName.setWidth(100, Unit.PERCENTAGE);
@@ -845,9 +865,18 @@ public class CsvTemplateForm extends CsvTemplateDesign {
 	        });
 
 			this.tblCsvCols.addItem(itemValues, this.lastNewItemId);
-			
+
+			if(this.chxColumnRepeat.getValue() != null && this.chxColumnRepeat.getValue())
+			{
+				if(addedCsvColumnNameMtx.indexOf(columns[i]) != -1)
+					addedCsvColumnTimesMtx.set(addedCsvColumnNameMtx.indexOf(columns[i]), csvColumnAddedTimes);
+				else
+				{
+					addedCsvColumnNameMtx.add(columns[i]);
+					addedCsvColumnTimesMtx.add(0);
+				}
+			}
 		}
-		
 	}
 
 	private void fillCombos() {

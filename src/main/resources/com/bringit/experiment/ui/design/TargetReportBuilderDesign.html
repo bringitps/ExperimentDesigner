@@ -32,9 +32,17 @@
      </row> 
     </vaadin-grid-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-vertical-layout width="960px" height="140px"> 
+   <vaadin-vertical-layout width="960px" height="190px"> 
     <vaadin-vertical-layout _id="targetRptLayout"> 
      <vaadin-grid-layout spacing width-full _id="gridMainData" :middle :center> 
+      <row> 
+       <column> 
+        <vaadin-combo-box caption="Experiment:" required style-name="tiny" width-full _id="cbxExperiment"></vaadin-combo-box> 
+       </column> 
+       <column> 
+        <vaadin-check-box caption="What if report analysis" style-name="tiny" width-full _id="chxWhatIf" :middle></vaadin-check-box> 
+       </column> 
+      </row> 
       <row> 
        <column> 
         <vaadin-text-field required-error="This field is mandatory." caption="Name:" required style-name="tiny" width-full _id="txtTargetRptName"></vaadin-text-field> 
@@ -45,7 +53,19 @@
       </row> 
       <row> 
        <column> 
-        <vaadin-combo-box caption="Experiment:" required style-name="tiny" width-full _id="cbxExperiment"></vaadin-combo-box> 
+        <vaadin-grid-layout caption="Default date range" width-full height="30px" _id="gridDefaultDateFilter"> 
+         <row> 
+          <column> 
+           <vaadin-combo-box input-prompt="Select a field" style-name="tiny" width="90%" _id="cbxDefaultDateRangeSelectExpField"></vaadin-combo-box> 
+          </column> 
+          <column> 
+           <vaadin-popup-date-field required style-name="tiny" width="90%" _id="dtDefaultFilterFrom"></vaadin-popup-date-field> 
+          </column> 
+          <column> 
+           <vaadin-popup-date-field required style-name="tiny" width="90%" _id="dtDefaultFilterTo"></vaadin-popup-date-field> 
+          </column> 
+         </row> 
+        </vaadin-grid-layout> 
        </column> 
       </row> 
      </vaadin-grid-layout> 

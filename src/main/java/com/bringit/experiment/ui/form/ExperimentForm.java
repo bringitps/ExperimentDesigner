@@ -14,6 +14,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.security.auth.callback.ConfirmationCallback;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -82,11 +84,13 @@ import com.vaadin.ui.Slider.ValueOutOfBoundsException;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Window;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.Panel;	
+	
 
 public class ExperimentForm extends ExperimentDesign {
 
@@ -957,12 +961,20 @@ public class ExperimentForm extends ExperimentDesign {
 	    List<String> fieldUoMCsvMtx = new ArrayList<String>();
 	    List<Boolean> fieldAddedCsvMtx = new ArrayList<Boolean>();
 	    
+	    List<String> fieldNameCsvMtxRp = new ArrayList<String>();
+	    List<String> fieldNameLowerCaseCsvMtxRp = new ArrayList<String>();
+	    List<String> fieldDbIdCsvMtxRp = new ArrayList<String>();
+	    List<String> fieldDbTypeCsvMtxRp = new ArrayList<String>();
+	    List<String> fieldUoMCsvMtxRp = new ArrayList<String>();
+	    List<Boolean> fieldAddedCsvMtxRp = new ArrayList<Boolean>();
+	    List<Integer> fieldPositionCsvMtxRp = new ArrayList<Integer>();
+	    
 		try {
 		
 			Integer rowCnt = 0;
 			//reader = new CSVReader(new FileReader(tempCsvFile));
 			//reader = new CSVReader(new FileReader(tempCsvFile));
-			reader = new CSVReader(new InputStreamReader(new FileInputStream(tempCsvFile), "UTF-8"));
+			reader = new CSVReader(new InputStreamReader(new FileInputStream(csvFile), "UTF-8"));
 		
 			if(reader != null)
 			{	
@@ -974,11 +986,16 @@ public class ExperimentForm extends ExperimentDesign {
 					return;
 				}
 				
+
+	            //Same column name scenario
+	    		List<String> addedCsvColumnNameMtx = new ArrayList<String>();
+	    		List<Integer> addedCsvColumnTimesMtx = new ArrayList<Integer>();	    		
+				
 				while(csvRow != null)
 				{
 					if(rowCnt == 0)
 					{
-						System.out.println("First column : " + csvRow[0].trim().toLowerCase());
+						//System.out.println("First column : " + csvRow[0].trim().toLowerCase());
 						//Validate Headers: FieldName, DatabaseId, DatabaseType, UoM
 						if(csvRow[0] == null || (csvRow[0] != null && !csvRow[0].trim().toLowerCase().equals("fieldname")))
 					    {
@@ -1002,7 +1019,7 @@ public class ExperimentForm extends ExperimentDesign {
 					    }
 					}
 					else
-					{
+					{						
 						if(csvRow[0].trim().isEmpty() || csvRow[1].trim().isEmpty()
 								&& (!csvRow[2].trim().isEmpty() || !csvRow[3].trim().isEmpty()))
 							getUI().showNotification("Invalid CSV file. FieldName and DatabaseId are mandatory. CSV Line: " + (rowCnt+1), Type.WARNING_MESSAGE);
@@ -1011,14 +1028,62 @@ public class ExperimentForm extends ExperimentDesign {
 				        	if(!csvRow[0].trim().isEmpty() && !csvRow[1].trim().isEmpty())
 				        	{
 				        		if(fieldNameCsvMtx.indexOf(csvRow[0].trim()) == -1)
-				        		{
+				        		{				        			
+				        			fieldNameCsvMtx.add(csvRow[0].trim());
+				        			fieldNameLowerCaseCsvMtx.add(csvRow[0].trim().toLowerCase());
+				        			fieldDbIdCsvMtx.add(csvRow[1].trim());
+				        			fieldDbTypeCsvMtx.add(csvRow[2].trim());
+				        			fieldUoMCsvMtx.add(csvRow[3].trim());
+				        			fieldAddedCsvMtx.add(false);		        			
+
+        		    				addedCsvColumnNameMtx.add(csvRow[0].trim());
+        		    				addedCsvColumnTimesMtx.add(0);
+				        		}
+				        		else				        			
+			        			{//+ "_" +  rowCnt
+				        			
+				        			String csvColumnName = csvRow[0].trim();
+	        		    			Integer csvColumnAddedTimes = 0;
+	        		    			if(addedCsvColumnNameMtx.indexOf(csvRow[0].trim()) != -1)
+	        		    			{
+	        		    				csvColumnAddedTimes = addedCsvColumnTimesMtx.get(addedCsvColumnNameMtx.indexOf(csvColumnName));
+	        		    				csvColumnAddedTimes = csvColumnAddedTimes + 1;
+	        		    				addedCsvColumnTimesMtx.set(addedCsvColumnNameMtx.indexOf(csvRow[0].trim()), csvColumnAddedTimes);
+	        		    				csvRow[0] = csvRow[0].trim()  + "_" + csvColumnAddedTimes;
+	        		    				csvRow[1] = csvRow[1].trim()  + "_" + csvColumnAddedTimes;
+	        		    			}
+	        		    			
 				        			fieldNameCsvMtx.add(csvRow[0].trim());
 				        			fieldNameLowerCaseCsvMtx.add(csvRow[0].trim().toLowerCase());
 				        			fieldDbIdCsvMtx.add(csvRow[1].trim());
 				        			fieldDbTypeCsvMtx.add(csvRow[2].trim());
 				        			fieldUoMCsvMtx.add(csvRow[3].trim());
 				        			fieldAddedCsvMtx.add(false);
-				        		}
+				        			
+				        			/*
+				        			String newColumnName = csvRow[0].trim() + "_1";		
+				        			String newColumnDbId = csvRow[1].trim() + "_1";
+				        			boolean columnRepeatedFound = true;
+				        			for(int i=1; columnRepeatedFound; i++)
+				        			{
+				        				if(fieldNameCsvMtxRp.indexOf(csvRow[0].trim() + "_" + i) == -1)
+				        				{
+				        					newColumnName = csvRow[0].trim() + "_" + i;	
+				        					newColumnDbId = csvRow[1].trim() + "_" + i;	
+				        					columnRepeatedFound = false;
+				        					break;
+				        				}
+				        			}
+				        			
+				        			fieldNameCsvMtxRp.add(newColumnName);
+				        			fieldNameLowerCaseCsvMtxRp.add(newColumnName.toLowerCase());
+				        			fieldDbIdCsvMtxRp.add(newColumnDbId);
+				        			fieldDbTypeCsvMtxRp.add(csvRow[2].trim());
+				        			fieldUoMCsvMtxRp.add(csvRow[3].trim());
+				        			fieldAddedCsvMtxRp.add(false);	
+				        			fieldPositionCsvMtxRp.add(rowCnt);
+				        			*/
+			        			}
 				        	}
 						}
 						
@@ -1028,7 +1093,17 @@ public class ExperimentForm extends ExperimentDesign {
 				}
 				
 	            reader.close();
-	            
+	            /*
+	            for (int i = 0; i< fieldNameCsvMtxRp.size(); i++) 
+	            {
+        			fieldNameCsvMtx.add(fieldPositionCsvMtxRp.get(i),fieldNameCsvMtxRp.get(i));
+        			fieldNameLowerCaseCsvMtx.add(fieldPositionCsvMtxRp.get(i),fieldNameLowerCaseCsvMtxRp.get(i));
+        			fieldDbIdCsvMtx.add(fieldPositionCsvMtxRp.get(i),fieldDbIdCsvMtxRp.get(i));
+        			fieldDbTypeCsvMtx.add(fieldPositionCsvMtxRp.get(i),fieldDbTypeCsvMtxRp.get(i));
+        			fieldUoMCsvMtx.add(fieldPositionCsvMtxRp.get(i),fieldUoMCsvMtxRp.get(i));
+        			fieldAddedCsvMtx.add(fieldPositionCsvMtxRp.get(i),fieldAddedCsvMtxRp.get(i));
+	            }
+	            */
 	            //Load Experiment Fields into TBL
 	            List<UnitOfMeasure> unitOfMeasures = new UnitOfMeasureDao().getAllUnitOfMeasures();
 	            List<String> uomNameMtx = new ArrayList<String>();
@@ -1102,6 +1177,7 @@ public class ExperimentForm extends ExperimentDesign {
 	            //Add new Exp Fields
 	    		for(int i = 0; i<fieldNameCsvMtx.size(); i++)
 	    		{
+	    			System.out.println(fieldNameCsvMtx.size());
 		            if(!fieldAddedCsvMtx.get(i))
 		            {
 		    			String csvFieldName = fieldNameCsvMtx.get(i);

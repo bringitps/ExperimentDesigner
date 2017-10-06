@@ -45,6 +45,26 @@ public class TargetColumn {
 
 	@Column(name="TargetColumnMaxValue")
 	private Float targetColumnMaxValue;
+
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="TargetColumnWhatIfCurrMinExpFieldId", unique=false, updatable=true)
+	private ExperimentField targetColumnWhatIfCurrMinExpField;
+
+	@Column(name="TargetColumnWhatIfCurrentMin")
+	private Float targetColumnWhatIfCurrentMin;
+	
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="TargetColumnWhatIfCurrMaxExpFieldId", unique=false, updatable=true)
+	private ExperimentField targetColumnWhatIfCurrMaxExpField;
+
+	@Column(name="TargetColumnWhatIfCurrentMax")
+	private Float targetColumnWhatIfCurrentMax;
+
+	@Column(name="TargetColumnWhatIfNewMin")
+	private Float targetColumnWhatIfNewMin;
+	
+	@Column(name="TargetColumnWhatIfNewMax")
+	private Float targetColumnWhatIfNewMax;
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
@@ -63,13 +83,22 @@ public class TargetColumn {
 		this.targetColumnGoalValue = null;
 		this.targetColumnMinValue = null;
 		this.targetColumnMaxValue = null;
+		this.targetColumnWhatIfCurrMinExpField = null;
+		this.targetColumnWhatIfCurrentMin = null;
+		this.targetColumnWhatIfCurrMaxExpField = null;
+		this.targetColumnWhatIfCurrentMax = null;
+		this.targetColumnWhatIfNewMin = null;
+		this.targetColumnWhatIfNewMax = null;
 		this.experimentField = null;
 		this.targetColumnGroup = null;
 	}
 
 	public TargetColumn(Integer targetColumnId, Boolean targetColumnIsInfo, Integer targetColumnPosition, String targetColumnLabel,
 			Float targetColumnOffset, Float targetColumnGoalValue, Float targetColumnMinValue,
-			Float targetColumnMaxValue, ExperimentField experimentField, TargetColumnGroup targetColumnGroup) {
+			Float targetColumnMaxValue, ExperimentField targetColumnWhatIfCurrMinExpField, Float targetColumnWhatIfCurrentMin,
+			ExperimentField targetColumnWhatIfCurrMaxExpField, Float targetColumnWhatIfCurrentMax,
+			Float targetColumnWhatIfNewMin, Float targetColumnWhatIfNewMax,
+			ExperimentField experimentField, TargetColumnGroup targetColumnGroup) {
 		this.targetColumnId = targetColumnId;
 		this.targetColumnIsInfo = targetColumnIsInfo;
 		this.targetColumnPosition = targetColumnPosition;
@@ -78,6 +107,12 @@ public class TargetColumn {
 		this.targetColumnGoalValue = targetColumnGoalValue;
 		this.targetColumnMinValue = targetColumnMinValue;
 		this.targetColumnMaxValue = targetColumnMaxValue;
+		this.targetColumnWhatIfCurrMinExpField = targetColumnWhatIfCurrMinExpField;
+		this.targetColumnWhatIfCurrentMin = targetColumnWhatIfCurrentMin;
+		this.targetColumnWhatIfCurrMaxExpField = targetColumnWhatIfCurrMaxExpField;
+		this.targetColumnWhatIfCurrentMax = targetColumnWhatIfCurrentMax;
+		this.targetColumnWhatIfNewMin = targetColumnWhatIfNewMin;
+		this.targetColumnWhatIfNewMax = targetColumnWhatIfNewMax;
 		this.experimentField = experimentField;
 		this.targetColumnGroup = targetColumnGroup;
 	}
@@ -144,6 +179,54 @@ public class TargetColumn {
 
 	public void setTargetColumnMaxValue(Float targetColumnMaxValue) {
 		this.targetColumnMaxValue = targetColumnMaxValue;
+	}
+	
+	public ExperimentField getTargetColumnWhatIfCurrMinExpField() {
+		return targetColumnWhatIfCurrMinExpField;
+	}
+
+	public Float getTargetColumnWhatIfCurrentMin() {
+		return targetColumnWhatIfCurrentMin;
+	}
+
+	public void setTargetColumnWhatIfCurrentMin(Float targetColumnWhatIfCurrentMin) {
+		this.targetColumnWhatIfCurrentMin = targetColumnWhatIfCurrentMin;
+	}
+
+	public ExperimentField getTargetColumnWhatIfCurrMaxExpField() {
+		return targetColumnWhatIfCurrMaxExpField;
+	}
+
+	public void setTargetColumnWhatIfCurrMaxExpField(ExperimentField targetColumnWhatIfCurrMaxExpField) {
+		this.targetColumnWhatIfCurrMaxExpField = targetColumnWhatIfCurrMaxExpField;
+	}
+
+	public Float getTargetColumnWhatIfCurrentMax() {
+		return targetColumnWhatIfCurrentMax;
+	}
+
+	public void setTargetColumnWhatIfCurrentMax(Float targetColumnWhatIfCurrentMax) {
+		this.targetColumnWhatIfCurrentMax = targetColumnWhatIfCurrentMax;
+	}
+
+	public Float getTargetColumnWhatIfNewMin() {
+		return targetColumnWhatIfNewMin;
+	}
+
+	public void setTargetColumnWhatIfNewMin(Float targetColumnWhatIfNewMin) {
+		this.targetColumnWhatIfNewMin = targetColumnWhatIfNewMin;
+	}
+
+	public Float getTargetColumnWhatIfNewMax() {
+		return targetColumnWhatIfNewMax;
+	}
+
+	public void setTargetColumnWhatIfNewMax(Float targetColumnWhatIfNewMax) {
+		this.targetColumnWhatIfNewMax = targetColumnWhatIfNewMax;
+	}
+
+	public void setTargetColumnWhatIfCurrMinExpField(ExperimentField targetColumnWhatIfCurrMinExpField) {
+		this.targetColumnWhatIfCurrMinExpField = targetColumnWhatIfCurrMinExpField;
 	}
 
 	public ExperimentField getExperimentField() {

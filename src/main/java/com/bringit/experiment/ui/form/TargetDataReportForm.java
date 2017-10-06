@@ -10,6 +10,7 @@ import com.bringit.experiment.bll.TargetColumnGroup;
 import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.dao.CmForSysRoleDao;
 import com.bringit.experiment.dao.ContractManufacturerDao;
+import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.TargetColumnDao;
 import com.bringit.experiment.dao.TargetColumnGroupDao;
 import com.bringit.experiment.dao.TargetReportDao;
@@ -17,6 +18,7 @@ import com.bringit.experiment.dao.TargetReportJobDataDao;
 import com.bringit.experiment.ui.design.TargetDataReportDesign;
 import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.Constants;
+import com.opencsv.CSVWriter;
 import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.converter.StringToDateConverter;
@@ -27,8 +29,12 @@ import com.vaadin.data.util.filter.Like;
 import com.vaadin.data.util.filter.Or;
 import com.vaadin.data.util.sqlcontainer.SQLContainer;
 import com.vaadin.data.util.sqlcontainer.connection.SimpleJDBCConnectionPool;
+import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 import com.vaadin.data.util.sqlcontainer.query.TableQuery;
 import com.vaadin.data.util.sqlcontainer.query.generator.MSSQLGenerator;
+import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.server.FileDownloader;
+import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -38,11 +44,18 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.CloseEvent;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -57,6 +70,10 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 	private SQLContainer vaadinTblContainer;
 	SysRole sysRoleSession = (SysRole) VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
 
+	private String sqlQuery = "";    
+	String firstWhereClause = "";
+	List<String> andSqlWhereClause = new ArrayList<String>();
+	
 	public TargetDataReportForm(Integer targetDataReportId)
 	{
 		targetRpt = new TargetReportDao().getTargetReportById(targetDataReportId);
@@ -77,6 +94,12 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 
 		});
 
+		if(targetRpt.getTargetReportWhatIf() != null && targetRpt.getTargetReportWhatIf())
+		{
+			this.cbxContractManufacturer.setVisible(false);
+			this.btnViewChart.setVisible(false);
+		}
+		
 		/*
 		experimentFields = new ExperimentFieldDao().getActiveExperimentFields(targetRpt.getExperiment());
 		
@@ -136,8 +159,31 @@ public class TargetDataReportForm extends TargetDataReportDesign{
     		
     			if(!targetRptCols.get(j).getTargetColumnIsInfo())
     			{
-    				dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Result" );
-        			dbRptTableTypes.add("varchar(20)");    				
+    				if(targetRpt.getTargetReportWhatIf() != null && targetRpt.getTargetReportWhatIf())
+    				{	
+    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Current_Min");
+    					dbRptTableTypes.add("varchar(50)");
+
+    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Current_Max");
+    					dbRptTableTypes.add("varchar(50)");
+                	
+    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Current_Result");
+    					dbRptTableTypes.add("varchar(20)");
+                    
+    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_New_Min");
+    					dbRptTableTypes.add("varchar(50)");
+
+    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_New_Max");
+    					dbRptTableTypes.add("varchar(50)");
+                	
+    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_New_Result");
+    					dbRptTableTypes.add("varchar(20)");
+    				}
+    				else
+    				{
+    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Result" );
+    					dbRptTableTypes.add("varchar(20)");
+    				}
     			}
     		}
     	}
@@ -164,14 +210,17 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 			}			
 		}
 		
-		cbxDateFieldsFilter.addItem("CreatedDate");
-		cbxDateFieldsFilter.setItemCaption("CreatedDate", "Created Date");
+		if(targetRpt.getTargetReportWhatIf() == null || !targetRpt.getTargetReportWhatIf())
+		{
+			cbxDateFieldsFilter.addItem("CreatedDate");
+			cbxDateFieldsFilter.setItemCaption("CreatedDate", "Created Date");
 
-		if(cbxDateFieldsFilter.size() == 1)
-			cbxDateFieldsFilter.select("CreatedDate");				
+			if(cbxDateFieldsFilter.size() == 1)
+				cbxDateFieldsFilter.select("CreatedDate");				
 	
-		cbxDateFieldsFilter.addItem("LastModifiedDate");
-		cbxDateFieldsFilter.setItemCaption("LastModifiedDate", "Last Modified Date");
+			cbxDateFieldsFilter.addItem("LastModifiedDate");
+			cbxDateFieldsFilter.setItemCaption("LastModifiedDate", "Last Modified Date");
+		}
 
 		if (!"sys_admin".equalsIgnoreCase(sysRoleSession.getRoleName())) {
 			List<CmForSysRole> cmForSysRole =  new CmForSysRoleDao().getListOfCmForSysRoleBysysRoleId(sysRoleSession.getRoleId());
@@ -224,6 +273,7 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 				
 				if(cbxDateFieldsFilter.getValue() != null && dtFilter1.getValue() != null && dtFilter2.getValue() != null)
 				{
+	    		    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					Date dateFilterValue1 = dtFilter1.getValue();
 					Date dateFilterValue2 = dtFilter2.getValue();
 
@@ -231,14 +281,20 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 					dateFilterValue2.setMinutes(59);
 					dateFilterValue2.setSeconds(59);
 					vaadinTblContainer.addContainerFilter(new Between(cbxDateFieldsFilter.getValue(), dateFilterValue1, dateFilterValue2)); 	
-					
+					andSqlWhereClause.add(cbxDateFieldsFilter.getValue() + " BETWEEN '" + df.format(dateFilterValue1) + "' AND '" + df.format(dateFilterValue2) + "'");
 				}
 				
 				if(cbxExpFieldFilter.getValue() != null )
-					vaadinTblContainer.addContainerFilter(new Like(cbxExpFieldFilter.getValue(), "%" + txtExpFieldFilter.getValue().trim() + "%")); 	
+				{
+					vaadinTblContainer.addContainerFilter(new Like(cbxExpFieldFilter.getValue(), "%" + txtExpFieldFilter.getValue().trim() + "%"));
+               		andSqlWhereClause.add(cbxExpFieldFilter.getValue() + " LIKE '%" + txtExpFieldFilter.getValue().trim() + "%'");
+				}
 				
 				if(cbxContractManufacturer.getValue() != null )
+				{
 					vaadinTblContainer.addContainerFilter(new Compare.Equal("CmName",cbxContractManufacturer.getValue()));
+					andSqlWhereClause.add("CmName = '" + cbxContractManufacturer.getValue() + "'");
+				}
 
 				 //If there is no Contract Manufacturer loaded into system, there should not have restrictions
 		        List<ContractManufacturer> allContractManufacturersLoaded = new ContractManufacturerDao().getAllContractManufacturers();
@@ -249,13 +305,88 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 						List<ContractManufacturer> contractManufacturersFilter = new CmForSysRoleDao().getListOfCmForBysysRoleId(sysRoleSession.getRoleId());
 						for (ContractManufacturer con : contractManufacturersFilter) {
 							filterList.add(new Compare.Equal("CmName", con.getCmName()));
+							andSqlWhereClause.add("CmName = '" + con.getCmName() + "'");
 	
 						}
 						vaadinTblContainer.addContainerFilter(new Or(filterList.toArray(new Compare.Equal[filterList.size()])));
 					}
 				}
+		        
+		        if(andSqlWhereClause != null && andSqlWhereClause.size() > 0)
+		        {
+		        	Config configuration = new Config();
+	
+			         if (configuration.getProperty("dbms").equals("sqlserver")) {
+			             String dbHost = configuration.getProperty("dbhost");
+			             String dbPort = configuration.getProperty("dbport");
+			             String dbDatabase = configuration.getProperty("dbdatabase");
+			             String dbUsername = configuration.getProperty("dbusername");
+			             String dbPassword = configuration.getProperty("dbpassword");
+	
+			             SimpleJDBCConnectionPool connectionPool;
+	
+			             try {
+			                 connectionPool = new SimpleJDBCConnectionPool("com.microsoft.sqlserver.jdbc.SQLServerDriver",
+			                         "jdbc:sqlserver://" + dbHost + ":" + dbPort + ";databaseName=" + dbDatabase,
+			                         dbUsername, dbPassword);
+			                
+			                 TableQuery tblQuery = new TableQuery(targetRpt.getTargetReportDbRptTableNameId(), connectionPool, new MSSQLGenerator());
+			                 List<OrderBy> tblOrderByRecordId = Arrays.asList(new OrderBy("RecordId", false));
+			                 StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(targetRpt.getTargetReportDbRptTableNameId(), null, tblOrderByRecordId, 0, 0, null);
+			                 sqlQuery = sh.getQueryString();
+			                 
+			                 firstWhereClause = andSqlWhereClause.get(0);
+			                 String sqlWhereClause = " WHERE " + firstWhereClause;
+			                 
+			                 for(int i=1; i < andSqlWhereClause.size(); i++)
+			                 	 sqlWhereClause += " AND (" + andSqlWhereClause.get(i) + ")";
+			                 
+			                 String sqlColumnLabels = "";
+			                 List<Object> asList = new ArrayList<Object>(Arrays.asList(tblTargetDataReport.getVisibleColumns()));
+			                 for(int i=0; i<asList.size(); i++)
+			                 	sqlColumnLabels += "\"" + asList.get(i).toString() + "\" AS \"" +  tblTargetDataReport.getColumnHeader(asList.get(i)) + "\",";
+			                 
+			                 sqlColumnLabels = sqlColumnLabels.substring(0, sqlColumnLabels.length() - 1);
+			                 
+			                 sqlQuery = sqlQuery.replace("SELECT *", "SELECT " + sqlColumnLabels);
+			                 sqlQuery = sqlQuery.replace("ORDER BY", " " + sqlWhereClause + " ORDER BY");
+			                 
+			                 //System.out.println("Built Query: " + sqlQuery);
+			                 
+			             } catch (SQLException e) {
+			                 // TODO Auto-generated catch block
+			                 e.printStackTrace();
+			             }
+			         }
+		        }	
+		        
+		        Integer totalRecords = tblTargetDataReport.size();
+		    	if (targetRpt.getTargetReportDbRptTableLastUpdate() != null)
+		            lblLastRefreshDate.setValue("Last Refresh Date: " + targetRpt.getTargetReportDbRptTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
+		    
 			}
+			
+			
 		});
+		
+		
+		if(targetRpt.getTargetReportWhatIfDateColumnLabel() != null)
+		{
+		    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			vaadinTblContainer.removeAllContainerFilters();
+			this.cbxDateFieldsFilter.select(targetRpt.getTargetReportWhatIfDateColumnLabel().replaceAll(" ", "_"));
+			this.dtFilter1.setValue(targetRpt.getTargetReportWhatIfDateFrom());
+			this.dtFilter2.setValue(targetRpt.getTargetReportWhatIfDateTo());
+			
+			Date dateFilterValue1 = dtFilter1.getValue();
+			Date dateFilterValue2 = dtFilter2.getValue();
+
+			dateFilterValue2.setHours(23);
+			dateFilterValue2.setMinutes(59);
+			dateFilterValue2.setSeconds(59);
+			vaadinTblContainer.addContainerFilter(new Between(cbxDateFieldsFilter.getValue(), dateFilterValue1, dateFilterValue2)); 	
+			andSqlWhereClause.add(cbxDateFieldsFilter.getValue() + " BETWEEN '" + df.format(dateFilterValue1) + "' AND '" + df.format(dateFilterValue2) + "'");
+		}
 		
 		
 		/*		
@@ -365,10 +496,15 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		Map<String, Object> result = experimentJobDataDao.targetProcedureJob(this.targetRpt.getTargetReportId());
 		vaadinTblContainer.refresh();
 		targetRpt = new TargetReportDao().getTargetReportById(targetRpt.getTargetReportId());
-		lblLastRefreshDate.setValue("Last Refresh Date: " + targetRpt.getTargetReportDbRptTableLastUpdate());
-
+	
+		
+		Integer totalRecords = tblTargetDataReport.size();
+		if (targetRpt.getTargetReportDbRptTableLastUpdate() != null)
+            this.lblLastRefreshDate.setValue("Last Refresh Date: " + targetRpt.getTargetReportDbRptTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
+    
 		if (Constants.SUCCESS == result.get("status")) {
 			this.getUI().showNotification("TargetReport '" + targetRpt.getTargetReportName() + "' has been Refresh Successfully.", Notification.Type.HUMANIZED_MESSAGE);
+			this.btnApplyFilters.click();		
 		} else {
 			String msgToDisplay = result.get("statusMessage").toString();
 			if (Constants.JOB_NOT_EXECUTED.equalsIgnoreCase(msgToDisplay)) {
@@ -424,9 +560,39 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 		    			
 		    			if(!targetRptCols.get(j).getTargetColumnIsInfo())
 		    			{
-		    				dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Result" );
-		        			dbRptTableTypes.add("varchar(20)");
-		        			dbRptTableUoms.add("");			    			
+		    				if(targetRpt.getTargetReportWhatIf() != null && targetRpt.getTargetReportWhatIf())
+		    				{	
+		    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Current_Min");
+		    					dbRptTableTypes.add("varchar(50)");
+		    					dbRptTableUoms.add("");
+		    					
+		    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Current_Max");
+		    					dbRptTableTypes.add("varchar(50)");
+		    					dbRptTableUoms.add("");
+		    					
+		    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Current_Result");
+		    					dbRptTableTypes.add("varchar(20)");
+		    					dbRptTableUoms.add("");
+		    					
+		    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_New_Min");
+		    					dbRptTableTypes.add("varchar(50)");
+		    					dbRptTableUoms.add("");
+		    					
+		    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_New_Max");
+		    					dbRptTableTypes.add("varchar(50)");
+		    					dbRptTableUoms.add("");
+		    					
+		    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_New_Result");
+		    					dbRptTableTypes.add("varchar(20)");
+		    					dbRptTableUoms.add("");
+		    					
+		    				}
+		    				else
+		    				{
+		    					dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Result" );
+		    					dbRptTableTypes.add("varchar(20)");
+		    					dbRptTableUoms.add("");
+		    				}
 		    			}
 		    		}
 		    	}
@@ -493,13 +659,46 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 				    	
 				    	return null;
 					}
-				    });
+				});
+				
+				
+				if(targetRpt.getTargetReportWhatIf() != null && targetRpt.getTargetReportWhatIf() && targetRpt.getTargetReportWhatIfDateColumnLabel() != null)
+				{
+					targetRpt.getTargetReportWhatIfDateTo().setHours(23);
+					targetRpt.getTargetReportWhatIfDateTo().setMinutes(59);
+					targetRpt.getTargetReportWhatIfDateTo().setSeconds(59);
+					
+				    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					firstWhereClause = targetRpt.getTargetReportWhatIfDateColumnLabel().replaceAll(" ", "_") + " BETWEEN '" + df.format(targetRpt.getTargetReportWhatIfDateFrom()) + "' AND '" + df.format(targetRpt.getTargetReportWhatIfDateTo()) + "'";
+				}
+				 
+				
+				StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(targetRpt.getTargetReportDbRptTableNameId(), null, null, 0, 0, null);
+                sqlQuery = sh.getQueryString();
+                
+				String sqlColumnLabels = "";
+                List<Object> asList = new ArrayList<Object>(Arrays.asList(tblTargetDataReport.getVisibleColumns()));
+                for(int i=0; i<asList.size(); i++)
+                	sqlColumnLabels += "\"" + asList.get(i).toString() + "\" AS \"" +  tblTargetDataReport.getColumnHeader(asList.get(i)) + "\",";
+                
+                sqlColumnLabels = sqlColumnLabels.substring(0, sqlColumnLabels.length() - 1);
+                
+                sqlQuery = sqlQuery.replace("SELECT *", "SELECT " + sqlColumnLabels);
+                
+                if(!firstWhereClause.isEmpty())
+                	sqlQuery += " WHERE " + firstWhereClause;
+                
+                sqlResultAttachCsvFileDownloaderToButton(this.btnExportExcel);
 				
 		    } catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}		    
-		}
+			}	
+		    
+		    Integer totalRecords = tblTargetDataReport.size();
+	    	if (targetRpt.getTargetReportDbRptTableLastUpdate() != null)
+	            this.lblLastRefreshDate.setValue("Last Refresh Date: " + targetRpt.getTargetReportDbRptTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
+	    }
 	}
 
 	
@@ -525,6 +724,7 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 	
 	private void exportExperimentDataReportToExcel()
 	{
+		/*
 		if(tblTargetDataReport.getItemIds() != null)
 		{
 			System.out.println("Starting export: " + new Date());
@@ -536,5 +736,41 @@ public class TargetDataReportForm extends TargetDataReportDesign{
 			
 			System.out.println("Finishing export: " + new Date());			
 		}
+		*/
+	}
+	
+	public void sqlResultAttachCsvFileDownloaderToButton(Button downloadBtn)
+	{	
+		 FileDownloader downloader = new FileDownloader(new StreamResource(
+                 new StreamResource.StreamSource() {
+                     @Override
+                     public InputStream getStream() {
+                    	InputStream is = null;
+                     	ResultSet experimentDataRecordResults = new ExecuteQueryDao().getSqlSelectQueryResults(sqlQuery);
+                 		if(experimentDataRecordResults != null)
+                 		{                 			
+                 			try {
+                 				ByteArrayOutputStream csvOutputStream = new ByteArrayOutputStream();
+             					CSVWriter writer = new CSVWriter(new OutputStreamWriter(csvOutputStream), ',',
+                     					CSVWriter.DEFAULT_QUOTE_CHARACTER, CSVWriter.NO_ESCAPE_CHARACTER, "\n");
+                 				Boolean includeHeaders = true;
+
+             					writer.writeAll(experimentDataRecordResults, includeHeaders);
+             					writer.close();
+             					
+             					is = new ByteArrayInputStream(csvOutputStream.toByteArray());
+             					
+             				} catch (SQLException | IOException e) {
+             					// TODO Auto-generated catch block
+             					e.printStackTrace();
+             				}
+
+                 			
+                       }
+                          return is;
+                     	}
+                 }, lblTargetRptTitle.getValue().trim() + ".csv"));
+         downloader.extend(downloadBtn);
+		
 	}
 }

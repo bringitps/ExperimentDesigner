@@ -39,6 +39,12 @@ public class SystemSettings {
 	@Column(name="ExperimentTypePluralLabel")
 	String experimentTypePluralLabel;
 	
+	@Column(name="VisualizationDataRefreshInterval")
+	Integer visualizationDataRefreshInterval;
+
+	@Column(name="TargetReportAutoDeleteInterval")
+	Integer targetReportAutoDeleteInterval;
+	
     @Column(name="CreatedDate")
     private Date createdDate;
 
@@ -53,16 +59,31 @@ public class SystemSettings {
     @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
     private SysUser lastModifiedBy;
 
-    public SystemSettings() {}
+    public SystemSettings() 
+    {
+    	this.systemSettingsId = null;
+		this.experimentLabel = null;
+		this.experimentPluralLabel = null;
+		this.experimentTypeLabel = null;
+		this.experimentTypePluralLabel = null;
+		this.visualizationDataRefreshInterval = null;
+		this.targetReportAutoDeleteInterval = null;
+		this.createdDate = null;
+		this.modifiedDate = null;
+		this.createdBy = null;
+		this.lastModifiedBy = null;
+    }
 
 	public SystemSettings(Integer systemSettingsId, String experimentLabel, String experimentPluralLabel,
-			String experimentTypeLabel, String experimentTypePluralLabel, Date createdDate, Date modifiedDate, SysUser createdBy,
-			SysUser lastModifiedBy) {
+			String experimentTypeLabel, String experimentTypePluralLabel, Integer visualizationDataRefreshInterval, Integer targetReportAutoDeleteInterval,
+			Date createdDate, Date modifiedDate, SysUser createdBy,	SysUser lastModifiedBy) {
 		this.systemSettingsId = systemSettingsId;
 		this.experimentLabel = experimentLabel;
 		this.experimentPluralLabel = experimentPluralLabel;
 		this.experimentTypeLabel = experimentTypeLabel;
 		this.experimentTypePluralLabel = experimentTypePluralLabel;
+		this.visualizationDataRefreshInterval = visualizationDataRefreshInterval;
+		this.targetReportAutoDeleteInterval = targetReportAutoDeleteInterval;
 		this.createdDate = createdDate;
 		this.modifiedDate = modifiedDate;
 		this.createdBy = createdBy;
@@ -107,6 +128,22 @@ public class SystemSettings {
 
 	public void setExperimentTypePluralLabel(String experimentTypePluralLabel) {
 		this.experimentTypePluralLabel = experimentTypePluralLabel;
+	}
+
+	public Integer getVisualizationDataRefreshInterval() {
+		return visualizationDataRefreshInterval;
+	}
+
+	public void setVisualizationDataRefreshInterval(Integer visualizationDataRefreshInterval) {
+		this.visualizationDataRefreshInterval = visualizationDataRefreshInterval;
+	}
+
+	public Integer getTargetReportAutoDeleteInterval() {
+		return targetReportAutoDeleteInterval;
+	}
+
+	public void setTargetReportAutoDeleteInterval(Integer targetReportAutoDeleteInterval) {
+		this.targetReportAutoDeleteInterval = targetReportAutoDeleteInterval;
 	}
 
 	public Date getCreatedDate() {

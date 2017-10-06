@@ -303,6 +303,91 @@ public class TargetReportDao {
         return successfulExecution;
     }
 
+    public boolean updateWhatIfDBRptTable(TargetReport targetRpt) {
+        String query = null;
+        boolean successfulExecution = true;
+
+        List<TargetColumnGroup> targetRptColGroups = new TargetColumnGroupDao().getTargetColumnGroupsByReportId(targetRpt.getTargetReportId());
+        List<String> dbRptTableCols = new ArrayList<String>();
+        List<String> dbRptTableTypes = new ArrayList<String>();
+
+        for (int i = 0; i < targetRptColGroups.size(); i++) {
+            List<TargetColumn> targetRptCols = new TargetColumnDao().getTargetColumnsByColGroupById(targetRptColGroups.get(i).getTargetColumnGroupId());
+
+            for (int j = 0; j < targetRptCols.size(); j++) {
+                dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_"));
+                dbRptTableTypes.add(targetRptCols.get(j).getExperimentField().getExpFieldType());
+
+                if (!targetRptCols.get(j).getTargetColumnIsInfo()) {
+                	
+                	dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Current_Min");
+                    dbRptTableTypes.add("varchar(50)");
+
+                    dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Current_Max");
+                    dbRptTableTypes.add("varchar(50)");
+                	
+                    dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_Current_Result");
+                    dbRptTableTypes.add("varchar(20)");
+                    
+                	dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_New_Min");
+                    dbRptTableTypes.add("varchar(50)");
+
+                    dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_New_Max");
+                    dbRptTableTypes.add("varchar(50)");
+                	
+                    dbRptTableCols.add(targetRptCols.get(j).getTargetColumnLabel().replaceAll(" ", "_") + "_New_Result");
+                    dbRptTableTypes.add("varchar(20)");
+
+                }
+            }
+        }
+
+        dbRptTableCols.add("Result");
+        dbRptTableTypes.add("varchar(20)");
+
+        Config configuration = new Config();
+
+
+        if (configuration.getProperty("dbms").equals("sqlserver")) {
+            String csvTableCols = "";
+            for (int i = 0; i < dbRptTableCols.size(); i++) {
+                csvTableCols += dbRptTableCols.get(i) + " " + dbRptTableTypes.get(i);
+
+                if ((i + 1) < dbRptTableCols.size())
+                    csvTableCols += ",";
+            }
+
+            query = " IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='" + targetRpt.getTargetReportDbRptTableNameId() + "' AND xtype='U') ";
+            query += " CREATE TABLE " + targetRpt.getTargetReportDbRptTableNameId();
+            query += " (RecordId int NOT NULL PRIMARY KEY, Comments text, CmName varchar(255),";
+            query += " CreatedBy varchar(255), LastModifiedBy varchar(255), CreatedDate datetime,";
+            query += " LastModifiedDate datetime, DataFileName varchar(255)," + csvTableCols + ");";
+            
+            //System.out.println("What if report creator SQL Query: " + query);
+            
+        } else
+            return false;
+
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+
+        try {
+            trns = session.beginTransaction();
+            session.createSQLQuery(query).executeUpdate();
+            session.getTransaction().commit();
+        } catch (RuntimeException e) {
+            if (trns != null) {
+                trns.rollback();
+            }
+            successfulExecution = false;
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return successfulExecution;
+    }
+   
     public Map<String,Object> executeTargetProcedure(TargetReportJobData TargetReportJobData, TargetReport target) {
         Map<String,Object> map= new HashMap<>();
         TargetReportJobDataDao TargetReportJobDataDao = new TargetReportJobDataDao();
@@ -316,7 +401,10 @@ public class TargetReportDao {
             List<String> lstTargetBean;
             lstTargetBean = new ArrayList<>();
             lstTargetBean.add(target.getTargetReportId().toString());
-            new ExecuteQueryDao().executeUpdateStoredProcedure("spTargetReportBuilder", lstTargetBean);
+            if(target.getTargetReportWhatIf() != null && target.getTargetReportWhatIf())
+            	new ExecuteQueryDao().executeUpdateStoredProcedure("spWhatIfTargetReportBuilder", lstTargetBean);
+            else
+            	new ExecuteQueryDao().executeUpdateStoredProcedure("spTargetReportBuilder", lstTargetBean);
 
             target.setTargetReportDbRptTableLastUpdate(new Date());
             this.updateTargetReport(target);

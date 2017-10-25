@@ -233,6 +233,14 @@ public class MainForm extends MainFormDesign {
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new TargetReportForm());
                     break;
+                case "first pass yield report":
+                    formContentLayout.removeAllComponents();
+                    formContentLayout.addComponent(new FirstPassYieldReportForm());
+                    break;
+                case "first time yield report":
+                    formContentLayout.removeAllComponents();
+                    formContentLayout.addComponent(new FirstTimeYieldReportForm());
+                    break;
                 case "contract manufacturers":
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new ContractManufacturerConfigForm());

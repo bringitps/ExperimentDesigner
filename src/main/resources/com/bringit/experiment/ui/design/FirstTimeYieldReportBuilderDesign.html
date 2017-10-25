@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head> 
+ <body> 
+  <vaadin-vertical-layout style-name="well" responsive margin> 
+   <vaadin-vertical-layout width="960px" height="40px" _id="layoutHeaderBtns" :middle :center> 
+    <vaadin-grid-layout width-full> 
+     <row> 
+      <column> 
+       <vaadin-grid-layout width="100px" height="30px"> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="tiny primary" plain-text _id="btnSave">
+            Save 
+          </vaadin-button> 
+         </column> 
+         <column> 
+          <vaadin-button style-name="tiny" plain-text _id="btnCancel">
+            Cancel 
+          </vaadin-button> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+      <column> 
+       <vaadin-check-box caption="Active" id="chxActive" style-name="tiny" _id="chxActive" :right></vaadin-check-box> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout width="960px" height="140px"> 
+    <vaadin-vertical-layout _id="ftyRptLayout"> 
+     <vaadin-grid-layout spacing width-full _id="gridMainData" :middle :center> 
+      <row> 
+       <column> 
+        <vaadin-text-field required-error="This field is mandatory." caption="Name:" required style-name="tiny" width-full _id="txtFtyRptName"></vaadin-text-field> 
+       </column> 
+       <column> 
+        <vaadin-text-field required-error="This field is mandatory." caption="Custom Id:" required style-name="tiny" width-full _id="txtFtyRptCustomId"></vaadin-text-field> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-combo-box caption="Experiment:" required style-name="tiny" width-full _id="cbxExperiment"></vaadin-combo-box> 
+       </column> 
+       <column> 
+        <vaadin-text-field caption="Description:" style-name="tiny" width-full _id="txtFtyDescription"></vaadin-text-field> 
+       </column> 
+      </row> 
+     </vaadin-grid-layout> 
+    </vaadin-vertical-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-grid-layout caption="Yield fields" style-name="tiny" spacing width="960px" height="70px" _id="gbxYieldFields"> 
+    <row> 
+     <column> 
+      <vaadin-combo-box caption="Datetime Field:" required style-name="tiny" width-full _id="cbxDateTimeField"></vaadin-combo-box> 
+     </column> 
+     <column> 
+      <vaadin-combo-box caption="Serial Number Field:" required style-name="tiny" width-full _id="cbxSerialNumberField"></vaadin-combo-box> 
+     </column> 
+     <column> 
+      <vaadin-combo-box caption="Result Field:" required style-name="tiny" width-full _id="cbxResultField"></vaadin-combo-box> 
+     </column> 
+    </row> 
+   </vaadin-grid-layout> 
+   <vaadin-vertical-layout style-name="well" width="960px" _id="colGroupLayout"> 
+    <vaadin-horizontal-layout width-full height="285px" _id="ftyFieldGroupsLayout"> 
+     <vaadin-tab-sheet style-name="framed compact" size-full _id="tabColumnGroups"></vaadin-tab-sheet> 
+    </vaadin-horizontal-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout height="40px" _id="btnDeleteLayout"> 
+    <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" plain-text _id="btnDelete" :bottom :right>
+      Delete First Time Yield Report 
+    </vaadin-button> 
+   </vaadin-vertical-layout> 
+  </vaadin-vertical-layout>  
+ </body>
+</html>

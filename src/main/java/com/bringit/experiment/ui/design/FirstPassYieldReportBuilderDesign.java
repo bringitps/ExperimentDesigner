@@ -40,11 +40,12 @@ public class FirstPassYieldReportBuilderDesign extends VerticalLayout {
 	protected ComboBox cbxDateTimeField;
 	protected ComboBox cbxSerialNumberField;
 	protected ComboBox cbxResultField;
-	protected CheckBox chxGroupByTimeRange;
-	protected TextField txtGroupTimeRange;
 	protected GridLayout gbxResultValues;
 	protected TextField txtFpyRptPassValue;
 	protected TextField txtFpyRptFailValue;
+	protected GridLayout gbxTimeRange;
+	protected TextField txtGroupTimeRange;
+	protected CheckBox chxGroupByTimeRange;
 	protected VerticalLayout colGroupLayout;
 	protected HorizontalLayout fpyFieldGroupsLayout;
 	protected TabSheet tabColumnGroups;

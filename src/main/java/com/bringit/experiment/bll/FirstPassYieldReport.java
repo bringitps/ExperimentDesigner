@@ -1,5 +1,7 @@
 package com.bringit.experiment.bll;
 
+import java.util.Date;
+
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -65,6 +67,20 @@ public class FirstPassYieldReport {
 	@Column(name="FpyFailResultValue")
 	private String fpyFailResultValue;
 
+	@Column(name="CreatedDate")
+	private Date createdDate;
+	
+	@Column(name="ModifiedDate")
+	private Date modifiedDate;
+
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CreatedBy", unique=false, updatable=false)
+	private SysUser createdBy;
+	
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="LastModifiedBy", unique=false, updatable=true)
+	private SysUser lastModifiedBy;	
+	
 	public FirstPassYieldReport() {
 		this.fpyReportId = null;
 		this.fpyReportIsActive = null;
@@ -79,12 +95,16 @@ public class FirstPassYieldReport {
 		this.ResultExpField = null;
 		this.fpyPassResultValue = null;
 		this.fpyFailResultValue = null;
+		this.createdDate = null;
+		this.modifiedDate = null;
+		this.createdBy = null;
+		this.lastModifiedBy = null;
 	}
 	
 	public FirstPassYieldReport(Integer fpyReportId, Boolean fpyReportIsActive, String fpyReportName,
 			String fpyReportDbRptTableNameId, String fpyReportDescription, Boolean fpyGroupByTimeRange, Integer fpyTimeRangeMin, Experiment experiment,
 			ExperimentField serialNumberExpField, ExperimentField dateTimeExpField, ExperimentField resultExpField,
-			String fpyPassResultValue, String fpyFailResultValue) {
+			String fpyPassResultValue, String fpyFailResultValue, Date createdDate, Date modifiedDate, SysUser createdBy, SysUser lastModifiedBy) {
 		this.fpyReportId = fpyReportId;
 		this.fpyReportIsActive = fpyReportIsActive;
 		this.fpyReportName = fpyReportName;
@@ -98,6 +118,10 @@ public class FirstPassYieldReport {
 		this.ResultExpField = resultExpField;
 		this.fpyPassResultValue = fpyPassResultValue;
 		this.fpyFailResultValue = fpyFailResultValue;
+		this.createdDate = createdDate;
+		this.modifiedDate = modifiedDate;
+		this.createdBy = createdBy;
+		this.lastModifiedBy = lastModifiedBy;
 	}
 
 	public Integer getFpyReportId() {
@@ -203,4 +227,37 @@ public class FirstPassYieldReport {
 	public void setFpyFailResultValue(String fpyFailResultValue) {
 		this.fpyFailResultValue = fpyFailResultValue;
 	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+
+	public SysUser getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(SysUser createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public SysUser getLastModifiedBy() {
+		return lastModifiedBy;
+	}
+
+	public void setLastModifiedBy(SysUser lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
+	}
+	
 }

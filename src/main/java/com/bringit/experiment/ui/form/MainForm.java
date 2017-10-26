@@ -2,11 +2,13 @@ package com.bringit.experiment.ui.form;
 
 import com.bringit.experiment.WebApplication;
 import com.bringit.experiment.bll.Experiment;
+import com.bringit.experiment.bll.FirstPassYieldReport;
 import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.dao.ExperimentDao;
+import com.bringit.experiment.dao.FirstPassYieldReportDao;
 import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.TargetReportDao;
 import com.bringit.experiment.ui.design.MainFormDesign;
@@ -57,7 +59,8 @@ public class MainForm extends MainFormDesign {
         for (Object id : treeMainMenu.rootItemIds()) {
             treeMainMenu.expandItemsRecursively(id);
         }
-        
+
+        treeMainMenu.collapseItem("Reports Builder");
         treeMainMenu.collapseItem("Configuration");
             
         List<Experiment> experimentsAvailable = new ExperimentDao().getActiveExperiments();
@@ -83,6 +86,19 @@ public class MainForm extends MainFormDesign {
             }
         }
 
+        treeMainMenu.addContainerProperty("isFpyReport", Boolean.class, null);
+        treeMainMenu.addContainerProperty("fpyReportId", Integer.class, null);
+
+        List<FirstPassYieldReport> fpyReportsAvailable = new FirstPassYieldReportDao().getAllFirstPassYieldReports();
+        if (targetReportsAvailable != null) {
+            for (int i = 0; i < fpyReportsAvailable.size(); i++) {
+                Item item = treeMainMenu.addItem(fpyReportsAvailable.get(i).getFpyReportName());
+                item.getItemProperty("isFpyReport").setValue(true);
+                item.getItemProperty("fpyReportId").setValue(fpyReportsAvailable.get(i).getFpyReportId());
+                treeMainMenu.setParent(fpyReportsAvailable.get(i).getFpyReportName(), "First Pass Yield Reports");
+            }
+        }        
+        
         treeMainMenu.addItemClickListener(new ItemClickEvent.ItemClickListener() {
             public void itemClick(ItemClickEvent event) {
                 if (event.getButton() == ItemClickEvent.BUTTON_LEFT)
@@ -165,7 +181,8 @@ public class MainForm extends MainFormDesign {
                     for (int i = 0; i < mainMenuItemIds.size(); i++) {
                         if (treeMainMenu.getParent(mainMenuItemIds.get(i)) != null
                                 && (treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isExperimentDataReport").getValue() == null
-                                && (treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isTargetReport").getValue() == null))) {
+                                && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isTargetReport").getValue() == null
+                                && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isFpyReport").getValue() == null)) {
                             if (mnuAccessTrimmed.indexOf(mainMenuItemIds.get(i).toString().trim()) == -1) {
                                 if (treeMainMenu.getChildren(mainMenuItemIds.get(i)) == null)
                                     treeMainMenu.removeItem(mainMenuItemIds.get(i));
@@ -195,7 +212,8 @@ public class MainForm extends MainFormDesign {
 
     private void setFormContent(String itemClickedText, Item treeItemClicked) {
         if (treeItemClicked == null || (treeItemClicked.getItemProperty("isExperimentDataReport").getValue() == null
-                && treeItemClicked.getItemProperty("isTargetReport").getValue() == null)) {
+                && treeItemClicked.getItemProperty("isTargetReport").getValue() == null
+                && treeItemClicked.getItemProperty("isFpyReport").getValue() == null)) {
             switch (itemClickedText.toLowerCase()) {
                 case "manage experiments":
                     formContentLayout.removeAllComponents();
@@ -278,6 +296,9 @@ public class MainForm extends MainFormDesign {
         } else if (treeItemClicked.getItemProperty("targetReportId").getValue() != null) {
             formContentLayout.removeAllComponents();
             formContentLayout.addComponent(new TargetDataReportForm((Integer) treeItemClicked.getItemProperty("targetReportId").getValue()));
+        } else if (treeItemClicked.getItemProperty("fpyReportId").getValue() != null) {
+            formContentLayout.removeAllComponents();
+            formContentLayout.addComponent(new FirstPassYieldReportDataForm((Integer) treeItemClicked.getItemProperty("fpyReportId").getValue()));
         }
     }
 }

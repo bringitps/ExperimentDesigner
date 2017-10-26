@@ -40,7 +40,7 @@
         <vaadin-text-field required-error="This field is mandatory." caption="Name:" required style-name="tiny" width-full _id="txtFpyRptName"></vaadin-text-field> 
        </column> 
        <column> 
-        <vaadin-text-field required-error="This field is mandatory." caption="Custom Id:" required style-name="tiny" width-full _id="txtFpyRptCustomId"></vaadin-text-field> 
+        <vaadin-text-field required-error="This field is mandatory. Only alphaNumeric characters, spaces and underscores are allowed." caption="Custom Id:" required style-name="tiny" width-full _id="txtFpyRptCustomId"></vaadin-text-field> 
        </column> 
       </row> 
       <row> 
@@ -54,39 +54,48 @@
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-grid-layout caption="Yield definition" style-name="tiny" spacing width="960px" height="130px" _id="gbxYieldFields"> 
-    <row> 
-     <column> 
-      <vaadin-combo-box caption="Datetime Field:" required style-name="tiny" width-full _id="cbxDateTimeField"></vaadin-combo-box> 
-     </column> 
-     <column> 
-      <vaadin-combo-box caption="Serial Number Field:" required style-name="tiny" width-full _id="cbxSerialNumberField"></vaadin-combo-box> 
-     </column> 
-     <column> 
-      <vaadin-combo-box caption="Result Field:" required style-name="tiny" width-full _id="cbxResultField"></vaadin-combo-box> 
-     </column> 
-    </row> 
-    <row> 
-     <column> 
-      <vaadin-check-box caption="Group by time range" _id="chxGroupByTimeRange" :middle></vaadin-check-box> 
-     </column> 
-     <column> 
-      <vaadin-text-field caption="Group time range (minutes):" style-name="tiny" width-full _id="txtGroupTimeRange"></vaadin-text-field> 
-     </column> 
-     <column> 
-      <vaadin-grid-layout spacing width-full height="60px" _id="gbxResultValues"> 
-       <row> 
-        <column> 
-         <vaadin-text-field required-error="This field is mandatory." caption="Result Pass Value:" required style-name="tiny" width-full value="PASS" _id="txtFpyRptPassValue"></vaadin-text-field> 
-        </column> 
-        <column> 
-         <vaadin-text-field required-error="This field is mandatory." caption="Result Fail Value:" required style-name="tiny" width-full value="FAIL" _id="txtFpyRptFailValue"></vaadin-text-field> 
-        </column> 
-       </row> 
-      </vaadin-grid-layout> 
-     </column> 
-    </row> 
-   </vaadin-grid-layout> 
+   <vaadin-vertical-layout width="960px" height="160px"> 
+    <vaadin-grid-layout caption="Yield definition" style-name="tiny" spacing width="960px" _id="gbxYieldFields"> 
+     <row> 
+      <column> 
+       <vaadin-combo-box caption="Datetime Field:" required style-name="tiny" width="310px" _id="cbxDateTimeField"></vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-combo-box caption="Serial Number Field:" required style-name="tiny" width="310px" _id="cbxSerialNumberField"></vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-combo-box caption="Result Field:" required style-name="tiny" width="310px" _id="cbxResultField"></vaadin-combo-box> 
+      </column> 
+     </row> 
+     <row> 
+      <column> 
+       <vaadin-grid-layout spacing height="60px" _id="gbxTimeRange"> 
+        <row> 
+         <column> 
+          <vaadin-check-box caption="Group by time range" _id="chxGroupByTimeRange" :middle></vaadin-check-box> 
+         </column> 
+         <column> 
+          <vaadin-text-field caption="Time (minutes):" required style-name="tiny" width="120px" value="5" _id="txtGroupTimeRange"></vaadin-text-field> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+      <column></column> 
+      <column> 
+       <vaadin-grid-layout spacing height="60px" _id="gbxResultValues"> 
+        <row> 
+         <column> 
+          <vaadin-text-field required-error="This field is mandatory." caption="Result Pass Value:" required style-name="tiny" width="150px" value="PASS" _id="txtFpyRptPassValue"></vaadin-text-field> 
+         </column> 
+         <column> 
+          <vaadin-text-field required-error="This field is mandatory." caption="Result Fail Value:" required style-name="tiny" width="150px" value="FAIL" _id="txtFpyRptFailValue"></vaadin-text-field> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
    <vaadin-vertical-layout style-name="well" width="960px" _id="colGroupLayout"> 
     <vaadin-horizontal-layout width-full height="225px" _id="fpyFieldGroupsLayout"> 
      <vaadin-tab-sheet style-name="framed compact" size-full _id="tabColumnGroups"> 

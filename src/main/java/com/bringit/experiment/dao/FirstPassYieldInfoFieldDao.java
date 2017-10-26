@@ -75,7 +75,7 @@ public class FirstPassYieldInfoFieldDao {
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            fpyInfoFields = session.createQuery("from TargetReport where FpyReportId = " + fpyReportId).list();
+            fpyInfoFields = session.createQuery("from FirstPassYieldInfoField where FpyReportId = " + fpyReportId).list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {

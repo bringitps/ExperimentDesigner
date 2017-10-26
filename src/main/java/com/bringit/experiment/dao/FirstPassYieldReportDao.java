@@ -9,9 +9,6 @@ import org.hibernate.Transaction;
 
 import com.bringit.experiment.bll.FirstPassYieldInfoField;
 import com.bringit.experiment.bll.FirstPassYieldReport;
-import com.bringit.experiment.bll.TargetColumn;
-import com.bringit.experiment.bll.TargetColumnGroup;
-import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.Config;
 
@@ -94,6 +91,24 @@ public class FirstPassYieldReportDao {
 	        return fpyReport;
 	    }
 	    
+	    @SuppressWarnings({"unchecked", "unused"})
+	    public List<FirstPassYieldReport> getAllFirstPassYieldReports() {
+	        List<FirstPassYieldReport> fpyReports = new ArrayList<FirstPassYieldReport>();
+	        Transaction trns = null;
+	        Session session = HibernateUtil.getSessionFactory().openSession();
+	        //Session session = HibernateUtil.openSession(dialectXmlFile);
+	        try {
+	            trns = session.beginTransaction();
+	            fpyReports = session.createQuery("from FirstPassYieldReport where FpyReportIsActive = 'true'").list();
+	        } catch (RuntimeException e) {
+	            e.printStackTrace();
+	        } finally {
+	            session.flush();
+	            session.close();
+	        }
+	        return fpyReports;
+	    }
+	    
 	    public boolean saveDBFpyRptTable(FirstPassYieldReport fpyRpt, List<FirstPassYieldInfoField> fpyInfoFields) {
 	        String query = null;
 	        boolean successfulExecution = true;
@@ -154,5 +169,35 @@ public class FirstPassYieldReportDao {
 	        return successfulExecution;
 	    }
 
-	
+	    public boolean deleteDBFpyRptTable(FirstPassYieldReport fpyRpt) {
+	        String query = null;
+	        boolean successfulExecution = true;
+
+	        Config configuration = new Config();
+	        if (configuration.getProperty("dbms").equals("sqlserver")) {
+	            query = " IF EXISTS (SELECT * FROM sysobjects WHERE name='" + fpyRpt.getFpyReportDbRptTableNameId() + "' AND xtype='U') ";
+	            query += " DROP TABLE " + fpyRpt.getFpyReportDbRptTableNameId() + ";";
+	        } else
+	            return false;
+
+	        Transaction trns = null;
+	        Session session = HibernateUtil.getSessionFactory().openSession();
+
+	        try {
+	            trns = session.beginTransaction();
+	            session.createSQLQuery(query).executeUpdate();
+	            session.getTransaction().commit();
+	        } catch (RuntimeException e) {
+	            if (trns != null) {
+	                trns.rollback();
+	            }
+	            successfulExecution = false;
+	            e.printStackTrace();
+	        } finally {
+	            session.flush();
+	            session.close();
+	        }
+	        return successfulExecution;
+	    }    
+	    	
 }

@@ -1,7 +1,10 @@
 package com.bringit.experiment.dao;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -9,8 +12,12 @@ import org.hibernate.Transaction;
 
 import com.bringit.experiment.bll.FirstPassYieldInfoField;
 import com.bringit.experiment.bll.FirstPassYieldReport;
+import com.bringit.experiment.bll.FirstPassYieldReportJobData;
+import com.bringit.experiment.bll.TargetReport;
+import com.bringit.experiment.bll.TargetReportJobData;
 import com.bringit.experiment.dal.HibernateUtil;
 import com.bringit.experiment.util.Config;
+import com.bringit.experiment.util.Constants;
 
 public class FirstPassYieldReportDao {
 
@@ -110,12 +117,17 @@ public class FirstPassYieldReportDao {
 	    }
 	    
 	    public boolean saveDBFpyRptTable(FirstPassYieldReport fpyRpt, List<FirstPassYieldInfoField> fpyInfoFields) {
-	        String query = null;
+	    	deleteDBFpyRptTable(fpyRpt);
+	    	
+	    	String query = null;
 	        boolean successfulExecution = true;
 
 	        List<String> dbRptTableCols = new ArrayList<String>();
 	        List<String> dbRptTableTypes = new ArrayList<String>();
 
+	        dbRptTableCols.add("fpy_experiment");
+	        dbRptTableTypes.add("varchar(MAX)");
+	        
 	        dbRptTableCols.add("fpy_date_time");
 	        dbRptTableTypes.add("datetime");
 
@@ -199,5 +211,39 @@ public class FirstPassYieldReportDao {
 	        }
 	        return successfulExecution;
 	    }    
+	    
+	    public Map<String,Object> executeFpyRptProcedure(FirstPassYieldReportJobData fpyRptJobData, FirstPassYieldReport fpyRpt) {
+	        Map<String,Object> map= new HashMap<>();
+	        FirstPassYieldReportJobDataDao firstPassYieldReportJobDataDao = new FirstPassYieldReportJobDataDao();
+	        String statusMessage = Constants.JOB_FINISHED;
+
+	        map.put("statusMessage", statusMessage);
+	        map.put("status", Constants.SUCCESS);
+	        try {
+
+
+	            List<String> lstFpyRptBean;
+	            lstFpyRptBean = new ArrayList<>();
+	            lstFpyRptBean.add(fpyRpt.getFpyReportId().toString());
+	            new ExecuteQueryDao().executeUpdateStoredProcedure("spFpyReportBuilder", lstFpyRptBean);
+
+	            fpyRpt.setFpyReportDbRptTableLastUpdate(new Date());
+	            this.updateFirstPassYieldReport(fpyRpt);
+
+	            statusMessage = Constants.JOB_FINISHED;
+	        } catch (Exception ex) {
+	            statusMessage = Constants.JOB_EXCEPTION;
+
+	            map.put("statusMessage", statusMessage);
+	            map.put("status", Constants.ERROR);
+	            ex.printStackTrace();
+	        } finally {
+	        	firstPassYieldReportJobDataDao.updateTargetJobStatus(fpyRptJobData, statusMessage);
+	        }
+
+	        return map;
+	    }
+	    
+	    
 	    	
 }

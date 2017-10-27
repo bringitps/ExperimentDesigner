@@ -39,7 +39,7 @@ public class FirstPassYieldReportDataDesign extends VerticalLayout {
 	protected ComboBox cbxFpyFieldFilter;
 	protected TextField txtExpFieldFilter;
 	protected Button btnExportExcel;
-	protected Table tblTargetDataReport;
+	protected Table tblFpyDataReport;
 
 	public FirstPassYieldReportDataDesign() {
 		Design.read(this);

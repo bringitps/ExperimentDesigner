@@ -341,6 +341,8 @@ public class FirstPassYieldReportBuilderForm extends FirstPassYieldReportBuilder
 			this.fpyReport.setFpyPassResultValue(this.txtFpyRptPassValue.getValue());
 			this.fpyReport.setFpyFailResultValue(this.txtFpyRptFailValue.getValue());
 			
+			this.fpyReport.setFpyReportDbRptTableLastUpdate(new Date());
+			
 			if(this.fpyReport.getFpyReportId() != null)
 			{
 				this.fpyReport.setCreatedBy(sessionUser);
@@ -366,7 +368,7 @@ public class FirstPassYieldReportBuilderForm extends FirstPassYieldReportBuilder
 				fpyInfoField.setFpyReport(this.fpyReport);
 				fpyInfoField.setExperimentField(new ExperimentFieldDao().getExperimentFieldById(Integer.parseInt(((ComboBox)(tblRowItem.getItemProperty(this.systemSettings.getExperimentLabel() + " Field").getValue())).getValue().toString())));
 				fpyInfoField.setFpyInfoFieldLabel(((TextField)(tblRowItem.getItemProperty("Label").getValue())).getValue());
-				
+								
 				if(itemId > 0)
 				{
 					fpyInfoField.setFpyInfoFieldId(itemId);
@@ -379,6 +381,8 @@ public class FirstPassYieldReportBuilderForm extends FirstPassYieldReportBuilder
 			}
 			
 			new FirstPassYieldReportDao().saveDBFpyRptTable(this.fpyReport, fpyInfoFields);
+			//Execute Store Procedure to refresh data
+			
 			
 			if(isNewRecord)
 			{

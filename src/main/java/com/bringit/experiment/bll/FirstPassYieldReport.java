@@ -36,6 +36,9 @@ public class FirstPassYieldReport {
 	@Column(name="FpyReportDbRptTableNameId")
 	private String fpyReportDbRptTableNameId;
 
+	@Column(name="FpyReportDbRptTableLastUpdate")
+	private Date fpyReportDbRptTableLastUpdate;
+	
 	@Column(name="FpyReportDescription")
 	private String fpyReportDescription;
 	
@@ -86,6 +89,7 @@ public class FirstPassYieldReport {
 		this.fpyReportIsActive = null;
 		this.fpyReportName = null;
 		this.fpyReportDbRptTableNameId = null;
+		this.fpyReportDbRptTableLastUpdate = null;
 		this.fpyReportDescription = null;
 		this.fpyGroupByTimeRange = null;
 		this.fpyTimeRangeMin = null;
@@ -102,13 +106,14 @@ public class FirstPassYieldReport {
 	}
 	
 	public FirstPassYieldReport(Integer fpyReportId, Boolean fpyReportIsActive, String fpyReportName,
-			String fpyReportDbRptTableNameId, String fpyReportDescription, Boolean fpyGroupByTimeRange, Integer fpyTimeRangeMin, Experiment experiment,
+			String fpyReportDbRptTableNameId, Date fpyReportDbRptTableLastUpdate, String fpyReportDescription, Boolean fpyGroupByTimeRange, Integer fpyTimeRangeMin, Experiment experiment,
 			ExperimentField serialNumberExpField, ExperimentField dateTimeExpField, ExperimentField resultExpField,
 			String fpyPassResultValue, String fpyFailResultValue, Date createdDate, Date modifiedDate, SysUser createdBy, SysUser lastModifiedBy) {
 		this.fpyReportId = fpyReportId;
 		this.fpyReportIsActive = fpyReportIsActive;
 		this.fpyReportName = fpyReportName;
 		this.fpyReportDbRptTableNameId = fpyReportDbRptTableNameId;
+		this.fpyReportDbRptTableLastUpdate = fpyReportDbRptTableLastUpdate;
 		this.fpyReportDescription = fpyReportDescription;
 		this.fpyGroupByTimeRange = fpyGroupByTimeRange;
 		this.fpyTimeRangeMin = fpyTimeRangeMin;
@@ -154,6 +159,14 @@ public class FirstPassYieldReport {
 
 	public void setFpyReportDbRptTableNameId(String fpyReportDbRptTableNameId) {
 		this.fpyReportDbRptTableNameId = fpyReportDbRptTableNameId;
+	}
+	
+	public Date getFpyReportDbRptTableLastUpdate() {
+		return fpyReportDbRptTableLastUpdate;
+	}
+
+	public void setFpyReportDbRptTableLastUpdate(Date fpyReportDbRptTableLastUpdate) {
+		this.fpyReportDbRptTableLastUpdate = fpyReportDbRptTableLastUpdate;
 	}
 
 	public String getFpyReportDescription() {

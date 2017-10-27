@@ -79,6 +79,7 @@
  		<mapping class="com.bringit.experiment.bll.CsvTemplateEnrichment"/>
  		<mapping class="com.bringit.experiment.bll.FirstPassYieldReport"/>
  		<mapping class="com.bringit.experiment.bll.FirstPassYieldInfoField"/>
+ 		<mapping class="com.bringit.experiment.bll.FirstPassYieldReportJobData"/>
  		<mapping class="com.bringit.experiment.bll.FirstTimeYieldReport"/>
  		<mapping class="com.bringit.experiment.bll.FirstTimeYieldInfoField"/>
 

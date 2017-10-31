@@ -272,7 +272,7 @@ public class ExperimentParser {
 	        			            //Enrichment Rules feature added to Bit-Exp
 	        			            List<String> csvFileColumnNameMtx = new ArrayList<String>();
 	        		            	List<String[]> csvFileColumnValuesMtx = new ArrayList<String[]>();
-	        		            	 
+	        		            	
 	        		            	for(int i=0; i < header.length; i++)
 	        		            	{
 	        		            		if(!header[i].isEmpty() && header[i] != null)
@@ -284,8 +284,9 @@ public class ExperimentParser {
 	     	        		            
 	        		            				csvFileColumnNameMtx.add(header[i]);
 	        		            				csvFileColumnValuesMtx.add(csvColumnValues);
+
 	        		            		}
-	 	        		            }
+	 	        		            }	
 	        		            	
 	        		            	List<String> enrichExpFieldDbIdMtx = new ArrayList<String>();
 	        		            	List<String> enrichExpFieldTypeMtx = new ArrayList<String>();
@@ -300,11 +301,15 @@ public class ExperimentParser {
 	        		            			int csvFileColumnMtxIndex = csvFileColumnNameMtx.indexOf(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentColumnNameSource());
 	        		            			if(csvFileColumnMtxIndex != -1)
 	        		            			{
+	        		            				
 	        		            				enrichExpFieldDbIdMtx.add(csvTemplateEnrichmentRules.get(i).getExpFieldDestination().getExpDbFieldNameId());
 	        		            				enrichExpFieldTypeMtx.add(csvTemplateEnrichmentRules.get(i).getExpFieldDestination().getExpFieldType());
 	        		            				enrichExpFieldLastCsvColumnMtx.add(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentColumnNameSource());
-	        		            				
-	        		            				enrichExpFieldValuesMtx.add(csvFileColumnValuesMtx.get(csvFileColumnMtxIndex));
+	        		            			
+	        		            				//Added at 10/31
+	        		            				//Clone function added to fix enrichment issue 
+	        		            				//It was not reading original csv column values because it was overwriting array entries
+	        		            				enrichExpFieldValuesMtx.add(csvFileColumnValuesMtx.get(csvFileColumnMtxIndex).clone());
 	        		            				
 	        		            				if(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentType() != null 
 	        		            						&& !"positivenumber".equals(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentType())
@@ -321,7 +326,7 @@ public class ExperimentParser {
 	        		            				if(!enrichExpFieldLastCsvColumnMtx.get(enrichExpFieldMtxIndex).equals(csvFileColumnNameMtx.get(csvFileColumnMtxIndex)))
 	        		            				{
 	        		            					//New Column Enrichment
-	        		            					enrichExpFieldValuesMtx.set(i, csvFileColumnValuesMtx.get(csvFileColumnMtxIndex));
+	        		            					enrichExpFieldValuesMtx.set(i, csvFileColumnValuesMtx.get(csvFileColumnMtxIndex).clone());
 	        		            				}
 	        		            				if(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentType() != null 
 	        		            						&& !"positivenumber".equals(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentType())
@@ -344,7 +349,7 @@ public class ExperimentParser {
 	        		            				enrichExpFieldTypeMtx.add(csvTemplateEnrichmentRules.get(i).getExpFieldDestination().getExpFieldType());
 	        		            				enrichExpFieldLastCsvColumnMtx.add(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentColumnNameSource());
 	        		            				
-	        		            				enrichExpFieldValuesMtx.add(csvFileColumnValuesMtx.get(csvFileColumnMtxIndex));
+	        		            				enrichExpFieldValuesMtx.add(csvFileColumnValuesMtx.get(csvFileColumnMtxIndex).clone());
 	        		            				
 	        		            				if(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentType() != null 
 	        		            						&& "positivenumber".equals(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentType()))
@@ -371,7 +376,7 @@ public class ExperimentParser {
 	        		            				if(!enrichExpFieldLastCsvColumnMtx.get(enrichExpFieldMtxIndex).equals(csvFileColumnNameMtx.get(csvFileColumnMtxIndex)))
 	        		            				{
 	        		            					//New Column Enrichment
-	        		            					enrichExpFieldValuesMtx.set(i, csvFileColumnValuesMtx.get(csvFileColumnMtxIndex));
+	        		            					enrichExpFieldValuesMtx.set(i, csvFileColumnValuesMtx.get(csvFileColumnMtxIndex).clone());
 	        		            				}
 	        		            				if(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentType() != null 
 	        		            						&& "positivenumber".equals(csvTemplateEnrichmentRules.get(i).getCsvTemplateEnrichmentType()))
@@ -391,7 +396,7 @@ public class ExperimentParser {
 	        		            			}
 	        		            		}
 	        		        		}
-	        		            	
+	        		            		        		            	
 	        		            	for(int i=0; i<enrichExpFieldDbIdMtx.size(); i++)
 	        		            	{
 	        		            		int directMappingCsvIndex = csvColumnFieldDbIdXRefMtx.indexOf(enrichExpFieldDbIdMtx.get(i));
@@ -406,6 +411,7 @@ public class ExperimentParser {
 	    	        		            	csvColumnValuesMtx.add(enrichExpFieldValuesMtx.get(i));
 	    	        		            }
 	        		            	}
+	        		            	
 	        		            	
 	        		            	
 	        		            	//Validate Field Types of Enriched Columns

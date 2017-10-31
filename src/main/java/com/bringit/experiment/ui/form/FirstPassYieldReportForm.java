@@ -77,13 +77,13 @@ public class FirstPassYieldReportForm extends FirstPassYieldReportDesign{
 			@Override
 			public void windowClose(CloseEvent e) {
 				// TODO Auto-generated method stub
-				reloadTargetReportDbViewResults();
+				reloadFpyReportDbViewResults();
 			}
 		});
 		 this.getUI().addWindow(fpyReportBuilderModalWindow);
     }
 	
-	private void reloadTargetReportDbViewResults()
+	private void reloadFpyReportDbViewResults()
 	{
 		ResultSet fpyRptViewResults = null;
 		if(this.cbxFirstPassYieldReportViewFilters.getValue() != null)

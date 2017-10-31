@@ -82,6 +82,7 @@
  		<mapping class="com.bringit.experiment.bll.FirstPassYieldReportJobData"/>
  		<mapping class="com.bringit.experiment.bll.FirstTimeYieldReport"/>
  		<mapping class="com.bringit.experiment.bll.FirstTimeYieldInfoField"/>
+ 		<mapping class="com.bringit.experiment.bll.FirstTimeYieldReportJobData"/>
 
     </session-factory>
 </hibernate-configuration>

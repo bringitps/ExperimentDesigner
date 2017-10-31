@@ -32,16 +32,22 @@ public class FirstTimeYieldInfoField {
     @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
 	private ExperimentField experimentField;
 
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="FtyReportId", unique=false, updatable=true)
+	private FirstTimeYieldReport ftyReport;
+	
 	public FirstTimeYieldInfoField() {
 		this.ftyInfoFieldId = null;
 		this.ftyInfoFieldLabel = null;
 		this.experimentField = null;
+		this.ftyReport = null;
 	}
 
-	public FirstTimeYieldInfoField(Integer ftyInfoFieldId, String ftyInfoFieldLabel, ExperimentField experimentField) {
+	public FirstTimeYieldInfoField(Integer ftyInfoFieldId, String ftyInfoFieldLabel, ExperimentField experimentField, FirstTimeYieldReport ftyReport) {
 		this.ftyInfoFieldId = ftyInfoFieldId;
 		this.ftyInfoFieldLabel = ftyInfoFieldLabel;
 		this.experimentField = experimentField;
+		this.ftyReport = ftyReport;
 	}
 
 	public Integer getFtyInfoFieldId() {
@@ -66,5 +72,13 @@ public class FirstTimeYieldInfoField {
 
 	public void setExperimentField(ExperimentField experimentField) {
 		this.experimentField = experimentField;
+	}
+
+	public FirstTimeYieldReport getFtyReport() {
+		return ftyReport;
+	}
+
+	public void setFtyReport(FirstTimeYieldReport ftyReport) {
+		this.ftyReport = ftyReport;
 	}
 }

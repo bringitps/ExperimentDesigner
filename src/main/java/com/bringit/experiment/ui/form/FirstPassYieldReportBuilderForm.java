@@ -305,7 +305,6 @@ public class FirstPassYieldReportBuilderForm extends FirstPassYieldReportBuilder
 		this.txtGroupTimeRange.setEnabled(enable);
 	}
 	
-	
 	private void onSave()
 	{		
 		boolean validateRequiredFieldsResult = validateRequiredFields();
@@ -344,15 +343,12 @@ public class FirstPassYieldReportBuilderForm extends FirstPassYieldReportBuilder
 			this.fpyReport.setFpyReportDbRptTableLastUpdate(new Date());
 			
 			if(this.fpyReport.getFpyReportId() != null)
-			{
-				this.fpyReport.setCreatedBy(sessionUser);
-				this.fpyReport.setCreatedDate(new Date());		
 				new FirstPassYieldReportDao().updateFirstPassYieldReport(this.fpyReport);
-				
-			}
 			else
 			{
 				isNewRecord = true;
+				this.fpyReport.setCreatedBy(sessionUser);
+				this.fpyReport.setCreatedDate(new Date());	
 				new FirstPassYieldReportDao().addFirstPassYieldReport(this.fpyReport);
 			}
 			

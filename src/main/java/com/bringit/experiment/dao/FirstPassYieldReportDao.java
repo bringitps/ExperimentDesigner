@@ -238,7 +238,7 @@ public class FirstPassYieldReportDao {
 	            map.put("status", Constants.ERROR);
 	            ex.printStackTrace();
 	        } finally {
-	        	firstPassYieldReportJobDataDao.updateTargetJobStatus(fpyRptJobData, statusMessage);
+	        	firstPassYieldReportJobDataDao.updateFpyJobStatus(fpyRptJobData, statusMessage);
 	        }
 
 	        return map;

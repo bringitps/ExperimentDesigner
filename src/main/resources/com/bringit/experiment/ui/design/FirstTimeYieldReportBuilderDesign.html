@@ -40,7 +40,7 @@
         <vaadin-text-field required-error="This field is mandatory." caption="Name:" required style-name="tiny" width-full _id="txtFtyRptName"></vaadin-text-field> 
        </column> 
        <column> 
-        <vaadin-text-field required-error="This field is mandatory." caption="Custom Id:" required style-name="tiny" width-full _id="txtFtyRptCustomId"></vaadin-text-field> 
+        <vaadin-text-field required-error="This field is mandatory. Only alphaNumeric characters, spaces and underscores are allowed." caption="Custom Id:" required style-name="tiny" width-full _id="txtFtyRptCustomId"></vaadin-text-field> 
        </column> 
       </row> 
       <row> 
@@ -54,22 +54,84 @@
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-grid-layout caption="Yield fields" style-name="tiny" spacing width="960px" height="70px" _id="gbxYieldFields"> 
-    <row> 
-     <column> 
-      <vaadin-combo-box caption="Datetime Field:" required style-name="tiny" width-full _id="cbxDateTimeField"></vaadin-combo-box> 
-     </column> 
-     <column> 
-      <vaadin-combo-box caption="Serial Number Field:" required style-name="tiny" width-full _id="cbxSerialNumberField"></vaadin-combo-box> 
-     </column> 
-     <column> 
-      <vaadin-combo-box caption="Result Field:" required style-name="tiny" width-full _id="cbxResultField"></vaadin-combo-box> 
-     </column> 
-    </row> 
-   </vaadin-grid-layout> 
+   <vaadin-vertical-layout width="960px" height="160px"> 
+    <vaadin-grid-layout caption="Yield definition" style-name="tiny" spacing width="960px" _id="gbxYieldFields"> 
+     <row> 
+      <column> 
+       <vaadin-combo-box caption="Datetime Field:" required style-name="tiny" width="310px" _id="cbxDateTimeField"></vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-combo-box caption="Serial Number Field:" required style-name="tiny" width="310px" _id="cbxSerialNumberField"></vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-combo-box caption="Result Field:" required style-name="tiny" width="310px" _id="cbxResultField"></vaadin-combo-box> 
+      </column> 
+     </row> 
+     <row> 
+      <column> 
+       <vaadin-grid-layout spacing height="60px" _id="gbxTimeRange"> 
+        <row> 
+         <column> 
+          <vaadin-check-box caption="Group by time range" _id="chxGroupByTimeRange" :middle></vaadin-check-box> 
+         </column> 
+         <column> 
+          <vaadin-text-field caption="Time (minutes):" required style-name="tiny" width="120px" value="5" _id="txtGroupTimeRange"></vaadin-text-field> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+      <column></column> 
+      <column> 
+       <vaadin-grid-layout spacing height="60px" _id="gbxResultValues"> 
+        <row> 
+         <column> 
+          <vaadin-text-field required-error="This field is mandatory." caption="Result Pass Value:" required style-name="tiny" width="150px" value="PASS" _id="txtFtyRptPassValue"></vaadin-text-field> 
+         </column> 
+         <column> 
+          <vaadin-text-field required-error="This field is mandatory." caption="Result Fail Value:" required style-name="tiny" width="150px" value="FAIL" _id="txtFtyRptFailValue"></vaadin-text-field> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
    <vaadin-vertical-layout style-name="well" width="960px" _id="colGroupLayout"> 
-    <vaadin-horizontal-layout width-full height="285px" _id="ftyFieldGroupsLayout"> 
-     <vaadin-tab-sheet style-name="framed compact" size-full _id="tabColumnGroups"></vaadin-tab-sheet> 
+    <vaadin-horizontal-layout width-full height="225px" _id="ftyFieldGroupsLayout"> 
+     <vaadin-tab-sheet style-name="framed compact" size-full _id="tabColumnGroups"> 
+      <tab caption="Information Fields" selected> 
+       <vaadin-vertical-layout size-full margin _id="infoFieldsLayout"> 
+        <vaadin-horizontal-split-panel locked split-position="82%" _id="pnlInfoFields"> 
+         <vaadin-table selectable size-full _id="tblInformationFields"> 
+          <table> 
+           <colgroup> 
+            <col property-id="*"> 
+            <col property-id="Field"> 
+            <col property-id="Label"> 
+           </colgroup> 
+           <tbody></tbody> 
+          </table> 
+         </vaadin-table> 
+         <vaadin-grid-layout spacing width-full height="70px" _id="gridBtnsRptInfoFields"> 
+          <row> 
+           <column> 
+            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" width="120px" height="25px" plain-text _id="btnAddField">
+              Add field 
+            </vaadin-button> 
+           </column> 
+          </row> 
+          <row> 
+           <column> 
+            <vaadin-button icon="fonticon://FontAwesome/f068" style-name="tiny danger" width="120px" height="25px" plain-text _id="btnRemoveField">
+              Remove field 
+            </vaadin-button> 
+           </column> 
+          </row> 
+         </vaadin-grid-layout> 
+        </vaadin-horizontal-split-panel> 
+       </vaadin-vertical-layout> 
+      </tab> 
+     </vaadin-tab-sheet> 
     </vaadin-horizontal-layout> 
    </vaadin-vertical-layout> 
    <vaadin-vertical-layout height="40px" _id="btnDeleteLayout"> 

@@ -2,6 +2,7 @@ package com.bringit.experiment.job;
 
 import com.bringit.experiment.dao.ExperimentJobDataDao;
 import com.bringit.experiment.dao.FirstPassYieldReportJobDataDao;
+import com.bringit.experiment.dao.FirstTimeYieldReportJobDataDao;
 import com.bringit.experiment.dao.TargetReportJobDataDao;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
@@ -25,6 +26,9 @@ public class ProcedureExecutionJob implements Job {
         
         FirstPassYieldReportJobDataDao fpyRptJobDataDao = new FirstPassYieldReportJobDataDao();
         fpyRptJobDataDao.fpyProcedureJob();
+        
+        FirstTimeYieldReportJobDataDao ftyRptJobDataDao = new FirstTimeYieldReportJobDataDao();
+        ftyRptJobDataDao.ftyProcedureJob();
     }
 
 

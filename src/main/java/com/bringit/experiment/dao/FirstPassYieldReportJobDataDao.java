@@ -133,7 +133,7 @@ public class FirstPassYieldReportJobDataDao {
 	        return this.addFpyRptDataJob(fpyRptJobData);
 	    }
 
-	    public void updateTargetJobStatus(FirstPassYieldReportJobData fpyRptJobData, String status) {
+	    public void updateFpyJobStatus(FirstPassYieldReportJobData fpyRptJobData, String status) {
 	    	fpyRptJobData.setIsCompleted(true);
 	    	fpyRptJobData.setLastModifiedDate(new Date());
 	    	fpyRptJobData.setStatus(status);
@@ -169,7 +169,7 @@ public class FirstPassYieldReportJobDataDao {
 	                    map.put("statusMessage",Constants.JOB_NOT_EXECUTED );
 	                    map.put("status",Constants.ERROR);
 	                    fpyReportJobData = this.createJob(Constants.Auto, null, fpyReport.getFpyReportId());
-	                    this.updateTargetJobStatus(fpyReportJobData, Constants.JOB_NOT_EXECUTED);
+	                    this.updateFpyJobStatus(fpyReportJobData, Constants.JOB_NOT_EXECUTED);
 	                }
 	            }
 	        	System.out.println("End of Refreshing First Pass Yield Report data: " + new Date());

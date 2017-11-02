@@ -224,6 +224,12 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
 
     private void applySelectedFilters()
     {
+    	if(multiFilterGrid.getRows() == 1 && ((ComboBox)multiFilterGrid.getComponent(0, 0)).getValue() == null)
+    	{
+         	vaadinTblContainer.removeAllContainerFilters();
+         	return;
+    	}
+    	
     	String filterExpression = null;
 
     	List<Filter> orFilterList = new ArrayList<>();
@@ -711,49 +717,11 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
     private void removeFilterRow(Button clickedButton)
     {
     	if(multiFilterGrid.getRows() == 1)
-    		return;
-    	
-    	Integer gridFilterRow = multiFilterGrid.getComponentArea(clickedButton).getRow1();    	
-    	multiFilterGrid.removeRow(gridFilterRow);
-    	
-    	if(multiFilterGrid.getRows() > 1)
-    		multiFilterGrid.setHeight(multiFilterGrid.getHeight() - 35, UNITS_PIXELS);
-    }
-    
-	private void updateFilterSearchField(ComboBox cbxExperimentField)
-	{
-		Integer experimentFieldTypeRefIndex = experimentFieldDbIdXRef.indexOf(cbxExperimentField.getValue());
-		
-		if(experimentFieldTypeXRef.get(experimentFieldTypeRefIndex).contains("date"))
-		{	
+    	{
+    		ComboBox cbxExperimentField = (ComboBox)multiFilterGrid.getComponent(0, 0);    		
+    		
 			Integer selectedGridFilterRow = multiFilterGrid.getComponentArea(cbxExperimentField).getRow1();
-			multiFilterGrid.removeComponent(2, selectedGridFilterRow);
-			
-			ComboBox selectedCbxFilterOperatorField = (ComboBox)multiFilterGrid.getComponent(1, selectedGridFilterRow);
-			selectedCbxFilterOperatorField.setContainerDataSource(null);
-			fillCbxDateFilterOperators(selectedCbxFilterOperatorField);
-			
-			HorizontalLayout dateFilterFieldLayout = new HorizontalLayout();
-			dateFilterFieldLayout.setWidth(195, Sizeable.UNITS_PIXELS);
-			
-	    	DateField fromDateField = new DateField();
-	    	fromDateField.setWidth(95, Sizeable.UNITS_PIXELS);
-	    	fromDateField.setHeight(25, Sizeable.UNITS_PIXELS);
-	    	fromDateField.setStyleName(txtStringFilter1.getStyleName());
-	    	dateFilterFieldLayout.addComponent(fromDateField);
-	    	
-	    	DateField toDateField = new DateField();
-	    	toDateField.setWidth(95, Sizeable.UNITS_PIXELS);
-	    	toDateField.setHeight(25, Sizeable.UNITS_PIXELS);
-	    	toDateField.setStyleName(txtStringFilter1.getStyleName());
-	    	dateFilterFieldLayout.addComponent(toDateField);
-	    
-	    	multiFilterGrid.addComponent(dateFilterFieldLayout, 2, selectedGridFilterRow);
-			
-		}
-		else
-		{
-			Integer selectedGridFilterRow = multiFilterGrid.getComponentArea(cbxExperimentField).getRow1();
+			multiFilterGrid.removeComponent(0, selectedGridFilterRow);
 			multiFilterGrid.removeComponent(2, selectedGridFilterRow);
 			
 			ComboBox selectedCbxFilterOperatorField = (ComboBox)multiFilterGrid.getComponent(1, selectedGridFilterRow);
@@ -765,9 +733,85 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
 	    	newTxtStringFilterField.setWidth(txtStringFilter1.getWidth(), UNITS_PIXELS);
 	    	newTxtStringFilterField.setStyleName(txtStringFilter1.getStyleName());
 	    	multiFilterGrid.addComponent(newTxtStringFilterField, 2, selectedGridFilterRow);
+			
+
+	    	ComboBox newCbxExperimentField = new ComboBox();
+	    	newCbxExperimentField.setId("cbxExperimentField1");
+	    	newCbxExperimentField.setHeight(cbxExperimentField1.getHeight(), UNITS_PIXELS);
+	    	newCbxExperimentField.setWidth(cbxExperimentField1.getWidth(), UNITS_PIXELS);
+	    	newCbxExperimentField.setStyleName(cbxExperimentField1.getStyleName());
 	    	
+	    	newCbxExperimentField.addValueChangeListener(new ValueChangeListener() {
+
+	            @Override
+	            public void valueChange(ValueChangeEvent event) {
+	            	updateFilterSearchField(newCbxExperimentField);
+	            }
+	        });
+	    	
+	    	fillCbxExperimentFields(newCbxExperimentField);
+	    	multiFilterGrid.addComponent(newCbxExperimentField, 0, 0);    	   
+    		
+    		return;
+    	}
+    	
+    	Integer gridFilterRow = multiFilterGrid.getComponentArea(clickedButton).getRow1();    	
+    	multiFilterGrid.removeRow(gridFilterRow);
+    	
+    	if(multiFilterGrid.getRows() > 1)
+    		multiFilterGrid.setHeight(multiFilterGrid.getHeight() - 35, UNITS_PIXELS);
+    }
+    
+	private void updateFilterSearchField(ComboBox cbxExperimentField)
+	{
+		if(cbxExperimentField != null)
+		{
+			Integer experimentFieldTypeRefIndex = experimentFieldDbIdXRef.indexOf(cbxExperimentField.getValue());
+			
+			if(experimentFieldTypeXRef.get(experimentFieldTypeRefIndex).contains("date"))
+			{	
+				Integer selectedGridFilterRow = multiFilterGrid.getComponentArea(cbxExperimentField).getRow1();
+				multiFilterGrid.removeComponent(2, selectedGridFilterRow);
+				
+				ComboBox selectedCbxFilterOperatorField = (ComboBox)multiFilterGrid.getComponent(1, selectedGridFilterRow);
+				selectedCbxFilterOperatorField.setContainerDataSource(null);
+				fillCbxDateFilterOperators(selectedCbxFilterOperatorField);
+				
+				HorizontalLayout dateFilterFieldLayout = new HorizontalLayout();
+				dateFilterFieldLayout.setWidth(195, Sizeable.UNITS_PIXELS);
+				
+		    	DateField fromDateField = new DateField();
+		    	fromDateField.setWidth(95, Sizeable.UNITS_PIXELS);
+		    	fromDateField.setHeight(25, Sizeable.UNITS_PIXELS);
+		    	fromDateField.setStyleName(txtStringFilter1.getStyleName());
+		    	dateFilterFieldLayout.addComponent(fromDateField);
+		    	
+		    	DateField toDateField = new DateField();
+		    	toDateField.setWidth(95, Sizeable.UNITS_PIXELS);
+		    	toDateField.setHeight(25, Sizeable.UNITS_PIXELS);
+		    	toDateField.setStyleName(txtStringFilter1.getStyleName());
+		    	dateFilterFieldLayout.addComponent(toDateField);
+		    
+		    	multiFilterGrid.addComponent(dateFilterFieldLayout, 2, selectedGridFilterRow);
+				
+			}
+			else
+			{
+				Integer selectedGridFilterRow = multiFilterGrid.getComponentArea(cbxExperimentField).getRow1();
+				multiFilterGrid.removeComponent(2, selectedGridFilterRow);
+				
+				ComboBox selectedCbxFilterOperatorField = (ComboBox)multiFilterGrid.getComponent(1, selectedGridFilterRow);
+				selectedCbxFilterOperatorField.setContainerDataSource(null);
+				fillCbxStringFilterOperators(selectedCbxFilterOperatorField);
+				
+				TextField newTxtStringFilterField = new TextField();
+		    	newTxtStringFilterField.setHeight(txtStringFilter1.getHeight(), UNITS_PIXELS);
+		    	newTxtStringFilterField.setWidth(txtStringFilter1.getWidth(), UNITS_PIXELS);
+		    	newTxtStringFilterField.setStyleName(txtStringFilter1.getStyleName());
+		    	multiFilterGrid.addComponent(newTxtStringFilterField, 2, selectedGridFilterRow);
+		    	
+			}
 		}
-		
 	}
     
     private void refreshData() {
@@ -1076,6 +1120,7 @@ public class ExperimentDataReportForm extends ExperimentDataReportDesign {
                      public InputStream getStream() {
                     	InputStream is = null;
                      	ResultSet experimentDataRecordResults = new ExecuteQueryDao().getSqlSelectQueryResults(sqlQuery);
+                     	//System.out.println("Executed Query: " + sqlQuery);
                  		if(experimentDataRecordResults != null)
                  		{                 			
                  			try {

@@ -103,7 +103,7 @@ public class FirstPassYieldReportBuilderForm extends FirstPassYieldReportBuilder
 			this.chxGroupByTimeRange.setValue(this.fpyReport.getFpyGroupByTimeRange());
 			
 			this.txtGroupTimeRange.setValue(this.fpyReport.getFpyTimeRangeMin().toString());
-			this.txtGroupTimeRange.setVisible(this.chxGroupByTimeRange.getValue());
+			//this.txtGroupTimeRange.setVisible(this.chxGroupByTimeRange.getValue());
 			
 			this.txtFpyRptPassValue.setValue(this.fpyReport.getFpyPassResultValue());
 			this.txtFpyRptFailValue.setValue(this.fpyReport.getFpyFailResultValue());			

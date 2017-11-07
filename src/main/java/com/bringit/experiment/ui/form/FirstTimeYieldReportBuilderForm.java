@@ -104,7 +104,7 @@ public class FirstTimeYieldReportBuilderForm extends FirstTimeYieldReportBuilder
 			this.chxGroupByTimeRange.setValue(this.ftyReport.getFpyGroupByTimeRange());
 			
 			this.txtGroupTimeRange.setValue(this.ftyReport.getFtyTimeRangeMin().toString());
-			this.txtGroupTimeRange.setVisible(this.chxGroupByTimeRange.getValue());
+			//this.txtGroupTimeRange.setVisible(this.chxGroupByTimeRange.getValue());
 			
 			this.txtFtyRptPassValue.setValue(this.ftyReport.getFtyPassResultValue());
 			this.txtFtyRptFailValue.setValue(this.ftyReport.getFtyFailResultValue());			

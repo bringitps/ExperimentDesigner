@@ -330,7 +330,7 @@ public class FirstTimeYieldReportBuilderForm extends FirstTimeYieldReportBuilder
 			
 			this.ftyReport.setFtyReportIsActive(this.chxActive.getValue());
 			this.ftyReport.setFtyReportName(this.txtFtyRptName.getValue());
-			this.ftyReport.setFtyReportDbRptTableNameId("fpy#" + this.txtFtyRptCustomId.getValue());
+			this.ftyReport.setFtyReportDbRptTableNameId("fty#" + this.txtFtyRptCustomId.getValue());
 			this.ftyReport.setExperiment(new ExperimentDao().getExperimentById(Integer.parseInt(this.cbxExperiment.getValue().toString())));
 			this.ftyReport.setFtyReportDescription(this.txtFtyDescription.getValue());
 			this.ftyReport.setDateTimeExpField(new ExperimentFieldDao().getExperimentFieldById(Integer.parseInt(this.cbxDateTimeField.getValue().toString())));

@@ -7,6 +7,9 @@ AS
 
 BEGIN
 	
+	DECLARE @FullTimeGroupFpySqlInsert NVARCHAR(MAX);	--Contains all SQL Insert Statements to be executed for time grouping
+	SET @FullTimeGroupFpySqlInsert = '';
+
 	DECLARE @GroupedByTimeRange BIT;					--Identifies if First Pass Yield report requires time grouping logic	
 	DECLARE @FpyFamilyExpField NVARCHAR(MAX);			--Family field of First Pass Yield report
 	DECLARE @FpyDateTimeExpField NVARCHAR(MAX);			--DateTime field of First Pass Yield report
@@ -140,7 +143,8 @@ BEGIN
 												' SELECT RecordId, ''', @ExperimentName, ''',fpy_datetime_tmp, fpy_sn_tmp, fpy_result_tmp,', 
 													@FpyCsvInfoFields, ' FROM ##TimeGroupFpyTmp WHERE RecordId IN (', @FpyTimeGroupRecordIds, ')');
 														
-							EXECUTE sp_executesql @SqlInsertTimeGroupFpyResults;
+							SET @FullTimeGroupFpySqlInsert = CONCAT(@FullTimeGroupFpySqlInsert, ';', @SqlInsertTimeGroupFpyResults);
+
 							SET @FpyTimeGroupRecordIds = '';
 							SET @FirstRecordFoundId = NULL;
 						END;
@@ -158,8 +162,13 @@ BEGIN
 													@FpyCsvInfoFields, ' FROM ##TimeGroupFpyTmp WHERE RecordId IN (', @FpyTimeGroupRecordIds, ')');
 			
 			IF(@FpyTimeGroupRecordIds <> '')
+				BEGIN							
+					SET @FullTimeGroupFpySqlInsert = CONCAT(@FullTimeGroupFpySqlInsert, ';', @SqlInsertTimeGroupFpyResults);
+				END
+
+			IF(@FullTimeGroupFpySqlInsert <> '')
 				BEGIN
-					EXECUTE sp_executesql @SqlInsertTimeGroupFpyResults;
+					EXECUTE sp_executesql @FullTimeGroupFpySqlInsert;
 				END
 
 			--Delete ##CommonFpyTmp Temporal Table

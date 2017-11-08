@@ -7,6 +7,9 @@ AS
 
 BEGIN
 	
+	DECLARE @FullTimeGroupFtySqlInsert NVARCHAR(MAX);	--Contains all SQL Insert Statements to be executed for time grouping
+	SET @FullTimeGroupFtySqlInsert = '';
+
 	DECLARE @GroupedByTimeRange BIT;					--Identifies if First Time Yield report requires time grouping logic	
 	DECLARE @FtyFamilyExpField NVARCHAR(MAX);			--Family field of First Time Yield report
 	DECLARE @FtyDateTimeExpField NVARCHAR(MAX);			--DateTime field of First Time Yield report
@@ -140,7 +143,8 @@ BEGIN
 												' SELECT RecordId, ''', @ExperimentName, ''',fty_datetime_tmp, fty_sn_tmp, fty_result_tmp,', 
 													@FtyCsvInfoFields, ' FROM ##TimeGroupFtyTmp WHERE RecordId IN (', @FtyTimeGroupRecordIds, ')');
 														
-							EXECUTE sp_executesql @SqlInsertTimeGroupFtyResults;
+							SET @FullTimeGroupFtySqlInsert = CONCAT(@FullTimeGroupFtySqlInsert, ';', @SqlInsertTimeGroupFtyResults);
+
 							SET @FtyTimeGroupRecordIds = '';
 							SET @FirstRecordFoundId = NULL;
 						END;
@@ -159,7 +163,12 @@ BEGIN
 			
 			IF(@FtyTimeGroupRecordIds <> '')
 				BEGIN
-					EXECUTE sp_executesql @SqlInsertTimeGroupFtyResults;
+					SET @FullTimeGroupFtySqlInsert = CONCAT(@FullTimeGroupFtySqlInsert, ';', @SqlInsertTimeGroupFtyResults);
+				END
+
+			IF(@FullTimeGroupFtySqlInsert <> '')
+				BEGIN
+					EXECUTE sp_executesql @FullTimeGroupFtySqlInsert;
 				END
 
 			--Delete ##CommonFpyTmp Temporal Table

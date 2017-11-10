@@ -96,7 +96,7 @@ public class ExecuteQueryDao {
 		return rs;
     }
 	
-	public ResultSet executeStoredProcedure(String spName, List<String> spParameters)
+	public void executeStoredProcedure(String spName, List<String> spParameters)
 	{
 		CallableStatement callableStatement = null;
 		ResultSet rs = null;
@@ -132,13 +132,14 @@ public class ExecuteQueryDao {
 			for(int i=0; spParameters!=null && i<spParameters.size(); i++)
 				preparedStmt.setString((i+1), spParameters.get(i));
 			preparedStmt.setFetchSize(10000);
-			rs = preparedStmt.executeQuery();
-			return rs;
+			//rs = preparedStmt.executeQuery();
+			preparedStmt.execute();
+			//return rs;
 		}
 		catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return null;
+			//return null;
 		}
 	}
 

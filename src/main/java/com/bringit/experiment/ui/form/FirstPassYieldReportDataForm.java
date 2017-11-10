@@ -253,6 +253,13 @@ public class FirstPassYieldReportDataForm extends FirstPassYieldReportDataDesign
 				tblFpyDataReport.setColumnHeader("fpy_serial_number", "Serial Number");
 				tblFpyDataReport.setColumnHeader("fpy_result", "Result");
 				tblFpyDataReport.setColumnHeader("fpy_date_time", "Datetime");
+				tblFpyDataReport.setConverter("fpy_date_time", new StringToDateConverter() {
+				    @Override
+				    protected DateFormat getFormat(Locale locale) {
+						return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				    }
+				});
+				
 				
 				List<FirstPassYieldInfoField> fpyInfoFields = new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldByReportById(this.fpyReport.getFpyReportId());		
 

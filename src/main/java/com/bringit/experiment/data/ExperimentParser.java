@@ -149,6 +149,14 @@ public class ExperimentParser {
 	        		            while ((csvFileLine = reader.readNext()) != null) 
 	        		            	csvFileLines.add(csvFileLine);
 	        		            
+	        		            for(int i=0; i<csvFileLines.size(); i++)
+	        		            {
+	        		            	//Empty lines validation
+		        		            String csvFileLineTrimmed = String.join("", csvFileLines.get(i));//.replaceAll("(?m)^[\t]*\r?\n", "");
+		        		            if(csvFileLineTrimmed.isEmpty())
+		        		            	csvFileLines.remove(i);		        		            
+	        		            }
+	        		            
 	        		            reader.close();
 	        		            
 	        		            int totalLines = csvFileLines.size();	        		            
@@ -280,7 +288,7 @@ public class ExperimentParser {
 	        		            			String[] csvColumnValues = new String[totalLines];
 	        		            		 
 	        		            			for(int j=0; j<totalLines; j++)
-	        		            				csvColumnValues[j] = (csvFileLines.get(j)[i] != null) ? csvFileLines.get(j)[i] : "";
+	        		            				csvColumnValues[j] = (csvFileLines.get(j)[i] != null) ? csvFileLines.get(j)[i] : "";	        		            			
 	     	        		            
 	        		            				csvFileColumnNameMtx.add(header[i]);
 	        		            				csvFileColumnValuesMtx.add(csvColumnValues);

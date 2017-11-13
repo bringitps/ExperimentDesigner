@@ -253,7 +253,7 @@ public class FirstTimeYieldReportDataForm extends FirstTimeYieldReportDataDesign
 				tblFtyDataReport.setColumnHeader("fty_serial_number", "Serial Number");
 				tblFtyDataReport.setColumnHeader("fty_result", "Result");
 				tblFtyDataReport.setColumnHeader("fty_date_time", "Datetime");
-				tblFtyDataReport.setConverter("fpy_date_time", new StringToDateConverter() {
+				tblFtyDataReport.setConverter("fty_date_time", new StringToDateConverter() {
 				    @Override
 				    protected DateFormat getFormat(Locale locale) {
 						return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

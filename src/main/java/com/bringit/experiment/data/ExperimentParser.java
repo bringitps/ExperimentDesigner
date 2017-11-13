@@ -152,9 +152,13 @@ public class ExperimentParser {
 	        		            for(int i=0; i<csvFileLines.size(); i++)
 	        		            {
 	        		            	//Empty lines validation
-		        		            String csvFileLineTrimmed = String.join("", csvFileLines.get(i));//.replaceAll("(?m)^[\t]*\r?\n", "");
-		        		            if(csvFileLineTrimmed.isEmpty())
-		        		            	csvFileLines.remove(i);		        		            
+		        		            String csvFileLineTrimmed = String.join("", csvFileLines.get(i));
+		        		            
+		        		            if(csvFileLineTrimmed.isEmpty() || csvFileLineTrimmed.replaceAll(",", "").isEmpty())
+		        		            {
+		        		            	csvFileLines.remove(i);
+		        		            	i--;
+		        		            }
 	        		            }
 	        		            
 	        		            reader.close();
@@ -265,6 +269,7 @@ public class ExperimentParser {
 	        		            				{
 	        		            					exceptionRowMtx.add(rowCount);
 	        		            					exceptionRowDetailsMtx.add("Mandatory value missing for Column '" + csvColumnNameMtx.get(i) +"'.");
+	        		            					System.out.print("Mandatory value missing for Column '" + csvColumnNameMtx.get(i) +"'.");
 	        		            				}
 	        		            				else
 	        		            					exceptionRowDetailsMtx.set(exceptionRowMtxIndex, exceptionRowDetailsMtx.get(i) + " " + "Mandatory value missing for Column '" + csvColumnNameMtx.get(i) +"'.");
@@ -289,10 +294,9 @@ public class ExperimentParser {
 	        		            		 
 	        		            			for(int j=0; j<totalLines; j++)
 	        		            				csvColumnValues[j] = (csvFileLines.get(j)[i] != null) ? csvFileLines.get(j)[i] : "";	        		            			
-	     	        		            
-	        		            				csvFileColumnNameMtx.add(header[i]);
-	        		            				csvFileColumnValuesMtx.add(csvColumnValues);
-
+	        		            			
+	        		            			csvFileColumnNameMtx.add(header[i]);
+	        		            			csvFileColumnValuesMtx.add(csvColumnValues);
 	        		            		}
 	 	        		            }	
 	        		            	

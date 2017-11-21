@@ -70,6 +70,7 @@ public class RemoteCsvJob implements Job {
         FilesRepository filesRepository = jobData.getInboundFileRepo();
         FilesRepository outboundRepo = jobData.getProcessedFileRepo();
         FilesRepository exceptionRepo = jobData.getExceptionFileRepo();
+        FilesRepository archivingRepository = jobData.getArchivingFileRepo();
 
         if (filesRepository.isFileRepoIsSftp()) {
             FTPUtil sftp = new FTPUtil(filesRepository.getFileRepoHost(), Integer.parseInt(filesRepository.getFileRepoPort()),
@@ -113,6 +114,7 @@ public class RemoteCsvJob implements Job {
                 	
                 	InputStream is = sftp.secureGetFile(filesRepository.getFileRepoPath()+"/"+file.getFilename());
                     if (is != null) {
+                    	                                            	
                     	filesProcessed = true;
                         System.out.println("Received Input file and passing to parser: "+file.getFilename());
                         //--  Data File --//
@@ -151,6 +153,10 @@ public class RemoteCsvJob implements Job {
                         }
                         else
                         {	
+                        	//Move file to Archive Repository
+                        	if(archivingRepository != null)
+                        		moveFileToRepo(archivingRepository,  sftp.secureGetFile(filesRepository.getFileRepoPath()+"/"+file.getFilename()), file.getFilename());
+                        	
 	                        DataFile dataFile = new DataFile();
 	                        Date createdDate = new Date();
 	                        dataFile.setCreatedDate(createdDate);
@@ -307,6 +313,7 @@ public class RemoteCsvJob implements Job {
 
                     InputStream is = ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName());
                     if (is != null) {
+                    	
                     	filesProcessed = true;
                         if (new DataFileDao().getDataFileByName(ftpFile.getName()) != null) {
                         	
@@ -343,6 +350,10 @@ public class RemoteCsvJob implements Job {
                         }
                         else
                         {
+                        	//Move file to Archive Repository
+                        	if(archivingRepository != null)
+                        		moveFileToRepo(archivingRepository, ftp.simpleGetFile(filesRepository.getFileRepoPath(), ftpFile.getName()), ftpFile.getName());
+                        	
 	                        DataFile dataFile = new DataFile();
 	                        Date createdDate = new Date();
 	                        dataFile.setCreatedDate(createdDate);
@@ -500,6 +511,8 @@ public class RemoteCsvJob implements Job {
             List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, false);
             boolean filesProcessed = false;
             for (File file: files) {
+            	           	
+            	
             	//System.out.println(fileFilterCriteria);
             	//System.out.println("Regular Expression:"  + jobData.getCsvTemplateRegex() + " File Name: "  + file.getName().replaceAll(".csv",""));
             	
@@ -554,6 +567,10 @@ public class RemoteCsvJob implements Job {
 		                    }
 		                    else
 		                    {
+		                    	//Move file to Archive Repository
+		                    	if(archivingRepository != null)
+		                    		moveFileToRepo(archivingRepository, new FileInputStream(file), file.getName());
+		                    			                    	
 			                    DataFile dataFile = new DataFile();
 			                    Date createdDate = new Date();
 			                    dataFile.setCreatedDate(createdDate);

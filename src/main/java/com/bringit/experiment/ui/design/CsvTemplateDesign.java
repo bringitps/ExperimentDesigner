@@ -34,13 +34,13 @@ public class CsvTemplateDesign extends VerticalLayout {
 	protected CheckBox chxActive;
 	protected VerticalLayout crudLayout;
 	protected ComboBox comboCsvTExperiment;
-	protected Upload upCsv;
-	protected TextField txtCsvTName;
-	protected ComboBox cbxContractManufacturer;
-	protected TextArea txtCsvTComments;
 	protected GridLayout gridAdditionalOptions;
 	protected CheckBox chxTransformTxt;
 	protected CheckBox chxColumnRepeat;
+	protected TextField txtCsvTName;
+	protected Upload upCsv;
+	protected TextArea txtCsvTComments;
+	protected ComboBox cbxContractManufacturer;
 	protected Accordion csvTJobAndMap;
 	protected VerticalLayout csvTJobLayout;
 	protected CheckBox chxNotScheduled;
@@ -52,8 +52,9 @@ public class CsvTemplateDesign extends VerticalLayout {
 	protected GridLayout gridFileNameFilterCriteria;
 	protected OptionGroup opFilterCriteriaType;
 	protected TextField txtCsvTFilterCriteria;
-	protected ComboBox comboCsvoutRepo;
 	protected ComboBox comboCsvTerrRepo;
+	protected ComboBox comboCsvoutRepo;
+	protected ComboBox comboCsvArchivingRepo;
 	protected VerticalLayout csvTMapLayout;
 	protected Table tblCsvCols;
 	protected VerticalLayout csvTEnrichmentLayout;

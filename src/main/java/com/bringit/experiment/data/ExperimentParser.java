@@ -279,6 +279,8 @@ public class ExperimentParser {
 	        		            	}
 	        		            }
 
+	        		            System.out.println("Datatype validation for fields done.");
+	        		            
 	        		            //if(exceptionRowColumns.isEmpty())
 	        		            //{
 	        		            	//Added at 9/4
@@ -299,12 +301,15 @@ public class ExperimentParser {
 	        		            			csvFileColumnValuesMtx.add(csvColumnValues);
 	        		            		}
 	 	        		            }	
-	        		            	
+
+		        		            System.out.println("Csv values loaded.");
+		        		            
 	        		            	List<String> enrichExpFieldDbIdMtx = new ArrayList<String>();
 	        		            	List<String> enrichExpFieldTypeMtx = new ArrayList<String>();
 	        		            	List<String> enrichExpFieldLastCsvColumnMtx = new ArrayList<String>();
 	        		            	List<String[]> enrichExpFieldValuesMtx = new ArrayList<String[]>();
-	        		            	
+
+		        		            System.out.println("Enrichment rules loaded." + csvTemplateEnrichmentRules);
 	        		            	for(int i=0; i<csvTemplateEnrichmentRules.size(); i++)
 	        		        		{
 	        		            		int enrichExpFieldMtxIndex = enrichExpFieldDbIdMtx.indexOf(csvTemplateEnrichmentRules.get(i).getExpFieldDestination().getExpDbFieldNameId());
@@ -408,7 +413,10 @@ public class ExperimentParser {
 	        		            			}
 	        		            		}
 	        		        		}
-	        		            		        		            	
+	        		            		     
+
+		        		            System.out.println("enrichExpFieldDbIdMtx." + enrichExpFieldDbIdMtx);
+		        		            
 	        		            	for(int i=0; i<enrichExpFieldDbIdMtx.size(); i++)
 	        		            	{
 	        		            		int directMappingCsvIndex = csvColumnFieldDbIdXRefMtx.indexOf(enrichExpFieldDbIdMtx.get(i));
@@ -424,7 +432,8 @@ public class ExperimentParser {
 	    	        		            }
 	        		            	}
 	        		            	
-	        		            	
+
+		        		            System.out.println("Enrichment of file done.");
 	        		            	
 	        		            	//Validate Field Types of Enriched Columns
 	        		            	String exceptionEnrichedRowColumns = "";
@@ -457,6 +466,10 @@ public class ExperimentParser {
 	        		            	{
 	        		            		System.out.println("Exception Row#" + exceptionRowMtx.get(i) + " Exception Details: " + exceptionRowDetailsMtx.get(i) );
 	        		            	}
+	        		            	
+
+		        		            System.out.println("Datatype validation for enriched fields done.");
+	        		            	
 	        		            	
 	        		            	//if(exceptionEnrichedRowColumns.isEmpty())
 	        		            	//{
@@ -556,7 +569,7 @@ public class ExperimentParser {
         			return respObj;  
             	}
         	
-        } catch (IOException e) {
+        } catch (Exception e) {
         	System.out.println("Unknown error at parsing.");
         	e.printStackTrace();
     		respObj.setCode(100);
@@ -565,7 +578,6 @@ public class ExperimentParser {
 			return respObj;
         }
 	}
-
 
 	public ResponseObj parseXmlDocument(Document xmlDocument, XmlTemplate xmlTemplate)
 	{
@@ -1028,8 +1040,7 @@ public class ExperimentParser {
 		return true;
 
 	}
-	 
-
+	
 	private boolean validateFieldTypeWithDateTimeMask(String fieldType, String fieldValue, String dateTimeMask)
 	{
 		if(fieldType.contains("date"))
@@ -1086,8 +1097,7 @@ public class ExperimentParser {
 		return true;
 
 	}
-	 
-	
+		
 	//Added at 9/4
     //Enrichment Rules feature added to Bit-Exp
 	private void enrichCsvColumn(CsvTemplateEnrichment csvEnrichmentRule, String[] csvColumnValues)

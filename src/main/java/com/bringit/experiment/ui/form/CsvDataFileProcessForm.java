@@ -156,18 +156,25 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 
 	        FilesRepository processedRepo = csvTemplate.getProcessedFileRepo();
 	        FilesRepository exceptionRepo = csvTemplate.getExceptionFileRepo();
-	       
+	        FilesRepository archivingRepo = csvTemplate.getArchivingFileRepo();
 			
 			ResponseObj parseCsvResponse = new ExperimentParser().parseCSV(tempFile, csvTemplate);
 			try {
-				isFile = new FileInputStream(tempFile);
+				isFile = new FileInputStream(tempFile);	
+                	
+                //Move file to Archive Repository
+                if(archivingRepo != null)
+                {
+                	moveFileToRepo(archivingRepo, new FileInputStream(tempFile), loadedFileName);
+    				System.out.println("File moved to archiving folder " + loadedFileName);    				
+                }
+                
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				isFile = null;
 			}
 			
-			tempFile.delete(); // delete the temp file 
 			SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 			DataFile dataFile = new DataFile();
 			dataFile.setCreatedBy(sessionUser);
@@ -222,6 +229,18 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 						new DataFileDao().addDataFile(dataFileException);
 
 						batchInsertResponse.setDescription("Some records could not be processed.");
+						
+						System.out.println("Original file is split");
+						
+						try {
+							
+						isFile = new FileInputStream(tempFile);
+						}
+						 catch (FileNotFoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+								isFile = null;
+							}
 					}
 					
 					this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "Step 2 of 3. Result (OK)\n");
@@ -284,6 +303,8 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 				        	spTargetRptParams.add(targetReportId.toString());
 				        	new ExecuteQueryDao().executeStoredProcedure("spTargetReportBuilder", spTargetRptParams);
 				        }
+				        
+				        System.out.println("Original file is moved");
 					}
 				}	
 				else
@@ -338,10 +359,14 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
 				}
 			
 			}
+
+			tempFile.delete(); // delete the temp file 
+			
 			this.txtCsvDataFileLoadResults.setValue(this.txtCsvDataFileLoadResults.getValue() + "\n\n=== Process Finished ===\n");
 			this.txtCsvDataFileLoadResults.setReadOnly(true);
 			this.txtCsvDataFileLoadResults.setSelectionRange(this.txtCsvDataFileLoadResults.getValue().length()-1, 1);
 			enableRunButton(false);
+			
 		}	
 	}
 	
@@ -424,7 +449,7 @@ public class CsvDataFileProcessForm extends CsvDataFileProcessDesign {
             }
 
         } catch (Exception ex) {
-            System.out.println("Error moving file to repo: "+filename);
+            System.out.println("Error moving file to repo: "+filename+". Details: " + ex);
         }
 
     }

@@ -87,6 +87,10 @@ public class CsvTemplate {
 	private FilesRepository exceptionFileRepo;
 	
 	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="archivingFileRepoId", unique=false, updatable=true)
+	private FilesRepository archivingFileRepo;
+	
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="JobExecRepeatId", unique=false, updatable=true)
 	private JobExecutionRepeat jobExecRepeat;
 	
@@ -122,6 +126,7 @@ public class CsvTemplate {
 		this.inboundFileRepo = null;
 		this.processedFileRepo = null;
 		this.exceptionFileRepo = null;
+		this.archivingFileRepo = null;
 		this.jobExecRepeat = null;
 		this.experiment = null;
 		this.createdBy = null;
@@ -135,8 +140,8 @@ public class CsvTemplate {
 			Boolean csvTemplateNotScheduled, Date csvTemplateExecStartDate,
 			Integer csvTemplateExecStartHour, Date csvTemplateExecEndDate, Date createdDate, Date modifiedDate,
 			ContractManufacturer contractManufacturer, FilesRepository inboundFileRepo,
-			FilesRepository processedFileRepo, FilesRepository exceptionFileRepo, JobExecutionRepeat jobExecRepeat,
-			Experiment experiment, SysUser createdBy, SysUser lastModifiedBy) {
+			FilesRepository processedFileRepo, FilesRepository exceptionFileRepo, FilesRepository archivingFileRepo, 
+			JobExecutionRepeat jobExecRepeat, Experiment experiment, SysUser createdBy, SysUser lastModifiedBy) {
 		this.csvTemplateId = csvTemplateId;
 		this.csvTemplateIsActive = csvTemplateIsActive;
 		this.CsvTemplateName = csvTemplateName;
@@ -156,6 +161,7 @@ public class CsvTemplate {
 		this.inboundFileRepo = inboundFileRepo;
 		this.processedFileRepo = processedFileRepo;
 		this.exceptionFileRepo = exceptionFileRepo;
+		this.archivingFileRepo = archivingFileRepo;
 		this.jobExecRepeat = jobExecRepeat;
 		this.experiment = experiment;
 		this.createdBy = createdBy;
@@ -315,6 +321,14 @@ public class CsvTemplate {
 		this.exceptionFileRepo = exceptionFileRepo;
 	}
 
+	public FilesRepository getArchivingFileRepo() {
+		return archivingFileRepo;
+	}
+
+	public void setArchivingFileRepo(FilesRepository archivingFileRepo) {
+		this.archivingFileRepo = archivingFileRepo;
+	}
+	
 	public JobExecutionRepeat getJobExecRepeat() {
 		return jobExecRepeat;
 	}
@@ -354,7 +368,4 @@ public class CsvTemplate {
 	public void setCsvTemplateIsActive(Boolean csvTemplateIsActive) {
 		this.csvTemplateIsActive = csvTemplateIsActive;
 	}
-
-
-
 }

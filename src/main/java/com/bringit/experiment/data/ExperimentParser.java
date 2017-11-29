@@ -210,7 +210,9 @@ public class ExperimentParser {
 	        		            }
 	        		            
 	        		            System.out.println("Row Count: " + rowCount);
-	        		            	        		            
+	        		            	  
+	        		            /*
+	        		             * Disabled due to requirement to apply data type validations after data is enriched
 	        		            //Validate Field & Types
 	        		   			String exceptionRowColumns = "";
 	        		            for(int i=0; i < columns.size(); i++)
@@ -280,6 +282,8 @@ public class ExperimentParser {
 	        		            }
 
 	        		            System.out.println("Datatype validation for fields done.");
+	        		            */
+	        		            
 	        		            
 	        		            //if(exceptionRowColumns.isEmpty())
 	        		            //{
@@ -435,6 +439,8 @@ public class ExperimentParser {
 
 		        		            System.out.println("Enrichment of file done.");
 	        		            	
+		        		            /*
+		        		             * Disabled due to requirement to apply data type validations after data is enriched
 	        		            	//Validate Field Types of Enriched Columns
 	        		            	String exceptionEnrichedRowColumns = "";
 		        		            
@@ -469,8 +475,80 @@ public class ExperimentParser {
 	        		            	
 
 		        		            System.out.println("Datatype validation for enriched fields done.");
+	        		            	*/
 	        		            	
-	        		            	
+		        		            //Validate Field & Types
+		        		   			String exceptionRowColumns = "";
+		        		            for(int i=0; i < columns.size(); i++)
+		        		            {
+		        		            	if(csvColumnPositionInFileMtx.get(i) != -1)
+		        		            	{
+		        		            		String fieldType = csvColumnTypeMtx.get(i);
+		        		            		String dateTimeMask = csvColumnDateTimeMaskMtx.get(i);
+		        		            		
+		        		            		for(int j=0; j<totalLines; j++)
+		        		            		{
+		        		            			rowCount = j+1;
+		        		            			if(!validateFieldTypeWithDateTimeMask(fieldType, csvColumnValuesMtx.get(i)[j], dateTimeMask))
+		        		            			{
+		        		            				if(!dateTimeMask.isEmpty() && (csvColumnValuesMtx.get(i)[j] == null || csvColumnValuesMtx.get(i)[j].isEmpty()))
+		        		            					csvColumnValuesMtx.get(i)[j] = "";
+		        		            				else
+		        		            				{
+		        		            					int exceptionRowMtxIndex = exceptionRowMtx.indexOf(j+1);
+		        		            					if(exceptionRowMtxIndex == -1)
+		        		            					{
+		        		            						exceptionRowMtx.add(rowCount);
+		        		            						exceptionRowDetailsMtx.add("Invalid Data: " + csvColumnValuesMtx.get(i)[j] + ". Cast failed to " + fieldType + " Found in Column '" + csvColumnNameMtx.get(i) + "'" + (fieldType.contains("date") ?  " Allowed Date format: " +  dateTimeMask : "."));
+		        		            					}
+		        		            					else
+		        		            						exceptionRowDetailsMtx.set(exceptionRowMtxIndex, exceptionRowDetailsMtx.get(exceptionRowMtxIndex) + " " + "Invalid Data: " + csvColumnValuesMtx.get(i)[j] + ". Cast failed to " + fieldType + " Found in Column '" + csvColumnNameMtx.get(i) + "'" + (fieldType.contains("date") ?  " Allowed Date format: " +  dateTimeMask : "."));
+		        		            		
+		        		            					exceptionRowColumns += "Invalid Data: " + csvColumnValuesMtx.get(i)[j] + ". Cast failed to " + fieldType + " Found in Column '" + csvColumnNameMtx.get(i) + "' Row #" + rowCount + (fieldType.contains("date") ?  " Allowed Date format: " +  dateTimeMask +"\n": ".\n");
+		        		            				}
+		        		            			}
+		        		            			else
+		        		            			{
+		        		            				if(!dateTimeMask.isEmpty())
+		        		            				{
+		        		            					//Convert to valid SQL format
+		        		            					DateFormat df = new SimpleDateFormat(dateTimeMask);
+		        		            					try {
+															Date csvColumnDateValue = df.parse(csvColumnValuesMtx.get(i)[j]);
+															SimpleDateFormat sqlDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+															String csvColumnDateValueSqlFormat = sqlDateFormat.format(csvColumnDateValue);
+															csvColumnValuesMtx.get(i)[j] = csvColumnDateValueSqlFormat;
+														} catch (ParseException e) {
+															// TODO Auto-generated catch block
+															e.printStackTrace();
+														}		        		            					
+		        		            				
+		        		            				}
+		        		            			}
+			            		            		        		            			
+		        		            			//Validate Mandatory fields
+		        		            			if(csvColumnValuesMtx.get(i)[j].isEmpty() && csvColumnMandatoryMtx.get(i) != null && csvColumnMandatoryMtx.get(i))
+		        		            			{
+		        		            				int exceptionRowMtxIndex = exceptionRowMtx.indexOf(j+1);
+		        		            				if(exceptionRowMtxIndex == -1)
+		        		            				{
+		        		            					exceptionRowMtx.add(rowCount);
+		        		            					exceptionRowDetailsMtx.add("Mandatory value missing for Column '" + csvColumnNameMtx.get(i) +"'.");
+		        		            					System.out.print("Mandatory value missing for Column '" + csvColumnNameMtx.get(i) +"'.");
+		        		            				}
+		        		            				else
+		        		            					exceptionRowDetailsMtx.set(exceptionRowMtxIndex, exceptionRowDetailsMtx.get(i) + " " + "Mandatory value missing for Column '" + csvColumnNameMtx.get(i) +"'.");
+		        		            		
+		        		            			}
+		        		            		}
+		        		            	}
+		        		            }
+
+		        		            System.out.println("Datatype validation for fields done.");
+		        		            
+		        		            
+		        		            
+		        		            
 	        		            	//if(exceptionEnrichedRowColumns.isEmpty())
 	        		            	//{
 			        		            for(int i=0; i < csvColumnFieldDbIdXRefMtx.size(); i++)

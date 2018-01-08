@@ -27,9 +27,12 @@ public class Connect {
 	
 	    } catch (SQLException ex) {
 	        ex.printStackTrace();
+
+			System.out.println("SQL exception: State" + ex.getSQLState() + " Error code: " + ex.getErrorCode() + " Message: " + ex.getMessage());
 	    } catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.out.println("Class not found exception.");
 		} 
 	    return conn;
 	}

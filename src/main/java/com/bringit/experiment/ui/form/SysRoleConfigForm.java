@@ -177,7 +177,9 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 			    for (Object id : treeMainMenu.getItemIds()) 
 			    {
 					if(treeMainMenu.getParent(id) != null && (treeMainMenu.getItem(id).getItemProperty("isExperimentDataReport").getValue() == null 
-							&& (treeMainMenu.getItem(id).getItemProperty("isTargetReport").getValue() == null)))
+							&& (treeMainMenu.getItem(id).getItemProperty("isTargetReport").getValue() == null)
+							&& (treeMainMenu.getItem(id).getItemProperty("isFpyReport").getValue() == null)
+							&& (treeMainMenu.getItem(id).getItemProperty("isFtyReport").getValue() == null)))
 					{
 						if(treeMainMenu.getChildren(id) != null && !isDynamicChildren(treeMainMenu.getChildren(id)))
 						{
@@ -287,7 +289,9 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 	    for (Object id : treeMainMenu.getItemIds()) 
 	    {
 			if(treeMainMenu.getParent(id) != null && (treeMainMenu.getItem(id).getItemProperty("isExperimentDataReport").getValue() == null 
-					&& (treeMainMenu.getItem(id).getItemProperty("isTargetReport").getValue() == null)))
+					&& (treeMainMenu.getItem(id).getItemProperty("isTargetReport").getValue() == null)
+					&& (treeMainMenu.getItem(id).getItemProperty("isFpyReport").getValue() == null)
+					&& (treeMainMenu.getItem(id).getItemProperty("isFtyReport").getValue() == null)))
 			{
 				if(treeMainMenu.getChildren(id) != null && !isDynamicChildren(treeMainMenu.getChildren(id)))
 				{
@@ -367,7 +371,9 @@ public class SysRoleConfigForm extends SysRoleConfigDesign {
 	private boolean isDynamicChildren(Collection<?> mnuItemChildren) {
 		for (Object id : mnuItemChildren) {
 			if (treeMainMenu.getItem(id).getItemProperty("isExperimentDataReport").getValue() == null
-					&& (treeMainMenu.getItem(id).getItemProperty("isTargetReport").getValue() == null))
+					&& (treeMainMenu.getItem(id).getItemProperty("isTargetReport").getValue() == null)
+					&& (treeMainMenu.getItem(id).getItemProperty("isFpyReport").getValue() == null)
+					&& (treeMainMenu.getItem(id).getItemProperty("isFtyReport").getValue() == null))
 				return false;
 		}
 		return true;

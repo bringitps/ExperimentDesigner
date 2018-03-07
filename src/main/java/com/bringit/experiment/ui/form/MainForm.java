@@ -304,6 +304,10 @@ public class MainForm extends MainFormDesign {
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new CustomListManagementForm());
                     break;
+                case "vertical view reports":
+                    formContentLayout.removeAllComponents();
+                    formContentLayout.addComponent(new ViewVerticalReportBuilderForm());
+                    break;
                 default:
                     break;
             }

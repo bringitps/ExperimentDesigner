@@ -1229,11 +1229,9 @@ public class CsvTemplateForm extends CsvTemplateDesign {
             public void valueChange(ValueChangeEvent event) {
             	onChangeCustomList(cbxCustomList);
             }
-        });
+        });		
 		
-		
-		this.tblEnrichmentRules.addItem(itemValues, itemId);
-		
+		this.tblEnrichmentRules.addItem(itemValues, itemId);		
 	}
 	
 	private void deleteTblEnrichmentRule()

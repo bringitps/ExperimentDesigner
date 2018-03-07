@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head> 
+ <body> 
+  <vaadin-vertical-layout style-name="well" responsive margin> 
+   <vaadin-vertical-layout width="960px" height="40px" _id="layoutHeaderBtns" :middle :center> 
+    <vaadin-grid-layout width-full> 
+     <row> 
+      <column> 
+       <vaadin-grid-layout width="100px" height="30px"> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="tiny primary" plain-text _id="btnSave">
+            Save 
+          </vaadin-button> 
+         </column> 
+         <column> 
+          <vaadin-button style-name="tiny" plain-text _id="btnCancel">
+            Cancel 
+          </vaadin-button> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+      <column> 
+       <vaadin-check-box caption="Active" id="chxActive" style-name="tiny" _id="chxActive" :right></vaadin-check-box> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout width="960px" height="140px"> 
+    <vaadin-vertical-layout _id="ftyRptLayout"> 
+     <vaadin-grid-layout spacing width-full _id="gridMainData" :middle :center> 
+      <row> 
+       <column> 
+        <vaadin-text-field required-error="This field is mandatory." caption="Name:" required style-name="tiny" width-full _id="txtFtyRptName"></vaadin-text-field> 
+       </column> 
+       <column> 
+        <vaadin-text-field required-error="This field is mandatory. Only alphaNumeric characters, spaces and underscores are allowed." caption="Custom Id:" required style-name="tiny" width-full _id="txtFtyRptCustomId"></vaadin-text-field> 
+       </column> 
+      </row> 
+      <row> 
+       <column> 
+        <vaadin-text-field caption="Description:" style-name="tiny" width-full _id="txtFtyDescription"></vaadin-text-field> 
+       </column> 
+       <column> 
+        <vaadin-text-field required-error="This field is mandatory." caption="Data refresh interval (hours):" required style-name="tiny" width-full _id="txtFtyRptName1"></vaadin-text-field> 
+       </column> 
+      </row> 
+     </vaadin-grid-layout> 
+    </vaadin-vertical-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout style-name="well" width="960px" _id="colGroupLayout"> 
+    <vaadin-horizontal-layout width-full height="225px" _id="ftyFieldGroupsLayout"> 
+     <vaadin-tab-sheet style-name="framed compact" size-full _id="tabColumnGroups"> 
+      <tab caption="Report data source" selected> 
+       <vaadin-vertical-layout size-full margin _id="lytReportDataSources"> 
+        <vaadin-grid-layout size-full> 
+         <row> 
+          <column> 
+           <vaadin-absolute-layout caption="Experiments" style-name="well" _id="pnlExperimentDataSource"></vaadin-absolute-layout> 
+          </column> 
+          <column> 
+           <vaadin-absolute-layout caption="First Pass Yield Reports" _id="pnlFpyReportDataSource"></vaadin-absolute-layout> 
+          </column> 
+          <column> 
+           <vaadin-absolute-layout caption="First Time Yield Reports" _id="pnlFtyReportDataSource"></vaadin-absolute-layout> 
+          </column> 
+          <column> 
+           <vaadin-absolute-layout caption="Target Reports" _id="pnlTargetReportDataSource"></vaadin-absolute-layout> 
+          </column> 
+         </row> 
+        </vaadin-grid-layout> 
+       </vaadin-vertical-layout> 
+      </tab> 
+      <tab caption="Report data source filters"> 
+       <vaadin-vertical-layout size-full margin _id="reportFiltersLayout"> 
+        <vaadin-horizontal-split-panel locked split-position="85%" _id="pnlReportFilters"> 
+         <vaadin-table selectable size-full _id="tblReportFilters"> 
+          <table> 
+           <colgroup> 
+            <col property-id="*"> 
+            <col property-id="Data source"> 
+            <col property-id="Source field/column"> 
+            <col property-id="Filter operator"> 
+            <col property-id="Fixed value"> 
+            <col property-id="Custom list"> 
+            <col property-id="Custom list value"> 
+            <col property-id="Expression"> 
+           </colgroup> 
+           <tbody></tbody> 
+          </table> 
+         </vaadin-table> 
+         <vaadin-grid-layout spacing width-full height="70px" _id="gridBtnsRptFilters"> 
+          <row> 
+           <column> 
+            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" width="120px" height="25px" plain-text _id="btnAddFilter">
+              Add filter 
+            </vaadin-button> 
+           </column> 
+          </row> 
+          <row> 
+           <column> 
+            <vaadin-button icon="fonticon://FontAwesome/f068" style-name="tiny danger" width="120px" height="25px" plain-text _id="btnRemoveFilter">
+              Remove filter 
+            </vaadin-button> 
+           </column> 
+          </row> 
+         </vaadin-grid-layout> 
+        </vaadin-horizontal-split-panel> 
+       </vaadin-vertical-layout> 
+      </tab> 
+      <tab caption="Report Columns"> 
+       <vaadin-vertical-layout size-full margin _id="infoFieldsLayout"> 
+        <vaadin-horizontal-split-panel locked split-position="82%" _id="pnlInfoFields"> 
+         <vaadin-table selectable size-full _id="tblReportColumns"> 
+          <table> 
+           <colgroup> 
+            <col property-id="*"> 
+            <col property-id="Column"> 
+            <col property-id="Data Type"> 
+           </colgroup> 
+           <tbody></tbody> 
+          </table> 
+         </vaadin-table> 
+         <vaadin-grid-layout spacing width-full height="70px" _id="gridBtnsRptInfoFields"> 
+          <row> 
+           <column> 
+            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" width="130px" height="25px" plain-text _id="btnAddRptColumn">
+              Add column 
+            </vaadin-button> 
+           </column> 
+          </row> 
+          <row> 
+           <column> 
+            <vaadin-button icon="fonticon://FontAwesome/f068" style-name="tiny danger" width="130px" height="25px" plain-text _id="btnRemoveRptColumn">
+              Remove column 
+            </vaadin-button> 
+           </column> 
+          </row> 
+         </vaadin-grid-layout> 
+        </vaadin-horizontal-split-panel> 
+       </vaadin-vertical-layout> 
+      </tab> 
+      <tab caption="Report Columns Enrichment"> 
+       <vaadin-vertical-layout size-full margin _id="columnsEnrichmentLayout"> 
+        <vaadin-horizontal-split-panel locked split-position="82%" _id="pnlColumnsEnrichment"> 
+         <vaadin-table selectable size-full _id="tblColumnsEnrichment"> 
+          <table> 
+           <colgroup> 
+            <col property-id="*"> 
+            <col property-id="Column"> 
+            <col property-id="Data Type"> 
+           </colgroup> 
+           <tbody></tbody> 
+          </table> 
+         </vaadin-table> 
+         <vaadin-grid-layout spacing width-full height="70px" _id="gridBtnsRptColumnsEnrichment"> 
+          <row> 
+           <column> 
+            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" width="120px" height="25px" plain-text _id="btnAddEnrichment">
+              Add enrichment 
+            </vaadin-button> 
+           </column> 
+          </row> 
+          <row> 
+           <column> 
+            <vaadin-button icon="fonticon://FontAwesome/f068" style-name="tiny danger" width="120px" height="25px" plain-text _id="btnRemoveEnrichment">
+              Remove enrichment 
+            </vaadin-button> 
+           </column> 
+          </row> 
+         </vaadin-grid-layout> 
+        </vaadin-horizontal-split-panel> 
+       </vaadin-vertical-layout> 
+      </tab> 
+     </vaadin-tab-sheet> 
+    </vaadin-horizontal-layout> 
+   </vaadin-vertical-layout> 
+   <vaadin-vertical-layout height="40px" _id="btnDeleteLayout"> 
+    <vaadin-button icon="fonticon://FontAwesome/f00d" style-name="tiny danger" plain-text _id="btnDelete" :bottom :right>
+      Delete Vertical View Report 
+    </vaadin-button> 
+   </vaadin-vertical-layout> 
+  </vaadin-vertical-layout>  
+ </body>
+</html>

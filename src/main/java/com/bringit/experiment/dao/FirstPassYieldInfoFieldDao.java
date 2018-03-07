@@ -3,6 +3,7 @@ package com.bringit.experiment.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -84,6 +85,25 @@ public class FirstPassYieldInfoFieldDao {
         }
         return fpyInfoFields;
     }
-    
+
+    @SuppressWarnings("unused")
+    public FirstPassYieldInfoField getFirstPassYieldInfoFieldById(int fpyInfoFieldId) {
+    	FirstPassYieldInfoField fpyInfoField = null;
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            trns = session.beginTransaction();
+            String queryString = "from FirstPassYieldInfoField where FpyInfoFieldId = :id";
+            Query query = session.createQuery(queryString);
+            query.setInteger("id", fpyInfoFieldId);
+            fpyInfoField = (FirstPassYieldInfoField) query.uniqueResult();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return fpyInfoField;
+    }
     
 }

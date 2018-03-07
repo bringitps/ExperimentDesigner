@@ -155,4 +155,22 @@ public class TargetColumnDao {
            }
            return targetColumns;
       }
+    
+    @SuppressWarnings({ "unchecked", "unused" })
+   	public List<TargetColumn> getTargetColumnByTargetReportId(int targetRptId) {
+           List<TargetColumn> targetColumns = new ArrayList<TargetColumn>();
+           Transaction trns = null;
+           Session session = HibernateUtil.getSessionFactory().openSession();
+   		
+           try {
+               trns = session.beginTransaction();
+               targetColumns = session.createQuery("from TargetColumn INNER JOIN TargetColumnGroup ON TargetColumn.TargetColumnGroupId = TargetColumnGroup.TargetColumnGroupId where TargetColumnGroup.TargetReportId = " + targetRptId + " order by TargetColumnLabel").list();
+           } catch (RuntimeException e) {
+               e.printStackTrace();
+           } finally {
+               session.flush();
+               session.close();
+           }
+           return targetColumns;
+      }
 }

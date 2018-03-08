@@ -29,9 +29,6 @@ public class ViewVerticalReportColumnByExpField {
     @JoinColumn(name="VwVerticalRptColumnId", unique=false, updatable=true)
 	private ViewVerticalReportColumn vwVerticalReportColumn;	
 	
-	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="VwVerticalReportByExperimentId", unique=false, updatable=true)
-	private ViewVerticalReportByExperiment vwVerticalReportByExperiment;	
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
@@ -39,18 +36,15 @@ public class ViewVerticalReportColumnByExpField {
 
 	public ViewVerticalReportColumnByExpField(Integer vwVerticalRptColumnByExpFieldId,
 			ViewVerticalReportColumn vwVerticalReportColumn,
-			ViewVerticalReportByExperiment vwVerticalReportByExperiment,
 			ExperimentField experimentField) {
 		this.vwVerticalRptColumnByExpFieldId = vwVerticalRptColumnByExpFieldId;
 		this.vwVerticalReportColumn = vwVerticalReportColumn;
-		this.vwVerticalReportByExperiment = vwVerticalReportByExperiment;
 		this.experimentField = experimentField;
 	}	
 	
 	public ViewVerticalReportColumnByExpField() {
 		this.vwVerticalRptColumnByExpFieldId = null;
 		this.vwVerticalReportColumn = null;
-		this.vwVerticalReportByExperiment = null;
 		this.experimentField = null;
 	}
 
@@ -68,14 +62,6 @@ public class ViewVerticalReportColumnByExpField {
 
 	public void setVwVerticalReportColumn(ViewVerticalReportColumn vwVerticalReportColumn) {
 		this.vwVerticalReportColumn = vwVerticalReportColumn;
-	}
-
-	public ViewVerticalReportByExperiment getVwVerticalReportByExperiment() {
-		return vwVerticalReportByExperiment;
-	}
-
-	public void setVwVerticalReportByExperiment(ViewVerticalReportByExperiment vwVerticalReportByExperiment) {
-		this.vwVerticalReportByExperiment = vwVerticalReportByExperiment;
 	}
 
 	public ExperimentField getExperimentField() {

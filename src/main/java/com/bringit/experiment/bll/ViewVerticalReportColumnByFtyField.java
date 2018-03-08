@@ -31,10 +31,6 @@ public class ViewVerticalReportColumnByFtyField {
 	private ViewVerticalReportColumn vwVerticalReportColumn;	
 	
 	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="VwVerticalReportByFtyRptId", unique=false, updatable=true)
-	private ViewVerticalReportByFtyRpt vwVerticalFtyRpt;	
-	
-	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FtyInfoFieldId", unique=false, updatable=true)
 	private FirstTimeYieldInfoField firstTimeYieldInfoField;
 
@@ -49,14 +45,12 @@ public class ViewVerticalReportColumnByFtyField {
 	
 	public ViewVerticalReportColumnByFtyField(Integer vwVerticalRptColumnByFtyFieldId,
 			ViewVerticalReportColumn vwVerticalReportColumn,
-			ViewVerticalReportByFtyRpt vwVerticalFtyRpt,
 			FirstTimeYieldInfoField firstTimeYieldInfoField,
 			Boolean vwVerticalRptFilterByFtyIsDateTimeExpField,
 			Boolean vwVerticalRptFilterByFtySNExpField,
 			Boolean vwVerticalRptFilterByFtyIsResultExpField) {
 		this.vwVerticalRptColumnByFtyFieldId = vwVerticalRptColumnByFtyFieldId;
 		this.vwVerticalReportColumn = vwVerticalReportColumn;
-		this.vwVerticalFtyRpt = vwVerticalFtyRpt;
 		this.firstTimeYieldInfoField = firstTimeYieldInfoField;
 		this.vwVerticalRptFilterByFtyIsDateTimeExpField = vwVerticalRptFilterByFtyIsDateTimeExpField;
 		this.vwVerticalRptFilterByFtySNExpField = vwVerticalRptFilterByFtySNExpField;
@@ -66,7 +60,6 @@ public class ViewVerticalReportColumnByFtyField {
 	public ViewVerticalReportColumnByFtyField() {
 		this.vwVerticalRptColumnByFtyFieldId = null;
 		this.vwVerticalReportColumn = null;
-		this.vwVerticalFtyRpt = null;
 		this.firstTimeYieldInfoField = null;
 		this.vwVerticalRptFilterByFtyIsDateTimeExpField = null;
 		this.vwVerticalRptFilterByFtySNExpField = null;
@@ -88,15 +81,7 @@ public class ViewVerticalReportColumnByFtyField {
 	public void setVwVerticalReportColumn(ViewVerticalReportColumn vwVerticalReportColumn) {
 		this.vwVerticalReportColumn = vwVerticalReportColumn;
 	}
-
-	public ViewVerticalReportByFtyRpt getVwVerticalFtyRpt() {
-		return vwVerticalFtyRpt;
-	}
-
-	public void setVwVerticalFtyRpt(ViewVerticalReportByFtyRpt vwVerticalFtyRpt) {
-		this.vwVerticalFtyRpt = vwVerticalFtyRpt;
-	}
-
+	
 	public FirstTimeYieldInfoField getFirstTimeYieldInfoField() {
 		return firstTimeYieldInfoField;
 	}

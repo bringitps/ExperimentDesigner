@@ -29,11 +29,7 @@ public class ViewVerticalReportColumnByFpyField {
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="VwVerticalRptColumnId", unique=false, updatable=true)
 	private ViewVerticalReportColumn vwVerticalReportColumn;	
-	
-	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="VwVerticalReportByFpyRptId", unique=false, updatable=true)
-	private ViewVerticalReportByFpyRpt vwVerticalFpyRpt;	
-	
+		
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FpyInfoFieldId", unique=false, updatable=true)
 	private FirstPassYieldInfoField firstPassYieldInfoField;
@@ -50,14 +46,12 @@ public class ViewVerticalReportColumnByFpyField {
 	
 	public ViewVerticalReportColumnByFpyField(Integer vwVerticalRptColumnByFpyFieldId,
 			ViewVerticalReportColumn vwVerticalReportColumn,
-			ViewVerticalReportByFpyRpt vwVerticalRptColumnByFpyFieldVwVerticalFpyRpt,
 			FirstPassYieldInfoField firstPassYieldInfoField,
 			Boolean vwVerticalRptFilterByFpyIsDateTimeExpField,
 			Boolean vwVerticalRptFilterByFpySNExpField,
 			Boolean vwVerticalRptFilterByFpyIsResultExpField) {
 		this.vwVerticalRptColumnByFpyFieldId = vwVerticalRptColumnByFpyFieldId;
 		this.vwVerticalReportColumn = vwVerticalReportColumn;
-		this.vwVerticalFpyRpt = vwVerticalRptColumnByFpyFieldVwVerticalFpyRpt;
 		this.firstPassYieldInfoField = firstPassYieldInfoField;
 		this.vwVerticalRptFilterByFpyIsDateTimeExpField = vwVerticalRptFilterByFpyIsDateTimeExpField;
 		this.vwVerticalRptFilterByFpySNExpField = vwVerticalRptFilterByFpySNExpField;
@@ -67,7 +61,6 @@ public class ViewVerticalReportColumnByFpyField {
 	public ViewVerticalReportColumnByFpyField() {
 		this.vwVerticalRptColumnByFpyFieldId = null;
 		this.vwVerticalReportColumn = null;
-		this.vwVerticalFpyRpt = null;
 		this.firstPassYieldInfoField = null;
 		this.vwVerticalRptFilterByFpyIsDateTimeExpField = null;
 		this.vwVerticalRptFilterByFpySNExpField = null;
@@ -89,15 +82,7 @@ public class ViewVerticalReportColumnByFpyField {
 	public void setVwVerticalReportColumn(ViewVerticalReportColumn vwVerticalReportColumn) {
 		this.vwVerticalReportColumn = vwVerticalReportColumn;
 	}
-
-	public ViewVerticalReportByFpyRpt getVwVerticalFpyRpt() {
-		return vwVerticalFpyRpt;
-	}
-
-	public void setVwVerticalFpyRpt(ViewVerticalReportByFpyRpt vwVerticalFpyRpt) {
-		this.vwVerticalFpyRpt = vwVerticalFpyRpt;
-	}
-
+	
 	public FirstPassYieldInfoField getFirstPassYieldInfoField() {
 		return firstPassYieldInfoField;
 	}

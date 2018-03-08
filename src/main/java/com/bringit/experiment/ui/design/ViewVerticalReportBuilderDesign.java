@@ -35,7 +35,7 @@ public class ViewVerticalReportBuilderDesign extends VerticalLayout {
 	protected TextField txtFtyRptName;
 	protected TextField txtFtyRptCustomId;
 	protected TextField txtFtyDescription;
-	protected TextField txtFtyRptName1;
+	protected TextField txtFtyRptRefreshInterval;
 	protected VerticalLayout colGroupLayout;
 	protected HorizontalLayout ftyFieldGroupsLayout;
 	protected TabSheet tabColumnGroups;

@@ -32,18 +32,26 @@ public class ViewVerticalReportColumn {
     @JoinColumn(name="VwVerticalReportId", unique=false, updatable=true)
 	private ViewVerticalReport viewVerticalReport;	
 
+	@Column(name="VwVerticalRptColumnIsKey")
+	private Boolean vwVerticalRptColumnIsKey;
+	
 	@Column(name="VwVerticalRptColumnName")
 	private String vwVerticalRptColumnName;
 
 	@Column(name="VwVerticalRptColumnDbId")
 	private String vwVerticalRptColumnDbId;
+	
+	@Column(name="VwVerticalRptColumnDataType")
+	private String vwVerticalRptColumnDataType;
 
-	public ViewVerticalReportColumn(Integer vwVerticalRptColumnId, ViewVerticalReport viewVerticalReport,
-			String vwVerticalRptColumnName, String vwVerticalRptColumnDbId) {
+	public ViewVerticalReportColumn(Integer vwVerticalRptColumnId, Boolean vwVerticalRptColumnIsKey, ViewVerticalReport viewVerticalReport,
+			String vwVerticalRptColumnName, String vwVerticalRptColumnDbId, String vwVerticalRptColumnDataType) {
 		this.vwVerticalRptColumnId = vwVerticalRptColumnId;
 		this.viewVerticalReport = viewVerticalReport;
 		this.vwVerticalRptColumnName = vwVerticalRptColumnName;
 		this.vwVerticalRptColumnDbId = vwVerticalRptColumnDbId;
+		this.vwVerticalRptColumnDataType = vwVerticalRptColumnDataType;
+		this.vwVerticalRptColumnIsKey = vwVerticalRptColumnIsKey;
 	}
 
 	public ViewVerticalReportColumn() {
@@ -51,6 +59,8 @@ public class ViewVerticalReportColumn {
 		this.viewVerticalReport = null;
 		this.vwVerticalRptColumnName = null;
 		this.vwVerticalRptColumnDbId = null;
+		this.vwVerticalRptColumnDataType = null;
+		this.vwVerticalRptColumnIsKey = null;
 	}
 
 	public Integer getVwVerticalRptColumnId() {
@@ -59,6 +69,14 @@ public class ViewVerticalReportColumn {
 
 	public void setVwVerticalRptColumnId(Integer vwVerticalRptColumnId) {
 		this.vwVerticalRptColumnId = vwVerticalRptColumnId;
+	}
+
+	public Boolean getVwVerticalRptColumnIsKey() {
+		return vwVerticalRptColumnIsKey;
+	}
+
+	public void setVwVerticalRptColumnIsKey(Boolean vwVerticalRptColumnIsKey) {
+		this.vwVerticalRptColumnIsKey = vwVerticalRptColumnIsKey;
 	}
 
 	public ViewVerticalReport getViewVerticalReport() {
@@ -83,6 +101,14 @@ public class ViewVerticalReportColumn {
 
 	public void setVwVerticalRptColumnDbId(String vwVerticalRptColumnDbId) {
 		this.vwVerticalRptColumnDbId = vwVerticalRptColumnDbId;
+	}
+
+	public String getVwVerticalRptColumnDataType() {
+		return vwVerticalRptColumnDataType;
+	}
+
+	public void setVwVerticalRptColumnDataType(String vwVerticalRptColumnDataType) {
+		this.vwVerticalRptColumnDataType = vwVerticalRptColumnDataType;
 	}
 	
 }

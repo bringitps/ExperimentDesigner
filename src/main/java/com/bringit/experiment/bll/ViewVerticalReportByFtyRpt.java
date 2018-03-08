@@ -32,10 +32,10 @@ public class ViewVerticalReportByFtyRpt {
 
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ftyRptId", unique=false, updatable=true)
-	private FirstPassYieldReport ftyRpt;
+	private FirstTimeYieldReport ftyRpt;
 
 	public ViewVerticalReportByFtyRpt(Integer vwVerticalRptByFtyId, ViewVerticalReport viewVerticalReport,
-			FirstPassYieldReport ftyRpt) {
+			FirstTimeYieldReport ftyRpt) {
 		this.vwVerticalRptByFtyId = vwVerticalRptByFtyId;
 		this.viewVerticalReport = viewVerticalReport;
 		this.ftyRpt = ftyRpt;
@@ -63,11 +63,11 @@ public class ViewVerticalReportByFtyRpt {
 		this.viewVerticalReport = viewVerticalReport;
 	}
 
-	public FirstPassYieldReport getFtyRpt() {
+	public FirstTimeYieldReport getFtyRpt() {
 		return ftyRpt;
 	}
 
-	public void setFtyRpt(FirstPassYieldReport ftyRpt) {
-		this.ftyRpt = ftyRpt;
+	public void setFtyRpt(FirstTimeYieldReport firstTimeYieldReport) {
+		this.ftyRpt = firstTimeYieldReport;
 	}
 }

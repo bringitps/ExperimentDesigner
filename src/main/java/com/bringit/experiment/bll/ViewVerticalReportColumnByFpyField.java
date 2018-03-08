@@ -38,14 +38,30 @@ public class ViewVerticalReportColumnByFpyField {
     @JoinColumn(name="FpyInfoFieldId", unique=false, updatable=true)
 	private FirstPassYieldInfoField firstPassYieldInfoField;
 
+	@Column(name="VwVerticalRptFilterByFpyIsDateTimeExpField")
+	private Boolean vwVerticalRptFilterByFpyIsDateTimeExpField;
+
+	@Column(name="VwVerticalRptFilterByFpyIsSNExpField")
+	private Boolean vwVerticalRptFilterByFpySNExpField;
+
+	@Column(name="VwVerticalRptFilterByFpyIsResultExpField")
+	private Boolean vwVerticalRptFilterByFpyIsResultExpField;
+	
+	
 	public ViewVerticalReportColumnByFpyField(Integer vwVerticalRptColumnByFpyFieldId,
 			ViewVerticalReportColumn vwVerticalReportColumn,
 			ViewVerticalReportByFpyRpt vwVerticalRptColumnByFpyFieldVwVerticalFpyRpt,
-			FirstPassYieldInfoField firstPassYieldInfoField) {
+			FirstPassYieldInfoField firstPassYieldInfoField,
+			Boolean vwVerticalRptFilterByFpyIsDateTimeExpField,
+			Boolean vwVerticalRptFilterByFpySNExpField,
+			Boolean vwVerticalRptFilterByFpyIsResultExpField) {
 		this.vwVerticalRptColumnByFpyFieldId = vwVerticalRptColumnByFpyFieldId;
 		this.vwVerticalReportColumn = vwVerticalReportColumn;
 		this.vwVerticalFpyRpt = vwVerticalRptColumnByFpyFieldVwVerticalFpyRpt;
 		this.firstPassYieldInfoField = firstPassYieldInfoField;
+		this.vwVerticalRptFilterByFpyIsDateTimeExpField = vwVerticalRptFilterByFpyIsDateTimeExpField;
+		this.vwVerticalRptFilterByFpySNExpField = vwVerticalRptFilterByFpySNExpField;
+		this.vwVerticalRptFilterByFpyIsResultExpField = vwVerticalRptFilterByFpyIsResultExpField;
 	}	
 
 	public ViewVerticalReportColumnByFpyField() {
@@ -53,6 +69,9 @@ public class ViewVerticalReportColumnByFpyField {
 		this.vwVerticalReportColumn = null;
 		this.vwVerticalFpyRpt = null;
 		this.firstPassYieldInfoField = null;
+		this.vwVerticalRptFilterByFpyIsDateTimeExpField = null;
+		this.vwVerticalRptFilterByFpySNExpField = null;
+		this.vwVerticalRptFilterByFpyIsResultExpField = null;
 	}
 
 	public Integer getVwVerticalRptColumnByFpyFieldId() {
@@ -85,6 +104,30 @@ public class ViewVerticalReportColumnByFpyField {
 
 	public void setFirstPassYieldInfoField(FirstPassYieldInfoField firstPassYieldInfoField) {
 		this.firstPassYieldInfoField = firstPassYieldInfoField;
+	}
+
+	public Boolean getVwVerticalRptFilterByFpyIsDateTimeExpField() {
+		return vwVerticalRptFilterByFpyIsDateTimeExpField;
+	}
+
+	public void setVwVerticalRptFilterByFpyIsDateTimeExpField(Boolean vwVerticalRptFilterByFpyIsDateTimeExpField) {
+		this.vwVerticalRptFilterByFpyIsDateTimeExpField = vwVerticalRptFilterByFpyIsDateTimeExpField;
+	}
+
+	public Boolean getVwVerticalRptFilterByFpySNExpField() {
+		return vwVerticalRptFilterByFpySNExpField;
+	}
+
+	public void setVwVerticalRptFilterByFpySNExpField(Boolean vwVerticalRptFilterByFpySNExpField) {
+		this.vwVerticalRptFilterByFpySNExpField = vwVerticalRptFilterByFpySNExpField;
+	}
+
+	public Boolean getVwVerticalRptFilterByFpyIsResultExpField() {
+		return vwVerticalRptFilterByFpyIsResultExpField;
+	}
+
+	public void setVwVerticalRptFilterByFpyIsResultExpField(Boolean vwVerticalRptFilterByFpyIsResultExpField) {
+		this.vwVerticalRptFilterByFpyIsResultExpField = vwVerticalRptFilterByFpyIsResultExpField;
 	}
 	
 }

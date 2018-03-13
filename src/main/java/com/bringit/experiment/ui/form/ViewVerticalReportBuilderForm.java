@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.bringit.experiment.bll.CsvTemplateEnrichment;
 import com.bringit.experiment.bll.CustomList;
 import com.bringit.experiment.bll.CustomListValue;
@@ -58,8 +60,12 @@ import com.bringit.experiment.util.Config;
 import com.vaadin.data.Container.ItemSetChangeEvent;
 import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.Item;
+import com.vaadin.data.Validator;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Button;
@@ -68,6 +74,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Button.ClickEvent;
 
@@ -88,6 +95,9 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 	private int lastReportColumnItemId = 0;
 	private int lastVerticalRptEnrichmentItemId = 0;
 	 
+
+	TreeTable tblVwVerticalRptCols = new TreeTable("Report Columns"); 
+	
 	String[] dbfieldTypes;
 	
 	public ViewVerticalReportBuilderForm()
@@ -259,6 +269,18 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			}
 		});
 		
+		//START: load report columns using tree
+		loadReportColumns2Table();
+		
+
+		this.btnCancel.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				addReportColumn2(null);
+			}
+
+		});
 	}
 
 	private void refreshExperimentDataSourceElements()
@@ -1557,4 +1579,485 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		}
 		
 	}
+
+	private void loadReportColumns2Table()
+	{
+		tblVwVerticalRptCols = new TreeTable("Report Columns");
+		tblVwVerticalRptCols.setStyleName("small");
+		tblVwVerticalRptCols.setHeight(100, Unit.PERCENTAGE);
+		tblVwVerticalRptCols.setWidth(100, Unit.PERCENTAGE);
+		
+		tblVwVerticalRptCols.addContainerProperty("Column Name", TextField.class, null);
+		tblVwVerticalRptCols.addContainerProperty("DB Column Name", TextField.class, null);
+		tblVwVerticalRptCols.addContainerProperty("Data Type", ComboBox.class, null);
+		tblVwVerticalRptCols.addContainerProperty("Data Source Table/Report", ComboBox.class, null);
+		tblVwVerticalRptCols.addContainerProperty("Data Source Field", ComboBox.class, null);
+		tblVwVerticalRptCols.addContainerProperty("To Map", CheckBox.class, null);
+		tblVwVerticalRptCols.setEditable(true);
+		tblVwVerticalRptCols.setPageLength(0);
+		
+		lytReportColumns2.addComponent(tblVwVerticalRptCols);
+		
+	}
+
+	private void addReportColumn2(Integer reportColumnId)
+	{
+		//Get all selected data sources 
+		Integer itemId = reportColumnId;
+		if(itemId == null)
+		{	
+			this.lastReportColumnItemId = this.lastReportColumnItemId - 1;
+			itemId = this.lastReportColumnItemId;
+		}
+		
+		Object[] rptColItemValues = new Object[6];
+		
+		TextField txtRptColumnName = new TextField("");
+		txtRptColumnName.setStyleName("tiny");
+		txtRptColumnName.setId(itemId.toString());
+		txtRptColumnName.setRequired(true);
+		txtRptColumnName.setRequiredError("This field is required.");
+		txtRptColumnName.setHeight(20, Unit.PIXELS);
+		txtRptColumnName.setWidth(100, Unit.PERCENTAGE);
+		txtRptColumnName.addValueChangeListener(new ValueChangeListener(){
+
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+				// TODO Auto-generated method stub
+				refreshChildColNameTblVwVerticalRptCols(txtRptColumnName);
+			}});
+		
+		rptColItemValues[0] = txtRptColumnName;
+		
+		TextField txtRptDbColumnName = new TextField("");
+		txtRptDbColumnName.setStyleName("tiny");
+		txtRptDbColumnName.setId(itemId.toString());
+		txtRptDbColumnName.setRequired(true);
+		txtRptDbColumnName.setRequiredError("This field is required.");
+		txtRptDbColumnName.setHeight(20, Unit.PIXELS);
+		txtRptDbColumnName.setWidth(100, Unit.PERCENTAGE);		
+		txtRptDbColumnName.addValidator(new Validator() {
+
+            public void validate(Object value) throws InvalidValueException {
+                if(!StringUtils.isAlphanumeric(((String) value).replaceAll("_", "")))
+                    throw new InvalidValueException("Only AlphaNumeric and Underscores are allowed for DB Names");
+            }
+            
+        });
+		
+		txtRptDbColumnName.addValueChangeListener(new ValueChangeListener(){
+
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+				// TODO Auto-generated method stub
+				refreshChildDbColNameTblVwVerticalRptCols(txtRptColumnName);
+			}});
+		rptColItemValues[1] = txtRptDbColumnName;
+				
+		//Loading field types				
+		ComboBox cbxDataType = new ComboBox("");
+		cbxDataType.setStyleName("tiny");
+		cbxDataType.setId(itemId.toString());
+		cbxDataType.setRequired(true);
+		cbxDataType.setRequiredError("This field is required.");
+		cbxDataType.setHeight(20, Unit.PIXELS);
+		cbxDataType.setWidth(100, Unit.PERCENTAGE);
+		
+		for(int j=0; j<dbfieldTypes.length; j++)
+		{
+			cbxDataType.addItem(dbfieldTypes[j]);
+			cbxDataType.setItemCaption(dbfieldTypes[j], dbfieldTypes[j]);
+		}
+				
+		rptColItemValues[2] = cbxDataType;
+
+		cbxDataType.addValueChangeListener(new ValueChangeListener() {
+
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+            	refreshChildCbxDataTypeTblVwVerticalRptCols(cbxDataType);
+            }
+        });
+		
+		ComboBox cbxDataSource = new ComboBox("");
+		cbxDataSource.setStyleName("tiny");
+		cbxDataSource.setHeight(20, Unit.PIXELS);
+		cbxDataSource.setWidth(100, Unit.PERCENTAGE);
+		cbxDataSource.setReadOnly(true);
+		rptColItemValues[3] = cbxDataSource;
+
+		ComboBox cbxDataSourceField = new ComboBox("");
+		cbxDataSourceField.setStyleName("tiny");
+		cbxDataSourceField.setHeight(20, Unit.PIXELS);
+		cbxDataSourceField.setWidth(100, Unit.PERCENTAGE);
+		cbxDataSourceField.setReadOnly(true);
+		rptColItemValues[4] = cbxDataSourceField;
+
+		CheckBox chxMappedData = new CheckBox();
+		chxMappedData.setStyleName("tiny");
+		chxMappedData.setVisible(true);
+		chxMappedData.setValue(false);
+		chxMappedData.setReadOnly(true);
+		chxMappedData.setHeight(20, Unit.PIXELS);
+		chxMappedData.setWidth(100, Unit.PERCENTAGE);
+		rptColItemValues[5] = chxMappedData;
+
+		tblVwVerticalRptCols.addItem(rptColItemValues, itemId);
+		tblVwVerticalRptCols.select(itemId);
+				
+		//Add child entries
+		Set<Item> selectedOptGrpPnlExperiments = (Set<Item>) optGrpPnlExperiments.getValue();
+		for (Object selectedExperiment : selectedOptGrpPnlExperiments)
+		{
+			for(int i=0; activeExperiments != null && i<activeExperiments.size(); i++)
+			{
+				int selectedExperimentId = Integer.parseInt(selectedExperiment.toString());				
+				if(activeExperiments.get(i).getExpId() == selectedExperimentId)
+				{
+					this.lastReportColumnItemId = this.lastReportColumnItemId - 1;
+					addChildRptCol(this.lastReportColumnItemId, itemId, selectedExperimentId, null,	null, null, null, null, null, null);
+					break;
+				}
+			}
+		}
+		
+		Set<Item> selectedOptGrpPnlFpyRpts = (Set<Item>) optGrpPnlFpyReports.getValue();
+		for (Object selectedFpyRpt : selectedOptGrpPnlFpyRpts)
+		{
+			for(int i=0; activeFpyReports != null && i<activeFpyReports.size(); i++)
+			{
+				int selectedFpyReportId = Integer.parseInt(selectedFpyRpt.toString());
+				if(activeFpyReports.get(i).getFpyReportId() == selectedFpyReportId)
+				{
+					this.lastReportColumnItemId = this.lastReportColumnItemId - 1;
+					addChildRptCol(this.lastReportColumnItemId, itemId, null, null,	selectedFpyReportId, null, null, null, null, null);
+					break;
+				}
+			}
+		}
+		
+		Set<Item> selectedOptGrpPnlFtyRpts = (Set<Item>) optGrpPnlFtyReports.getValue();
+		for (Object selectedFtyRpt : selectedOptGrpPnlFtyRpts)
+		{
+			for(int i=0; activeFtyReports != null && i<activeFtyReports.size(); i++)
+			{
+				int selectedFtyReportId = Integer.parseInt(selectedFtyRpt.toString());
+				if(activeFtyReports.get(i).getFtyReportId() == selectedFtyReportId)
+				{
+					this.lastReportColumnItemId = this.lastReportColumnItemId - 1;
+					addChildRptCol(this.lastReportColumnItemId, itemId, null, null,	null, null, selectedFtyReportId, null, null, null);
+					break;
+				}
+			}
+		}	
+		
+		Set<Item> selectedOptGrpPnlTargetRpts = (Set<Item>) optGrpPnlTargetReports.getValue();
+		for (Object selectedTargetRpt : selectedOptGrpPnlTargetRpts)
+		{
+			for(int i=0; activeTargetReports != null && i<activeTargetReports.size(); i++)
+			{
+				int selectedTargetReportId = Integer.parseInt(selectedTargetRpt.toString());
+				if(activeTargetReports.get(i).getTargetReportId() == selectedTargetReportId)
+				{
+					this.lastReportColumnItemId = this.lastReportColumnItemId - 1;
+					addChildRptCol(this.lastReportColumnItemId, itemId, null, null,	null, null, null, null, selectedTargetReportId, null);
+					break;
+				}
+			}
+		}
+		
+		
+		for (Object rptColItemId: tblVwVerticalRptCols.getContainerDataSource().getItemIds()) 
+		{
+			tblVwVerticalRptCols.setCollapsed(rptColItemId, false);
+			if (!tblVwVerticalRptCols.hasChildren(rptColItemId))
+				tblVwVerticalRptCols.setChildrenAllowed(rptColItemId, false);
+		}
+		
+	}
+
+	private void addChildRptCol(Integer rptColumnId, Integer parentRptColumnId, Integer expDataSourceId, Integer expDataSourceFieldId, 
+			Integer fpyDataSourceId, Integer fpyDataSourceFieldId, Integer ftyDataSourceId, Integer ftyDataSourceFieldId, 
+			Integer tgtDataSourceId, Integer tgtDataSourceFieldId)
+	{
+		Object[] rptColItemValues = new Object[6];
+		
+		TextField txtRptColumnName = new TextField("");
+		txtRptColumnName.setStyleName("tiny");
+		txtRptColumnName.setRequired(true);
+		txtRptColumnName.setReadOnly(true);
+		txtRptColumnName.setRequiredError("This field is required.");
+		txtRptColumnName.setHeight(20, Unit.PIXELS);
+		txtRptColumnName.setWidth(100, Unit.PERCENTAGE);
+		rptColItemValues[0] = txtRptColumnName;
+		
+		TextField txtRptDbColumnName = new TextField("");
+		txtRptDbColumnName.setStyleName("tiny");
+		txtRptDbColumnName.setRequired(true);
+		txtRptDbColumnName.setReadOnly(true);
+		txtRptDbColumnName.setRequiredError("This field is required.");
+		txtRptDbColumnName.setHeight(20, Unit.PIXELS);
+		txtRptDbColumnName.setWidth(100, Unit.PERCENTAGE);
+		rptColItemValues[1] = txtRptDbColumnName;
+				
+		//Loading field types				
+		ComboBox cbxDataType = new ComboBox("");
+		cbxDataType.setStyleName("tiny");
+		cbxDataType.setRequired(true);
+		cbxDataType.setRequiredError("This field is required.");
+		cbxDataType.setHeight(20, Unit.PIXELS);
+		cbxDataType.setWidth(100, Unit.PERCENTAGE);
+		
+		for(int j=0; j<dbfieldTypes.length; j++)
+		{
+			cbxDataType.addItem(dbfieldTypes[j]);
+			cbxDataType.setItemCaption(dbfieldTypes[j], dbfieldTypes[j]);
+		}
+		rptColItemValues[2] = cbxDataType;
+
+		ComboBox cbxDataSource = new ComboBox("");
+		cbxDataSource.setStyleName("tiny");
+		cbxDataSource.setHeight(20, Unit.PIXELS);
+		cbxDataSource.setWidth(100, Unit.PERCENTAGE);
+		
+		if(expDataSourceId != null)
+		{
+			Experiment experiment = new ExperimentDao().getExperimentById(expDataSourceId);
+			cbxDataSource.addItem("exp_" + expDataSourceId);
+			cbxDataSource.setItemCaption("exp_" + expDataSourceId, experiment.getExpName());		
+			cbxDataSource.setValue("exp_" + expDataSourceId);
+		}
+		
+		if(fpyDataSourceId != null)
+		{
+			FirstPassYieldReport fpyRpt = new FirstPassYieldReportDao().getFirstPassYieldReportById(fpyDataSourceId);
+			cbxDataSource.addItem("fpy_" + fpyDataSourceId);
+			cbxDataSource.setItemCaption("fpy_" + fpyDataSourceId, "FPY: " + fpyRpt.getFpyReportName());	
+			cbxDataSource.setValue("fpy_" + fpyDataSourceId);
+		}
+		
+		if(ftyDataSourceId != null)
+		{
+			FirstTimeYieldReport ftyRpt = new FirstTimeYieldReportDao().getFirstTimeYieldReportById(ftyDataSourceId);
+			cbxDataSource.addItem("fty_" + ftyDataSourceId);
+			cbxDataSource.setItemCaption("fty_" + ftyDataSourceId, "FTY: " + ftyRpt.getFtyReportName());	
+			cbxDataSource.setValue("fty_" + ftyDataSourceId);
+		}
+
+		if(tgtDataSourceId != null)
+		{
+			TargetReport tgtRpt = new TargetReportDao().getTargetReportById(tgtDataSourceId);
+			cbxDataSource.addItem("tgt_" + tgtDataSourceId);
+			cbxDataSource.setItemCaption("tgt_" + tgtDataSourceId, "TARGET: " + tgtRpt.getTargetReportName());
+			cbxDataSource.setValue("tgt_" + tgtDataSourceId);				
+		}
+		
+		cbxDataSource.setReadOnly(true);
+		rptColItemValues[3] = cbxDataSource;
+
+		ComboBox cbxDataFieldSource = new ComboBox("");
+		cbxDataFieldSource.setStyleName("tiny");
+		cbxDataFieldSource.setHeight(20, Unit.PIXELS);
+		cbxDataFieldSource.setWidth(100, Unit.PERCENTAGE);
+		rptColItemValues[4] = cbxDataFieldSource;
+		
+		CheckBox chxMappedData = new CheckBox();
+		chxMappedData.setStyleName("tiny");
+		chxMappedData.setVisible(true);
+		chxMappedData.setValue(true);
+		chxMappedData.setReadOnly(true);
+		chxMappedData.setHeight(20, Unit.PIXELS);
+		chxMappedData.setWidth(100, Unit.PERCENTAGE);
+		rptColItemValues[5] = chxMappedData;
+
+		tblVwVerticalRptCols.addItem(rptColItemValues, rptColumnId);
+		tblVwVerticalRptCols.select(rptColumnId);		
+		tblVwVerticalRptCols.setParent(rptColumnId, parentRptColumnId);
+		
+	}
+	
+	private void refreshChildColNameTblVwVerticalRptCols(TextField txtColName)
+	{
+		Integer parentItemId = Integer.parseInt(txtColName.getId());
+	
+		for (Object rptColItemId: tblVwVerticalRptCols.getContainerDataSource().getItemIds()) 
+		{
+			if(rptColItemId.toString().equals(parentItemId.toString()))
+			{
+				Item tblVwVerticalParentRptColRowItem = tblVwVerticalRptCols.getContainerDataSource().getItem(rptColItemId);
+				
+				String rptParentColumnName = ((TextField)(tblVwVerticalParentRptColRowItem.getItemProperty("Column Name").getValue())).getValue();
+				
+				for (Object rptChildColItemId: tblVwVerticalRptCols.getChildren(rptColItemId)) 
+				{
+					Item tblVwVerticalRptColRowItem = tblVwVerticalRptCols.getContainerDataSource().getItem(rptChildColItemId);
+					
+					TextField txtRptChildColumnName = (TextField)(tblVwVerticalRptColRowItem.getItemProperty("Column Name").getValue());
+					txtRptChildColumnName.setReadOnly(false);
+					txtRptChildColumnName.setValue(rptParentColumnName);
+					txtRptChildColumnName.setReadOnly(true);				
+				}				
+			}
+		}		
+	}
+	
+	private void refreshChildDbColNameTblVwVerticalRptCols(TextField txtDbColName)
+	{
+		Integer parentItemId = Integer.parseInt(txtDbColName.getId());
+		
+		for (Object rptColItemId: tblVwVerticalRptCols.getContainerDataSource().getItemIds()) 
+		{
+			if(rptColItemId.toString().equals(parentItemId.toString()))
+			{
+				Item tblVwVerticalParentRptColRowItem = tblVwVerticalRptCols.getContainerDataSource().getItem(rptColItemId);
+				
+				String rptParentColumnName = ((TextField)(tblVwVerticalParentRptColRowItem.getItemProperty("DB Column Name").getValue())).getValue();
+				
+				for (Object rptChildColItemId: tblVwVerticalRptCols.getChildren(rptColItemId)) 
+				{
+					Item tblVwVerticalRptColRowItem = tblVwVerticalRptCols.getContainerDataSource().getItem(rptChildColItemId);
+					
+					TextField txtRptChildDbColumnName = (TextField)(tblVwVerticalRptColRowItem.getItemProperty("DB Column Name").getValue());
+					txtRptChildDbColumnName.setReadOnly(false);
+					txtRptChildDbColumnName.setValue(rptParentColumnName);
+					txtRptChildDbColumnName.setReadOnly(true);										
+				}				
+			}
+		}		
+	}
+	
+	private void refreshChildCbxDataTypeTblVwVerticalRptCols(ComboBox cbxDataType)
+	{
+		Integer parentItemId = Integer.parseInt(cbxDataType.getId());
+	
+		for (Object rptColItemId: tblVwVerticalRptCols.getContainerDataSource().getItemIds()) 
+		{
+			if(rptColItemId.toString().equals(parentItemId.toString()))
+			{
+				Item tblVwVerticalParentRptColRowItem = tblVwVerticalRptCols.getContainerDataSource().getItem(rptColItemId);
+				
+				String rptParentDataType = ((ComboBox)(tblVwVerticalParentRptColRowItem.getItemProperty("Data Type").getValue())).getValue().toString();
+				
+				for (Object rptChildColItemId: tblVwVerticalRptCols.getChildren(rptColItemId)) 
+				{
+					Item tblVwVerticalRptColRowItem = tblVwVerticalRptCols.getContainerDataSource().getItem(rptChildColItemId);
+					
+					ComboBox cbxRptChildDataType = (ComboBox)(tblVwVerticalRptColRowItem.getItemProperty("Data Type").getValue());
+					cbxRptChildDataType.setReadOnly(false);
+					cbxRptChildDataType.setValue(rptParentDataType);
+					cbxRptChildDataType.setReadOnly(true);				
+
+					ComboBox cbxDataSource = (ComboBox)(tblVwVerticalRptColRowItem.getItemProperty("Data Source Table/Report").getValue());
+					ComboBox cbxDataSourceField = (ComboBox)(tblVwVerticalRptColRowItem.getItemProperty("Data Source Field").getValue());
+					
+					//Fill cbxDataSourceFields 
+					switch(cbxDataSource.getValue().toString().substring(0, 4))
+					{
+						case "exp_":
+							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)), null, null, null);
+							break;
+	
+						case "fpy_":
+							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, null, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)), null, null);
+							break;
+	
+						case "fty_":
+							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, null, null, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)), null);
+							break;
+	
+						case "tgt_":
+							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, null, null, null, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)));
+							break;
+							
+					}
+				}				
+			}
+		}		
+	}
+	
+	
+	private void fillCbxDataSourceFields(String dataFieldType, ComboBox cbxDataSourceFields, Integer expDataSourceId, Integer fpyDataSourceId, 
+			Integer ftyDataSourceId, Integer tgtDataSourceId)
+	{		
+		if(expDataSourceId != null)
+		{
+			Experiment selectedExperiment = new ExperimentDao().getExperimentById(expDataSourceId);
+			List<ExperimentField> selectedExperimentFields = new ExperimentFieldDao().getAllExperimentFieldsByExperiment(selectedExperiment);
+			
+			for(int i=0; selectedExperimentFields!=null && i<selectedExperimentFields.size(); i++)
+			{
+				System.out.println("Adding Exp field:" + expDataSourceId + "expfield_" + selectedExperimentFields.get(i).getExpFieldId() + "_" + selectedExperimentFields.get(i).getExpFieldName() + "_" + selectedExperimentFields.get(i).getExpFieldType());
+				
+				addItemIfTypeMatches(dataFieldType, "expfield_" + selectedExperimentFields.get(i).getExpFieldId(), selectedExperimentFields.get(i).getExpFieldName(), selectedExperimentFields.get(i).getExpFieldType(), cbxDataSourceFields);
+			}
+		}
+		
+		if(fpyDataSourceId != null)
+		{
+			List<FirstPassYieldInfoField> fpyFields = new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldByReportById(fpyDataSourceId);
+			for(int i=0; fpyFields != null && i<fpyFields.size(); i++)
+				addItemIfTypeMatches(dataFieldType, "fpyfield_" + fpyFields.get(i).getFpyInfoFieldId(), fpyFields.get(i).getFpyInfoFieldLabel(), fpyFields.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
+	
+			addItemIfTypeMatches(dataFieldType, "fpy_datetime", "Datetime (FPY)", "datetime", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fpy_sn", "Serial Number (FPY)", "nvarchar(max)", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fpy_result", "Result (FPY)", "nvarchar(max)", cbxDataSourceFields);
+		}
+		
+		if(ftyDataSourceId != null)
+		{
+			List<FirstTimeYieldInfoField> ftyFields = new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldByReportById(ftyDataSourceId);
+			for(int i=0; ftyFields != null && i<ftyFields.size(); i++)
+				addItemIfTypeMatches(dataFieldType, "ftyfield_" + ftyFields.get(i).getFtyInfoFieldId(), ftyFields.get(i).getFtyInfoFieldLabel(), ftyFields.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
+	
+			addItemIfTypeMatches(dataFieldType, "fty_datetime", "Datetime (FTY)", "datetime", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fty_sn", "Serial Number (FTY)", "nvarchar(max)", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fty_result", "Result (FTY)", "nvarchar(max)", cbxDataSourceFields);
+		}
+		
+		if(tgtDataSourceId != null)
+		{
+			List<TargetColumn> targetColumns = new TargetColumnDao().getTargetColumnByTargetReportId(tgtDataSourceId);
+			
+			for(int i=0; targetColumns!=null && i<targetColumns.size(); i++)
+				addItemIfTypeMatches(dataFieldType, "tgtfield_" + targetColumns.get(i).getTargetColumnId(), targetColumns.get(i).getTargetColumnLabel(), targetColumns.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
+		}				
+	}
+	
+	private void addItemIfTypeMatches(String dataType, String dataSourceFieldId, String dataSourceFieldName, String dataSourceFieldType, ComboBox cbxDataSourceField)
+	{
+		if(dataType.equals(dataSourceFieldType) || (dataType.equals("float") && dataSourceFieldType.equals("int")))
+		{
+			cbxDataSourceField.addItem(dataSourceFieldId);
+			cbxDataSourceField.setItemCaption(dataSourceFieldId, dataSourceFieldName);
+		}
+		else if(dataType.equals("nvarchar(max)") || dataType.equals("varchar(max)") || dataType.equals("text")
+				&& (dataSourceFieldType.startsWith("varchar") || dataSourceFieldType.startsWith("char")
+		                || dataSourceFieldType.startsWith("text") || dataSourceFieldType.startsWith("nvarchar")
+		                || dataSourceFieldType.startsWith("nchar") || dataSourceFieldType.startsWith("ntext")))			
+		{
+			cbxDataSourceField.addItem(dataSourceFieldId);
+			cbxDataSourceField.setItemCaption(dataSourceFieldId, dataSourceFieldName);
+		}
+		else if((dataType.startsWith("varchar") || dataType.startsWith("char")
+                || dataType.startsWith("text") || dataType.startsWith("nvarchar")
+                || dataType.startsWith("nchar") || dataType.startsWith("ntext"))
+				&& (dataSourceFieldType.startsWith("varchar") || dataSourceFieldType.startsWith("char")
+		                || dataSourceFieldType.startsWith("text") || dataSourceFieldType.startsWith("nvarchar")
+		                || dataSourceFieldType.startsWith("nchar") || dataSourceFieldType.startsWith("ntext")))
+		{
+			String selectedDataTypeStringStrLength = dataType.replaceAll("\\D+","");
+			String dataSourcFieldDataTypeStringStrLength = dataSourceFieldType.replaceAll("\\D+","");	
+			
+			if(selectedDataTypeStringStrLength != null && selectedDataTypeStringStrLength.length() > 0 && dataSourcFieldDataTypeStringStrLength != null && dataSourcFieldDataTypeStringStrLength.length() > 0)
+			{
+				if(Integer.parseInt(selectedDataTypeStringStrLength)>Integer.parseInt(dataSourcFieldDataTypeStringStrLength))
+				{
+					cbxDataSourceField.addItem(dataSourceFieldId);
+					cbxDataSourceField.setItemCaption(dataSourceFieldId, dataSourceFieldName);
+				}
+			}
+		}
+		
+	}
+	
 }

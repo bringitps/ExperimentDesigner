@@ -62,6 +62,7 @@ public class ViewVerticalReportBuilderDesign extends VerticalLayout {
 	protected GridLayout gridBtnsRptColumnsEnrichment;
 	protected Button btnAddEnrichment;
 	protected Button btnRemoveEnrichment;
+	protected VerticalLayout lytReportColumns2;
 	protected VerticalLayout btnDeleteLayout;
 	protected Button btnDelete;
 

@@ -2,6 +2,7 @@ package com.bringit.experiment.ui.form;
 
 import com.bringit.experiment.WebApplication;
 import com.bringit.experiment.bll.Experiment;
+import com.bringit.experiment.bll.FinalPassYieldReport;
 import com.bringit.experiment.bll.FirstPassYieldReport;
 import com.bringit.experiment.bll.FirstTimeYieldReport;
 import com.bringit.experiment.bll.SysRole;
@@ -9,6 +10,7 @@ import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.dao.ExperimentDao;
+import com.bringit.experiment.dao.FinalPassYieldReportDao;
 import com.bringit.experiment.dao.FirstPassYieldReportDao;
 import com.bringit.experiment.dao.FirstTimeYieldReportDao;
 import com.bringit.experiment.dao.SystemSettingsDao;
@@ -99,7 +101,20 @@ public class MainForm extends MainFormDesign {
                 item.getItemProperty("fpyReportId").setValue(fpyReportsAvailable.get(i).getFpyReportId());
                 treeMainMenu.setParent(fpyReportsAvailable.get(i).getFpyReportName(), "First Pass Yield Reports");
             }
-        }    
+        }   
+
+        treeMainMenu.addContainerProperty("isFnyReport", Boolean.class, null);
+        treeMainMenu.addContainerProperty("fnyReportId", Integer.class, null);
+
+        List<FinalPassYieldReport> fnyReportsAvailable = new FinalPassYieldReportDao().getAllFinalPassYieldReports();
+        if (fnyReportsAvailable != null) {
+            for (int i = 0; i < fnyReportsAvailable.size(); i++) {
+                Item item = treeMainMenu.addItem(fnyReportsAvailable.get(i).getFnyReportName());
+                item.getItemProperty("isFnyReport").setValue(true);
+                item.getItemProperty("fnyReportId").setValue(fnyReportsAvailable.get(i).getFnyReportId());
+                treeMainMenu.setParent(fnyReportsAvailable.get(i).getFnyReportName(), "Final Pass Yield Reports");
+            }
+        }  
 
         treeMainMenu.addContainerProperty("isFtyReport", Boolean.class, null);
         treeMainMenu.addContainerProperty("ftyReportId", Integer.class, null);
@@ -198,6 +213,7 @@ public class MainForm extends MainFormDesign {
                                 && (treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isExperimentDataReport").getValue() == null
                                 && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isTargetReport").getValue() == null
                                 && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isFpyReport").getValue() == null
+                                && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isFnyReport").getValue() == null
                                 && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isFtyReport").getValue() == null)) {
                             if (mnuAccessTrimmed.indexOf(mainMenuItemIds.get(i).toString().trim()) == -1) {
                                 if (treeMainMenu.getChildren(mainMenuItemIds.get(i)) == null)
@@ -230,6 +246,7 @@ public class MainForm extends MainFormDesign {
         if (treeItemClicked == null || (treeItemClicked.getItemProperty("isExperimentDataReport").getValue() == null
                 && treeItemClicked.getItemProperty("isTargetReport").getValue() == null
                 && treeItemClicked.getItemProperty("isFpyReport").getValue() == null
+                && treeItemClicked.getItemProperty("isFnyReport").getValue() == null
                 && treeItemClicked.getItemProperty("isFtyReport").getValue() == null)) {
             switch (itemClickedText.toLowerCase()) {
                 case "manage experiments":
@@ -271,6 +288,10 @@ public class MainForm extends MainFormDesign {
                 case "first pass yield report":
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new FirstPassYieldReportForm());
+                    break;
+                case "final pass yield report":
+                    formContentLayout.removeAllComponents();
+                    formContentLayout.addComponent(new FinalPassYieldReportForm());
                     break;
                 case "first time yield report":
                     formContentLayout.removeAllComponents();
@@ -320,6 +341,9 @@ public class MainForm extends MainFormDesign {
         } else if (treeItemClicked.getItemProperty("fpyReportId").getValue() != null) {
             formContentLayout.removeAllComponents();
             formContentLayout.addComponent(new FirstPassYieldReportDataForm((Integer) treeItemClicked.getItemProperty("fpyReportId").getValue()));
+        } else if (treeItemClicked.getItemProperty("fnyReportId").getValue() != null) {
+            formContentLayout.removeAllComponents();
+            formContentLayout.addComponent(new FinalPassYieldReportDataForm((Integer) treeItemClicked.getItemProperty("fnyReportId").getValue()));
         } else if (treeItemClicked.getItemProperty("ftyReportId").getValue() != null) {
             formContentLayout.removeAllComponents();
             formContentLayout.addComponent(new FirstTimeYieldReportDataForm((Integer) treeItemClicked.getItemProperty("ftyReportId").getValue()));

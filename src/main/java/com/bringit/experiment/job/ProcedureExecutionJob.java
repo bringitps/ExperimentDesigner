@@ -1,6 +1,7 @@
 package com.bringit.experiment.job;
 
 import com.bringit.experiment.dao.ExperimentJobDataDao;
+import com.bringit.experiment.dao.FinalPassYieldReportJobDataDao;
 import com.bringit.experiment.dao.FirstPassYieldReportJobDataDao;
 import com.bringit.experiment.dao.FirstTimeYieldReportJobDataDao;
 import com.bringit.experiment.dao.TargetReportJobDataDao;
@@ -29,6 +30,10 @@ public class ProcedureExecutionJob implements Job {
         
         FirstTimeYieldReportJobDataDao ftyRptJobDataDao = new FirstTimeYieldReportJobDataDao();
         ftyRptJobDataDao.ftyProcedureJob();
+        
+        FinalPassYieldReportJobDataDao fnyRptJobDataDao = new FinalPassYieldReportJobDataDao();
+        fnyRptJobDataDao.fnyProcedureJob();
+        
     }
 
 

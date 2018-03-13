@@ -77,6 +77,9 @@
  		<mapping class="com.bringit.experiment.bll.CustomList"/>
  		<mapping class="com.bringit.experiment.bll.CustomListValue"/>
  		<mapping class="com.bringit.experiment.bll.CsvTemplateEnrichment"/>
+ 		<mapping class="com.bringit.experiment.bll.FinalPassYieldReport"/>
+ 		<mapping class="com.bringit.experiment.bll.FinalPassYieldInfoField"/>
+ 		<mapping class="com.bringit.experiment.bll.FinalPassYieldReportJobData"/>
  		<mapping class="com.bringit.experiment.bll.FirstPassYieldReport"/>
  		<mapping class="com.bringit.experiment.bll.FirstPassYieldInfoField"/>
  		<mapping class="com.bringit.experiment.bll.FirstPassYieldReportJobData"/>

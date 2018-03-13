@@ -55,7 +55,7 @@
     </vaadin-vertical-layout> 
    </vaadin-vertical-layout> 
    <vaadin-vertical-layout style-name="well" width="960px" _id="colGroupLayout"> 
-    <vaadin-horizontal-layout width-full height="225px" _id="ftyFieldGroupsLayout"> 
+    <vaadin-horizontal-layout width-full height="425px" _id="ftyFieldGroupsLayout"> 
      <vaadin-tab-sheet style-name="framed compact" size-full _id="tabColumnGroups"> 
       <tab caption="Report data source" selected> 
        <vaadin-vertical-layout size-full margin _id="lytReportDataSources"> 
@@ -117,7 +117,7 @@
       <tab caption="Report Columns"> 
        <vaadin-vertical-layout size-full margin _id="infoFieldsLayout"> 
         <vaadin-horizontal-split-panel locked split-position="82%" _id="pnlInfoFields"> 
-         <vaadin-table selectable size-full _id="tblReportColumns"> 
+         <vaadin-table selectable width-full height="120px" _id="tblReportColumns"> 
           <table> 
            <colgroup> 
             <col property-id="*"> 
@@ -177,6 +177,9 @@
          </vaadin-grid-layout> 
         </vaadin-horizontal-split-panel> 
        </vaadin-vertical-layout> 
+      </tab> 
+      <tab caption="Report Columns 2"> 
+       <vaadin-vertical-layout size-full margin _id="lytReportColumns2"></vaadin-vertical-layout> 
       </tab> 
      </vaadin-tab-sheet> 
     </vaadin-horizontal-layout> 

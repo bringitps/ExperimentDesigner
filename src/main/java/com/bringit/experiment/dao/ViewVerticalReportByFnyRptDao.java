@@ -3,19 +3,20 @@ package com.bringit.experiment.dao;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.ViewVerticalReportFilterByFpyField;
+import com.bringit.experiment.bll.ViewVerticalReportByFnyRpt;
 import com.bringit.experiment.dal.HibernateUtil;
 
-public class ViewVerticalReportFilterByFpyFieldDao {
+public class ViewVerticalReportByFnyRptDao {
 
-	public void addVwVerticalReportFilterByFpyField(ViewVerticalReportFilterByFpyField vwVerticalReportFilterByFpyField) {
+
+	public void addVwVerticalReportByFnyRpt(ViewVerticalReportByFnyRpt vwVerticalReportByFnyRpt) {
     	
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         
         try {
             trns = session.beginTransaction();
-            session.save(vwVerticalReportFilterByFpyField);
+            session.save(vwVerticalReportByFnyRpt);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -28,13 +29,13 @@ public class ViewVerticalReportFilterByFpyFieldDao {
         }
     }
 
-    public void deleteVwVerticalReportFilterByFpyField(int vwVerticalReportFilterByFpyFieldId) {
+    public void deleteVwVerticalReportByFnyRpt(int vwVerticalReportByFnyRptId) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            ViewVerticalReportFilterByFpyField vwVerticalReportFilterByFpyField = (ViewVerticalReportFilterByFpyField)session.load(ViewVerticalReportFilterByFpyField.class, new Integer(vwVerticalReportFilterByFpyFieldId));
-            session.delete(vwVerticalReportFilterByFpyField);
+            ViewVerticalReportByFnyRpt vwVerticalReportByFnyRpt = (ViewVerticalReportByFnyRpt)session.load(ViewVerticalReportByFnyRpt.class, new Integer(vwVerticalReportByFnyRptId));
+            session.delete(vwVerticalReportByFnyRpt);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -47,12 +48,12 @@ public class ViewVerticalReportFilterByFpyFieldDao {
         }
     }
 
-    public void updateVwVerticalReportFilterByFpyField(ViewVerticalReportFilterByFpyField vwVerticalReportFilterByFpyField) {
+    public void updateVwVerticalReportByFnyRpt(ViewVerticalReportByFnyRpt vwVerticalReportByFnyRpt) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            session.update(vwVerticalReportFilterByFpyField);
+            session.update(vwVerticalReportByFnyRpt);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -64,5 +65,6 @@ public class ViewVerticalReportFilterByFpyFieldDao {
             session.close();
         }
     }
-	
+
+
 }

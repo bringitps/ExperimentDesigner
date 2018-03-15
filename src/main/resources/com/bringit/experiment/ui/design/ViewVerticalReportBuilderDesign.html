@@ -68,6 +68,9 @@
            <vaadin-absolute-layout caption="First Pass Yield Reports" _id="pnlFpyReportDataSource"></vaadin-absolute-layout> 
           </column> 
           <column> 
+           <vaadin-absolute-layout caption="Final Pass Yield Reports" _id="pnlFnyReportDataSource"></vaadin-absolute-layout> 
+          </column> 
+          <column> 
            <vaadin-absolute-layout caption="First Time Yield Reports" _id="pnlFtyReportDataSource"></vaadin-absolute-layout> 
           </column> 
           <column> 
@@ -115,29 +118,20 @@
        </vaadin-vertical-layout> 
       </tab> 
       <tab caption="Report Columns"> 
-       <vaadin-vertical-layout size-full margin _id="infoFieldsLayout"> 
-        <vaadin-horizontal-split-panel locked split-position="82%" _id="pnlInfoFields"> 
-         <vaadin-table selectable width-full height="120px" _id="tblReportColumns"> 
-          <table> 
-           <colgroup> 
-            <col property-id="*"> 
-            <col property-id="Column"> 
-            <col property-id="Data Type"> 
-           </colgroup> 
-           <tbody></tbody> 
-          </table> 
-         </vaadin-table> 
-         <vaadin-grid-layout spacing width-full height="70px" _id="gridBtnsRptInfoFields"> 
+       <vaadin-vertical-layout size-full margin _id="vwVerticalRptColumns"> 
+        <vaadin-horizontal-split-panel locked split-position="82%" _id="pnlVwVerticalRptColumns"> 
+         <vaadin-vertical-layout size-full _id="lytVwVerticalRptColumnsTbl"></vaadin-vertical-layout> 
+         <vaadin-grid-layout spacing width-full height="70px" _id="gridBtnsVwVerticalBtnColumns"> 
           <row> 
            <column> 
-            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" width="130px" height="25px" plain-text _id="btnAddRptColumn">
+            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" width="130px" height="25px" plain-text _id="btnAddVwVerticalRptColumn">
               Add column 
             </vaadin-button> 
            </column> 
           </row> 
           <row> 
            <column> 
-            <vaadin-button icon="fonticon://FontAwesome/f068" style-name="tiny danger" width="130px" height="25px" plain-text _id="btnRemoveRptColumn">
+            <vaadin-button icon="fonticon://FontAwesome/f068" style-name="tiny danger" width="130px" height="25px" plain-text _id="btnRemoveVwVerticalRptColumn">
               Remove column 
             </vaadin-button> 
            </column> 
@@ -177,9 +171,6 @@
          </vaadin-grid-layout> 
         </vaadin-horizontal-split-panel> 
        </vaadin-vertical-layout> 
-      </tab> 
-      <tab caption="Report Columns 2"> 
-       <vaadin-vertical-layout size-full margin _id="lytReportColumns2"></vaadin-vertical-layout> 
       </tab> 
      </vaadin-tab-sheet> 
     </vaadin-horizontal-layout> 

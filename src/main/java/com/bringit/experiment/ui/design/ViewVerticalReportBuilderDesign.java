@@ -42,6 +42,7 @@ public class ViewVerticalReportBuilderDesign extends VerticalLayout {
 	protected VerticalLayout lytReportDataSources;
 	protected AbsoluteLayout pnlExperimentDataSource;
 	protected AbsoluteLayout pnlFpyReportDataSource;
+	protected AbsoluteLayout pnlFnyReportDataSource;
 	protected AbsoluteLayout pnlFtyReportDataSource;
 	protected AbsoluteLayout pnlTargetReportDataSource;
 	protected VerticalLayout reportFiltersLayout;
@@ -50,19 +51,18 @@ public class ViewVerticalReportBuilderDesign extends VerticalLayout {
 	protected GridLayout gridBtnsRptFilters;
 	protected Button btnAddFilter;
 	protected Button btnRemoveFilter;
-	protected VerticalLayout infoFieldsLayout;
-	protected HorizontalSplitPanel pnlInfoFields;
-	protected Table tblReportColumns;
-	protected GridLayout gridBtnsRptInfoFields;
-	protected Button btnAddRptColumn;
-	protected Button btnRemoveRptColumn;
+	protected VerticalLayout vwVerticalRptColumns;
+	protected HorizontalSplitPanel pnlVwVerticalRptColumns;
+	protected VerticalLayout lytVwVerticalRptColumnsTbl;
+	protected GridLayout gridBtnsVwVerticalBtnColumns;
+	protected Button btnAddVwVerticalRptColumn;
+	protected Button btnRemoveVwVerticalRptColumn;
 	protected VerticalLayout columnsEnrichmentLayout;
 	protected HorizontalSplitPanel pnlColumnsEnrichment;
 	protected Table tblColumnsEnrichment;
 	protected GridLayout gridBtnsRptColumnsEnrichment;
 	protected Button btnAddEnrichment;
 	protected Button btnRemoveEnrichment;
-	protected VerticalLayout lytReportColumns2;
 	protected VerticalLayout btnDeleteLayout;
 	protected Button btnDelete;
 

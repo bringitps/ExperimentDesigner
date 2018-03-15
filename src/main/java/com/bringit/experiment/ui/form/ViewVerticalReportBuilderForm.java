@@ -12,6 +12,8 @@ import com.bringit.experiment.bll.CustomList;
 import com.bringit.experiment.bll.CustomListValue;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
+import com.bringit.experiment.bll.FinalPassYieldInfoField;
+import com.bringit.experiment.bll.FinalPassYieldReport;
 import com.bringit.experiment.bll.FirstPassYieldInfoField;
 import com.bringit.experiment.bll.FirstPassYieldReport;
 import com.bringit.experiment.bll.FirstTimeYieldInfoField;
@@ -21,14 +23,19 @@ import com.bringit.experiment.bll.TargetColumn;
 import com.bringit.experiment.bll.TargetReport;
 import com.bringit.experiment.bll.ViewVerticalReport;
 import com.bringit.experiment.bll.ViewVerticalReportByExperiment;
+import com.bringit.experiment.bll.ViewVerticalReportByFnyRpt;
 import com.bringit.experiment.bll.ViewVerticalReportByFpyRpt;
 import com.bringit.experiment.bll.ViewVerticalReportByFtyRpt;
 import com.bringit.experiment.bll.ViewVerticalReportByTargetRpt;
 import com.bringit.experiment.bll.ViewVerticalReportColumn;
+import com.bringit.experiment.bll.ViewVerticalReportColumnByEnrichment;
 import com.bringit.experiment.bll.ViewVerticalReportColumnByExpField;
+import com.bringit.experiment.bll.ViewVerticalReportColumnByFnyField;
 import com.bringit.experiment.bll.ViewVerticalReportColumnByFpyField;
 import com.bringit.experiment.bll.ViewVerticalReportColumnByFtyField;
+import com.bringit.experiment.bll.ViewVerticalReportColumnByTargetColumn;
 import com.bringit.experiment.bll.ViewVerticalReportFilterByExpField;
+import com.bringit.experiment.bll.ViewVerticalReportFilterByFnyField;
 import com.bringit.experiment.bll.ViewVerticalReportFilterByFpyField;
 import com.bringit.experiment.bll.ViewVerticalReportFilterByFtyField;
 import com.bringit.experiment.dao.CsvTemplateEnrichmentDao;
@@ -36,6 +43,8 @@ import com.bringit.experiment.dao.CustomListDao;
 import com.bringit.experiment.dao.CustomListValueDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
+import com.bringit.experiment.dao.FinalPassYieldInfoFieldDao;
+import com.bringit.experiment.dao.FinalPassYieldReportDao;
 import com.bringit.experiment.dao.FirstPassYieldInfoFieldDao;
 import com.bringit.experiment.dao.FirstPassYieldReportDao;
 import com.bringit.experiment.dao.FirstTimeYieldInfoFieldDao;
@@ -44,15 +53,20 @@ import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.TargetColumnDao;
 import com.bringit.experiment.dao.TargetReportDao;
 import com.bringit.experiment.dao.ViewVerticalReportByExperimentDao;
+import com.bringit.experiment.dao.ViewVerticalReportByFnyRptDao;
 import com.bringit.experiment.dao.ViewVerticalReportByFpyRptDao;
 import com.bringit.experiment.dao.ViewVerticalReportByFtyRptDao;
 import com.bringit.experiment.dao.ViewVerticalReportByTargetRptDao;
+import com.bringit.experiment.dao.ViewVerticalReportColumnByEnrichmentDao;
 import com.bringit.experiment.dao.ViewVerticalReportColumnByExpFieldDao;
+import com.bringit.experiment.dao.ViewVerticalReportColumnByFnyFieldDao;
 import com.bringit.experiment.dao.ViewVerticalReportColumnByFpyFieldDao;
 import com.bringit.experiment.dao.ViewVerticalReportColumnByFtyFieldDao;
+import com.bringit.experiment.dao.ViewVerticalReportColumnByTargetColumnDao;
 import com.bringit.experiment.dao.ViewVerticalReportColumnDao;
 import com.bringit.experiment.dao.ViewVerticalReportDao;
 import com.bringit.experiment.dao.ViewVerticalReportFilterByExpFieldDao;
+import com.bringit.experiment.dao.ViewVerticalReportFilterByFnyFieldDao;
 import com.bringit.experiment.dao.ViewVerticalReportFilterByFpyFieldDao;
 import com.bringit.experiment.dao.ViewVerticalReportFilterByFtyFieldDao;
 import com.bringit.experiment.ui.design.ViewVerticalReportBuilderDesign;
@@ -82,12 +96,14 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 
 	private List<Experiment> activeExperiments = new ExperimentDao().getActiveExperiments();
 	private List<FirstPassYieldReport> activeFpyReports = new FirstPassYieldReportDao().getAllFirstPassYieldReports();
+	private List<FinalPassYieldReport> activeFnyReports = new FinalPassYieldReportDao().getAllFinalPassYieldReports();
 	private List<FirstTimeYieldReport> activeFtyReports = new FirstTimeYieldReportDao().getAllFirstTimeYieldReports();
 	private List<TargetReport> activeTargetReports = new TargetReportDao().getAllActiveTargetReports();
 	private SystemSettings systemSettings;
 	
 	private OptionGroup optGrpPnlExperiments = new OptionGroup();
 	private OptionGroup optGrpPnlFpyReports = new OptionGroup();
+	private OptionGroup optGrpPnlFnyReports = new OptionGroup();
 	private OptionGroup optGrpPnlFtyReports = new OptionGroup();
 	private OptionGroup optGrpPnlTargetReports = new OptionGroup();
 
@@ -163,6 +179,34 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		pnlFpyReports.setContent(lytPnlFpyReports);
 		pnlFpyReportDataSource.addComponent(pnlFpyReports);
 
+
+		Panel pnlFnyReports = new Panel("Final Pass Yield Reports");
+		VerticalLayout lytPnlFnyReports = new VerticalLayout();
+		optGrpPnlFnyReports.setMultiSelect(true);
+		optGrpPnlFnyReports.setStyleName("small");
+		pnlFnyReports.setHeight(100, Unit.PERCENTAGE);
+		pnlFnyReports.setWidth(95, Unit.PERCENTAGE);
+		pnlFnyReports.setStyleName("well");
+		pnlFnyReports.setCaption("");
+		
+		for(int i=0; activeFnyReports != null && i<activeFnyReports.size(); i++)
+		{
+			optGrpPnlFnyReports.addItem(activeFnyReports.get(i).getFnyReportId());
+			optGrpPnlFnyReports.setItemCaption(activeFnyReports.get(i).getFnyReportId(), activeFnyReports.get(i).getFnyReportName());
+		}
+
+		optGrpPnlFnyReports.addValueChangeListener(new ValueChangeListener(){
+           @Override
+			public void valueChange(ValueChangeEvent event) {
+        	   refreshFnyRptDataSourceElements();
+           }
+        });
+		
+		lytPnlFnyReports.addComponent(optGrpPnlFnyReports);
+		pnlFnyReports.setContent(lytPnlFnyReports);
+		pnlFnyReportDataSource.addComponent(pnlFnyReports);
+		
+		
 		Panel pnlFtyReports = new Panel("First Time Yield Reports");
 		VerticalLayout lytPnlFtyReports = new VerticalLayout();
 		optGrpPnlFtyReports.setMultiSelect(true);
@@ -235,12 +279,12 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 
 		});
 	
-		
-		//START: Load data tables
+
+		//START: load report columns using tree
 		loadReportColumnsTable();
 				
 		
-		this.btnAddRptColumn.addClickListener(new Button.ClickListener() {
+		this.btnAddVwVerticalRptColumn.addClickListener(new Button.ClickListener() {
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
@@ -269,15 +313,12 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			}
 		});
 		
-		//START: load report columns using tree
-		loadReportColumns2Table();
 		
 
 		this.btnCancel.addClickListener(new Button.ClickListener() {
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				addReportColumn2(null);
 			}
 
 		});
@@ -297,6 +338,11 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 	}
 	
 	private void refreshFpyRptDataSourceElements()
+	{
+		//System.out.println(optGrpPnlFpyReports.getValue());
+	}
+
+	private void refreshFnyRptDataSourceElements()
 	{
 		//System.out.println(optGrpPnlFpyReports.getValue());
 	}
@@ -381,6 +427,22 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 				{
 					cbxDataSource.addItem("fpy_" + selectedFpyReportId);
 					cbxDataSource.setItemCaption("fpy_" + selectedFpyReportId, " FPY : " + activeFpyReports.get(i).getFpyReportName());
+					break;
+				}
+			}
+		}
+		
+
+		Set<Item> selectedOptGrpPnlFnyRpts = (Set<Item>) optGrpPnlFnyReports.getValue();
+		for (Object selectedFnyRpt : selectedOptGrpPnlFnyRpts)
+		{
+			for(int i=0; activeFnyReports != null && i<activeFnyReports.size(); i++)
+			{
+				int selectedFnyReportId = Integer.parseInt(selectedFnyRpt.toString());
+				if(activeFnyReports.get(i).getFnyReportId() == selectedFnyReportId)
+				{
+					cbxDataSource.addItem("fny_" + selectedFnyReportId);
+					cbxDataSource.setItemCaption("fny_" + selectedFnyReportId, " FNY : " + activeFnyReports.get(i).getFnyReportName());
 					break;
 				}
 			}
@@ -502,341 +564,6 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		
 	}
 	
-	private void addReportColumn(Integer reportColumnId)
-	{
-		//Get all selected data sources 
-		Integer itemId = reportColumnId;
-		if(itemId == null)
-		{	
-			this.lastReportColumnItemId = this.lastReportColumnItemId - 1;
-			itemId = this.lastReportColumnItemId;
-		}
-		
-		Object[] rptColItemValues = new Object[5];
-		
-		//Dummy initial column
-		CheckBox chxSelect = new CheckBox();
-		chxSelect.setStyleName("tiny");
-		chxSelect.setVisible(false);
-		chxSelect.setHeight(20, Unit.PIXELS);
-		rptColItemValues[0] = chxSelect;
-
-		TextField txtRptColumnName = new TextField("");
-		txtRptColumnName.setStyleName("tiny");
-		txtRptColumnName.setHeight(20, Unit.PIXELS);
-		rptColItemValues[1] = txtRptColumnName;
-		
-		TextField txtRptDbColumnName = new TextField("");
-		txtRptDbColumnName.setStyleName("tiny");
-		txtRptDbColumnName.setHeight(20, Unit.PIXELS);
-		rptColItemValues[2] = txtRptDbColumnName;
-				
-		//Loading field types				
-		ComboBox cbxDataType = new ComboBox("");
-		cbxDataType.setStyleName("tiny");
-		cbxDataType.setRequired(true);
-		cbxDataType.setRequiredError("This field is required.");
-		cbxDataType.setHeight(20, Unit.PIXELS);
-		
-		for(int j=0; j<dbfieldTypes.length; j++)
-		{
-			cbxDataType.addItem(dbfieldTypes[j]);
-			cbxDataType.setItemCaption(dbfieldTypes[j], dbfieldTypes[j]);
-		}
-		rptColItemValues[3] = cbxDataType;
-		
-		OptionGroup optGrpDataSourceFieldCols = new OptionGroup();
-		optGrpDataSourceFieldCols.setMultiSelect(true);
-		optGrpDataSourceFieldCols.setStyleName("small");
-		rptColItemValues[4] = optGrpDataSourceFieldCols;
-		
-
-		cbxDataType.addValueChangeListener(new ValueChangeListener() {
-
-            @Override
-            public void valueChange(ValueChangeEvent event) {
-            	onChangeRptColumnDataType(cbxDataType, optGrpDataSourceFieldCols);
-            }
-        });
-		
-
-		this.tblReportColumns.addItem(rptColItemValues, itemId);
-		this.tblReportColumns.select(itemId);
-	}
-	
-	private void onChangeRptColumnDataType(ComboBox cbxDataType, OptionGroup optGrpDataSourceFieldCols)
-	{
-		optGrpDataSourceFieldCols.setContainerDataSource(null);
-		
-		Set<Item> selectedDataSrcExperiments = (Set<Item>) optGrpPnlExperiments.getValue();
-		for (Object selectedDataSrcExperiment : selectedDataSrcExperiments)
-		{
-			Integer selectedExperimentId = Integer.parseInt(selectedDataSrcExperiment.toString());
-			Experiment selectedExperiment = new ExperimentDao().getExperimentById(selectedExperimentId);
-			List<ExperimentField> selectedExperimentFields = new ExperimentFieldDao().getAllExperimentFieldsByExperiment(selectedExperiment);
-			
-			for(int i=0; selectedExperimentFields!=null && i<selectedExperimentFields.size(); i++)
-			{
-				if(selectedExperimentFields.get(i).getExpFieldType().equals(cbxDataType.getValue().toString()))
-				{
-					optGrpDataSourceFieldCols.addItem("expfield_" + selectedExperimentFields.get(i).getExpFieldId());
-					optGrpDataSourceFieldCols.setItemCaption("expfield_" + selectedExperimentFields.get(i).getExpFieldId(), selectedExperiment.getExpName() + " / " + selectedExperimentFields.get(i).getExpFieldName());
-				}
-				else
-				{
-					String selectedDataType = cbxDataType.getValue().toString();
-					String experimentFieldDataType = selectedExperimentFields.get(i).getExpFieldType();
-					
-					if((selectedDataType.startsWith("varchar") || selectedDataType.startsWith("char")
-	                || selectedDataType.startsWith("text") || selectedDataType.startsWith("nvarchar")
-	                || selectedDataType.startsWith("nchar") || selectedDataType.startsWith("ntext")))
-					{
-						if(selectedDataType.equals("nvarchar(max)") || selectedDataType.equals("varchar(max)") || selectedDataType.equals("text")
-								&& (experimentFieldDataType.startsWith("varchar") || experimentFieldDataType.startsWith("char")
-						                || experimentFieldDataType.startsWith("text") || experimentFieldDataType.startsWith("nvarchar")
-						                || experimentFieldDataType.startsWith("nchar") || experimentFieldDataType.startsWith("ntext")))
-						{
-							optGrpDataSourceFieldCols.addItem("expfield_" + selectedExperimentFields.get(i).getExpFieldId());
-							optGrpDataSourceFieldCols.setItemCaption("expfield_" + selectedExperimentFields.get(i).getExpFieldId(), selectedExperiment.getExpName() + " / " + selectedExperimentFields.get(i).getExpFieldName());
-						}
-						else
-						{
-							if((selectedDataType.startsWith("varchar") || selectedDataType.startsWith("char")
-					                || selectedDataType.startsWith("text") || selectedDataType.startsWith("nvarchar")
-					                || selectedDataType.startsWith("nchar") || selectedDataType.startsWith("ntext"))
-									&& (experimentFieldDataType.startsWith("varchar") || experimentFieldDataType.startsWith("char")
-							                || experimentFieldDataType.startsWith("text") || experimentFieldDataType.startsWith("nvarchar")
-							                || experimentFieldDataType.startsWith("nchar") || experimentFieldDataType.startsWith("ntext")))
-							{
-								String selectedDataTypeStringStrLength = selectedDataType.replaceAll("\\D+","");
-								String expFieldDataTypeStringStrLength = experimentFieldDataType.replaceAll("\\D+","");	
-								
-								if(selectedDataTypeStringStrLength != null && selectedDataTypeStringStrLength.length() > 0 && expFieldDataTypeStringStrLength != null && expFieldDataTypeStringStrLength.length() > 0)
-								{
-									if(Integer.parseInt(selectedDataTypeStringStrLength)>Integer.parseInt(expFieldDataTypeStringStrLength))
-									{
-										optGrpDataSourceFieldCols.addItem("expfield_" + selectedExperimentFields.get(i).getExpFieldId());
-										optGrpDataSourceFieldCols.setItemCaption("expfield_" + selectedExperimentFields.get(i).getExpFieldId(), selectedExperiment.getExpName() + " / " + selectedExperimentFields.get(i).getExpFieldName());
-									
-									}
-								}
-							}							
-						}
-					}
-				}
-			}
-		}
-		
-		Set<Item> selectedDataSrcFpyReports = (Set<Item>) optGrpPnlFpyReports.getValue();
-		for (Object selectedDataSrcFpyReport : selectedDataSrcFpyReports)
-		{
-			Integer selectedDataSrcFpyReportId = Integer.parseInt(selectedDataSrcFpyReport.toString());
-			FirstPassYieldReport selectedFpyReport = new FirstPassYieldReportDao().getFirstPassYieldReportById(selectedDataSrcFpyReportId);
-			List<FirstPassYieldInfoField> selectedFpyInfoFields = new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldByReportById(selectedDataSrcFpyReportId);
-			
-			for(int i=0; selectedFpyInfoFields!=null && i<selectedFpyInfoFields.size(); i++)
-			{
-				if(selectedFpyInfoFields.get(i).getExperimentField().getExpFieldType().equals(cbxDataType.getValue().toString()))
-				{
-					optGrpDataSourceFieldCols.addItem("fpyfield_" + selectedFpyInfoFields.get(i).getExperimentField().getExpFieldId());
-					optGrpDataSourceFieldCols.setItemCaption("fpyfield_" + selectedFpyInfoFields.get(i).getExperimentField().getExpFieldId(), "FPY: " + selectedFpyReport.getFpyReportName() + " / " + selectedFpyInfoFields.get(i).getExperimentField().getExpFieldName());
-				}
-				else
-				{
-					String selectedDataType = cbxDataType.getValue().toString();
-					String experimentFieldDataType = selectedFpyInfoFields.get(i).getExperimentField().getExpFieldType();
-					
-					if((selectedDataType.startsWith("varchar") || selectedDataType.startsWith("char")
-	                || selectedDataType.startsWith("text") || selectedDataType.startsWith("nvarchar")
-	                || selectedDataType.startsWith("nchar") || selectedDataType.startsWith("ntext")))
-					{
-						if(selectedDataType.equals("nvarchar(max)") || selectedDataType.equals("varchar(max)") || selectedDataType.equals("text")
-								&& (experimentFieldDataType.startsWith("varchar") || experimentFieldDataType.startsWith("char")
-						                || experimentFieldDataType.startsWith("text") || experimentFieldDataType.startsWith("nvarchar")
-						                || experimentFieldDataType.startsWith("nchar") || experimentFieldDataType.startsWith("ntext")))
-						{
-							optGrpDataSourceFieldCols.addItem("fpyfield_" + selectedFpyInfoFields.get(i).getExperimentField().getExpFieldId());
-							optGrpDataSourceFieldCols.setItemCaption("fpyfield_" + selectedFpyInfoFields.get(i).getExperimentField().getExpFieldId(), "FPY: " + selectedFpyReport.getFpyReportName() + " / " + selectedFpyInfoFields.get(i).getExperimentField().getExpFieldName());
-						}
-						else
-						{
-							if((selectedDataType.startsWith("varchar") || selectedDataType.startsWith("char")
-					                || selectedDataType.startsWith("text") || selectedDataType.startsWith("nvarchar")
-					                || selectedDataType.startsWith("nchar") || selectedDataType.startsWith("ntext"))
-									&& (experimentFieldDataType.startsWith("varchar") || experimentFieldDataType.startsWith("char")
-							                || experimentFieldDataType.startsWith("text") || experimentFieldDataType.startsWith("nvarchar")
-							                || experimentFieldDataType.startsWith("nchar") || experimentFieldDataType.startsWith("ntext")))
-							{
-								String selectedDataTypeStringStrLength = selectedDataType.replaceAll("\\D+","");
-								String expFieldDataTypeStringStrLength = experimentFieldDataType.replaceAll("\\D+","");	
-								
-								if(selectedDataTypeStringStrLength != null && selectedDataTypeStringStrLength.length() > 0 && expFieldDataTypeStringStrLength != null && expFieldDataTypeStringStrLength.length() > 0)
-								{
-									if(Integer.parseInt(selectedDataTypeStringStrLength)>Integer.parseInt(expFieldDataTypeStringStrLength))
-									{
-										optGrpDataSourceFieldCols.addItem("fpyfield_" + selectedFpyInfoFields.get(i).getExperimentField().getExpFieldId());
-										optGrpDataSourceFieldCols.setItemCaption("fpyfield_" + selectedFpyInfoFields.get(i).getExperimentField().getExpFieldId(), "FPY: " + selectedFpyReport.getFpyReportName() + " / " + selectedFpyInfoFields.get(i).getExperimentField().getExpFieldName());
-									}
-								}
-							}							
-						}
-					}
-				}
-			}			
-
-
-			if(cbxDataType.getValue().toString().contains("date"))
-			{
-				optGrpDataSourceFieldCols.addItem("fpyfield_datetime");
-				optGrpDataSourceFieldCols.setItemCaption("fpyfield_datetime", "FPY: " + selectedFpyReport.getFpyReportName() + " / Datetime ");
-			}
-			if((cbxDataType.getValue().toString().startsWith("varchar") || cbxDataType.getValue().toString().startsWith("char")
-	                || cbxDataType.getValue().toString().startsWith("text") || cbxDataType.getValue().toString().startsWith("nvarchar")
-	                || cbxDataType.getValue().toString().startsWith("nchar") || cbxDataType.getValue().toString().startsWith("ntext")))
-			{
-				optGrpDataSourceFieldCols.addItem("fpyfield_sn");
-				optGrpDataSourceFieldCols.setItemCaption("fpyfield_sn", "FPY: " + selectedFpyReport.getFpyReportName() + " / Serial Number");
-
-				optGrpDataSourceFieldCols.addItem("fpyfield_result");
-				optGrpDataSourceFieldCols.setItemCaption("fpyfield_result", "FPY: " + selectedFpyReport.getFpyReportName() + " / Result");
-			}
-		}		
-		
-		
-		Set<Item> selectedDataSrcFtyReports = (Set<Item>) optGrpPnlFtyReports.getValue();
-		for (Object selectedDataSrcFtyReport : selectedDataSrcFtyReports)
-		{
-			Integer selectedDataSrcFtyReportId = Integer.parseInt(selectedDataSrcFtyReport.toString());
-			FirstTimeYieldReport selectedFpyReport = new FirstTimeYieldReportDao().getFirstTimeYieldReportById(selectedDataSrcFtyReportId);
-			List<FirstTimeYieldInfoField> selectedFtyInfoFields = new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldByReportById(selectedDataSrcFtyReportId);
-			
-			for(int i=0; selectedFtyInfoFields!=null && i<selectedFtyInfoFields.size(); i++)
-			{
-				if(selectedFtyInfoFields.get(i).getExperimentField().getExpFieldType().equals(cbxDataType.getValue().toString()))
-				{
-					optGrpDataSourceFieldCols.addItem("ftyfield_" + selectedFtyInfoFields.get(i).getExperimentField().getExpFieldId());
-					optGrpDataSourceFieldCols.setItemCaption("ftyfield_" + selectedFtyInfoFields.get(i).getExperimentField().getExpFieldId(), "FTY: " + selectedFpyReport.getFtyReportName() + " / " + selectedFtyInfoFields.get(i).getExperimentField().getExpFieldName());
-				}
-				else
-				{
-					String selectedDataType = cbxDataType.getValue().toString();
-					String experimentFieldDataType = selectedFtyInfoFields.get(i).getExperimentField().getExpFieldType();
-					
-					if((selectedDataType.startsWith("varchar") || selectedDataType.startsWith("char")
-	                || selectedDataType.startsWith("text") || selectedDataType.startsWith("nvarchar")
-	                || selectedDataType.startsWith("nchar") || selectedDataType.startsWith("ntext")))
-					{
-						if(selectedDataType.equals("nvarchar(max)") || selectedDataType.equals("varchar(max)") || selectedDataType.equals("text")
-								&& (experimentFieldDataType.startsWith("varchar") || experimentFieldDataType.startsWith("char")
-						                || experimentFieldDataType.startsWith("text") || experimentFieldDataType.startsWith("nvarchar")
-						                || experimentFieldDataType.startsWith("nchar") || experimentFieldDataType.startsWith("ntext")))
-						{
-							optGrpDataSourceFieldCols.addItem("ftyfield_" + selectedFtyInfoFields.get(i).getExperimentField().getExpFieldId());
-							optGrpDataSourceFieldCols.setItemCaption("ftyfield_" + selectedFtyInfoFields.get(i).getExperimentField().getExpFieldId(), "FTY: " + selectedFpyReport.getFtyReportName() + " / " + selectedFtyInfoFields.get(i).getExperimentField().getExpFieldName());
-						}
-						else
-						{
-							if((selectedDataType.startsWith("varchar") || selectedDataType.startsWith("char")
-					                || selectedDataType.startsWith("text") || selectedDataType.startsWith("nvarchar")
-					                || selectedDataType.startsWith("nchar") || selectedDataType.startsWith("ntext"))
-									&& (experimentFieldDataType.startsWith("varchar") || experimentFieldDataType.startsWith("char")
-							                || experimentFieldDataType.startsWith("text") || experimentFieldDataType.startsWith("nvarchar")
-							                || experimentFieldDataType.startsWith("nchar") || experimentFieldDataType.startsWith("ntext")))
-							{
-								String selectedDataTypeStringStrLength = selectedDataType.replaceAll("\\D+","");
-								String expFieldDataTypeStringStrLength = experimentFieldDataType.replaceAll("\\D+","");	
-								
-								if(selectedDataTypeStringStrLength != null && selectedDataTypeStringStrLength.length() > 0 && expFieldDataTypeStringStrLength != null && expFieldDataTypeStringStrLength.length() > 0)
-								{
-									if(Integer.parseInt(selectedDataTypeStringStrLength)>Integer.parseInt(expFieldDataTypeStringStrLength))
-									{
-										optGrpDataSourceFieldCols.addItem("ftyfield_" + selectedFtyInfoFields.get(i).getExperimentField().getExpFieldId());
-										optGrpDataSourceFieldCols.setItemCaption("ftyfield_" + selectedFtyInfoFields.get(i).getExperimentField().getExpFieldId(), "FTY: " + selectedFpyReport.getFtyReportName() + " / " + selectedFtyInfoFields.get(i).getExperimentField().getExpFieldName());
-									}
-								}
-							}							
-						}
-					}
-				}
-			}
-			
-			if(cbxDataType.getValue().toString().contains("date"))
-			{
-				optGrpDataSourceFieldCols.addItem("ftyfield_datetime");
-				optGrpDataSourceFieldCols.setItemCaption("ftyfield_datetime", "FTY: " + selectedFpyReport.getFtyReportName() + " / Datetime ");
-			}
-			
-			if((cbxDataType.getValue().toString().startsWith("varchar") || cbxDataType.getValue().toString().startsWith("char")
-	                || cbxDataType.getValue().toString().startsWith("text") || cbxDataType.getValue().toString().startsWith("nvarchar")
-	                || cbxDataType.getValue().toString().startsWith("nchar") || cbxDataType.getValue().toString().startsWith("ntext")))
-			{
-				optGrpDataSourceFieldCols.addItem("ftyfield_sn");
-				optGrpDataSourceFieldCols.setItemCaption("ftyfield_sn", "FTY: " + selectedFpyReport.getFtyReportName() + " / Serial Number");
-
-				optGrpDataSourceFieldCols.addItem("ftyfield_result");
-				optGrpDataSourceFieldCols.setItemCaption("ftyfield_result", "FTY: " + selectedFpyReport.getFtyReportName() + " / Result");
-			}
-		}
-		
-		Set<Item> selectedDataSrcTargetReports = (Set<Item>) optGrpPnlTargetReports.getValue();
-		for (Object selectedDataSrcTargetReport : selectedDataSrcTargetReports)
-		{
-			Integer selectedDataSrcTargetReportId = Integer.parseInt(selectedDataSrcTargetReport.toString());
-			TargetReport selectedTargetReport = new TargetReportDao().getTargetReportById(selectedDataSrcTargetReportId);
-			List<TargetColumn> selectedTargetColumns = new TargetColumnDao().getTargetColumnByTargetReportId(selectedDataSrcTargetReportId);
-			
-			for(int i=0; selectedTargetColumns!=null && i<selectedTargetColumns.size(); i++)
-			{
-				if(selectedTargetColumns.get(i).getExperimentField().getExpFieldType().equals(cbxDataType.getValue().toString()))
-				{
-					optGrpDataSourceFieldCols.addItem("tgtfield_" + selectedTargetColumns.get(i).getExperimentField().getExpFieldId());
-					optGrpDataSourceFieldCols.setItemCaption("tgtfield_" + selectedTargetColumns.get(i).getExperimentField().getExpFieldId(), "Target: " + selectedTargetReport.getTargetReportName() + " / " + selectedTargetColumns.get(i).getExperimentField().getExpFieldName());
-				} 
-				else
-				{
-					String selectedDataType = cbxDataType.getValue().toString();
-					String experimentFieldDataType = selectedTargetColumns.get(i).getExperimentField().getExpFieldType();
-					
-					if((selectedDataType.startsWith("varchar") || selectedDataType.startsWith("char")
-	                || selectedDataType.startsWith("text") || selectedDataType.startsWith("nvarchar")
-	                || selectedDataType.startsWith("nchar") || selectedDataType.startsWith("ntext")))
-					{
-						if(selectedDataType.equals("nvarchar(max)") || selectedDataType.equals("varchar(max)") || selectedDataType.equals("text")
-								&& (experimentFieldDataType.startsWith("varchar") || experimentFieldDataType.startsWith("char")
-						                || experimentFieldDataType.startsWith("text") || experimentFieldDataType.startsWith("nvarchar")
-						                || experimentFieldDataType.startsWith("nchar") || experimentFieldDataType.startsWith("ntext")))
-						{
-							optGrpDataSourceFieldCols.addItem("tgtfield_" + selectedTargetColumns.get(i).getExperimentField().getExpFieldId());
-							optGrpDataSourceFieldCols.setItemCaption("tgtfield_" + selectedTargetColumns.get(i).getExperimentField().getExpFieldId(), "Target: " + selectedTargetReport.getTargetReportName() + " / " + selectedTargetColumns.get(i).getExperimentField().getExpFieldName());
-						}
-						else
-						{
-							if((selectedDataType.startsWith("varchar") || selectedDataType.startsWith("char")
-					                || selectedDataType.startsWith("text") || selectedDataType.startsWith("nvarchar")
-					                || selectedDataType.startsWith("nchar") || selectedDataType.startsWith("ntext"))
-									&& (experimentFieldDataType.startsWith("varchar") || experimentFieldDataType.startsWith("char")
-							                || experimentFieldDataType.startsWith("text") || experimentFieldDataType.startsWith("nvarchar")
-							                || experimentFieldDataType.startsWith("nchar") || experimentFieldDataType.startsWith("ntext")))
-							{
-								String selectedDataTypeStringStrLength = selectedDataType.replaceAll("\\D+","");
-								String expFieldDataTypeStringStrLength = experimentFieldDataType.replaceAll("\\D+","");	
-								
-								if(selectedDataTypeStringStrLength != null && selectedDataTypeStringStrLength.length() > 0 && expFieldDataTypeStringStrLength != null && expFieldDataTypeStringStrLength.length() > 0)
-								{
-									if(Integer.parseInt(selectedDataTypeStringStrLength)>Integer.parseInt(expFieldDataTypeStringStrLength))
-									{
-										optGrpDataSourceFieldCols.addItem("tgtfield_" + selectedTargetColumns.get(i).getExperimentField().getExpFieldId());
-										optGrpDataSourceFieldCols.setItemCaption("tgtfield_" + selectedTargetColumns.get(i).getExperimentField().getExpFieldId(), "Target: " + selectedTargetReport.getTargetReportName() + " / " + selectedTargetColumns.get(i).getExperimentField().getExpFieldName());
-									}
-								}
-							}							
-						}
-					}
-				}
-			}		
-		}		
-	}
-	
 	private void loadTblEnrichmentRulesData()
 	{
 		this.tblColumnsEnrichment.setContainerDataSource(null);
@@ -878,15 +605,19 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		cbxRptColumnSource.setRequired(true);
 		cbxRptColumnSource.setRequiredError("This field is required.");
 		
-		Collection rptColumnItemIds = this.tblReportColumns.getContainerDataSource().getItemIds();
+		Collection rptColumnItemIds = this.tblVwVerticalRptCols.getContainerDataSource().getItemIds();
 		
 		for (Object rptColumnItemIdObj : rptColumnItemIds) 
 		{
-			int rptColumnItemId = (int)rptColumnItemIdObj;
-			Item tblEnrichmentRuleRowItem = this.tblReportColumns.getContainerDataSource().getItem(rptColumnItemId);
-			cbxRptColumnSource.addItem(rptColumnItemId);
-			cbxRptColumnSource.setItemCaption(rptColumnItemId, ((TextField)(tblEnrichmentRuleRowItem.getItemProperty("Column Name").getValue())).getValue().toString());
-			cbxRptColumnSource.setWidth(100, Unit.PERCENTAGE);
+			//int rptColumnItemId = (int)rptColumnItemIdObj;
+			Item tblEnrichmentRuleRowItem = this.tblVwVerticalRptCols.getContainerDataSource().getItem(rptColumnItemIdObj);
+			
+			if (tblVwVerticalRptCols.hasChildren(rptColumnItemIdObj))
+			{
+				cbxRptColumnSource.addItem(((TextField)(tblEnrichmentRuleRowItem.getItemProperty("DB Column Name").getValue())).getValue().toString());
+				cbxRptColumnSource.setItemCaption(((TextField)(tblEnrichmentRuleRowItem.getItemProperty("DB Column Name").getValue())).getValue().toString(), ((TextField)(tblEnrichmentRuleRowItem.getItemProperty("Column Name").getValue())).getValue().toString());
+				cbxRptColumnSource.setWidth(100, Unit.PERCENTAGE);
+			}
 		}
 		
 		cbxRptColumnSource.setHeight(20, Unit.PIXELS);
@@ -1084,6 +815,26 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			
 			break;
 
+		case "fny_":
+			List<FinalPassYieldInfoField> fnyFields = new FinalPassYieldInfoFieldDao().getFinalPassYieldInfoFieldByReportById(dataSourceId);
+			cbxDataSourceField.setContainerDataSource(null);
+			for(int i=0; fnyFields != null && i<fnyFields.size(); i++)
+			{
+				cbxDataSourceField.addItem("fny_" + fnyFields.get(i).getFnyInfoFieldId());
+				cbxDataSourceField.setItemCaption("fny_" + fnyFields.get(i).getFnyInfoFieldId(), fnyFields.get(i).getFnyInfoFieldLabel());
+			}
+
+			cbxDataSourceField.addItem("fny_datetime");
+			cbxDataSourceField.setItemCaption("fny_datetime", "Datetime (FPY)");
+
+			cbxDataSourceField.addItem("fny_sn");
+			cbxDataSourceField.setItemCaption("fny_sn", "Serial Number (FPY)");
+
+			cbxDataSourceField.addItem("fny_result");
+			cbxDataSourceField.setItemCaption("fny_result", "Result (FPY)");
+			
+			break;
+
 		case "fty_":
 			List<FirstTimeYieldInfoField> ftyFields = new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldByReportById(dataSourceId);
 			cbxDataSourceField.setContainerDataSource(null);
@@ -1131,6 +882,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		Integer filterDataSourceFieldId = -1;
 		
 		if(!cbxDataSourceField.getValue().toString().equals("fpy_sn") && !cbxDataSourceField.getValue().toString().equals("fpy_result") && !cbxDataSourceField.getValue().toString().equals("fpy_datetime") 
+				&& !cbxDataSourceField.getValue().toString().equals("fny_sn") && !cbxDataSourceField.getValue().toString().equals("fny_result") && !cbxDataSourceField.getValue().toString().equals("fny_datetime")
 				&& !cbxDataSourceField.getValue().toString().equals("fty_sn") && !cbxDataSourceField.getValue().toString().equals("fty_result") && !cbxDataSourceField.getValue().toString().equals("fty_datetime"))
 			filterDataSourceFieldId = Integer.parseInt((cbxDataSourceField.getValue().toString().substring(4)));
 		
@@ -1150,6 +902,18 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			if(cbxDataSourceField.getValue().toString().equals("fpy_datetime"))
 				dataFieldType = "datetime";
 			else if(cbxDataSourceField.getValue().toString().equals("fpy_sn") || cbxDataSourceField.getValue().toString().equals("fpy_result"))
+				dataFieldType = "varchar";
+			else
+			{
+				ExperimentField fpyInfoExpField = new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldById(filterDataSourceFieldId).getExperimentField(); 
+				dataFieldType = fpyInfoExpField.getExpFieldType();
+			}
+			break;
+
+		case "fny_":
+			if(cbxDataSourceField.getValue().toString().equals("fny_datetime"))
+				dataFieldType = "datetime";
+			else if(cbxDataSourceField.getValue().toString().equals("fny_sn") || cbxDataSourceField.getValue().toString().equals("fny_result"))
 				dataFieldType = "varchar";
 			else
 			{
@@ -1317,270 +1081,9 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			}
 		}
 	}
-
-	private void loadReportColumnsTable()
-	{
-		this.tblReportColumns.setContainerDataSource(null);
-		this.tblReportColumns.setStyleName("small");
-		this.tblReportColumns.addContainerProperty("*", CheckBox.class, null);
-		this.tblReportColumns.addContainerProperty("Column Name", TextField.class, null);
-		this.tblReportColumns.addContainerProperty("DB Column Name", TextField.class, null);
-		this.tblReportColumns.addContainerProperty("Data Type", ComboBox.class, null);
-		this.tblReportColumns.addContainerProperty("Data Source Column/Field", OptionGroup.class, null);
-		this.tblReportColumns.setEditable(true);
-		this.tblReportColumns.setPageLength(0);
-		this.tblReportColumns.setColumnWidth("*", 20);
-	}
 	
-	private void onSave()
-	{
-		ViewVerticalReport vwVerticalRpt = new ViewVerticalReport();
-		vwVerticalRpt.setVwVerticalRptDbTableNameId(this.txtFtyRptCustomId.getValue());
-		vwVerticalRpt.setVwVerticalRptName(this.txtFtyRptName.getValue());
-		vwVerticalRpt.setVwVerticalRptDescription(this.txtFtyDescription.getValue());
-		vwVerticalRpt.setVwVerticalRptIsActive(true);
-		
-		new ViewVerticalReportDao().addVwVerticalReport(vwVerticalRpt);
-		
-		Set<Item> selectedOptGrpPnlExperiments = (Set<Item>) optGrpPnlExperiments.getValue();
-		for (Object selectedExperiment : selectedOptGrpPnlExperiments)
-		{
-			for(int i=0; activeExperiments != null && i<activeExperiments.size(); i++)
-			{
-				int selectedExperimentId = Integer.parseInt(selectedExperiment.toString());				
-				if(activeExperiments.get(i).getExpId() == selectedExperimentId)
-				{
-					ViewVerticalReportByExperiment vwVerticalRptByExperiment = new ViewVerticalReportByExperiment();
-					vwVerticalRptByExperiment.setExperiment(activeExperiments.get(i));
-					vwVerticalRptByExperiment.setViewVerticalReport(vwVerticalRpt);
-					new ViewVerticalReportByExperimentDao().addVwVerticalReportByExperiment(vwVerticalRptByExperiment);
-					
-					//Save filters attached to Experiment
-					Collection dataSourceFiltersItemIds = this.tblReportFilters.getContainerDataSource().getItemIds();
-					
-					for (Object dataSourceFiltersItemIdObj : dataSourceFiltersItemIds) 
-					{
-						Item tblDataSourceFilterRowItem = this.tblReportFilters.getContainerDataSource().getItem(dataSourceFiltersItemIdObj);
-						String dataSourceId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Data Source").getValue())).getValue().toString();
-						if(("exp_" + selectedExperimentId).equals(dataSourceId))
-						{
-							ViewVerticalReportFilterByExpField vwVerticalRptFilterByExpField = new ViewVerticalReportFilterByExpField();
-							vwVerticalRptFilterByExpField.setVwVerticalReportByExperiment(vwVerticalRptByExperiment);
-							vwVerticalRptFilterByExpField.setExpField(new ExperimentFieldDao().getExperimentFieldById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
-							vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
-							vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
-							vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
-							vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
-						
-							if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
-								vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
-						
-							new ViewVerticalReportFilterByExpFieldDao().addVwVerticalReportFilterByExpField(vwVerticalRptFilterByExpField);
-						}
-					}
-					
-					break;
-				}
-			}
-		}
-
-		Set<Item> selectedOptGrpPnlFpyRpts = (Set<Item>) optGrpPnlFpyReports.getValue();
-		for (Object selectedFpyRpt : selectedOptGrpPnlFpyRpts)
-		{
-			for(int i=0; activeFpyReports != null && i<activeFpyReports.size(); i++)
-			{
-				int selectedFpyReportId = Integer.parseInt(selectedFpyRpt.toString());
-				if(activeFpyReports.get(i).getFpyReportId() == selectedFpyReportId)
-				{
-					ViewVerticalReportByFpyRpt vwVerticalRptByFpyRpt = new ViewVerticalReportByFpyRpt();
-					vwVerticalRptByFpyRpt.setFpyRpt(activeFpyReports.get(i));
-					vwVerticalRptByFpyRpt.setViewVerticalReport(vwVerticalRpt);
-					new ViewVerticalReportByFpyRptDao().addVwVerticalReportByFpyRpt(vwVerticalRptByFpyRpt);
-					
-					//Save filters attached to FPY
-					Collection dataSourceFiltersItemIds = this.tblReportFilters.getContainerDataSource().getItemIds();
-					
-					for (Object dataSourceFiltersItemIdObj : dataSourceFiltersItemIds) 
-					{
-						Item tblDataSourceFilterRowItem = this.tblReportFilters.getContainerDataSource().getItem(dataSourceFiltersItemIdObj);
-						String dataSourceId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Data Source").getValue())).getValue().toString();
-						if(("fpy_" + selectedFpyReportId).equals(dataSourceId))
-						{
-							ViewVerticalReportFilterByFpyField vwVerticalRptFilterByFpyField = new ViewVerticalReportFilterByFpyField();
-							vwVerticalRptFilterByFpyField.setVwVerticalFpyRpt(vwVerticalRptByFpyRpt);
-						
-							String fpyInfoFieldStrId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString();
-							if(fpyInfoFieldStrId.equals("fpy_datetime") ||fpyInfoFieldStrId.equals("fpy_sn") ||fpyInfoFieldStrId.equals("fpy_result"))
-							{
-								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyIsDateTimeExpField(fpyInfoFieldStrId.equals("fpy_datetime"));
-								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyIsResultExpField(fpyInfoFieldStrId.equals("fpy_result"));
-								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpySNExpField(fpyInfoFieldStrId.equals("fpy_sn"));
-							}
-							else
-								vwVerticalRptFilterByFpyField.setFpyInfoField(new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
-						
-							vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
-							vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
-							vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
-							vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
-						
-							if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
-								vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
-						
-							new ViewVerticalReportFilterByFpyFieldDao().addVwVerticalReportFilterByFpyField(vwVerticalRptFilterByFpyField);
-						}
-					}				
-					
-					break;
-				}
-			}
-		}
-		
-		Set<Item> selectedOptGrpPnlFtyRpts = (Set<Item>) optGrpPnlFtyReports.getValue();
-		for (Object selectedFtyRpt : selectedOptGrpPnlFtyRpts)
-		{
-			for(int i=0; activeFtyReports != null && i<activeFtyReports.size(); i++)
-			{
-				int selectedFtyReportId = Integer.parseInt(selectedFtyRpt.toString());
-				if(activeFtyReports.get(i).getFtyReportId() == selectedFtyReportId)
-				{
-					ViewVerticalReportByFtyRpt vwVerticalRptByFtyRpt = new ViewVerticalReportByFtyRpt();
-					vwVerticalRptByFtyRpt.setFtyRpt(activeFtyReports.get(i));
-					vwVerticalRptByFtyRpt.setViewVerticalReport(vwVerticalRpt);
-					new ViewVerticalReportByFtyRptDao().addVwVerticalReportByFtyRpt(vwVerticalRptByFtyRpt);
-					
-					//Save filters attached to FTY
-					Collection dataSourceFiltersItemIds = this.tblReportFilters.getContainerDataSource().getItemIds();
-					
-					for (Object dataSourceFiltersItemIdObj : dataSourceFiltersItemIds) 
-					{
-						Item tblDataSourceFilterRowItem = this.tblReportFilters.getContainerDataSource().getItem(dataSourceFiltersItemIdObj);
-						String dataSourceId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Data Source").getValue())).getValue().toString();
-						if(("fty_" + selectedFtyReportId).equals(dataSourceId))
-						{
-							ViewVerticalReportFilterByFtyField vwVerticalRptFilterByFtyField = new ViewVerticalReportFilterByFtyField();
-							vwVerticalRptFilterByFtyField.setVwVerticalFtyRpt(vwVerticalRptByFtyRpt);
-						
-							String ftyInfoFieldStrId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString();
-							if(ftyInfoFieldStrId.equals("fty_datetime") || ftyInfoFieldStrId.equals("fty_sn") ||ftyInfoFieldStrId.equals("fty_result"))
-							{
-								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyIsDateTimeExpField(ftyInfoFieldStrId.equals("fty_datetime"));
-								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyIsResultExpField(ftyInfoFieldStrId.equals("fty_result"));
-								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtySNExpField(ftyInfoFieldStrId.equals("fty_sn"));
-							}
-							else
-								vwVerticalRptFilterByFtyField.setFtyInfoField(new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
-						
-							vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
-							vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
-							vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
-							vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
-						
-							if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
-								vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
-						
-							new ViewVerticalReportFilterByFtyFieldDao().addVwVerticalReportFilterByFtyField(vwVerticalRptFilterByFtyField);
-						}
-					}
-					
-					break;
-				}
-			}
-		}	
-		
-		Set<Item> selectedOptGrpPnlTargetRpts = (Set<Item>) optGrpPnlTargetReports.getValue();
-		for (Object selectedTargetRpt : selectedOptGrpPnlTargetRpts)
-		{
-			for(int i=0; activeTargetReports != null && i<activeTargetReports.size(); i++)
-			{
-				int selectedTargetReportId = Integer.parseInt(selectedTargetRpt.toString());
-				if(activeTargetReports.get(i).getTargetReportId() == selectedTargetReportId)
-				{
-					ViewVerticalReportByTargetRpt vwVerticalRptByTargetRpt = new ViewVerticalReportByTargetRpt();
-					vwVerticalRptByTargetRpt.setTargetRpt(activeTargetReports.get(i));
-					vwVerticalRptByTargetRpt.setViewVerticalReport(vwVerticalRpt);
-					new ViewVerticalReportByTargetRptDao().addVwVerticalReportByTargetRpt(vwVerticalRptByTargetRpt);
-					break;
-				}
-			}
-		}
-		
-		//Save report columns
-		Collection rptColumnsItemIds = this.tblReportColumns.getContainerDataSource().getItemIds();
-		
-		for (Object rptColumnsItemIdObj : rptColumnsItemIds) 
-		{
-			Item tblRptColumnRowItem = this.tblReportColumns.getContainerDataSource().getItem(rptColumnsItemIdObj);
-			
-			String rptColumnName = ((TextField)(tblRptColumnRowItem.getItemProperty("Column Name").getValue())).getValue();
-			String rptDBColumnName = ((TextField)(tblRptColumnRowItem.getItemProperty("DB Column Name").getValue())).getValue();
-			String rptColumnDataType = ((ComboBox)(tblRptColumnRowItem.getItemProperty("Data Type").getValue())).getValue().toString();
-			
-			ViewVerticalReportColumn vwRptColumn =  new ViewVerticalReportColumn();
-			vwRptColumn.setViewVerticalReport(vwVerticalRpt);
-			vwRptColumn.setVwVerticalRptColumnName(rptColumnName);
-			vwRptColumn.setVwVerticalRptColumnDbId(rptDBColumnName);
-			vwRptColumn.setVwVerticalRptColumnDataType(rptColumnDataType);
-			
-			new ViewVerticalReportColumnDao().addVwVerticalReportColumn(vwRptColumn);
-			
-			OptionGroup rptColumnDsFieldCol = ((OptionGroup)(tblRptColumnRowItem.getItemProperty("Data Source Column/Field").getValue()));
-			
-			Set<Item> selectedRptColumnDsFieldCols = (Set<Item>) rptColumnDsFieldCol.getValue();
-			for (Object selectedRptColumnDsFieldCol : selectedRptColumnDsFieldCols)
-			{
-				if(selectedRptColumnDsFieldCol.toString().startsWith("expfield_"))
-				{
-					int selectedExpFieldId = Integer.parseInt(selectedRptColumnDsFieldCol.toString().substring(9));				
-					ViewVerticalReportColumnByExpField vwVerticalRptColByExpField = new ViewVerticalReportColumnByExpField();
-					vwVerticalRptColByExpField.setExperimentField(new ExperimentFieldDao().getExperimentFieldById(selectedExpFieldId));
-					vwVerticalRptColByExpField.setVwVerticalReportColumn(vwRptColumn);
-					new ViewVerticalReportColumnByExpFieldDao().addVwVerticalReportColumnByExpField(vwVerticalRptColByExpField);
-					
-				}
-
-				if(selectedRptColumnDsFieldCol.toString().startsWith("fpyfield_"))
-				{
-					ViewVerticalReportColumnByFpyField vwVerticalRptColByFpyField = new ViewVerticalReportColumnByFpyField();
-					if("fpyfield_sn".equals(selectedRptColumnDsFieldCol.toString()) || "fpyfield_result".equals(selectedRptColumnDsFieldCol.toString()) || "fpyfield_datetime".equals(selectedRptColumnDsFieldCol.toString()))
-					{
-						vwVerticalRptColByFpyField.setVwVerticalRptFilterByFpySNExpField("fpyfield_sn".equals(selectedRptColumnDsFieldCol.toString()));
-						vwVerticalRptColByFpyField.setVwVerticalRptFilterByFpyIsResultExpField("fpyfield_result".equals(selectedRptColumnDsFieldCol.toString()));
-						vwVerticalRptColByFpyField.setVwVerticalRptFilterByFpyIsDateTimeExpField("fpyfield_datetime".equals(selectedRptColumnDsFieldCol.toString()));
-					}
-					else
-					{
-						int selectedFpyFieldId = Integer.parseInt(selectedRptColumnDsFieldCol.toString().substring(9));				
-						vwVerticalRptColByFpyField.setFirstPassYieldInfoField(new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldById(selectedFpyFieldId));
-					}
-					vwVerticalRptColByFpyField.setVwVerticalReportColumn(vwRptColumn);
-					new ViewVerticalReportColumnByFpyFieldDao().addVwVerticalReportColumnByFpyField(vwVerticalRptColByFpyField);
-				}
-				
-				if(selectedRptColumnDsFieldCol.toString().startsWith("ftyfield_"))
-				{
-					ViewVerticalReportColumnByFtyField vwVerticalRptColByFtyField = new ViewVerticalReportColumnByFtyField();
-					if("ftyfield_sn".equals(selectedRptColumnDsFieldCol.toString()) || "ftyfield_result".equals(selectedRptColumnDsFieldCol.toString()) || "ftyfield_datetime".equals(selectedRptColumnDsFieldCol.toString()))
-					{
-						vwVerticalRptColByFtyField.setVwVerticalRptFilterByFtySNExpField("ftyfield_sn".equals(selectedRptColumnDsFieldCol.toString()));
-						vwVerticalRptColByFtyField.setVwVerticalRptFilterByFtyIsResultExpField("ftyfield_result".equals(selectedRptColumnDsFieldCol.toString()));
-						vwVerticalRptColByFtyField.setVwVerticalRptFilterByFtyIsDateTimeExpField("ftyfield_datetime".equals(selectedRptColumnDsFieldCol.toString()));
-					}
-					else
-					{
-						int selectedFtyFieldId = Integer.parseInt(selectedRptColumnDsFieldCol.toString().substring(9));				
-						vwVerticalRptColByFtyField.setFirstTimeYieldInfoField(new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldById(selectedFtyFieldId));
-					}
-					vwVerticalRptColByFtyField.setVwVerticalReportColumn(vwRptColumn);
-					new ViewVerticalReportColumnByFtyFieldDao().addVwVerticalReportColumnByFtyField(vwVerticalRptColByFtyField);
-				}
-			}
-			
-		}
-		
-	}
-
-	private void loadReportColumns2Table()
+	
+	private void loadReportColumnsTable()
 	{
 		tblVwVerticalRptCols = new TreeTable("Report Columns");
 		tblVwVerticalRptCols.setStyleName("small");
@@ -1588,6 +1091,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		tblVwVerticalRptCols.setWidth(100, Unit.PERCENTAGE);
 		
 		tblVwVerticalRptCols.addContainerProperty("Column Name", TextField.class, null);
+		tblVwVerticalRptCols.addContainerProperty("Key", CheckBox.class, null);
 		tblVwVerticalRptCols.addContainerProperty("DB Column Name", TextField.class, null);
 		tblVwVerticalRptCols.addContainerProperty("Data Type", ComboBox.class, null);
 		tblVwVerticalRptCols.addContainerProperty("Data Source Table/Report", ComboBox.class, null);
@@ -1596,11 +1100,11 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		tblVwVerticalRptCols.setEditable(true);
 		tblVwVerticalRptCols.setPageLength(0);
 		
-		lytReportColumns2.addComponent(tblVwVerticalRptCols);
+		lytVwVerticalRptColumnsTbl.addComponent(tblVwVerticalRptCols);
 		
 	}
 
-	private void addReportColumn2(Integer reportColumnId)
+	private void addReportColumn(Integer reportColumnId)
 	{
 		//Get all selected data sources 
 		Integer itemId = reportColumnId;
@@ -1610,7 +1114,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			itemId = this.lastReportColumnItemId;
 		}
 		
-		Object[] rptColItemValues = new Object[6];
+		Object[] rptColItemValues = new Object[7];
 		
 		TextField txtRptColumnName = new TextField("");
 		txtRptColumnName.setStyleName("tiny");
@@ -1628,6 +1132,16 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			}});
 		
 		rptColItemValues[0] = txtRptColumnName;
+		
+
+		CheckBox chxKeyColumn = new CheckBox();
+		chxKeyColumn.setStyleName("tiny");
+		chxKeyColumn.setVisible(true);
+		chxKeyColumn.setValue(false);
+		chxKeyColumn.setHeight(20, Unit.PIXELS);
+		chxKeyColumn.setWidth(100, Unit.PERCENTAGE);
+		rptColItemValues[1] = chxKeyColumn;
+		
 		
 		TextField txtRptDbColumnName = new TextField("");
 		txtRptDbColumnName.setStyleName("tiny");
@@ -1652,7 +1166,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 				// TODO Auto-generated method stub
 				refreshChildDbColNameTblVwVerticalRptCols(txtRptColumnName);
 			}});
-		rptColItemValues[1] = txtRptDbColumnName;
+		rptColItemValues[2] = txtRptDbColumnName;
 				
 		//Loading field types				
 		ComboBox cbxDataType = new ComboBox("");
@@ -1669,7 +1183,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			cbxDataType.setItemCaption(dbfieldTypes[j], dbfieldTypes[j]);
 		}
 				
-		rptColItemValues[2] = cbxDataType;
+		rptColItemValues[3] = cbxDataType;
 
 		cbxDataType.addValueChangeListener(new ValueChangeListener() {
 
@@ -1684,14 +1198,14 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		cbxDataSource.setHeight(20, Unit.PIXELS);
 		cbxDataSource.setWidth(100, Unit.PERCENTAGE);
 		cbxDataSource.setReadOnly(true);
-		rptColItemValues[3] = cbxDataSource;
+		rptColItemValues[4] = cbxDataSource;
 
 		ComboBox cbxDataSourceField = new ComboBox("");
 		cbxDataSourceField.setStyleName("tiny");
 		cbxDataSourceField.setHeight(20, Unit.PIXELS);
 		cbxDataSourceField.setWidth(100, Unit.PERCENTAGE);
 		cbxDataSourceField.setReadOnly(true);
-		rptColItemValues[4] = cbxDataSourceField;
+		rptColItemValues[5] = cbxDataSourceField;
 
 		CheckBox chxMappedData = new CheckBox();
 		chxMappedData.setStyleName("tiny");
@@ -1700,7 +1214,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		chxMappedData.setReadOnly(true);
 		chxMappedData.setHeight(20, Unit.PIXELS);
 		chxMappedData.setWidth(100, Unit.PERCENTAGE);
-		rptColItemValues[5] = chxMappedData;
+		rptColItemValues[6] = chxMappedData;
 
 		tblVwVerticalRptCols.addItem(rptColItemValues, itemId);
 		tblVwVerticalRptCols.select(itemId);
@@ -1715,7 +1229,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 				if(activeExperiments.get(i).getExpId() == selectedExperimentId)
 				{
 					this.lastReportColumnItemId = this.lastReportColumnItemId - 1;
-					addChildRptCol(this.lastReportColumnItemId, itemId, selectedExperimentId, null,	null, null, null, null, null, null);
+					addChildRptCol(this.lastReportColumnItemId, itemId, selectedExperimentId, null,	null, null, null, null, null, null, null, null);
 					break;
 				}
 			}
@@ -1730,7 +1244,22 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 				if(activeFpyReports.get(i).getFpyReportId() == selectedFpyReportId)
 				{
 					this.lastReportColumnItemId = this.lastReportColumnItemId - 1;
-					addChildRptCol(this.lastReportColumnItemId, itemId, null, null,	selectedFpyReportId, null, null, null, null, null);
+					addChildRptCol(this.lastReportColumnItemId, itemId, null, null,	selectedFpyReportId, null, null, null, null, null, null, null);
+					break;
+				}
+			}
+		}
+		
+		Set<Item> selectedOptGrpPnlFnyRpts = (Set<Item>) optGrpPnlFnyReports.getValue();
+		for (Object selectedFnyRpt : selectedOptGrpPnlFnyRpts)
+		{
+			for(int i=0; activeFnyReports != null && i<activeFnyReports.size(); i++)
+			{
+				int selectedFnyReportId = Integer.parseInt(selectedFnyRpt.toString());
+				if(activeFnyReports.get(i).getFnyReportId() == selectedFnyReportId)
+				{
+					this.lastReportColumnItemId = this.lastReportColumnItemId - 1;
+					addChildRptCol(this.lastReportColumnItemId, itemId, null, null,	null, null, selectedFnyReportId, null, null, null, null, null);
 					break;
 				}
 			}
@@ -1745,7 +1274,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 				if(activeFtyReports.get(i).getFtyReportId() == selectedFtyReportId)
 				{
 					this.lastReportColumnItemId = this.lastReportColumnItemId - 1;
-					addChildRptCol(this.lastReportColumnItemId, itemId, null, null,	null, null, selectedFtyReportId, null, null, null);
+					addChildRptCol(this.lastReportColumnItemId, itemId, null, null,	null, null, null, null, selectedFtyReportId, null, null, null);
 					break;
 				}
 			}
@@ -1760,7 +1289,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 				if(activeTargetReports.get(i).getTargetReportId() == selectedTargetReportId)
 				{
 					this.lastReportColumnItemId = this.lastReportColumnItemId - 1;
-					addChildRptCol(this.lastReportColumnItemId, itemId, null, null,	null, null, null, null, selectedTargetReportId, null);
+					addChildRptCol(this.lastReportColumnItemId, itemId, null, null, null, null,	null, null, null, null, selectedTargetReportId, null);
 					break;
 				}
 			}
@@ -1777,10 +1306,10 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 	}
 
 	private void addChildRptCol(Integer rptColumnId, Integer parentRptColumnId, Integer expDataSourceId, Integer expDataSourceFieldId, 
-			Integer fpyDataSourceId, Integer fpyDataSourceFieldId, Integer ftyDataSourceId, Integer ftyDataSourceFieldId, 
+			Integer fpyDataSourceId, Integer fpyDataSourceFieldId, Integer fnyDataSourceId, Integer fnyDataSourceFieldId, Integer ftyDataSourceId, Integer ftyDataSourceFieldId, 
 			Integer tgtDataSourceId, Integer tgtDataSourceFieldId)
 	{
-		Object[] rptColItemValues = new Object[6];
+		Object[] rptColItemValues = new Object[7];
 		
 		TextField txtRptColumnName = new TextField("");
 		txtRptColumnName.setStyleName("tiny");
@@ -1791,6 +1320,17 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		txtRptColumnName.setWidth(100, Unit.PERCENTAGE);
 		rptColItemValues[0] = txtRptColumnName;
 		
+
+		CheckBox chxKeyColumn = new CheckBox();
+		chxKeyColumn.setStyleName("tiny");
+		chxKeyColumn.setVisible(true);
+		chxKeyColumn.setValue(false);
+		chxKeyColumn.setReadOnly(true);
+		chxKeyColumn.setHeight(20, Unit.PIXELS);
+		chxKeyColumn.setWidth(100, Unit.PERCENTAGE);
+		rptColItemValues[1] = chxKeyColumn;
+		
+		
 		TextField txtRptDbColumnName = new TextField("");
 		txtRptDbColumnName.setStyleName("tiny");
 		txtRptDbColumnName.setRequired(true);
@@ -1798,7 +1338,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		txtRptDbColumnName.setRequiredError("This field is required.");
 		txtRptDbColumnName.setHeight(20, Unit.PIXELS);
 		txtRptDbColumnName.setWidth(100, Unit.PERCENTAGE);
-		rptColItemValues[1] = txtRptDbColumnName;
+		rptColItemValues[2] = txtRptDbColumnName;
 				
 		//Loading field types				
 		ComboBox cbxDataType = new ComboBox("");
@@ -1813,7 +1353,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			cbxDataType.addItem(dbfieldTypes[j]);
 			cbxDataType.setItemCaption(dbfieldTypes[j], dbfieldTypes[j]);
 		}
-		rptColItemValues[2] = cbxDataType;
+		rptColItemValues[3] = cbxDataType;
 
 		ComboBox cbxDataSource = new ComboBox("");
 		cbxDataSource.setStyleName("tiny");
@@ -1836,6 +1376,14 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			cbxDataSource.setValue("fpy_" + fpyDataSourceId);
 		}
 		
+		if(fnyDataSourceId != null)
+		{
+			FinalPassYieldReport fnyRpt = new FinalPassYieldReportDao().getFinalPassYieldReportById(fnyDataSourceId);
+			cbxDataSource.addItem("fny_" + fnyDataSourceId);
+			cbxDataSource.setItemCaption("fny_" + fnyDataSourceId, "FNY: " + fnyRpt.getFnyReportName());	
+			cbxDataSource.setValue("fny_" + fnyDataSourceId);
+		}
+		
 		if(ftyDataSourceId != null)
 		{
 			FirstTimeYieldReport ftyRpt = new FirstTimeYieldReportDao().getFirstTimeYieldReportById(ftyDataSourceId);
@@ -1853,13 +1401,13 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		}
 		
 		cbxDataSource.setReadOnly(true);
-		rptColItemValues[3] = cbxDataSource;
+		rptColItemValues[4] = cbxDataSource;
 
 		ComboBox cbxDataFieldSource = new ComboBox("");
 		cbxDataFieldSource.setStyleName("tiny");
 		cbxDataFieldSource.setHeight(20, Unit.PIXELS);
 		cbxDataFieldSource.setWidth(100, Unit.PERCENTAGE);
-		rptColItemValues[4] = cbxDataFieldSource;
+		rptColItemValues[5] = cbxDataFieldSource;
 		
 		CheckBox chxMappedData = new CheckBox();
 		chxMappedData.setStyleName("tiny");
@@ -1868,7 +1416,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		chxMappedData.setReadOnly(true);
 		chxMappedData.setHeight(20, Unit.PIXELS);
 		chxMappedData.setWidth(100, Unit.PERCENTAGE);
-		rptColItemValues[5] = chxMappedData;
+		rptColItemValues[6] = chxMappedData;
 
 		tblVwVerticalRptCols.addItem(rptColItemValues, rptColumnId);
 		tblVwVerticalRptCols.select(rptColumnId);		
@@ -1954,19 +1502,23 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 					switch(cbxDataSource.getValue().toString().substring(0, 4))
 					{
 						case "exp_":
-							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)), null, null, null);
+							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)), null, null, null, null);
 							break;
-	
+
 						case "fpy_":
-							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, null, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)), null, null);
+							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, null, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)), null, null, null);
+							break;
+
+						case "fny_":
+							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, null, null, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)), null, null);
 							break;
 	
 						case "fty_":
-							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, null, null, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)), null);
+							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, null, null, null, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)), null);
 							break;
 	
 						case "tgt_":
-							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, null, null, null, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)));
+							fillCbxDataSourceFields(cbxDataType.getValue().toString(), cbxDataSourceField, null, null, null, null, Integer.parseInt(cbxDataSource.getValue().toString().substring(4)));
 							break;
 							
 					}
@@ -1977,7 +1529,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 	
 	
 	private void fillCbxDataSourceFields(String dataFieldType, ComboBox cbxDataSourceFields, Integer expDataSourceId, Integer fpyDataSourceId, 
-			Integer ftyDataSourceId, Integer tgtDataSourceId)
+			Integer fnyDataSourceId, Integer ftyDataSourceId, Integer tgtDataSourceId)
 	{		
 		if(expDataSourceId != null)
 		{
@@ -1985,11 +1537,18 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			List<ExperimentField> selectedExperimentFields = new ExperimentFieldDao().getAllExperimentFieldsByExperiment(selectedExperiment);
 			
 			for(int i=0; selectedExperimentFields!=null && i<selectedExperimentFields.size(); i++)
-			{
-				System.out.println("Adding Exp field:" + expDataSourceId + "expfield_" + selectedExperimentFields.get(i).getExpFieldId() + "_" + selectedExperimentFields.get(i).getExpFieldName() + "_" + selectedExperimentFields.get(i).getExpFieldType());
-				
 				addItemIfTypeMatches(dataFieldType, "expfield_" + selectedExperimentFields.get(i).getExpFieldId(), selectedExperimentFields.get(i).getExpFieldName(), selectedExperimentFields.get(i).getExpFieldType(), cbxDataSourceFields);
-			}
+		}
+		
+		if(fnyDataSourceId != null)
+		{
+			List<FinalPassYieldInfoField> fnyFields = new FinalPassYieldInfoFieldDao().getFinalPassYieldInfoFieldByReportById(fnyDataSourceId);
+			for(int i=0; fnyFields != null && i<fnyFields.size(); i++)
+				addItemIfTypeMatches(dataFieldType, "fnyfield_" + fnyFields.get(i).getFnyInfoFieldId(), fnyFields.get(i).getFnyInfoFieldLabel(), fnyFields.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
+	
+			addItemIfTypeMatches(dataFieldType, "fny_datetime", "Datetime (FNY)", "datetime", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fny_sn", "Serial Number (FNY)", "nvarchar(max)", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fny_result", "Result (FNY)", "nvarchar(max)", cbxDataSourceFields);
 		}
 		
 		if(fpyDataSourceId != null)
@@ -2056,8 +1615,412 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 					cbxDataSourceField.setItemCaption(dataSourceFieldId, dataSourceFieldName);
 				}
 			}
-		}
-		
+		}		
 	}
 	
+	private void onSave()
+	{
+		ViewVerticalReport vwVerticalRpt = new ViewVerticalReport();
+		vwVerticalRpt.setVwVerticalRptDbTableNameId(this.txtFtyRptCustomId.getValue());
+		vwVerticalRpt.setVwVerticalRptName(this.txtFtyRptName.getValue());
+		vwVerticalRpt.setVwVerticalRptDescription(this.txtFtyDescription.getValue());
+		vwVerticalRpt.setVwVerticalRptIsActive(true);
+		
+		new ViewVerticalReportDao().addVwVerticalReport(vwVerticalRpt);
+		
+		Set<Item> selectedOptGrpPnlExperiments = (Set<Item>) optGrpPnlExperiments.getValue();
+		for (Object selectedExperiment : selectedOptGrpPnlExperiments)
+		{
+			for(int i=0; activeExperiments != null && i<activeExperiments.size(); i++)
+			{
+				int selectedExperimentId = Integer.parseInt(selectedExperiment.toString());				
+				if(activeExperiments.get(i).getExpId() == selectedExperimentId)
+				{
+					ViewVerticalReportByExperiment vwVerticalRptByExperiment = new ViewVerticalReportByExperiment();
+					vwVerticalRptByExperiment.setExperiment(activeExperiments.get(i));
+					vwVerticalRptByExperiment.setViewVerticalReport(vwVerticalRpt);
+					new ViewVerticalReportByExperimentDao().addVwVerticalReportByExperiment(vwVerticalRptByExperiment);
+					
+					//Save filters attached to Experiment
+					Collection dataSourceFiltersItemIds = this.tblReportFilters.getContainerDataSource().getItemIds();
+					
+					for (Object dataSourceFiltersItemIdObj : dataSourceFiltersItemIds) 
+					{
+						Item tblDataSourceFilterRowItem = this.tblReportFilters.getContainerDataSource().getItem(dataSourceFiltersItemIdObj);
+						String dataSourceId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Data Source").getValue())).getValue().toString();
+						if(("exp_" + selectedExperimentId).equals(dataSourceId))
+						{
+							ViewVerticalReportFilterByExpField vwVerticalRptFilterByExpField = new ViewVerticalReportFilterByExpField();
+							vwVerticalRptFilterByExpField.setVwVerticalReportByExperiment(vwVerticalRptByExperiment);
+							vwVerticalRptFilterByExpField.setExpField(new ExperimentFieldDao().getExperimentFieldById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
+							vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
+							vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
+							
+							if(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue() != null)
+								vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
+							else
+								vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldExpression("and");
+								
+							vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
+						
+							if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
+								vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+						
+							new ViewVerticalReportFilterByExpFieldDao().addVwVerticalReportFilterByExpField(vwVerticalRptFilterByExpField);
+						}
+					}
+					
+					break;
+				}
+			}
+		}
+
+		Set<Item> selectedOptGrpPnlFpyRpts = (Set<Item>) optGrpPnlFpyReports.getValue();
+		for (Object selectedFpyRpt : selectedOptGrpPnlFpyRpts)
+		{
+			for(int i=0; activeFpyReports != null && i<activeFpyReports.size(); i++)
+			{
+				int selectedFpyReportId = Integer.parseInt(selectedFpyRpt.toString());
+				if(activeFpyReports.get(i).getFpyReportId() == selectedFpyReportId)
+				{
+					ViewVerticalReportByFpyRpt vwVerticalRptByFpyRpt = new ViewVerticalReportByFpyRpt();
+					vwVerticalRptByFpyRpt.setFpyRpt(activeFpyReports.get(i));
+					vwVerticalRptByFpyRpt.setViewVerticalReport(vwVerticalRpt);
+					new ViewVerticalReportByFpyRptDao().addVwVerticalReportByFpyRpt(vwVerticalRptByFpyRpt);
+					
+					//Save filters attached to FPY
+					Collection dataSourceFiltersItemIds = this.tblReportFilters.getContainerDataSource().getItemIds();
+					
+					for (Object dataSourceFiltersItemIdObj : dataSourceFiltersItemIds) 
+					{
+						Item tblDataSourceFilterRowItem = this.tblReportFilters.getContainerDataSource().getItem(dataSourceFiltersItemIdObj);
+						String dataSourceId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Data Source").getValue())).getValue().toString();
+						if(("fpy_" + selectedFpyReportId).equals(dataSourceId))
+						{
+							ViewVerticalReportFilterByFpyField vwVerticalRptFilterByFpyField = new ViewVerticalReportFilterByFpyField();
+							vwVerticalRptFilterByFpyField.setVwVerticalFpyRpt(vwVerticalRptByFpyRpt);
+						
+							String fpyInfoFieldStrId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString();
+							if(fpyInfoFieldStrId.equals("fpy_datetime") ||fpyInfoFieldStrId.equals("fpy_sn") ||fpyInfoFieldStrId.equals("fpy_result"))
+							{
+								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyIsDateTimeExpField(fpyInfoFieldStrId.equals("fpy_datetime"));
+								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyIsResultExpField(fpyInfoFieldStrId.equals("fpy_result"));
+								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpySNExpField(fpyInfoFieldStrId.equals("fpy_sn"));
+							}
+							else
+								vwVerticalRptFilterByFpyField.setFpyInfoField(new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
+						
+							vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
+							vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
+							if(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue() != null)
+								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
+							else
+								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldExpression("and");
+							
+							vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
+						
+							if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
+								vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+						
+							new ViewVerticalReportFilterByFpyFieldDao().addVwVerticalReportFilterByFpyField(vwVerticalRptFilterByFpyField);
+						}
+					}				
+					
+					break;
+				}
+			}
+		}
+		
+		Set<Item> selectedOptGrpPnlFnyRpts = (Set<Item>) optGrpPnlFnyReports.getValue();
+		for (Object selectedFnyRpt : selectedOptGrpPnlFnyRpts)
+		{
+			for(int i=0; activeFnyReports != null && i<activeFnyReports.size(); i++)
+			{
+				int selectedFnyReportId = Integer.parseInt(selectedFnyRpt.toString());
+				if(activeFnyReports.get(i).getFnyReportId() == selectedFnyReportId)
+				{
+					ViewVerticalReportByFnyRpt vwVerticalRptByFnyRpt = new ViewVerticalReportByFnyRpt();
+					vwVerticalRptByFnyRpt.setFnyRpt(activeFnyReports.get(i));
+					vwVerticalRptByFnyRpt.setViewVerticalReport(vwVerticalRpt);
+					new ViewVerticalReportByFnyRptDao().addVwVerticalReportByFnyRpt(vwVerticalRptByFnyRpt);
+					
+					//Save filters attached to FPY
+					Collection dataSourceFiltersItemIds = this.tblReportFilters.getContainerDataSource().getItemIds();
+					
+					for (Object dataSourceFiltersItemIdObj : dataSourceFiltersItemIds) 
+					{
+						Item tblDataSourceFilterRowItem = this.tblReportFilters.getContainerDataSource().getItem(dataSourceFiltersItemIdObj);
+						String dataSourceId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Data Source").getValue())).getValue().toString();
+						if(("fny_" + selectedFnyReportId).equals(dataSourceId))
+						{
+							ViewVerticalReportFilterByFnyField vwVerticalRptFilterByFnyField = new ViewVerticalReportFilterByFnyField();
+							vwVerticalRptFilterByFnyField.setVwVerticalFnyRpt(vwVerticalRptByFnyRpt);
+						
+							String fnyInfoFieldStrId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString();
+							if(fnyInfoFieldStrId.equals("fny_datetime") ||fnyInfoFieldStrId.equals("fny_sn") ||fnyInfoFieldStrId.equals("fny_result"))
+							{
+								vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyIsDateTimeExpField(fnyInfoFieldStrId.equals("fny_datetime"));
+								vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyIsResultExpField(fnyInfoFieldStrId.equals("fny_result"));
+								vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnySNExpField(fnyInfoFieldStrId.equals("fny_sn"));
+							}
+							else
+								vwVerticalRptFilterByFnyField.setFnyInfoField(new FinalPassYieldInfoFieldDao().getFinalPassYieldInfoFieldById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
+						
+							vwVerticalRptFilterByFnyField.setVwVerticalRptFilteByFnyFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
+							vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
+							if(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue() != null)
+								vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
+							else
+								vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldExpression("and");
+							
+							vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
+						
+							if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
+								vwVerticalRptFilterByFnyField.setVwVerticalRptFilteByFnyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+						
+							new ViewVerticalReportFilterByFnyFieldDao().addVwVerticalReportFilterByFnyField(vwVerticalRptFilterByFnyField);
+						}
+					}				
+					
+					break;
+				}
+			}
+		}
+		
+		
+		Set<Item> selectedOptGrpPnlFtyRpts = (Set<Item>) optGrpPnlFtyReports.getValue();
+		for (Object selectedFtyRpt : selectedOptGrpPnlFtyRpts)
+		{
+			for(int i=0; activeFtyReports != null && i<activeFtyReports.size(); i++)
+			{
+				int selectedFtyReportId = Integer.parseInt(selectedFtyRpt.toString());
+				if(activeFtyReports.get(i).getFtyReportId() == selectedFtyReportId)
+				{
+					ViewVerticalReportByFtyRpt vwVerticalRptByFtyRpt = new ViewVerticalReportByFtyRpt();
+					vwVerticalRptByFtyRpt.setFtyRpt(activeFtyReports.get(i));
+					vwVerticalRptByFtyRpt.setViewVerticalReport(vwVerticalRpt);
+					new ViewVerticalReportByFtyRptDao().addVwVerticalReportByFtyRpt(vwVerticalRptByFtyRpt);
+					
+					//Save filters attached to FTY
+					Collection dataSourceFiltersItemIds = this.tblReportFilters.getContainerDataSource().getItemIds();
+					
+					for (Object dataSourceFiltersItemIdObj : dataSourceFiltersItemIds) 
+					{
+						Item tblDataSourceFilterRowItem = this.tblReportFilters.getContainerDataSource().getItem(dataSourceFiltersItemIdObj);
+						String dataSourceId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Data Source").getValue())).getValue().toString();
+						if(("fty_" + selectedFtyReportId).equals(dataSourceId))
+						{
+							ViewVerticalReportFilterByFtyField vwVerticalRptFilterByFtyField = new ViewVerticalReportFilterByFtyField();
+							vwVerticalRptFilterByFtyField.setVwVerticalFtyRpt(vwVerticalRptByFtyRpt);
+						
+							String ftyInfoFieldStrId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString();
+							if(ftyInfoFieldStrId.equals("fty_datetime") || ftyInfoFieldStrId.equals("fty_sn") ||ftyInfoFieldStrId.equals("fty_result"))
+							{
+								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyIsDateTimeExpField(ftyInfoFieldStrId.equals("fty_datetime"));
+								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyIsResultExpField(ftyInfoFieldStrId.equals("fty_result"));
+								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtySNExpField(ftyInfoFieldStrId.equals("fty_sn"));
+							}
+							else
+								vwVerticalRptFilterByFtyField.setFtyInfoField(new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
+						
+							vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
+							vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
+							
+							if(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue() != null)
+								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
+							else
+								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldExpression("and");
+							
+
+							vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
+						
+							if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
+								vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+						
+							new ViewVerticalReportFilterByFtyFieldDao().addVwVerticalReportFilterByFtyField(vwVerticalRptFilterByFtyField);
+						}
+					}
+					
+					break;
+				}
+			}
+		}	
+		
+		Set<Item> selectedOptGrpPnlTargetRpts = (Set<Item>) optGrpPnlTargetReports.getValue();
+		for (Object selectedTargetRpt : selectedOptGrpPnlTargetRpts)
+		{
+			for(int i=0; activeTargetReports != null && i<activeTargetReports.size(); i++)
+			{
+				int selectedTargetReportId = Integer.parseInt(selectedTargetRpt.toString());
+				if(activeTargetReports.get(i).getTargetReportId() == selectedTargetReportId)
+				{
+					ViewVerticalReportByTargetRpt vwVerticalRptByTargetRpt = new ViewVerticalReportByTargetRpt();
+					vwVerticalRptByTargetRpt.setTargetRpt(activeTargetReports.get(i));
+					vwVerticalRptByTargetRpt.setViewVerticalReport(vwVerticalRpt);
+					new ViewVerticalReportByTargetRptDao().addVwVerticalReportByTargetRpt(vwVerticalRptByTargetRpt);
+					break;
+				}
+			}
+		}
+			
+		//Load report columns into Matrix to be reused in Enrichment
+		List<String> vwEnrichmentRptColumnId = new ArrayList<String>(); 
+		List<ViewVerticalReportColumn> vwEnrichmentRptColumn = new ArrayList<ViewVerticalReportColumn>(); 
+		
+		
+		//Save report columns
+		Collection rptColumnsItemIds = this.tblVwVerticalRptCols.getContainerDataSource().getItemIds();
+		
+		for (Object rptColumnsItemIdObj : rptColumnsItemIds) 
+		{
+			Item tblRptColumnRowItem = this.tblVwVerticalRptCols.getContainerDataSource().getItem(rptColumnsItemIdObj);
+			
+			//System.out.println(rptColumnsItemIdObj.toString());
+			
+			
+			if (tblVwVerticalRptCols.hasChildren(rptColumnsItemIdObj))
+			{
+				//Save report columns
+				String rptColumnName = ((TextField)(tblRptColumnRowItem.getItemProperty("Column Name").getValue())).getValue();
+				String rptDBColumnName = ((TextField)(tblRptColumnRowItem.getItemProperty("DB Column Name").getValue())).getValue();
+				String rptColumnDataType = ((ComboBox)(tblRptColumnRowItem.getItemProperty("Data Type").getValue())).getValue().toString();
+				Boolean rptColumnIsKey = ((CheckBox)(tblRptColumnRowItem.getItemProperty("Key").getValue())).getValue();
+				
+				ViewVerticalReportColumn vwRptColumn =  new ViewVerticalReportColumn();
+				vwRptColumn.setViewVerticalReport(vwVerticalRpt);
+				vwRptColumn.setVwVerticalRptColumnIsKey(rptColumnIsKey);
+				vwRptColumn.setVwVerticalRptColumnName(rptColumnName);
+				vwRptColumn.setVwVerticalRptColumnDbId(rptDBColumnName);
+				vwRptColumn.setVwVerticalRptColumnDataType(rptColumnDataType);
+				
+				new ViewVerticalReportColumnDao().addVwVerticalReportColumn(vwRptColumn);
+				
+				vwEnrichmentRptColumnId.add(rptDBColumnName);
+				vwEnrichmentRptColumn.add(vwRptColumn);
+				
+				//Save linked sources of column
+				for (Object rptChildColItemId: tblVwVerticalRptCols.getChildren(rptColumnsItemIdObj)) 
+				{
+					Item tblVwVerticalChildRptColRowItem = tblVwVerticalRptCols.getContainerDataSource().getItem(rptChildColItemId);
+					String dataSourceStrId = ((ComboBox)(tblVwVerticalChildRptColRowItem.getItemProperty("Data Source Table/Report").getValue())).getValue().toString();
+					
+					if(((ComboBox)(tblVwVerticalChildRptColRowItem.getItemProperty("Data Source Field").getValue())).getValue() != null)
+					{
+						String dataSourceFieldStrId = ((ComboBox)(tblVwVerticalChildRptColRowItem.getItemProperty("Data Source Field").getValue())).getValue().toString();
+						
+						if(dataSourceStrId.startsWith("exp"))
+						{
+							Integer dataSourceFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));
+							ViewVerticalReportColumnByExpField vwVerticalRptColByExpField = new ViewVerticalReportColumnByExpField();
+							vwVerticalRptColByExpField.setExperimentField(new ExperimentFieldDao().getExperimentFieldById(dataSourceFieldId));
+							vwVerticalRptColByExpField.setVwVerticalReportColumn(vwRptColumn);
+							new ViewVerticalReportColumnByExpFieldDao().addVwVerticalReportColumnByExpField(vwVerticalRptColByExpField);
+						}	
+	
+						if(dataSourceStrId.startsWith("fpy"))
+						{
+							ViewVerticalReportColumnByFpyField vwVerticalRptColByFpyField = new ViewVerticalReportColumnByFpyField();
+							if("fpy_sn".equals(dataSourceFieldStrId) || "fpy_result".equals(dataSourceFieldStrId) || "fpy_datetime".equals(dataSourceFieldStrId))
+							{
+								vwVerticalRptColByFpyField.setVwVerticalRptFilterByFpySNExpField("fpy_sn".equals(dataSourceFieldStrId));
+								vwVerticalRptColByFpyField.setVwVerticalRptFilterByFpyIsResultExpField("fpy_result".equals(dataSourceFieldStrId));
+								vwVerticalRptColByFpyField.setVwVerticalRptFilterByFpyIsDateTimeExpField("fpy_datetime".equals(dataSourceFieldStrId));
+							}
+							else
+							{
+								int selectedFpyFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));				
+								vwVerticalRptColByFpyField.setFirstPassYieldInfoField(new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldById(selectedFpyFieldId));
+							}
+							vwVerticalRptColByFpyField.setVwVerticalReportColumn(vwRptColumn);
+							new ViewVerticalReportColumnByFpyFieldDao().addVwVerticalReportColumnByFpyField(vwVerticalRptColByFpyField);		
+						}
+	
+						if(dataSourceStrId.startsWith("fny"))
+						{
+							ViewVerticalReportColumnByFnyField vwVerticalRptColByFnyField = new ViewVerticalReportColumnByFnyField();
+							if("fny_sn".equals(dataSourceFieldStrId) || "fny_result".equals(dataSourceFieldStrId) || "fny_datetime".equals(dataSourceFieldStrId))
+							{
+								vwVerticalRptColByFnyField.setVwVerticalRptFilterByFnySNExpField("fny_sn".equals(dataSourceFieldStrId));
+								vwVerticalRptColByFnyField.setVwVerticalRptFilterByFnyIsResultExpField("fny_result".equals(dataSourceFieldStrId));
+								vwVerticalRptColByFnyField.setVwVerticalRptFilterByFnyIsDateTimeExpField("fny_datetime".equals(dataSourceFieldStrId));
+							}
+							else
+							{
+								int selectedFnyFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));				
+								vwVerticalRptColByFnyField.setFinalPassYieldInfoField(new FinalPassYieldInfoFieldDao().getFinalPassYieldInfoFieldById(selectedFnyFieldId));
+							}
+							vwVerticalRptColByFnyField.setVwVerticalReportColumn(vwRptColumn);
+							new ViewVerticalReportColumnByFnyFieldDao().addVwVerticalReportColumnByFnyField(vwVerticalRptColByFnyField);			
+						}	
+	
+						if(dataSourceStrId.startsWith("fty"))
+						{
+							ViewVerticalReportColumnByFtyField vwVerticalRptColByFtyField = new ViewVerticalReportColumnByFtyField();
+							if("fty_sn".equals(dataSourceFieldStrId) || "fty_result".equals(dataSourceFieldStrId) || "fty_datetime".equals(dataSourceFieldStrId))
+							{
+								vwVerticalRptColByFtyField.setVwVerticalRptFilterByFtySNExpField("fty_sn".equals(dataSourceFieldStrId));
+								vwVerticalRptColByFtyField.setVwVerticalRptFilterByFtyIsResultExpField("fny_result".equals(dataSourceFieldStrId));
+								vwVerticalRptColByFtyField.setVwVerticalRptFilterByFtyIsDateTimeExpField("fny_datetime".equals(dataSourceFieldStrId));
+							}
+							else
+							{
+								int selectedFtyFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));				
+								vwVerticalRptColByFtyField.setFirstTimeYieldInfoField(new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldById(selectedFtyFieldId));
+							}
+							vwVerticalRptColByFtyField.setVwVerticalReportColumn(vwRptColumn);
+							new ViewVerticalReportColumnByFtyFieldDao().addVwVerticalReportColumnByFtyField(vwVerticalRptColByFtyField);			
+						}			
+						
+						if(dataSourceStrId.startsWith("tgt"))
+						{
+							Integer dataSourceFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));
+							ViewVerticalReportColumnByTargetColumn vwVerticalRptColByTargetColumn = new ViewVerticalReportColumnByTargetColumn();
+							vwVerticalRptColByTargetColumn.setTargetColumn(new TargetColumnDao().getTargetColumnById(dataSourceFieldId));
+							vwVerticalRptColByTargetColumn.setVwVerticalReportColumn(vwRptColumn);
+							new ViewVerticalReportColumnByTargetColumnDao().addVwVerticalReportColumnByTargetColumn(vwVerticalRptColByTargetColumn);	
+						}
+					}									
+				}	
+			}
+			
+		}
+		
+		//Enrichment Rules
+		Collection enrichmentRuleItemIds = this.tblColumnsEnrichment.getContainerDataSource().getItemIds();
+		
+		ViewVerticalReportColumnByEnrichmentDao vwVertRptColEnrichmentDao = new ViewVerticalReportColumnByEnrichmentDao();
+		
+		for (Object enrichmentRuleItemIdObj : enrichmentRuleItemIds) 
+		{
+			int enrichmentRuleItemId = (int)enrichmentRuleItemIdObj;
+			Item tblEnrichmentRuleRowItem = this.tblColumnsEnrichment.getContainerDataSource().getItem(enrichmentRuleItemId);
+			
+			ViewVerticalReportColumnByEnrichment vwVertRptColByEnrichment = new ViewVerticalReportColumnByEnrichment();
+			Integer vwEnrichmentRptColumnIndex = vwEnrichmentRptColumnId.indexOf(((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("Report Column").getValue())).getValue().toString());
+			vwVertRptColByEnrichment.setVwVerticalReportColumn(vwEnrichmentRptColumn.get(vwEnrichmentRptColumnIndex));
+			vwVertRptColByEnrichment.setVwVerticalRptColumnEnrichmentOperation(((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("Operator").getValue())).getValue().toString());			
+			vwVertRptColByEnrichment.setVwVerticalRptColumnEnrichmentValue(((TextField)(tblEnrichmentRuleRowItem.getItemProperty("Value").getValue())).getValue().toString());			
+			vwVertRptColByEnrichment.setVwVerticalRptColumnEnrichmentType((((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("Enrichment Type").getValue())).getValue().toString()));			
+			
+			String customListValueStrId = "";
+			if(((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("List Value").getValue())).getValue() != null)
+				customListValueStrId = ((ComboBox)(tblEnrichmentRuleRowItem.getItemProperty("List Value").getValue())).getValue().toString();
+
+			if(!customListValueStrId.isEmpty())
+				vwVertRptColByEnrichment.setCustomListValue((new CustomListValueDao().getCustomListValueById(Integer.parseInt(customListValueStrId))));			
+			
+			vwVertRptColByEnrichment.setVwVerticalRptColumnEnrichmentStaticValue(((TextField)(tblEnrichmentRuleRowItem.getItemProperty("Static Value").getValue())).getValue().toString());			
+			
+			/*
+			if(enrichmentRuleItemId > 0)
+			{
+				csvTemplateEnrichment.setCsvTemplateEnrichmentId(enrichmentRuleItemId);
+				csvTemplateEnrichmentDao.updateCsvTemplateEnrichment(csvTemplateEnrichment);
+			}
+			else
+				csvTemplateEnrichmentDao.addCsvTemplateEnrichment(csvTemplateEnrichment);
+				*/
+			vwVertRptColEnrichmentDao.addVwVerticalReportColumnByEnrichment(vwVertRptColByEnrichment);
+		}
+	}	
 }

@@ -297,6 +297,10 @@ public class MainForm extends MainFormDesign {
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new FirstTimeYieldReportForm());
                     break;
+                case "vertical view report":
+                    formContentLayout.removeAllComponents();
+                    formContentLayout.addComponent(new ViewVerticalReportForm());
+                    break;
                 case "contract manufacturers":
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new ContractManufacturerConfigForm());
@@ -324,10 +328,6 @@ public class MainForm extends MainFormDesign {
                 case "custom lists":
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new CustomListManagementForm());
-                    break;
-                case "vertical view reports":
-                    formContentLayout.removeAllComponents();
-                    formContentLayout.addComponent(new ViewVerticalReportBuilderForm());
                     break;
                 default:
                     break;

@@ -37,25 +37,22 @@
      <vaadin-grid-layout spacing width-full _id="gridMainData" :middle :center> 
       <row> 
        <column> 
-        <vaadin-text-field required-error="This field is mandatory." caption="Name:" required style-name="tiny" width-full _id="txtFtyRptName"></vaadin-text-field> 
+        <vaadin-text-field required-error="This field is mandatory." caption="Name:" required style-name="tiny" width-full _id="txtVwVerticalRptName"></vaadin-text-field> 
        </column> 
        <column> 
-        <vaadin-text-field required-error="This field is mandatory. Only alphaNumeric characters, spaces and underscores are allowed." caption="Custom Id:" required style-name="tiny" width-full _id="txtFtyRptCustomId"></vaadin-text-field> 
+        <vaadin-text-field required-error="This field is mandatory. Only alphaNumeric characters, spaces and underscores are allowed." caption="Custom Id:" required style-name="tiny" width-full _id="txtVwVerticalRptCustomId"></vaadin-text-field> 
        </column> 
       </row> 
       <row> 
        <column> 
-        <vaadin-text-field caption="Description:" style-name="tiny" width-full _id="txtFtyDescription"></vaadin-text-field> 
-       </column> 
-       <column> 
-        <vaadin-text-field required-error="This field is mandatory." caption="Data refresh interval (hours):" required style-name="tiny" width-full _id="txtFtyRptRefreshInterval"></vaadin-text-field> 
+        <vaadin-text-field caption="Description:" style-name="tiny" width-full _id="txtVwVerticalDescription"></vaadin-text-field> 
        </column> 
       </row> 
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
    </vaadin-vertical-layout> 
    <vaadin-vertical-layout style-name="well" width="960px" _id="colGroupLayout"> 
-    <vaadin-horizontal-layout width-full height="425px" _id="ftyFieldGroupsLayout"> 
+    <vaadin-horizontal-layout width-full height="425px" _id="vwVerticalFieldGroupsLayout"> 
      <vaadin-tab-sheet style-name="framed compact" size-full _id="tabColumnGroups"> 
       <tab caption="Report data source" selected> 
        <vaadin-vertical-layout size-full margin _id="lytReportDataSources"> 

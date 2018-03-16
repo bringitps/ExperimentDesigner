@@ -32,12 +32,11 @@ public class ViewVerticalReportBuilderDesign extends VerticalLayout {
 	protected CheckBox chxActive;
 	protected VerticalLayout ftyRptLayout;
 	protected GridLayout gridMainData;
-	protected TextField txtFtyRptName;
-	protected TextField txtFtyRptCustomId;
-	protected TextField txtFtyDescription;
-	protected TextField txtFtyRptRefreshInterval;
+	protected TextField txtVwVerticalRptName;
+	protected TextField txtVwVerticalRptCustomId;
+	protected TextField txtVwVerticalDescription;
 	protected VerticalLayout colGroupLayout;
-	protected HorizontalLayout ftyFieldGroupsLayout;
+	protected HorizontalLayout vwVerticalFieldGroupsLayout;
 	protected TabSheet tabColumnGroups;
 	protected VerticalLayout lytReportDataSources;
 	protected AbsoluteLayout pnlExperimentDataSource;

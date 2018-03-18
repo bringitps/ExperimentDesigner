@@ -104,5 +104,17 @@
 		<mapping class="com.bringit.experiment.bll.ViewVerticalReportFilterByFpyField"/>
 		<mapping class="com.bringit.experiment.bll.ViewVerticalReportFilterByFtyField"/>
 		<mapping class="com.bringit.experiment.bll.ViewVerticalReportFilterByTargetColumn"/>
+    	<mapping class="com.bringit.experiment.bll.ViewHorizontalReport"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportByExperiment"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportByFnyRpt"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportByFpyRpt"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportByFtyRpt"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportByTargetRpt"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportColumn"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportFilterByExpField"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportFilterByFnyField"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportFilterByFpyField"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportFilterByFtyField"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportFilterByTargetColumn"/>
     </session-factory>
 </hibernate-configuration>

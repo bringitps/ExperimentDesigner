@@ -84,11 +84,13 @@ import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.Sizeable;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
@@ -129,11 +131,22 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 	
 	String[] dbfieldTypes;
 	
+	//Saved data
+	private List<ViewVerticalReportByExperiment> vwVerticalRptByExperimentList = new ArrayList<ViewVerticalReportByExperiment>();
+	private List<ViewVerticalReportByFpyRpt> vwVerticalRptByFpyRptList = new ArrayList<ViewVerticalReportByFpyRpt>();
+	private List<ViewVerticalReportByFnyRpt> vwVerticalRptByFnyRptList = new ArrayList<ViewVerticalReportByFnyRpt>();
+	private List<ViewVerticalReportByFtyRpt> vwVerticalRptByFtyRptList = new ArrayList<ViewVerticalReportByFtyRpt>();
+	
 	public ViewVerticalReportBuilderForm(Integer vwVerticalRptId)
 	{
 		if(vwVerticalRptId != null && vwVerticalRptId > -1)
 			isNewRecord = true;
-		
+		else
+		{
+			
+			
+			
+		}
 		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
 		
 		Config configuration = new Config();
@@ -455,7 +468,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		this.tblReportFilters.setEditable(true);
 		this.tblReportFilters.setPageLength(0);
 		this.tblReportFilters.setColumnWidth("*", 20);
-		this.tblReportFilters.setColumnWidth("Filter Value", 160);
+		this.tblReportFilters.setColumnWidth("Filter Value", 260);
 	}
 	
 	private void addDataSourceFilter(String dataSourceType, Integer dataSourceFilterId)
@@ -563,7 +576,6 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			}
 		}
 
-		cbxDataSource.setWidth(150, Unit.PIXELS);
 		cbxDataSource.setHeight(20, Unit.PIXELS);
 		itemValues[1] = cbxDataSource;
 		
@@ -572,7 +584,6 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		cbxDataSourceField.setStyleName("tiny");
 		cbxDataSourceField.setRequired(true);
 		cbxDataSourceField.setRequiredError("This field is required.");
-		cbxDataSourceField.setWidth(100, Unit.PIXELS);				
 		cbxDataSourceField.setHeight(20, Unit.PIXELS);		
 		itemValues[2] = cbxDataSourceField;
 		
@@ -584,12 +595,12 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		itemValues[3] = cbxFilterOperator;
 
 		GridLayout gridFilterValues = new GridLayout(2,1);
-		gridFilterValues.setWidth(160, Unit.PIXELS);
+		gridFilterValues.setWidth(240, Unit.PIXELS);
 		TextField txtFilterValue1 = new TextField("");
 		txtFilterValue1.setCaption(null);	
 		txtFilterValue1.setStyleName("tiny");
 		txtFilterValue1.setHeight(20, Unit.PIXELS);
-		txtFilterValue1.setWidth(80, Unit.PIXELS);
+		txtFilterValue1.setWidth(120, Unit.PIXELS);
 		txtFilterValue1.setInputPrompt("Value1");
 		//itemValues[4] = txtFilterValue1;
 		gridFilterValues.addComponent(txtFilterValue1, 0, 0);
@@ -598,7 +609,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		txtFilterValue2.setCaption(null);	
 		txtFilterValue2.setStyleName("tiny");
 		txtFilterValue2.setHeight(20, Unit.PIXELS);
-		txtFilterValue1.setWidth(80, Unit.PIXELS);
+		txtFilterValue1.setWidth(120, Unit.PIXELS);
 		txtFilterValue2.setInputPrompt("Value2");
 		
 		gridFilterValues.setCaption(null);		
@@ -1060,8 +1071,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     	cbxDateFilterOperators.addItem("before");
     	cbxDateFilterOperators.setItemCaption("before", "before");
     	
-    	cbxDateFilterOperators.addItem("between");
-    	cbxDateFilterOperators.setItemCaption("between", "is between");
+    	cbxDateFilterOperators.addItem("customrange");
+    	cbxDateFilterOperators.setItemCaption("customrange", "custom range");
     	
     	cbxDateFilterOperators.addItem("on");
     	cbxDateFilterOperators.setItemCaption("on", "on");
@@ -1072,9 +1083,49 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     	cbxDateFilterOperators.addItem("onorbefore");
     	cbxDateFilterOperators.setItemCaption("onorbefore", "on or before");
 
-    	cbxDateFilterOperators.select("between");    
+    	cbxDateFilterOperators.addItem("today");
+    	cbxDateFilterOperators.setItemCaption("today", "today");
+    	cbxDateFilterOperators.addItem("currentweek");
+    	cbxDateFilterOperators.setItemCaption("currentweek", "on current week");
+    	cbxDateFilterOperators.addItem("currentmonth");
+    	cbxDateFilterOperators.setItemCaption("currentmonth", "on current month");
+    	cbxDateFilterOperators.addItem("currentyear");
+    	cbxDateFilterOperators.setItemCaption("currentyear", "on current year");
     	
+    	
+    	cbxDateFilterOperators.addItem("onorbeforendaysago");
+    	cbxDateFilterOperators.setItemCaption("onorbeforendaysago", "on or before N days ago");
+    	cbxDateFilterOperators.addItem("onorbeforenweeksago");
+    	cbxDateFilterOperators.setItemCaption("onorbeforenweeksago", "on or before N weeks ago");
+    	cbxDateFilterOperators.addItem("onorbeforenmonthsago");
+    	cbxDateFilterOperators.setItemCaption("onorbeforenmonthsago", "on or before N months ago");
+    	cbxDateFilterOperators.addItem("onorbeforenyearsago");
+    	cbxDateFilterOperators.setItemCaption("onorbeforenyearsago", "on or before N years ago");
+    	
+    	cbxDateFilterOperators.addItem("lastndays");
+    	cbxDateFilterOperators.setItemCaption("lastndays", "last N days");
+    	cbxDateFilterOperators.addItem("lastnweeks");
+    	cbxDateFilterOperators.setItemCaption("lastnweeks", "last N weeks");
+    	cbxDateFilterOperators.addItem("lastnmonths");
+    	cbxDateFilterOperators.setItemCaption("lastnmonths", "last N months");
+    	cbxDateFilterOperators.addItem("lastnyears");
+    	cbxDateFilterOperators.setItemCaption("lastnyears", "last N years");    	
+    	
+    	cbxDateFilterOperators.select("customrange");    
 
+		gridFilterValues.removeAllComponents();
+		DateField fromDateField = new DateField();
+    	fromDateField.setWidth(95, Sizeable.UNITS_PIXELS);
+    	fromDateField.setHeight(25, Sizeable.UNITS_PIXELS);
+    	fromDateField.setStyleName("tiny");
+		gridFilterValues.addComponent(fromDateField, 0, 0);
+    	
+    	DateField toDateField = new DateField();
+    	toDateField.setWidth(95, Sizeable.UNITS_PIXELS);
+    	toDateField.setHeight(25, Sizeable.UNITS_PIXELS);
+    	toDateField.setStyleName("tiny");
+		gridFilterValues.addComponent(toDateField, 1, 0);
+		
     	cbxDateFilterOperators.addValueChangeListener(new ValueChangeListener() {
 
             @Override
@@ -1126,6 +1177,14 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
             }
         });
     	
+    	gridFilterValues.removeAllComponents();
+		TextField txtFilterValue1 = new TextField("");
+		txtFilterValue1.setCaption(null);	
+		txtFilterValue1.setStyleName("tiny");
+		txtFilterValue1.setHeight(20, Unit.PIXELS);
+		txtFilterValue1.setWidth(110, Unit.PIXELS);
+		txtFilterValue1.setInputPrompt("Value1");
+		gridFilterValues.addComponent(txtFilterValue1, 0, 0);
     }    
 
     private void fillCbxNumericFilterOperators(ComboBox cbxNumericFilterOperators, GridLayout gridFilterValues) 
@@ -1186,11 +1245,14 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
             	onChangeCbxFilterOperator("numeric", cbxNumericFilterOperators, gridFilterValues);
             }
         });
-    	
+       
     }   
     
     private void onChangeCbxFilterOperator(String filterDataType, ComboBox cbxSelectedFilter, GridLayout gridFilterValues)
     {
+    	if(cbxSelectedFilter.getValue() == null)
+    		return;
+    	
     	if(filterDataType.equals("string"))
     	{
     		gridFilterValues.removeAllComponents();
@@ -1198,7 +1260,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     		txtFilterValue1.setCaption(null);	
     		txtFilterValue1.setStyleName("tiny");
     		txtFilterValue1.setHeight(20, Unit.PIXELS);
-    		txtFilterValue1.setWidth(75, Unit.PIXELS);
+    		txtFilterValue1.setWidth(110, Unit.PIXELS);
     		txtFilterValue1.setInputPrompt("Value1");
     		gridFilterValues.addComponent(txtFilterValue1, 0, 0);
 
@@ -1206,11 +1268,14 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     		txtFilterValue2.setCaption(null);	
     		txtFilterValue2.setStyleName("tiny");
     		txtFilterValue2.setHeight(20, Unit.PIXELS);
-    		txtFilterValue2.setWidth(80, Unit.PIXELS);
+    		txtFilterValue2.setWidth(110, Unit.PIXELS);
     		txtFilterValue2.setInputPrompt("Value2");
     		gridFilterValues.setCaption(null);		
     		gridFilterValues.addComponent(txtFilterValue2, 1, 0);
     		txtFilterValue2.setVisible(false);
+    		
+    		if(cbxSelectedFilter.getValue().toString().equals("isempty") || cbxSelectedFilter.getValue().toString().equals("isnotempty"))
+    			txtFilterValue1.setVisible(false);
     	}    	
 
     	if(filterDataType.equals("numeric"))
@@ -1220,7 +1285,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     		txtFilterValue1.setCaption(null);	
     		txtFilterValue1.setStyleName("tiny");
     		txtFilterValue1.setHeight(20, Unit.PIXELS);
-    		txtFilterValue1.setWidth(75, Unit.PIXELS);
+    		txtFilterValue1.setWidth(110, Unit.PIXELS);
     		txtFilterValue1.setInputPrompt("Value1");
     		gridFilterValues.addComponent(txtFilterValue1, 0, 0);
 
@@ -1228,7 +1293,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     		txtFilterValue2.setCaption(null);	
     		txtFilterValue2.setStyleName("tiny");
     		txtFilterValue2.setHeight(20, Unit.PIXELS);
-    		txtFilterValue2.setWidth(80, Unit.PIXELS);
+    		txtFilterValue2.setWidth(110, Unit.PIXELS);
     		txtFilterValue2.setInputPrompt("Value2");
     		gridFilterValues.setCaption(null);		
     		gridFilterValues.addComponent(txtFilterValue2, 1, 0);
@@ -1236,16 +1301,58 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     		
     		if(cbxSelectedFilter.getValue().toString().equals("between") || cbxSelectedFilter.getValue().toString().equals("notbetween"))
     			txtFilterValue2.setVisible(true);
+    		if(cbxSelectedFilter.getValue().toString().equals("isempty") || cbxSelectedFilter.getValue().toString().equals("isnotempty"))
+    			txtFilterValue1.setVisible(false);
     	}
 
     	if(filterDataType.equals("date"))
     	{
+    		gridFilterValues.removeAllComponents();
     		
+    		if(cbxSelectedFilter.getValue().toString().equals("customrange"))
+    		{
+    			DateField fromDateField = new DateField();
+    	    	fromDateField.setWidth(95, Sizeable.UNITS_PIXELS);
+    	    	fromDateField.setHeight(25, Sizeable.UNITS_PIXELS);
+    	    	fromDateField.setStyleName("tiny");
+        		gridFilterValues.addComponent(fromDateField, 0, 0);
+    	    	
+    	    	DateField toDateField = new DateField();
+    	    	toDateField.setWidth(95, Sizeable.UNITS_PIXELS);
+    	    	toDateField.setHeight(25, Sizeable.UNITS_PIXELS);
+    	    	toDateField.setStyleName("tiny");
+        		gridFilterValues.addComponent(toDateField, 1, 0);
+    		}
+    		
+    		if(cbxSelectedFilter.getValue().toString().equals("after") || cbxSelectedFilter.getValue().toString().equals("before")
+    				|| cbxSelectedFilter.getValue().toString().equals("on") || cbxSelectedFilter.getValue().toString().equals("onorafter")
+    				|| cbxSelectedFilter.getValue().toString().equals("onorbefore"))
+    		{
+    			DateField fromDateField = new DateField();
+    	    	fromDateField.setWidth(95, Sizeable.UNITS_PIXELS);
+    	    	fromDateField.setHeight(25, Sizeable.UNITS_PIXELS);
+    	    	fromDateField.setStyleName("tiny");
+        		gridFilterValues.addComponent(fromDateField, 0, 0);
+    	    }
+    		
+    		if(cbxSelectedFilter.getValue().toString().equals("onorbeforendaysago") || cbxSelectedFilter.getValue().toString().equals("onorbeforenweeksago")
+    				|| cbxSelectedFilter.getValue().toString().equals("onorbeforenmonthsago") || cbxSelectedFilter.getValue().toString().equals("onorbeforenyearsago")
+    				|| cbxSelectedFilter.getValue().toString().equals("lastndays") || cbxSelectedFilter.getValue().toString().equals("lastnweeks")
+    				|| cbxSelectedFilter.getValue().toString().equals("lastnmonths") || cbxSelectedFilter.getValue().toString().equals("lastnyears"))
+    		{
+        		TextField txtFilterValue1 = new TextField("");
+        		txtFilterValue1.setCaption(null);	
+        		txtFilterValue1.setStyleName("tiny");
+        		txtFilterValue1.setHeight(20, Unit.PIXELS);
+        		txtFilterValue1.setWidth(110, Unit.PIXELS);
+        		txtFilterValue1.setInputPrompt("N");
+        		gridFilterValues.addComponent(txtFilterValue1, 0, 0);
+    	    }
+
     	}    	
 
     }
-    
-    
+        
     private void onChangeFilterCustomList(ComboBox cbxFilterCustomList, ComboBox cbxFilterCustomListValues)
 	{
     	cbxFilterCustomListValues.setContainerDataSource(null);
@@ -1261,8 +1368,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			}
 		}
 	}
-	
-	
+		
 	private void loadReportColumnsTable()
 	{
 		tblVwVerticalRptCols = new TreeTable("Report Columns");
@@ -1709,8 +1815,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			}
 		}		
 	}
-	
-	
+		
 	private void fillCbxDataSourceFields(String dataFieldType, ComboBox cbxDataSourceFields, Integer expDataSourceId, Integer fpyDataSourceId, 
 			Integer fnyDataSourceId, Integer ftyDataSourceId, Integer tgtDataSourceId)
 	{		
@@ -1959,8 +2064,42 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								ViewVerticalReportFilterByExpField vwVerticalRptFilterByExpField = new ViewVerticalReportFilterByExpField();
 								vwVerticalRptFilterByExpField.setVwVerticalReportByExperiment(vwVerticalRptByExperiment);
 								vwVerticalRptFilterByExpField.setExpField(new ExperimentFieldDao().getExperimentFieldById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
-								vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
-								vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
+								
+								String filterOperator = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString();
+								GridLayout gridFilterValues = (GridLayout)tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue();
+								
+								if(filterOperator.equals("between") || filterOperator.equals("notbetween"))
+								{
+									TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+									TextField txtFilterValue2 = (TextField)gridFilterValues.getComponent(1, 0);
+									vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(txtFilterValue1.getValue().toString());
+									vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue2(txtFilterValue2.getValue().toString());
+								}
+								else if(filterOperator.equals("customrange"))
+								{
+									DateField fromDateField = (DateField)gridFilterValues.getComponent(0, 0);
+									DateField toDateField = (DateField)gridFilterValues.getComponent(1, 0);
+									vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(fromDateField.getValue().toString());
+									vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue2(toDateField.getValue().toString());
+								}
+								else if(filterOperator.equals("after") || filterOperator.equals("before")
+					    				|| filterOperator.equals("on") || filterOperator.equals("onorafter")
+					    				|| filterOperator.equals("onorbefore"))
+								{
+									DateField dtFilterValue = (DateField)gridFilterValues.getComponent(0, 0);
+									vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(dtFilterValue.getValue().toString());									
+								}
+								else
+								{
+									TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+									vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(txtFilterValue1.getValue());
+								
+									if(txtFilterValue1.getValue() == null || txtFilterValue1.getValue() == "")
+										vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+								}
+								
+								//vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
+								//vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
 								
 								if(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue() != null)
 									vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
@@ -1969,9 +2108,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 									
 								vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
 							
-								if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
-									vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
-							
+								
 								new ViewVerticalReportFilterByExpFieldDao().addVwVerticalReportFilterByExpField(vwVerticalRptFilterByExpField);
 							}
 						}
@@ -2016,8 +2153,43 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								else
 									vwVerticalRptFilterByFpyField.setFpyInfoField(new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
 							
-								vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
-								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
+								String filterOperator = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString();
+								GridLayout gridFilterValues = (GridLayout)tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue();
+								
+								if(filterOperator.equals("between") || filterOperator.equals("notbetween"))
+								{
+									TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+									TextField txtFilterValue2 = (TextField)gridFilterValues.getComponent(1, 0);
+									vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(txtFilterValue1.getValue().toString());
+									vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue2(txtFilterValue2.getValue().toString());
+								}
+								else if(filterOperator.equals("customrange"))
+								{
+									DateField fromDateField = (DateField)gridFilterValues.getComponent(0, 0);
+									DateField toDateField = (DateField)gridFilterValues.getComponent(1, 0);
+									vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(fromDateField.getValue().toString());
+									vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue2(toDateField.getValue().toString());
+									
+								}
+								else if(filterOperator.equals("after") || filterOperator.equals("before")
+					    				|| filterOperator.equals("on") || filterOperator.equals("onorafter")
+					    				|| filterOperator.equals("onorbefore"))
+								{
+									DateField dtFilterValue = (DateField)gridFilterValues.getComponent(0, 0);
+									vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(dtFilterValue.getValue().toString());									
+								}
+								else
+								{
+									TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+									vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(txtFilterValue1.getValue());
+
+									if(txtFilterValue1.getValue() == null || txtFilterValue1.getValue() == "")
+										vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+								
+								}
+								
+								//vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
+								//vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
 								if(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue() != null)
 									vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
 								else
@@ -2025,8 +2197,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								
 								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
 							
-								if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
-									vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+								//if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
+								//	vwVerticalRptFilterByFpyField.setVwVerticalRptFilteByFpyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
 							
 								new ViewVerticalReportFilterByFpyFieldDao().addVwVerticalReportFilterByFpyField(vwVerticalRptFilterByFpyField);
 							}
@@ -2072,8 +2244,43 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								else
 									vwVerticalRptFilterByFnyField.setFnyInfoField(new FinalPassYieldInfoFieldDao().getFinalPassYieldInfoFieldById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
 							
-								vwVerticalRptFilterByFnyField.setVwVerticalRptFilteByFnyFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
-								vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
+								String filterOperator = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString();
+								GridLayout gridFilterValues = (GridLayout)tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue();
+								
+								if(filterOperator.equals("between") || filterOperator.equals("notbetween"))
+								{
+									TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+									TextField txtFilterValue2 = (TextField)gridFilterValues.getComponent(1, 0);
+									vwVerticalRptFilterByFnyField.setVwVerticalRptFilteByFnyFieldValue1(txtFilterValue1.getValue().toString());
+									vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldValue2(txtFilterValue2.getValue().toString());
+								}
+								else if(filterOperator.equals("customrange"))
+								{
+									DateField fromDateField = (DateField)gridFilterValues.getComponent(0, 0);
+									DateField toDateField = (DateField)gridFilterValues.getComponent(1, 0);
+									vwVerticalRptFilterByFnyField.setVwVerticalRptFilteByFnyFieldValue1(fromDateField.getValue().toString());
+									vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldValue2(toDateField.getValue().toString());
+									
+								}
+								else if(filterOperator.equals("after") || filterOperator.equals("before")
+					    				|| filterOperator.equals("on") || filterOperator.equals("onorafter")
+					    				|| filterOperator.equals("onorbefore"))
+								{
+									DateField dtFilterValue = (DateField)gridFilterValues.getComponent(0, 0);
+									vwVerticalRptFilterByFnyField.setVwVerticalRptFilteByFnyFieldValue1(dtFilterValue.getValue().toString());									
+								}
+								else
+								{
+									TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+									vwVerticalRptFilterByFnyField.setVwVerticalRptFilteByFnyFieldValue1(txtFilterValue1.getValue());
+								
+									if(txtFilterValue1.getValue() == null || txtFilterValue1.getValue() == "")
+										vwVerticalRptFilterByFnyField.setVwVerticalRptFilteByFnyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+								}
+								
+								
+								//vwVerticalRptFilterByFnyField.setVwVerticalRptFilteByFnyFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
+								//vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
 								if(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue() != null)
 									vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
 								else
@@ -2081,8 +2288,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								
 								vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
 							
-								if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
-									vwVerticalRptFilterByFnyField.setVwVerticalRptFilteByFnyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+								//if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
+								//	vwVerticalRptFilterByFnyField.setVwVerticalRptFilteByFnyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
 							
 								new ViewVerticalReportFilterByFnyFieldDao().addVwVerticalReportFilterByFnyField(vwVerticalRptFilterByFnyField);
 							}
@@ -2129,8 +2336,42 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								else
 									vwVerticalRptFilterByFtyField.setFtyInfoField(new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
 							
-								vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
-								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
+								String filterOperator = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString();
+								GridLayout gridFilterValues = (GridLayout)tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue();
+								
+								if(filterOperator.equals("between") || filterOperator.equals("notbetween"))
+								{
+									TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+									TextField txtFilterValue2 = (TextField)gridFilterValues.getComponent(1, 0);
+									vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(txtFilterValue1.getValue().toString());
+									vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue2(txtFilterValue2.getValue().toString());
+								}
+								else if(filterOperator.equals("customrange"))
+								{
+									DateField fromDateField = (DateField)gridFilterValues.getComponent(0, 0);
+									DateField toDateField = (DateField)gridFilterValues.getComponent(1, 0);
+									vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(fromDateField.getValue().toString());
+									vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue2(toDateField.getValue().toString());
+									
+								}
+								else if(filterOperator.equals("after") || filterOperator.equals("before")
+					    				|| filterOperator.equals("on") || filterOperator.equals("onorafter")
+					    				|| filterOperator.equals("onorbefore"))
+								{
+									DateField dtFilterValue = (DateField)gridFilterValues.getComponent(0, 0);
+									vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(dtFilterValue.getValue().toString());									
+								}
+								else
+								{
+									TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+									vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(txtFilterValue1.getValue());
+								
+									if(txtFilterValue1.getValue() == null || txtFilterValue1.getValue() == "")
+										vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+								}
+								
+								//vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
+								//vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
 								
 								if(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue() != null)
 									vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
@@ -2140,8 +2381,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 	
 								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
 							
-								if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
-									vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+								//if(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == null || ((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue() == "")
+								//	vwVerticalRptFilterByFtyField.setVwVerticalRptFilteByFtyFieldValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
 							
 								new ViewVerticalReportFilterByFtyFieldDao().addVwVerticalReportFilterByFtyField(vwVerticalRptFilterByFtyField);
 							}
@@ -2339,7 +2580,6 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 				this.getUI().showNotification("Column names for report must be unique.", Type.WARNING_MESSAGE);
 		}
 	}	
-
 
 	private boolean validateRequiredFields()
 	{

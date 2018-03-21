@@ -28,43 +28,50 @@ public class ViewVerticalReportColumnByFpyField {
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="VwVerticalRptColumnId", unique=false, updatable=true)
-	private ViewVerticalReportColumn vwVerticalReportColumn;	
-		
+	private ViewVerticalReportColumn vwVerticalReportColumn;
+	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FpyInfoFieldId", unique=false, updatable=true)
-	private FirstPassYieldInfoField firstPassYieldInfoField;
+	private FirstPassYieldInfoField firstPassYieldInfoField;	
+	
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="fpyRptId", unique=false, updatable=true)
+	private FirstPassYieldReport fpyRpt;
 
-	@Column(name="VwVerticalRptFilterByFpyIsDateTimeExpField")
-	private Boolean vwVerticalRptFilterByFpyIsDateTimeExpField;
+	@Column(name="VwVerticalRptColumnByFpyIsDateTimeExpField")
+	private Boolean VwVerticalRptColumnByFpyIsDateTimeExpField;
 
-	@Column(name="VwVerticalRptFilterByFpyIsSNExpField")
-	private Boolean vwVerticalRptFilterByFpySNExpField;
+	@Column(name="VwVerticalRptColumnByFpyIsSNExpField")
+	private Boolean VwVerticalRptColumnByFpyIsSNExpField;
 
-	@Column(name="VwVerticalRptFilterByFpyIsResultExpField")
-	private Boolean vwVerticalRptFilterByFpyIsResultExpField;
+	@Column(name="VwVerticalRptColumnByFpyIsResultExpField")
+	private Boolean VwVerticalRptColumnByFpyIsResultExpField;
 	
 	
 	public ViewVerticalReportColumnByFpyField(Integer vwVerticalRptColumnByFpyFieldId,
 			ViewVerticalReportColumn vwVerticalReportColumn,
 			FirstPassYieldInfoField firstPassYieldInfoField,
-			Boolean vwVerticalRptFilterByFpyIsDateTimeExpField,
-			Boolean vwVerticalRptFilterByFpySNExpField,
-			Boolean vwVerticalRptFilterByFpyIsResultExpField) {
+			FirstPassYieldReport fpyRpt,
+			Boolean VwVerticalRptColumnByFpyIsDateTimeExpField,
+			Boolean VwVerticalRptColumnByFpyIsSNExpField,
+			Boolean VwVerticalRptColumnByFpyIsResultExpField) {
 		this.vwVerticalRptColumnByFpyFieldId = vwVerticalRptColumnByFpyFieldId;
 		this.vwVerticalReportColumn = vwVerticalReportColumn;
 		this.firstPassYieldInfoField = firstPassYieldInfoField;
-		this.vwVerticalRptFilterByFpyIsDateTimeExpField = vwVerticalRptFilterByFpyIsDateTimeExpField;
-		this.vwVerticalRptFilterByFpySNExpField = vwVerticalRptFilterByFpySNExpField;
-		this.vwVerticalRptFilterByFpyIsResultExpField = vwVerticalRptFilterByFpyIsResultExpField;
+		this.fpyRpt = fpyRpt;
+		this.VwVerticalRptColumnByFpyIsDateTimeExpField = VwVerticalRptColumnByFpyIsDateTimeExpField;
+		this.VwVerticalRptColumnByFpyIsSNExpField = VwVerticalRptColumnByFpyIsSNExpField;
+		this.VwVerticalRptColumnByFpyIsResultExpField = VwVerticalRptColumnByFpyIsResultExpField;
 	}	
 
 	public ViewVerticalReportColumnByFpyField() {
 		this.vwVerticalRptColumnByFpyFieldId = null;
 		this.vwVerticalReportColumn = null;
 		this.firstPassYieldInfoField = null;
-		this.vwVerticalRptFilterByFpyIsDateTimeExpField = null;
-		this.vwVerticalRptFilterByFpySNExpField = null;
-		this.vwVerticalRptFilterByFpyIsResultExpField = null;
+		this.fpyRpt = null;
+		this.VwVerticalRptColumnByFpyIsDateTimeExpField = null;
+		this.VwVerticalRptColumnByFpyIsSNExpField = null;
+		this.VwVerticalRptColumnByFpyIsResultExpField = null;
 	}
 
 	public Integer getVwVerticalRptColumnByFpyFieldId() {
@@ -91,28 +98,36 @@ public class ViewVerticalReportColumnByFpyField {
 		this.firstPassYieldInfoField = firstPassYieldInfoField;
 	}
 
-	public Boolean getVwVerticalRptFilterByFpyIsDateTimeExpField() {
-		return vwVerticalRptFilterByFpyIsDateTimeExpField;
+	public FirstPassYieldReport getFpyRpt() {
+		return fpyRpt;
 	}
 
-	public void setVwVerticalRptFilterByFpyIsDateTimeExpField(Boolean vwVerticalRptFilterByFpyIsDateTimeExpField) {
-		this.vwVerticalRptFilterByFpyIsDateTimeExpField = vwVerticalRptFilterByFpyIsDateTimeExpField;
+	public void setFpyRpt(FirstPassYieldReport fpyRpt) {
+		this.fpyRpt = fpyRpt;
 	}
 
-	public Boolean getVwVerticalRptFilterByFpySNExpField() {
-		return vwVerticalRptFilterByFpySNExpField;
+	public Boolean getVwVerticalRptColumnByFpyIsDateTimeExpField() {
+		return VwVerticalRptColumnByFpyIsDateTimeExpField;
 	}
 
-	public void setVwVerticalRptFilterByFpySNExpField(Boolean vwVerticalRptFilterByFpySNExpField) {
-		this.vwVerticalRptFilterByFpySNExpField = vwVerticalRptFilterByFpySNExpField;
+	public void setVwVerticalRptColumnByFpyIsDateTimeExpField(Boolean VwVerticalRptColumnByFpyIsDateTimeExpField) {
+		this.VwVerticalRptColumnByFpyIsDateTimeExpField = VwVerticalRptColumnByFpyIsDateTimeExpField;
 	}
 
-	public Boolean getVwVerticalRptFilterByFpyIsResultExpField() {
-		return vwVerticalRptFilterByFpyIsResultExpField;
+	public Boolean getVwVerticalRptColumnByFpyIsSNExpField() {
+		return VwVerticalRptColumnByFpyIsSNExpField;
 	}
 
-	public void setVwVerticalRptFilterByFpyIsResultExpField(Boolean vwVerticalRptFilterByFpyIsResultExpField) {
-		this.vwVerticalRptFilterByFpyIsResultExpField = vwVerticalRptFilterByFpyIsResultExpField;
+	public void setVwVerticalRptColumnByFpyIsSNExpField(Boolean VwVerticalRptColumnByFpyIsSNExpField) {
+		this.VwVerticalRptColumnByFpyIsSNExpField = VwVerticalRptColumnByFpyIsSNExpField;
+	}
+
+	public Boolean getVwVerticalRptColumnByFpyIsResultExpField() {
+		return VwVerticalRptColumnByFpyIsResultExpField;
+	}
+
+	public void setVwVerticalRptColumnByFpyIsResultExpField(Boolean VwVerticalRptColumnByFpyIsResultExpField) {
+		this.VwVerticalRptColumnByFpyIsResultExpField = VwVerticalRptColumnByFpyIsResultExpField;
 	}
 	
 }

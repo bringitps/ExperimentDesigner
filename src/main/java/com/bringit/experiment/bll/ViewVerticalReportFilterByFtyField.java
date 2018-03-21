@@ -33,7 +33,7 @@ public class ViewVerticalReportFilterByFtyField {
 	private String vwVerticalRptFilterByFtyFieldOperation;
 	
 	@Column(name="VwVerticalRptFilterByFtyFieldValue1")
-	private String vwVerticalRptFilteByFtyFieldValue1;
+	private String vwVerticalRptFilterByFtyFieldValue1;
 
 	@Column(name="VwVerticalRptFilterByFtyFieldValue2")
 	private String vwVerticalRptFilterByFtyFieldValue2;
@@ -55,36 +55,43 @@ public class ViewVerticalReportFilterByFtyField {
     @JoinColumn(name="FtyInfoFieldId", unique=false, updatable=true)
 	private FirstTimeYieldInfoField ftyInfoField;
 
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CustomListId", unique=false, updatable=true)
+	private CustomList customList;
+
+
 	public ViewVerticalReportFilterByFtyField(Integer vwVerticalRptFilterByFtyFieldId,
 			String vwVerticalRptFilterByFtyFieldExpression, String vwVerticalRptFilterByFtyFieldOperation,
-			String vwVerticalRptFilteByFtyFieldValue1, String vwVerticalRptFilterByFtyFieldValue2,
+			String vwVerticalRptFilterByFtyFieldValue1, String vwVerticalRptFilterByFtyFieldValue2,
 			Boolean vwVerticalRptFilterByFpyIsDateTimeExpField, Boolean vwVerticalRptFilterByFpySNExpField, 
 			Boolean vwVerticalRptFilterByFpyIsResultExpField, 
 			ViewVerticalReportByFtyRpt vwVerticalFtyRpt,
-			FirstTimeYieldInfoField ftyInfoField) {
+			FirstTimeYieldInfoField ftyInfoField, CustomList customList) {
 		this.vwVerticalRptFilterByFtyFieldId = vwVerticalRptFilterByFtyFieldId;
 		this.vwVerticalRptFilterByFtyFieldExpression = vwVerticalRptFilterByFtyFieldExpression;
 		this.vwVerticalRptFilterByFtyFieldOperation = vwVerticalRptFilterByFtyFieldOperation;
-		this.vwVerticalRptFilteByFtyFieldValue1 = vwVerticalRptFilteByFtyFieldValue1;
+		this.vwVerticalRptFilterByFtyFieldValue1 = vwVerticalRptFilterByFtyFieldValue1;
 		this.vwVerticalRptFilterByFtyFieldValue2 = vwVerticalRptFilterByFtyFieldValue2;
 		this.vwVerticalRptFilterByFtyIsDateTimeExpField = vwVerticalRptFilterByFpyIsDateTimeExpField;
 		this.vwVerticalRptFilterByFtySNExpField = vwVerticalRptFilterByFpySNExpField;
 		this.vwVerticalRptFilterByFtyIsResultExpField = vwVerticalRptFilterByFpyIsResultExpField;
 		this.vwVerticalFtyRpt = vwVerticalFtyRpt;
 		this.ftyInfoField = ftyInfoField;
+		this.customList = customList;
 	}	
 
 	public ViewVerticalReportFilterByFtyField() {
 		this.vwVerticalRptFilterByFtyFieldId = null;
 		this.vwVerticalRptFilterByFtyFieldExpression = null;
 		this.vwVerticalRptFilterByFtyFieldOperation = null;
-		this.vwVerticalRptFilteByFtyFieldValue1 = null;
+		this.vwVerticalRptFilterByFtyFieldValue1 = null;
 		this.vwVerticalRptFilterByFtyFieldValue2 = null;
 		this.vwVerticalRptFilterByFtyIsDateTimeExpField = null;
 		this.vwVerticalRptFilterByFtySNExpField = null;
 		this.vwVerticalRptFilterByFtyIsResultExpField = null;
 		this.vwVerticalFtyRpt = null;
 		this.ftyInfoField = null;
+		this.customList = null;
 	}
 
 	public Integer getVwVerticalRptFilterByFtyFieldId() {
@@ -111,12 +118,12 @@ public class ViewVerticalReportFilterByFtyField {
 		this.vwVerticalRptFilterByFtyFieldOperation = vwVerticalRptFilterByFtyFieldOperation;
 	}
 
-	public String getVwVerticalRptFilteByFtyFieldValue1() {
-		return vwVerticalRptFilteByFtyFieldValue1;
+	public String getVwVerticalRptFilterByFtyFieldValue1() {
+		return vwVerticalRptFilterByFtyFieldValue1;
 	}
 
-	public void setVwVerticalRptFilteByFtyFieldValue1(String vwVerticalRptFilteByFtyFieldValue1) {
-		this.vwVerticalRptFilteByFtyFieldValue1 = vwVerticalRptFilteByFtyFieldValue1;
+	public void setVwVerticalRptFilterByFtyFieldValue1(String vwVerticalRptFilterByFtyFieldValue1) {
+		this.vwVerticalRptFilterByFtyFieldValue1 = vwVerticalRptFilterByFtyFieldValue1;
 	}
 
 	public String getVwVerticalRptFilterByFtyFieldValue2() {
@@ -166,6 +173,14 @@ public class ViewVerticalReportFilterByFtyField {
 
 	public void setFtyInfoField(FirstTimeYieldInfoField ftyInfoField) {
 		this.ftyInfoField = ftyInfoField;
+	}
+
+	public CustomList getCustomList() {
+		return customList;
+	}
+
+	public void setCustomList(CustomList customList) {
+		this.customList = customList;
 	}
 	
 }

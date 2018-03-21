@@ -1,5 +1,8 @@
 package com.bringit.experiment.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -65,4 +68,22 @@ public class ViewVerticalReportColumnByExpFieldDao {
         }
     }
 	
+
+    @SuppressWarnings({"unchecked", "unused"})
+    public List<ViewVerticalReportColumnByExpField> getAllVwVerticalRptColsByExpFieldByColId(Integer vwVerticalRptColumnId) {
+        List<ViewVerticalReportColumnByExpField> vwVerticalRptColsByExpField = new ArrayList<ViewVerticalReportColumnByExpField>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            trns = session.beginTransaction();
+            vwVerticalRptColsByExpField = session.createQuery("from ViewVerticalReportColumnByExpField where VwVerticalRptColumnId = " + vwVerticalRptColumnId).list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return vwVerticalRptColsByExpField;
+    }  
+    
 }

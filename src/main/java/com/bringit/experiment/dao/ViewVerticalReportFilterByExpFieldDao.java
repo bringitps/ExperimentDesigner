@@ -1,5 +1,8 @@
 package com.bringit.experiment.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -63,5 +66,22 @@ public void addVwVerticalReportFilterByExpField(ViewVerticalReportFilterByExpFie
             session.flush();
             session.close();
         }
+    }
+    
+    @SuppressWarnings({"unchecked", "unused"})
+    public List<ViewVerticalReportFilterByExpField> getAllVwVerticalReportFiltersByExpRptId(Integer vwVerticalRptByExpId) {
+        List<ViewVerticalReportFilterByExpField> vwVerticalRptFiltersByExp = new ArrayList<ViewVerticalReportFilterByExpField>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            trns = session.beginTransaction();
+            vwVerticalRptFiltersByExp = session.createQuery("from ViewVerticalReportFilterByExpField where VwVerticalReportByExperimentId = " + vwVerticalRptByExpId).list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return vwVerticalRptFiltersByExp;
     }
 }

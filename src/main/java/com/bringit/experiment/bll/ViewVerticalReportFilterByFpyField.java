@@ -33,7 +33,7 @@ public class ViewVerticalReportFilterByFpyField {
 	private String vwVerticalRptFilterByFpyFieldOperation;
 	
 	@Column(name="VwVerticalRptFilterByFpyFieldValue1")
-	private String vwVerticalRptFilteByFpyFieldValue1;
+	private String vwVerticalRptFilterByFpyFieldValue1;
 
 	@Column(name="VwVerticalRptFilterByFpyFieldValue2")
 	private String vwVerticalRptFilterByFpyFieldValue2;
@@ -55,35 +55,41 @@ public class ViewVerticalReportFilterByFpyField {
     @JoinColumn(name="FpyInfoFieldId", unique=false, updatable=true)
 	private FirstPassYieldInfoField fpyInfoField;
 
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CustomListId", unique=false, updatable=true)
+	private CustomList customList;
+	
 	public ViewVerticalReportFilterByFpyField(Integer vwVerticalRptFilterByFpyFieldId,
 			String vwVerticalRptFilterByFpyFieldExpression, String vwVerticalRptFilterByFpyFieldOperation,
-			String vwVerticalRptFilteByFpyFieldValue1, String vwVerticalRptFilterByFpyFieldValue2,
+			String vwVerticalRptFilterByFpyFieldValue1, String vwVerticalRptFilterByFpyFieldValue2,
 			Boolean vwVerticalRptFilterByFpyIsDateTimeExpField, Boolean vwVerticalRptFilterByFpySNExpField, 
 			Boolean vwVerticalRptFilterByFpyIsResultExpField, ViewVerticalReportByFpyRpt vwVerticalFpyRpt,
-			FirstPassYieldInfoField fpyInfoField) {
+			FirstPassYieldInfoField fpyInfoField, CustomList customList) {
 		this.vwVerticalRptFilterByFpyFieldId = vwVerticalRptFilterByFpyFieldId;
 		this.vwVerticalRptFilterByFpyFieldExpression = vwVerticalRptFilterByFpyFieldExpression;
 		this.vwVerticalRptFilterByFpyFieldOperation = vwVerticalRptFilterByFpyFieldOperation;
-		this.vwVerticalRptFilteByFpyFieldValue1 = vwVerticalRptFilteByFpyFieldValue1;
+		this.vwVerticalRptFilterByFpyFieldValue1 = vwVerticalRptFilterByFpyFieldValue1;
 		this.vwVerticalRptFilterByFpyFieldValue2 = vwVerticalRptFilterByFpyFieldValue2;
 		this.vwVerticalRptFilterByFpyIsDateTimeExpField = vwVerticalRptFilterByFpyIsDateTimeExpField;
 		this.vwVerticalRptFilterByFpySNExpField = vwVerticalRptFilterByFpySNExpField;
 		this.vwVerticalRptFilterByFpyIsResultExpField = vwVerticalRptFilterByFpyIsResultExpField;
 		this.vwVerticalFpyRpt = vwVerticalFpyRpt;
 		this.fpyInfoField = fpyInfoField;
+		this.customList = customList;
 	}	
 
 	public ViewVerticalReportFilterByFpyField() {
 		this.vwVerticalRptFilterByFpyFieldId = null;
 		this.vwVerticalRptFilterByFpyFieldExpression = null;
 		this.vwVerticalRptFilterByFpyFieldOperation = null;
-		this.vwVerticalRptFilteByFpyFieldValue1 = null;
+		this.vwVerticalRptFilterByFpyFieldValue1 = null;
 		this.vwVerticalRptFilterByFpyFieldValue2 = null;
 		this.vwVerticalRptFilterByFpyIsDateTimeExpField = null;
 		this.vwVerticalRptFilterByFpySNExpField = null;
 		this.vwVerticalRptFilterByFpyIsResultExpField = null;
 		this.vwVerticalFpyRpt = null;
 		this.fpyInfoField = null;
+		this.customList = null;
 	}
 
 	public Integer getVwVerticalRptFilterByFpyFieldId() {
@@ -110,12 +116,12 @@ public class ViewVerticalReportFilterByFpyField {
 		this.vwVerticalRptFilterByFpyFieldOperation = vwVerticalRptFilterByFpyFieldOperation;
 	}
 
-	public String getVwVerticalRptFilteByFpyFieldValue1() {
-		return vwVerticalRptFilteByFpyFieldValue1;
+	public String getVwVerticalRptFilterByFpyFieldValue1() {
+		return vwVerticalRptFilterByFpyFieldValue1;
 	}
 
-	public void setVwVerticalRptFilteByFpyFieldValue1(String vwVerticalRptFilteByFpyFieldValue1) {
-		this.vwVerticalRptFilteByFpyFieldValue1 = vwVerticalRptFilteByFpyFieldValue1;
+	public void setVwVerticalRptFilterByFpyFieldValue1(String vwVerticalRptFilterByFpyFieldValue1) {
+		this.vwVerticalRptFilterByFpyFieldValue1 = vwVerticalRptFilterByFpyFieldValue1;
 	}
 
 	public String getVwVerticalRptFilterByFpyFieldValue2() {
@@ -166,4 +172,12 @@ public class ViewVerticalReportFilterByFpyField {
 		this.fpyInfoField = fpyInfoField;
 	}
 
+
+	public CustomList getCustomList() {
+		return customList;
+	}
+
+	public void setCustomList(CustomList customList) {
+		this.customList = customList;
+	}
 }

@@ -1,5 +1,8 @@
 package com.bringit.experiment.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -64,4 +67,21 @@ public class ViewVerticalReportByTargetRptDao {
             session.close();
         }
     }
+    
+    @SuppressWarnings({"unchecked", "unused"})
+    public List<ViewVerticalReportByTargetRpt> getAllVwVerticalReportByTargetRptById(Integer vwVerticalReportId) {
+        List<ViewVerticalReportByTargetRpt> vwVerticalRptByTargetRpts = new ArrayList<ViewVerticalReportByTargetRpt>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            trns = session.beginTransaction();
+            vwVerticalRptByTargetRpts = session.createQuery("from ViewVerticalReportByTargetRpt where VwVerticalReportId = " + vwVerticalReportId).list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return vwVerticalRptByTargetRpts;
+    }  
 }

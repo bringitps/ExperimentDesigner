@@ -32,7 +32,7 @@ public class ViewVerticalReportFilterByExpField {
 	private String vwVerticalRptFilterByExpFieldOperation;
 	
 	@Column(name="VwVerticalRptFilterByExpFieldValue1")
-	private String vwVerticalRptFilteByExpFieldValue1;
+	private String vwVerticalRptFilterByExpFieldValue1;
 
 	@Column(name="VwVerticalRptFilterByExpFieldValue2")
 	private String vwVerticalRptFilterByExpFieldValue2;
@@ -45,28 +45,35 @@ public class ViewVerticalReportFilterByExpField {
     @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
 	private ExperimentField expField;
 
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CustomListId", unique=false, updatable=true)
+	private CustomList customList;
+
+
 	public ViewVerticalReportFilterByExpField(Integer vwVerticalRptFilterByExpFieldId,
 			String vwVerticalRptFilterByExpFieldExpression, String vwVerticalRptFilterByExpFieldOperation,
 			String vwVerticalRptFilteByExpFieldValue1, String vwVerticalRptFilterByExpFieldValue2,
 			ViewVerticalReportByExperiment vwVerticalReportByExperiment,
-			ExperimentField expField) {
+			ExperimentField expField, CustomList customList) {
 		this.vwVerticalRptFilterByExpFieldId = vwVerticalRptFilterByExpFieldId;
 		this.vwVerticalRptFilterByExpFieldExpression = vwVerticalRptFilterByExpFieldExpression;
 		this.vwVerticalRptFilterByExpFieldOperation = vwVerticalRptFilterByExpFieldOperation;
-		this.vwVerticalRptFilteByExpFieldValue1 = vwVerticalRptFilteByExpFieldValue1;
+		this.vwVerticalRptFilterByExpFieldValue1 = vwVerticalRptFilteByExpFieldValue1;
 		this.vwVerticalRptFilterByExpFieldValue2 = vwVerticalRptFilterByExpFieldValue2;
 		this.vwVerticalReportByExperiment = vwVerticalReportByExperiment;
 		this.expField = expField;
+		this.customList = customList;
 	}	
 
 	public ViewVerticalReportFilterByExpField() {
 		this.vwVerticalRptFilterByExpFieldId = null;
 		this.vwVerticalRptFilterByExpFieldExpression = null;
 		this.vwVerticalRptFilterByExpFieldOperation = null;
-		this.vwVerticalRptFilteByExpFieldValue1 = null;
+		this.vwVerticalRptFilterByExpFieldValue1 = null;
 		this.vwVerticalRptFilterByExpFieldValue2 = null;
 		this.vwVerticalReportByExperiment = null;
 		this.expField = null;
+		this.customList = null;
 	}
 
 	public Integer getVwVerticalRptFilterByExpFieldId() {
@@ -93,12 +100,12 @@ public class ViewVerticalReportFilterByExpField {
 		this.vwVerticalRptFilterByExpFieldOperation = vwVerticalRptFilterByExpFieldOperation;
 	}
 
-	public String getVwVerticalRptFilteByExpFieldValue1() {
-		return vwVerticalRptFilteByExpFieldValue1;
+	public String getVwVerticalRptFilterByExpFieldValue1() {
+		return vwVerticalRptFilterByExpFieldValue1;
 	}
 
-	public void setVwVerticalRptFilteByExpFieldValue1(String vwVerticalRptFilteByExpFieldValue1) {
-		this.vwVerticalRptFilteByExpFieldValue1 = vwVerticalRptFilteByExpFieldValue1;
+	public void setVwVerticalRptFilterByExpFieldValue1(String vwVerticalRptFilterByExpFieldValue1) {
+		this.vwVerticalRptFilterByExpFieldValue1 = vwVerticalRptFilterByExpFieldValue1;
 	}
 
 	public String getVwVerticalRptFilterByExpFieldValue2() {
@@ -124,4 +131,15 @@ public class ViewVerticalReportFilterByExpField {
 	public void setExpField(ExperimentField expField) {
 		this.expField = expField;
 	}
+
+	public CustomList getCustomList() {
+		return customList;
+	}
+
+	public void setCustomList(CustomList customList) {
+		this.customList = customList;
+	}
+	
+	
+	
 }

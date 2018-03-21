@@ -1,5 +1,8 @@
 package com.bringit.experiment.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -65,4 +68,20 @@ public class ViewVerticalReportColumnByEnrichmentDao {
         }
     }
 	
+    @SuppressWarnings({"unchecked", "unused"})
+    public List<ViewVerticalReportColumnByEnrichment> getAllVwVerticalRptColsByEnrichmentByColId(Integer vwVerticalRptColumnId) {
+        List<ViewVerticalReportColumnByEnrichment> vwVerticalRptColEnrichments = new ArrayList<ViewVerticalReportColumnByEnrichment>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            trns = session.beginTransaction();
+            vwVerticalRptColEnrichments = session.createQuery("from ViewVerticalReportColumnByEnrichment where VwVerticalRptColumnId = " + vwVerticalRptColumnId).list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return vwVerticalRptColEnrichments;
+    }  
 }

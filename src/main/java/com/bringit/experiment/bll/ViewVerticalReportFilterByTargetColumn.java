@@ -32,7 +32,7 @@ public class ViewVerticalReportFilterByTargetColumn {
 	private String vwVerticalRptFilterByTargetColumnOperation;
 	
 	@Column(name="VwVerticalRptFilterByTargetColumnValue1")
-	private String vwVerticalRptFilteByTargetColumnValue1;
+	private String vwVerticalRptFilterByTargetColumnValue1;
 
 	@Column(name="VwVerticalRptFilterByTargetColumnValue2")
 	private String vwVerticalRptFilterByTargetColumnValue2;
@@ -45,25 +45,32 @@ public class ViewVerticalReportFilterByTargetColumn {
     @JoinColumn(name="targetColumnId", unique=false, updatable=true)
 	private TargetColumn targetColumn;
 
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CustomListId", unique=false, updatable=true)
+	private CustomList customList;
+
+
 	public ViewVerticalReportFilterByTargetColumn(Integer vwVerticalRptFilterByTargetColumnId,
 			String vwVerticalRptFilterByTargetColumnExpression, String vwVerticalRptFilterByTargetColumnOperation,
-			String vwVerticalRptFilteByTargetColumnValue1, String vwVerticalRptFilterByTargetColumnValue2,
+			String vwVerticalRptFilterByTargetColumnValue1, String vwVerticalRptFilterByTargetColumnValue2,
 			ViewVerticalReportByTargetRpt vwVerticalTargetRpt,
-			TargetColumn targetColumn) {
+			TargetColumn targetColumn, CustomList customList) {
 		VwVerticalRptFilterByTargetColumnId = vwVerticalRptFilterByTargetColumnId;
 		this.vwVerticalRptFilterByTargetColumnExpression = vwVerticalRptFilterByTargetColumnExpression;
 		this.vwVerticalRptFilterByTargetColumnOperation = vwVerticalRptFilterByTargetColumnOperation;
-		this.vwVerticalRptFilteByTargetColumnValue1 = vwVerticalRptFilteByTargetColumnValue1;
+		this.vwVerticalRptFilterByTargetColumnValue1 = vwVerticalRptFilterByTargetColumnValue1;
 		this.vwVerticalRptFilterByTargetColumnValue2 = vwVerticalRptFilterByTargetColumnValue2;
 		this.vwVerticalTargetRpt = vwVerticalTargetRpt;
 		this.targetColumn = targetColumn;
+		this.customList = customList;
+		this.customList = null;
 	}
 
 	public ViewVerticalReportFilterByTargetColumn() {
 		VwVerticalRptFilterByTargetColumnId = null;
 		this.vwVerticalRptFilterByTargetColumnExpression = null;
 		this.vwVerticalRptFilterByTargetColumnOperation = null;
-		this.vwVerticalRptFilteByTargetColumnValue1 = null;
+		this.vwVerticalRptFilterByTargetColumnValue1 = null;
 		this.vwVerticalRptFilterByTargetColumnValue2 = null;
 		this.vwVerticalTargetRpt = null;
 		this.targetColumn = null;
@@ -93,12 +100,12 @@ public class ViewVerticalReportFilterByTargetColumn {
 		this.vwVerticalRptFilterByTargetColumnOperation = vwVerticalRptFilterByTargetColumnOperation;
 	}
 
-	public String getVwVerticalRptFilteByTargetColumnValue1() {
-		return vwVerticalRptFilteByTargetColumnValue1;
+	public String getVwVerticalRptFilterByTargetColumnValue1() {
+		return vwVerticalRptFilterByTargetColumnValue1;
 	}
 
-	public void setVwVerticalRptFilteByTargetColumnValue1(String vwVerticalRptFilteByTargetColumnValue1) {
-		this.vwVerticalRptFilteByTargetColumnValue1 = vwVerticalRptFilteByTargetColumnValue1;
+	public void setVwVerticalRptFilterByTargetColumnValue1(String vwVerticalRptFilterByTargetColumnValue1) {
+		this.vwVerticalRptFilterByTargetColumnValue1 = vwVerticalRptFilterByTargetColumnValue1;
 	}
 
 	public String getVwVerticalRptFilterByTargetColumnValue2() {
@@ -123,5 +130,13 @@ public class ViewVerticalReportFilterByTargetColumn {
 
 	public void setTargetColumn(TargetColumn targetColumn) {
 		this.targetColumn = targetColumn;
+	}
+
+	public CustomList getCustomList() {
+		return customList;
+	}
+
+	public void setCustomList(CustomList customList) {
+		this.customList = customList;
 	}
 }

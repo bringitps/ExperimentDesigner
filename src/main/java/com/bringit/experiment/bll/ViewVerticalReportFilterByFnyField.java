@@ -33,7 +33,7 @@ public class ViewVerticalReportFilterByFnyField {
 	private String vwVerticalRptFilterByFnyFieldOperation;
 	
 	@Column(name="VwVerticalRptFilterByFnyFieldValue1")
-	private String vwVerticalRptFilteByFnyFieldValue1;
+	private String vwVerticalRptFilterByFnyFieldValue1;
 
 	@Column(name="VwVerticalRptFilterByFnyFieldValue2")
 	private String vwVerticalRptFilterByFnyFieldValue2;
@@ -55,35 +55,41 @@ public class ViewVerticalReportFilterByFnyField {
     @JoinColumn(name="FnyInfoFieldId", unique=false, updatable=true)
 	private FinalPassYieldInfoField fnyInfoField;
 
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CustomListId", unique=false, updatable=true)
+	private CustomList customList;
+
 	public ViewVerticalReportFilterByFnyField(Integer vwVerticalRptFilterByFnyFieldId,
 			String vwVerticalRptFilterByFnyFieldExpression, String vwVerticalRptFilterByFnyFieldOperation,
-			String vwVerticalRptFilteByFnyFieldValue1, String vwVerticalRptFilterByFnyFieldValue2,
+			String vwVerticalRptFilterByFnyFieldValue1, String vwVerticalRptFilterByFnyFieldValue2,
 			Boolean vwVerticalRptFilterByFnyIsDateTimeExpField, Boolean vwVerticalRptFilterByFnySNExpField,
 			Boolean vwVerticalRptFilterByFnyIsResultExpField, ViewVerticalReportByFnyRpt vwVerticalFnyRpt,
-			FinalPassYieldInfoField fnyInfoField) {
+			FinalPassYieldInfoField fnyInfoField, CustomList customList) {
 		this.vwVerticalRptFilterByFnyFieldId = vwVerticalRptFilterByFnyFieldId;
 		this.vwVerticalRptFilterByFnyFieldExpression = vwVerticalRptFilterByFnyFieldExpression;
 		this.vwVerticalRptFilterByFnyFieldOperation = vwVerticalRptFilterByFnyFieldOperation;
-		this.vwVerticalRptFilteByFnyFieldValue1 = vwVerticalRptFilteByFnyFieldValue1;
+		this.vwVerticalRptFilterByFnyFieldValue1 = vwVerticalRptFilterByFnyFieldValue1;
 		this.vwVerticalRptFilterByFnyFieldValue2 = vwVerticalRptFilterByFnyFieldValue2;
 		this.vwVerticalRptFilterByFnyIsDateTimeExpField = vwVerticalRptFilterByFnyIsDateTimeExpField;
 		this.vwVerticalRptFilterByFnySNExpField = vwVerticalRptFilterByFnySNExpField;
 		this.vwVerticalRptFilterByFnyIsResultExpField = vwVerticalRptFilterByFnyIsResultExpField;
 		this.vwVerticalFnyRpt = vwVerticalFnyRpt;
 		this.fnyInfoField = fnyInfoField;
+		this.customList = customList;
 	}	
 
 	public ViewVerticalReportFilterByFnyField() {
 		this.vwVerticalRptFilterByFnyFieldId = null;
 		this.vwVerticalRptFilterByFnyFieldExpression = null;
 		this.vwVerticalRptFilterByFnyFieldOperation = null;
-		this.vwVerticalRptFilteByFnyFieldValue1 = null;
+		this.vwVerticalRptFilterByFnyFieldValue1 = null;
 		this.vwVerticalRptFilterByFnyFieldValue2 = null;
 		this.vwVerticalRptFilterByFnyIsDateTimeExpField = null;
 		this.vwVerticalRptFilterByFnySNExpField = null;
 		this.vwVerticalRptFilterByFnyIsResultExpField = null;
 		this.vwVerticalFnyRpt = null;
 		this.fnyInfoField = null;
+		this.customList = null;
 	}
 
 	public Integer getVwVerticalRptFilterByFnyFieldId() {
@@ -110,12 +116,12 @@ public class ViewVerticalReportFilterByFnyField {
 		this.vwVerticalRptFilterByFnyFieldOperation = vwVerticalRptFilterByFnyFieldOperation;
 	}
 
-	public String getVwVerticalRptFilteByFnyFieldValue1() {
-		return vwVerticalRptFilteByFnyFieldValue1;
+	public String getVwVerticalRptFilterByFnyFieldValue1() {
+		return vwVerticalRptFilterByFnyFieldValue1;
 	}
 
-	public void setVwVerticalRptFilteByFnyFieldValue1(String vwVerticalRptFilteByFnyFieldValue1) {
-		this.vwVerticalRptFilteByFnyFieldValue1 = vwVerticalRptFilteByFnyFieldValue1;
+	public void setVwVerticalRptFilterByFnyFieldValue1(String vwVerticalRptFilterByFnyFieldValue1) {
+		this.vwVerticalRptFilterByFnyFieldValue1 = vwVerticalRptFilterByFnyFieldValue1;
 	}
 
 	public String getVwVerticalRptFilterByFnyFieldValue2() {
@@ -165,4 +171,13 @@ public class ViewVerticalReportFilterByFnyField {
 	public void setFnyInfoField(FinalPassYieldInfoField fnyInfoField) {
 		this.fnyInfoField = fnyInfoField;
 	}
+
+	public CustomList getCustomList() {
+		return customList;
+	}
+
+	public void setCustomList(CustomList customList) {
+		this.customList = customList;
+	}
+	
 }

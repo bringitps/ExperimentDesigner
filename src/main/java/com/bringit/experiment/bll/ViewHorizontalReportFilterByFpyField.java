@@ -32,7 +32,7 @@ public class ViewHorizontalReportFilterByFpyField {
 	private String vwHorizontalRptFilterByFpyFieldOperation;
 	
 	@Column(name="VwHorizontalRptFilterByFpyFieldValue1")
-	private String vwHorizontalRptFilteByFpyFieldValue1;
+	private String vwHorizontalRptFilterByFpyFieldValue1;
 
 	@Column(name="VwHorizontalRptFilterByFpyFieldValue2")
 	private String vwHorizontalRptFilterByFpyFieldValue2;
@@ -56,14 +56,14 @@ public class ViewHorizontalReportFilterByFpyField {
 
 	public ViewHorizontalReportFilterByFpyField(Integer vwHorizontalRptFilterByFpyFieldId,
 			String vwHorizontalRptFilterByFpyFieldExpression, String vwHorizontalRptFilterByFpyFieldOperation,
-			String vwHorizontalRptFilteByFpyFieldValue1, String vwHorizontalRptFilterByFpyFieldValue2,
+			String vwHorizontalRptFilterByFpyFieldValue1, String vwHorizontalRptFilterByFpyFieldValue2,
 			Boolean vwHorizontalRptFilterByFpyIsDateTimeExpField, Boolean vwHorizontalRptFilterByFpySNExpField,
 			Boolean vwHorizontalRptFilterByFpyIsResultExpField, ViewHorizontalReportByFpyRpt vwHorizontalFpyRpt,
 			FirstPassYieldInfoField fpyInfoField) {
 		this.vwHorizontalRptFilterByFpyFieldId = vwHorizontalRptFilterByFpyFieldId;
 		this.vwHorizontalRptFilterByFpyFieldExpression = vwHorizontalRptFilterByFpyFieldExpression;
 		this.vwHorizontalRptFilterByFpyFieldOperation = vwHorizontalRptFilterByFpyFieldOperation;
-		this.vwHorizontalRptFilteByFpyFieldValue1 = vwHorizontalRptFilteByFpyFieldValue1;
+		this.vwHorizontalRptFilterByFpyFieldValue1 = vwHorizontalRptFilterByFpyFieldValue1;
 		this.vwHorizontalRptFilterByFpyFieldValue2 = vwHorizontalRptFilterByFpyFieldValue2;
 		this.vwHorizontalRptFilterByFpyIsDateTimeExpField = vwHorizontalRptFilterByFpyIsDateTimeExpField;
 		this.vwHorizontalRptFilterByFpySNExpField = vwHorizontalRptFilterByFpySNExpField;
@@ -76,7 +76,7 @@ public class ViewHorizontalReportFilterByFpyField {
 		this.vwHorizontalRptFilterByFpyFieldId = null;
 		this.vwHorizontalRptFilterByFpyFieldExpression = null;
 		this.vwHorizontalRptFilterByFpyFieldOperation = null;
-		this.vwHorizontalRptFilteByFpyFieldValue1 = null;
+		this.vwHorizontalRptFilterByFpyFieldValue1 = null;
 		this.vwHorizontalRptFilterByFpyFieldValue2 = null;
 		this.vwHorizontalRptFilterByFpyIsDateTimeExpField = null;
 		this.vwHorizontalRptFilterByFpySNExpField = null;
@@ -109,12 +109,12 @@ public class ViewHorizontalReportFilterByFpyField {
 		this.vwHorizontalRptFilterByFpyFieldOperation = vwHorizontalRptFilterByFpyFieldOperation;
 	}
 
-	public String getVwHorizontalRptFilteByFpyFieldValue1() {
-		return vwHorizontalRptFilteByFpyFieldValue1;
+	public String getVwHorizontalRptFilterByFpyFieldValue1() {
+		return vwHorizontalRptFilterByFpyFieldValue1;
 	}
 
-	public void setVwHorizontalRptFilteByFpyFieldValue1(String vwHorizontalRptFilteByFpyFieldValue1) {
-		this.vwHorizontalRptFilteByFpyFieldValue1 = vwHorizontalRptFilteByFpyFieldValue1;
+	public void setVwHorizontalRptFilterByFpyFieldValue1(String vwHorizontalRptFilteByFpyFieldValue1) {
+		this.vwHorizontalRptFilterByFpyFieldValue1 = vwHorizontalRptFilteByFpyFieldValue1;
 	}
 
 	public String getVwHorizontalRptFilterByFpyFieldValue2() {

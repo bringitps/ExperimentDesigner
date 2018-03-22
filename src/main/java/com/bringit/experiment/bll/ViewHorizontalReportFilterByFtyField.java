@@ -32,7 +32,7 @@ public class ViewHorizontalReportFilterByFtyField {
 	private String vwHorizontalRptFilterByFtyFieldOperation;
 	
 	@Column(name="VwHorizontalRptFilterByFtyFieldValue1")
-	private String vwHorizontalRptFilteByFtyFieldValue1;
+	private String vwHorizontalRptFilterByFtyFieldValue1;
 
 	@Column(name="VwHorizontalRptFilterByFtyFieldValue2")
 	private String vwHorizontalRptFilterByFtyFieldValue2;
@@ -53,6 +53,37 @@ public class ViewHorizontalReportFilterByFtyField {
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FtyInfoFieldId", unique=false, updatable=true)
 	private FirstTimeYieldInfoField ftyInfoField;
+	
+	public ViewHorizontalReportFilterByFtyField(Integer vwHorizontalRptFilterByFtyFieldId,
+			String vwHorizontalRptFilterByFtyFieldExpression, String vwHorizontalRptFilterByFtyFieldOperation,
+			String vwHorizontalRptFilterByFtyFieldValue1, String vwHorizontalRptFilterByFtyFieldValue2,
+			Boolean vwHorizontalRptFilterByFtyIsDateTimeExpField, Boolean vwHorizontalRptFilterByFtySNExpField,
+			Boolean vwHorizontalRptFilterByFtyIsResultExpField, ViewHorizontalReportByFtyRpt vwHorizontalFtyRpt,
+			FirstTimeYieldInfoField ftyInfoField) {
+		this.vwHorizontalRptFilterByFtyFieldId = vwHorizontalRptFilterByFtyFieldId;
+		this.vwHorizontalRptFilterByFtyFieldExpression = vwHorizontalRptFilterByFtyFieldExpression;
+		this.vwHorizontalRptFilterByFtyFieldOperation = vwHorizontalRptFilterByFtyFieldOperation;
+		this.vwHorizontalRptFilterByFtyFieldValue1 = vwHorizontalRptFilterByFtyFieldValue1;
+		this.vwHorizontalRptFilterByFtyFieldValue2 = vwHorizontalRptFilterByFtyFieldValue2;
+		this.vwHorizontalRptFilterByFtyIsDateTimeExpField = vwHorizontalRptFilterByFtyIsDateTimeExpField;
+		this.vwHorizontalRptFilterByFtySNExpField = vwHorizontalRptFilterByFtySNExpField;
+		this.vwHorizontalRptFilterByFtyIsResultExpField = vwHorizontalRptFilterByFtyIsResultExpField;
+		this.vwHorizontalFtyRpt = vwHorizontalFtyRpt;
+		this.ftyInfoField = ftyInfoField;
+	}
+
+	public ViewHorizontalReportFilterByFtyField() {
+		this.vwHorizontalRptFilterByFtyFieldId = null;
+		this.vwHorizontalRptFilterByFtyFieldExpression = null;
+		this.vwHorizontalRptFilterByFtyFieldOperation = null;
+		this.vwHorizontalRptFilterByFtyFieldValue1 = null;
+		this.vwHorizontalRptFilterByFtyFieldValue2 = null;
+		this.vwHorizontalRptFilterByFtyIsDateTimeExpField = null;
+		this.vwHorizontalRptFilterByFtySNExpField = null;
+		this.vwHorizontalRptFilterByFtyIsResultExpField = null;
+		this.vwHorizontalFtyRpt = null;
+		this.ftyInfoField = null;
+	}
 
 	public Integer getVwHorizontalRptFilterByFtyFieldId() {
 		return vwHorizontalRptFilterByFtyFieldId;
@@ -78,12 +109,12 @@ public class ViewHorizontalReportFilterByFtyField {
 		this.vwHorizontalRptFilterByFtyFieldOperation = vwHorizontalRptFilterByFtyFieldOperation;
 	}
 
-	public String getVwHorizontalRptFilteByFtyFieldValue1() {
-		return vwHorizontalRptFilteByFtyFieldValue1;
+	public String getVwHorizontalRptFilterByFtyFieldValue1() {
+		return vwHorizontalRptFilterByFtyFieldValue1;
 	}
 
-	public void setVwHorizontalRptFilteByFtyFieldValue1(String vwHorizontalRptFilteByFtyFieldValue1) {
-		this.vwHorizontalRptFilteByFtyFieldValue1 = vwHorizontalRptFilteByFtyFieldValue1;
+	public void setVwHorizontalRptFilterByFtyFieldValue1(String vwHorizontalRptFilteByFtyFieldValue1) {
+		this.vwHorizontalRptFilterByFtyFieldValue1 = vwHorizontalRptFilteByFtyFieldValue1;
 	}
 
 	public String getVwHorizontalRptFilterByFtyFieldValue2() {

@@ -22,16 +22,20 @@ public class ViewHorizontalReportFilterByFnyField {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="VwHorizontalRptColumnByFnyFieldId")
-	private Integer vwHorizontalRptColumnByFnyFieldId;
+	@Column(name="VwHorizontalRptFilterByFnyFieldId")
+	private Integer vwHorizontalRptFilterByFnyFieldId;
 	
-	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="VwHorizontalRptColumnId", unique=false, updatable=true)
-	private ViewHorizontalReportColumn vwHorizontalReportColumn;	
-		
-	@OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="FnyInfoFieldId", unique=false, updatable=true)
-	private FinalPassYieldInfoField finalPassYieldInfoField;
+	@Column(name="VwHorizontalRptFilterByFnyFieldExpression")
+	private String vwHorizontalRptFilterByFnyFieldExpression;
+
+	@Column(name="VwHorizontalRptFilterByFnyFieldOperation")
+	private String vwHorizontalRptFilterByFnyFieldOperation;
+	
+	@Column(name="VwHorizontalRptFilterByFnyFieldValue1")
+	private String vwHorizontalRptFilterByFnyFieldValue1;
+
+	@Column(name="VwHorizontalRptFilterByFnyFieldValue2")
+	private String vwHorizontalRptFilterByFnyFieldValue2;
 
 	@Column(name="VwHorizontalRptFilterByFnyIsDateTimeExpField")
 	private Boolean vwHorizontalRptFilterByFnyIsDateTimeExpField;
@@ -42,49 +46,83 @@ public class ViewHorizontalReportFilterByFnyField {
 	@Column(name="VwHorizontalRptFilterByFnyIsResultExpField")
 	private Boolean vwHorizontalRptFilterByFnyIsResultExpField;
 
-	public ViewHorizontalReportFilterByFnyField(Integer vwHorizontalRptColumnByFnyFieldId,
-			ViewHorizontalReportColumn vwHorizontalReportColumn, FinalPassYieldInfoField finalPassYieldInfoField,
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="VwHorizontalFnyRptId", unique=false, updatable=true)
+	private ViewHorizontalReportByFnyRpt vwHorizontalFnyRpt;	
+	
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="FnyInfoFieldId", unique=false, updatable=true)
+	private FinalPassYieldInfoField FnyInfoField;
+	
+	public ViewHorizontalReportFilterByFnyField(Integer vwHorizontalRptFilterByFnyFieldId,
+			String vwHorizontalRptFilterByFnyFieldExpression, String vwHorizontalRptFilterByFnyFieldOperation,
+			String vwHorizontalRptFilterByFnyFieldValue1, String vwHorizontalRptFilterByFnyFieldValue2,
 			Boolean vwHorizontalRptFilterByFnyIsDateTimeExpField, Boolean vwHorizontalRptFilterByFnySNExpField,
-			Boolean vwHorizontalRptFilterByFnyIsResultExpField) {
-		this.vwHorizontalRptColumnByFnyFieldId = vwHorizontalRptColumnByFnyFieldId;
-		this.vwHorizontalReportColumn = vwHorizontalReportColumn;
-		this.finalPassYieldInfoField = finalPassYieldInfoField;
+			Boolean vwHorizontalRptFilterByFnyIsResultExpField, ViewHorizontalReportByFnyRpt vwHorizontalFnyRpt,
+			FinalPassYieldInfoField FnyInfoField) {
+		this.vwHorizontalRptFilterByFnyFieldId = vwHorizontalRptFilterByFnyFieldId;
+		this.vwHorizontalRptFilterByFnyFieldExpression = vwHorizontalRptFilterByFnyFieldExpression;
+		this.vwHorizontalRptFilterByFnyFieldOperation = vwHorizontalRptFilterByFnyFieldOperation;
+		this.vwHorizontalRptFilterByFnyFieldValue1 = vwHorizontalRptFilterByFnyFieldValue1;
+		this.vwHorizontalRptFilterByFnyFieldValue2 = vwHorizontalRptFilterByFnyFieldValue2;
 		this.vwHorizontalRptFilterByFnyIsDateTimeExpField = vwHorizontalRptFilterByFnyIsDateTimeExpField;
 		this.vwHorizontalRptFilterByFnySNExpField = vwHorizontalRptFilterByFnySNExpField;
 		this.vwHorizontalRptFilterByFnyIsResultExpField = vwHorizontalRptFilterByFnyIsResultExpField;
+		this.vwHorizontalFnyRpt = vwHorizontalFnyRpt;
+		this.FnyInfoField = FnyInfoField;
 	}
-	
+
 	public ViewHorizontalReportFilterByFnyField() {
-		this.vwHorizontalRptColumnByFnyFieldId = null;
-		this.vwHorizontalReportColumn = null;
-		this.finalPassYieldInfoField = null;
+		this.vwHorizontalRptFilterByFnyFieldId = null;
+		this.vwHorizontalRptFilterByFnyFieldExpression = null;
+		this.vwHorizontalRptFilterByFnyFieldOperation = null;
+		this.vwHorizontalRptFilterByFnyFieldValue1 = null;
+		this.vwHorizontalRptFilterByFnyFieldValue2 = null;
 		this.vwHorizontalRptFilterByFnyIsDateTimeExpField = null;
 		this.vwHorizontalRptFilterByFnySNExpField = null;
 		this.vwHorizontalRptFilterByFnyIsResultExpField = null;
+		this.vwHorizontalFnyRpt = null;
+		this.FnyInfoField = null;
 	}
 
-	public Integer getVwHorizontalRptColumnByFnyFieldId() {
-		return vwHorizontalRptColumnByFnyFieldId;
+	public Integer getVwHorizontalRptFilterByFnyFieldId() {
+		return vwHorizontalRptFilterByFnyFieldId;
 	}
 
-	public void setVwHorizontalRptColumnByFnyFieldId(Integer vwHorizontalRptColumnByFnyFieldId) {
-		this.vwHorizontalRptColumnByFnyFieldId = vwHorizontalRptColumnByFnyFieldId;
+	public void setVwHorizontalRptFilterByFnyFieldId(Integer vwHorizontalRptFilterByFnyFieldId) {
+		this.vwHorizontalRptFilterByFnyFieldId = vwHorizontalRptFilterByFnyFieldId;
 	}
 
-	public ViewHorizontalReportColumn getVwHorizontalReportColumn() {
-		return vwHorizontalReportColumn;
+	public String getVwHorizontalRptFilterByFnyFieldExpression() {
+		return vwHorizontalRptFilterByFnyFieldExpression;
 	}
 
-	public void setVwHorizontalReportColumn(ViewHorizontalReportColumn vwHorizontalReportColumn) {
-		this.vwHorizontalReportColumn = vwHorizontalReportColumn;
+	public void setVwHorizontalRptFilterByFnyFieldExpression(String vwHorizontalRptFilterByFnyFieldExpression) {
+		this.vwHorizontalRptFilterByFnyFieldExpression = vwHorizontalRptFilterByFnyFieldExpression;
 	}
 
-	public FinalPassYieldInfoField getFinalPassYieldInfoField() {
-		return finalPassYieldInfoField;
+	public String getVwHorizontalRptFilterByFnyFieldOperation() {
+		return vwHorizontalRptFilterByFnyFieldOperation;
 	}
 
-	public void setFinalPassYieldInfoField(FinalPassYieldInfoField finalPassYieldInfoField) {
-		this.finalPassYieldInfoField = finalPassYieldInfoField;
+	public void setVwHorizontalRptFilterByFnyFieldOperation(String vwHorizontalRptFilterByFnyFieldOperation) {
+		this.vwHorizontalRptFilterByFnyFieldOperation = vwHorizontalRptFilterByFnyFieldOperation;
+	}
+
+	public String getVwHorizontalRptFilterByFnyFieldValue1() {
+		return vwHorizontalRptFilterByFnyFieldValue1;
+	}
+
+	public void setVwHorizontalRptFilterByFnyFieldValue1(String vwHorizontalRptFilteByFnyFieldValue1) {
+		this.vwHorizontalRptFilterByFnyFieldValue1 = vwHorizontalRptFilteByFnyFieldValue1;
+	}
+
+	public String getVwHorizontalRptFilterByFnyFieldValue2() {
+		return vwHorizontalRptFilterByFnyFieldValue2;
+	}
+
+	public void setVwHorizontalRptFilterByFnyFieldValue2(String vwHorizontalRptFilterByFnyFieldValue2) {
+		this.vwHorizontalRptFilterByFnyFieldValue2 = vwHorizontalRptFilterByFnyFieldValue2;
 	}
 
 	public Boolean getVwHorizontalRptFilterByFnyIsDateTimeExpField() {
@@ -110,7 +148,22 @@ public class ViewHorizontalReportFilterByFnyField {
 	public void setVwHorizontalRptFilterByFnyIsResultExpField(Boolean vwHorizontalRptFilterByFnyIsResultExpField) {
 		this.vwHorizontalRptFilterByFnyIsResultExpField = vwHorizontalRptFilterByFnyIsResultExpField;
 	}
-	
+
+	public ViewHorizontalReportByFnyRpt getVwHorizontalFnyRpt() {
+		return vwHorizontalFnyRpt;
+	}
+
+	public void setVwHorizontalFnyRpt(ViewHorizontalReportByFnyRpt vwHorizontalFnyRpt) {
+		this.vwHorizontalFnyRpt = vwHorizontalFnyRpt;
+	}
+
+	public FinalPassYieldInfoField getFnyInfoField() {
+		return FnyInfoField;
+	}
+
+	public void setFnyInfoField(FinalPassYieldInfoField FnyInfoField) {
+		this.FnyInfoField = FnyInfoField;
+	}
 	
 	
 }

@@ -109,7 +109,7 @@ import com.vaadin.ui.Notification.Type;
 public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesign {
 
 	private Boolean isNewRecord = false;
-	private ViewVerticalReport vwVerticalRpt = new ViewVerticalReport();
+	private ViewVerticalReport savedVwVerticalRpt = new ViewVerticalReport();
 	
 	private List<Experiment> activeExperiments = new ExperimentDao().getActiveExperiments();
 	private List<FirstPassYieldReport> activeFpyReports = new FirstPassYieldReportDao().getAllFirstPassYieldReports();
@@ -174,7 +174,10 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		if(vwVerticalRptId == null || vwVerticalRptId == -1)
 			isNewRecord = true;
 		else
-		{
+		{	
+			//Load report data from DB
+			this.savedVwVerticalRpt = new ViewVerticalReportDao().getVwVerticalRptById(vwVerticalRptId);
+			
 			//Load data sources from DB
 			vwVerticalRptByExperimentList = new ViewVerticalReportByExperimentDao().getAllVwVerticalReportByExperimentByRptId(vwVerticalRptId);
 			vwVerticalRptByFpyRptList = new ViewVerticalReportByFpyRptDao().getAllVwVerticalReportByFpyRptById(vwVerticalRptId);
@@ -259,6 +262,12 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 				for(int j=0; currentVwVerticalRptColumnsByEnrichment != null && j<currentVwVerticalRptColumnsByEnrichment.size(); j++)
 					vwVerticalRptColumnsByEnrichment.add(currentVwVerticalRptColumnsByEnrichment.get(j));
 			}
+			
+			//Load Report Header information
+			this.txtVwVerticalRptName.setValue(this.savedVwVerticalRpt.getVwVerticalRptName());
+			this.txtVwVerticalRptCustomId.setValue(this.savedVwVerticalRpt.getVwVerticalRptDbTableNameId().replace("vwvertical#", ""));
+			this.txtVwVerticalDescription.setValue(this.savedVwVerticalRpt.getVwVerticalRptDescription());
+			this.chxActive.setValue(this.savedVwVerticalRpt.getVwVerticalRptIsActive());
 		}
 		
 		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
@@ -824,7 +833,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
         });
 		
 		
-		if(itemId != null)
+		if(itemId != null && dataSourceType!=null)
 		{				
 			//Adding Data Source Filters
 			if(dataSourceType.equals("exp_"))
@@ -1355,11 +1364,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			cbxEnrichmentType.setValue(vwVerticalRptColumnsByEnrichment.getVwVerticalRptColumnEnrichmentType());
 			cbxCustomList.setValue(vwVerticalRptColumnsByEnrichment.getCustomListValue());
 			cbxCustomListValue.setValue(vwVerticalRptColumnsByEnrichment.getCustomListValue());
-			txtStaticValue.setValue(vwVerticalRptColumnsByEnrichment.getVwVerticalRptColumnEnrichmentStaticValue());
-			/*txtRptColumnName.setValue(vwVerticalRptCol.getVwVerticalRptColumnName());
-			chxKeyColumn.setValue(vwVerticalRptCol.getVwVerticalRptColumnIsKey());
-			txtRptDbColumnName.setValue(vwVerticalRptCol.getVwVerticalRptColumnDbId());
-			cbxDataType.setValue(vwVerticalRptCol.getVwVerticalRptColumnDataType());*/				
+			txtStaticValue.setValue(vwVerticalRptColumnsByEnrichment.getVwVerticalRptColumnEnrichmentStaticValue());			
 		}
 		
 		this.tblColumnsEnrichment.addItem(itemValues, itemId);		
@@ -2674,12 +2679,26 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			}
 			
 			ViewVerticalReport vwVerticalRpt = new ViewVerticalReport();
-			vwVerticalRpt.setVwVerticalRptDbTableNameId(this.txtVwVerticalRptCustomId.getValue());
-			vwVerticalRpt.setVwVerticalRptName(this.txtVwVerticalRptName.getValue());
-			vwVerticalRpt.setVwVerticalRptDescription(this.txtVwVerticalDescription.getValue());
-			vwVerticalRpt.setVwVerticalRptIsActive(true);
 			
-			new ViewVerticalReportDao().addVwVerticalReport(vwVerticalRpt);
+			if(isNewRecord)
+			{
+				vwVerticalRpt.setVwVerticalRptDbTableNameId("vwvertical#" + this.txtVwVerticalRptCustomId.getValue());
+				vwVerticalRpt.setVwVerticalRptName(this.txtVwVerticalRptName.getValue());
+				vwVerticalRpt.setVwVerticalRptDescription(this.txtVwVerticalDescription.getValue());
+				vwVerticalRpt.setVwVerticalRptIsActive(true);
+			
+				new ViewVerticalReportDao().addVwVerticalReport(vwVerticalRpt);
+			}
+			else
+			{				
+				this.savedVwVerticalRpt.setVwVerticalRptDbTableNameId("vwvertical#" + this.txtVwVerticalRptCustomId.getValue());
+				this.savedVwVerticalRpt.setVwVerticalRptName(this.txtVwVerticalRptName.getValue());
+				this.savedVwVerticalRpt.setVwVerticalRptDescription(this.txtVwVerticalDescription.getValue());
+				this.savedVwVerticalRpt.setVwVerticalRptIsActive(true);			
+				new ViewVerticalReportDao().updateVwVerticalReport(this.savedVwVerticalRpt);
+				vwVerticalRpt = new ViewVerticalReportDao().getVwVerticalRptById(this.savedVwVerticalRpt.getVwVerticalRptId());
+			}
+			
 			
 			Set<Item> selectedOptGrpPnlExperiments = (Set<Item>) optGrpPnlExperiments.getValue();
 			for (Object selectedExperiment : selectedOptGrpPnlExperiments)
@@ -2721,15 +2740,15 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								{
 									DateField fromDateField = (DateField)gridFilterValues.getComponent(0, 0);
 									DateField toDateField = (DateField)gridFilterValues.getComponent(1, 0);
-									vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue1(fromDateField.getValue().toString());
-									vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue2(toDateField.getValue().toString());
+									vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue1(new SimpleDateFormat("yyyyMMdd").format(fromDateField.getValue()));
+									vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue2(new SimpleDateFormat("yyyyMMdd").format(toDateField.getValue()));
 								}
 								else if(filterOperator.equals("after") || filterOperator.equals("before")
 					    				|| filterOperator.equals("on") || filterOperator.equals("onorafter")
 					    				|| filterOperator.equals("onorbefore"))
 								{
 									DateField dtFilterValue = (DateField)gridFilterValues.getComponent(0, 0);
-									vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue1(dtFilterValue.getValue().toString());									
+									vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue1(new SimpleDateFormat("yyyyMMdd").format(dtFilterValue.getValue()));									
 								}
 								else
 								{
@@ -2809,8 +2828,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								{
 									DateField fromDateField = (DateField)gridFilterValues.getComponent(0, 0);
 									DateField toDateField = (DateField)gridFilterValues.getComponent(1, 0);
-									vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue1(fromDateField.getValue().toString());
-									vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue2(toDateField.getValue().toString());
+									vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue1(new SimpleDateFormat("yyyyMMdd").format(fromDateField.getValue()));
+									vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue2(new SimpleDateFormat("yyyyMMdd").format(toDateField.getValue()));
 									
 								}
 								else if(filterOperator.equals("after") || filterOperator.equals("before")
@@ -2818,7 +2837,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 					    				|| filterOperator.equals("onorbefore"))
 								{
 									DateField dtFilterValue = (DateField)gridFilterValues.getComponent(0, 0);
-									vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue1(dtFilterValue.getValue().toString());									
+									vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyFieldValue1(new SimpleDateFormat("yyyyMMdd").format(dtFilterValue.getValue()));									
 								}
 								else
 								{
@@ -2900,8 +2919,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								{
 									DateField fromDateField = (DateField)gridFilterValues.getComponent(0, 0);
 									DateField toDateField = (DateField)gridFilterValues.getComponent(1, 0);
-									vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldValue1(fromDateField.getValue().toString());
-									vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldValue2(toDateField.getValue().toString());
+									vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldValue1(new SimpleDateFormat("yyyyMMdd").format(fromDateField.getValue()));
+									vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyFieldValue2(new SimpleDateFormat("yyyyMMdd").format(toDateField.getValue()));
 									
 								}
 								else if(filterOperator.equals("after") || filterOperator.equals("before")
@@ -2992,8 +3011,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								{
 									DateField fromDateField = (DateField)gridFilterValues.getComponent(0, 0);
 									DateField toDateField = (DateField)gridFilterValues.getComponent(1, 0);
-									vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue1(fromDateField.getValue().toString());
-									vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue2(toDateField.getValue().toString());
+									vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue1(new SimpleDateFormat("yyyyMMdd").format(fromDateField.getValue()));
+									vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue2(new SimpleDateFormat("yyyyMMdd").format(toDateField.getValue()));
 									
 								}
 								else if(filterOperator.equals("after") || filterOperator.equals("before")
@@ -3001,7 +3020,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 					    				|| filterOperator.equals("onorbefore"))
 								{
 									DateField dtFilterValue = (DateField)gridFilterValues.getComponent(0, 0);
-									vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue1(dtFilterValue.getValue().toString());									
+									vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyFieldValue1(new SimpleDateFormat("yyyyMMdd").format(dtFilterValue.getValue()));									
 								}
 								else
 								{
@@ -3049,6 +3068,69 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 						vwVerticalRptByTargetRpt.setTargetRpt(activeTargetReports.get(i));
 						vwVerticalRptByTargetRpt.setViewVerticalReport(vwVerticalRpt);
 						new ViewVerticalReportByTargetRptDao().addVwVerticalReportByTargetRpt(vwVerticalRptByTargetRpt);
+						
+						//Save filters attached to FTY
+						Collection dataSourceFiltersItemIds = this.tblReportFilters.getContainerDataSource().getItemIds();
+						
+						for (Object dataSourceFiltersItemIdObj : dataSourceFiltersItemIds) 
+						{
+							Item tblDataSourceFilterRowItem = this.tblReportFilters.getContainerDataSource().getItem(dataSourceFiltersItemIdObj);
+							String dataSourceId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Data Source").getValue())).getValue().toString();
+							if(("tgt_" + selectedTargetReportId).equals(dataSourceId))
+							{
+								ViewVerticalReportFilterByTargetColumn vwVerticalRptFilterByTgtCol = new ViewVerticalReportFilterByTargetColumn();
+								vwVerticalRptFilterByTgtCol.setVwVerticalTargetRpt(vwVerticalRptByTargetRpt);
+								vwVerticalRptFilterByTgtCol.setTargetColumn(new TargetColumnDao().getTargetColumnById(Integer.parseInt(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString().substring(4))));
+								
+								String filterOperator = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString();
+								GridLayout gridFilterValues = (GridLayout)tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue();
+								
+								if(filterOperator.equals("between") || filterOperator.equals("notbetween"))
+								{
+									TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+									TextField txtFilterValue2 = (TextField)gridFilterValues.getComponent(1, 0);
+									vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnValue1(txtFilterValue1.getValue().toString());
+									vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnValue2(txtFilterValue2.getValue().toString());
+								}
+								else if(filterOperator.equals("customrange"))
+								{
+									DateField fromDateField = (DateField)gridFilterValues.getComponent(0, 0);
+									DateField toDateField = (DateField)gridFilterValues.getComponent(1, 0);
+									vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnValue1(new SimpleDateFormat("yyyyMMdd").format(fromDateField.getValue()));
+									vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnValue2(new SimpleDateFormat("yyyyMMdd").format(toDateField.getValue()));
+								}
+								else if(filterOperator.equals("after") || filterOperator.equals("before")
+					    				|| filterOperator.equals("on") || filterOperator.equals("onorafter")
+					    				|| filterOperator.equals("onorbefore"))
+								{
+									DateField dtFilterValue = (DateField)gridFilterValues.getComponent(0, 0);
+									vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnValue1(new SimpleDateFormat("yyyyMMdd").format(dtFilterValue.getValue()));									
+								}
+								else
+								{
+									TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+									vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnValue1(txtFilterValue1.getValue());
+								
+									if(txtFilterValue1.getValue() == null || txtFilterValue1.getValue() == "")
+										vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnValue1(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Custom List Value").getValue())).getValue().toString());
+								}
+								
+								//vwVerticalRptFilterByExpField.setVwVerticalRptFilteByExpFieldValue1(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value").getValue())).getValue());
+								//vwVerticalRptFilterByExpField.setVwVerticalRptFilterByExpFieldValue2(((TextField)(tblDataSourceFilterRowItem.getItemProperty("Filter Value 2").getValue())).getValue());
+								
+								if(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue() != null)
+									vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnExpression(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Expression").getValue())).getValue().toString());
+								else
+									vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnExpression("and");
+									
+								vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnOperation(((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString());
+							
+								
+								new ViewVerticalReportFilterByTargetColumnDao().addVwVerticalReportFilterByTargetColumn(vwVerticalRptFilterByTgtCol);
+							}
+						}
+						
+						
 						break;
 					}
 				}
@@ -3111,6 +3193,9 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 							{
 								ViewVerticalReportColumnByFpyField vwVerticalRptColByFpyField = new ViewVerticalReportColumnByFpyField();
 								vwVerticalRptColByFpyField.setFpyRpt(new FirstPassYieldReportDao().getFirstPassYieldReportById(Integer.parseInt(dataSourceStrId.substring(4))));
+								vwVerticalRptColByFpyField.setVwVerticalRptColumnByFpyIsSNExpField(false);
+								vwVerticalRptColByFpyField.setVwVerticalRptColumnByFpyIsResultExpField(false);
+								vwVerticalRptColByFpyField.setVwVerticalRptColumnByFpyIsDateTimeExpField(false);
 								if("fpy_sn".equals(dataSourceFieldStrId) || "fpy_result".equals(dataSourceFieldStrId) || "fpy_datetime".equals(dataSourceFieldStrId))
 								{
 									vwVerticalRptColByFpyField.setVwVerticalRptColumnByFpyIsSNExpField("fpy_sn".equals(dataSourceFieldStrId));
@@ -3130,6 +3215,9 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 							{
 								ViewVerticalReportColumnByFnyField vwVerticalRptColByFnyField = new ViewVerticalReportColumnByFnyField();
 								vwVerticalRptColByFnyField.setFnyRpt(new FinalPassYieldReportDao().getFinalPassYieldReportById(Integer.parseInt(dataSourceStrId.substring(4))));
+								vwVerticalRptColByFnyField.setVwVerticalRptColumnByFnyIsSNExpField(false);
+								vwVerticalRptColByFnyField.setVwVerticalRptColumnByFnyIsResultExpField(false);
+								vwVerticalRptColByFnyField.setVwVerticalRptColumnByFnyIsDateTimeExpField(false);
 								if("fny_sn".equals(dataSourceFieldStrId) || "fny_result".equals(dataSourceFieldStrId) || "fny_datetime".equals(dataSourceFieldStrId))
 								{
 									vwVerticalRptColByFnyField.setVwVerticalRptColumnByFnyIsSNExpField("fny_sn".equals(dataSourceFieldStrId));
@@ -3149,11 +3237,15 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 							{
 								ViewVerticalReportColumnByFtyField vwVerticalRptColByFtyField = new ViewVerticalReportColumnByFtyField();
 								vwVerticalRptColByFtyField.setFtyRpt(new FirstTimeYieldReportDao().getFirstTimeYieldReportById(Integer.parseInt(dataSourceStrId.substring(4))));
+								vwVerticalRptColByFtyField.setVwVerticalRptColumnByFtyIsSNExpField(false);
+								vwVerticalRptColByFtyField.setVwVerticalRptColumnByFtyIsResultExpField(false);
+								vwVerticalRptColByFtyField.setVwVerticalRptColumnByFtyIsDateTimeExpField(false);
+						
 								if("fty_sn".equals(dataSourceFieldStrId) || "fty_result".equals(dataSourceFieldStrId) || "fty_datetime".equals(dataSourceFieldStrId))
 								{
 									vwVerticalRptColByFtyField.setVwVerticalRptColumnByFtyIsSNExpField("fty_sn".equals(dataSourceFieldStrId));
-									vwVerticalRptColByFtyField.setVwVerticalRptColumnByFtyIsResultExpField("fny_result".equals(dataSourceFieldStrId));
-									vwVerticalRptColByFtyField.setVwVerticalRptColumnByFtyIsDateTimeExpField("fny_datetime".equals(dataSourceFieldStrId));
+									vwVerticalRptColByFtyField.setVwVerticalRptColumnByFtyIsResultExpField("fty_result".equals(dataSourceFieldStrId));
+									vwVerticalRptColByFtyField.setVwVerticalRptColumnByFtyIsDateTimeExpField("fty_datetime".equals(dataSourceFieldStrId));
 								}
 								else
 								{
@@ -3210,9 +3302,79 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			if(isNewRecord)
 			{
 				WebApplication webApp = (WebApplication)this.getParent().getParent();
-				webApp.reloadMainForm("first pass yield report");
+				webApp.reloadMainForm("vertical view report");
 			}
-			
+			else
+			{
+				ViewVerticalReportColumnByEnrichmentDao vwVerticalRptColEnrichmentDao = new ViewVerticalReportColumnByEnrichmentDao();
+				for(int i=0; vwVerticalRptColumnsByEnrichment != null &&i<vwVerticalRptColumnsByEnrichment.size(); i++)
+					vwVerticalRptColEnrichmentDao.deleteVwVerticalReportColumnByEnrichment(vwVerticalRptColumnsByEnrichment.get(i).getVwVerticalRptColumnByEnrichmentId()); 
+				
+				ViewVerticalReportColumnByExpFieldDao vwVerticalRptColumnByExpFieldDao = new ViewVerticalReportColumnByExpFieldDao();
+				for(int i=0; vwVerticalRptColumnsByExpField != null &&i<vwVerticalRptColumnsByExpField.size(); i++)
+					vwVerticalRptColumnByExpFieldDao.deleteVwVerticalReportColumnByExpField(vwVerticalRptColumnsByExpField.get(i).getVwVerticalRptColumnByExpFieldId());
+				
+				ViewVerticalReportColumnByFpyFieldDao vwVerticalRptColumnByFpyFieldDao = new ViewVerticalReportColumnByFpyFieldDao();
+				for(int i=0; vwVerticalRptColumnsByFpyField != null &&i<vwVerticalRptColumnsByFpyField.size(); i++)
+					vwVerticalRptColumnByFpyFieldDao.deleteVwVerticalReportColumnByFpyField(vwVerticalRptColumnsByFpyField.get(i).getVwVerticalRptColumnByFpyFieldId());
+				
+				ViewVerticalReportColumnByFnyFieldDao vwVerticalRptColumnByFnyFieldDao = new ViewVerticalReportColumnByFnyFieldDao();
+				for(int i=0; vwVerticalRptColumnsByFnyField != null &&i<vwVerticalRptColumnsByFnyField.size(); i++)
+					vwVerticalRptColumnByFnyFieldDao.deleteVwVerticalReportColumnByFnyField(vwVerticalRptColumnsByFnyField.get(i).getVwVerticalRptColumnByFnyFieldId());
+				
+				ViewVerticalReportColumnByFtyFieldDao vwVerticalRptColumnByFtyFieldDao = new ViewVerticalReportColumnByFtyFieldDao();
+				for(int i=0; vwVerticalRptColumnsByFtyField != null &&i<vwVerticalRptColumnsByFtyField.size(); i++)
+					vwVerticalRptColumnByFtyFieldDao.deleteVwVerticalReportColumnByFtyField(vwVerticalRptColumnsByFtyField.get(i).getVwVerticalRptColumnByFtyFieldId());
+				
+				ViewVerticalReportColumnByTargetColumnDao vwVerticalReportColumnByTargetColumnDao = new ViewVerticalReportColumnByTargetColumnDao();
+				for(int i=0; vwVerticalRptColumnsByTgtCol != null &&i<vwVerticalRptColumnsByTgtCol.size(); i++)
+					vwVerticalReportColumnByTargetColumnDao.deleteVwVerticalReportColumnByTargetColumn(vwVerticalRptColumnsByTgtCol.get(i).getVwVerticalRptColumnByTargetColumnId());
+				
+				ViewVerticalReportFilterByExpFieldDao vwVerticalReportFilterByExpFieldDao = new ViewVerticalReportFilterByExpFieldDao();
+				for(int i=0; vwVerticalRptFiltersByExpField != null &&i<vwVerticalRptFiltersByExpField.size(); i++)
+					vwVerticalReportFilterByExpFieldDao.deleteVwVerticalReportFilterByExpField(vwVerticalRptFiltersByExpField.get(i).getVwVerticalRptFilterByExpFieldId());
+				
+				ViewVerticalReportFilterByFpyFieldDao vwVerticalReportFilterByFpyFieldDao = new ViewVerticalReportFilterByFpyFieldDao();
+				for(int i=0; vwVerticalRptFiltersByFpyField != null &&i<vwVerticalRptFiltersByFpyField.size(); i++)
+					vwVerticalReportFilterByFpyFieldDao.deleteVwVerticalReportFilterByFpyField(vwVerticalRptFiltersByFpyField.get(i).getVwVerticalRptFilterByFpyFieldId());
+				
+				ViewVerticalReportFilterByFnyFieldDao vwVerticalReportFilterByFnyFieldDao = new ViewVerticalReportFilterByFnyFieldDao();
+				for(int i=0; vwVerticalRptFiltersByFnyField != null &&i<vwVerticalRptFiltersByFnyField.size(); i++)
+					vwVerticalReportFilterByFnyFieldDao.deleteVwVerticalReportFilterByFnyField(vwVerticalRptFiltersByFnyField.get(i).getVwVerticalRptFilterByFnyFieldId());
+				
+				ViewVerticalReportFilterByFtyFieldDao vwVerticalReportFilterByFtyFieldDao = new ViewVerticalReportFilterByFtyFieldDao();
+				for(int i=0; vwVerticalRptFiltersByFtyField != null &&i<vwVerticalRptFiltersByFtyField.size(); i++)
+					vwVerticalReportFilterByFtyFieldDao.deleteVwVerticalReportFilterByFtyField(vwVerticalRptFiltersByFtyField.get(i).getVwVerticalRptFilterByFtyFieldId());
+				
+				ViewVerticalReportFilterByTargetColumnDao vwVerticalReportFilterByTargetColumnDao = new ViewVerticalReportFilterByTargetColumnDao();
+				for(int i=0; vwVerticalRptFiltersByTgtCol != null &&i<vwVerticalRptFiltersByTgtCol.size(); i++)
+					vwVerticalReportFilterByTargetColumnDao.deleteVwVerticalReportFilterByTargetColumn(vwVerticalRptFiltersByTgtCol.get(i).getVwVerticalRptFilterByTargetColumnId());
+				
+				ViewVerticalReportColumnDao vwVerticalReportColumnDao = new ViewVerticalReportColumnDao();
+				for(int i=0; vwVerticalRptColumns != null && i<vwVerticalRptColumns.size(); i++)
+					vwVerticalReportColumnDao.deleteVwVerticalReportColumn(vwVerticalRptColumns.get(i).getVwVerticalRptColumnId());
+				
+				ViewVerticalReportByExperimentDao vwVerticalReportByExperimentDao = new ViewVerticalReportByExperimentDao();
+				for(int i=0; vwVerticalRptByExperimentList != null && i<vwVerticalRptByExperimentList.size(); i++)
+					vwVerticalReportByExperimentDao.deleteVwVerticalReportByExperiment(vwVerticalRptByExperimentList.get(i).getVwVerticalRptByExperimentId());
+
+				ViewVerticalReportByFpyRptDao vwVerticalReportByFpyRptDao = new ViewVerticalReportByFpyRptDao();
+				for(int i=0; vwVerticalRptByFpyRptList != null && i<vwVerticalRptByFpyRptList.size(); i++)
+					vwVerticalReportByFpyRptDao.deleteVwVerticalReportByFpyRpt(vwVerticalRptByFpyRptList.get(i).getVwVerticalRptByFpyId());
+
+				ViewVerticalReportByFtyRptDao vwVerticalReportByFtyRptDao = new ViewVerticalReportByFtyRptDao();
+				for(int i=0; vwVerticalRptByFtyRptList != null && i<vwVerticalRptByFtyRptList.size(); i++)
+					vwVerticalReportByFtyRptDao.deleteVwVerticalReportByFtyRpt(vwVerticalRptByFtyRptList.get(i).getVwVerticalRptByFtyId());
+				
+				ViewVerticalReportByFnyRptDao vwVerticalReportByFnyRptDao = new ViewVerticalReportByFnyRptDao();
+				for(int i=0; vwVerticalRptByFnyRptList != null && i<vwVerticalRptByFnyRptList.size(); i++)
+					vwVerticalReportByFnyRptDao.deleteVwVerticalReportByFnyRpt(vwVerticalRptByFnyRptList.get(i).getVwVerticalRptByFnyId());
+				
+				ViewVerticalReportByTargetRptDao vwVerticalReportByTargetRptDao = new ViewVerticalReportByTargetRptDao();
+				for(int i=0; vwVerticalRptByTgtRptList != null && i<vwVerticalRptByTgtRptList.size(); i++)
+					vwVerticalReportByTargetRptDao.deleteVwVerticalReportByTargetRpt(vwVerticalRptByTgtRptList.get(i).getVwVerticalRptByTargetRptId());
+				
+			}
 			
 			closeModalWindow();		
 			
@@ -3318,11 +3480,11 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 
 	private void onDelete()
 	{
-		this.vwVerticalRpt.setVwVerticalRptIsActive(false);
+		this.savedVwVerticalRpt.setVwVerticalRptIsActive(false);
 		SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
-		this.vwVerticalRpt.setLastModifiedBy(sessionUser);
-		this.vwVerticalRpt.setModifiedDate(new Date());	
-		new ViewVerticalReportDao().updateVwVerticalReport(this.vwVerticalRpt);
+		this.savedVwVerticalRpt.setLastModifiedBy(sessionUser);
+		this.savedVwVerticalRpt.setModifiedDate(new Date());	
+		new ViewVerticalReportDao().updateVwVerticalReport(this.savedVwVerticalRpt);
 		//new FirstPassYieldReportDao().deleteDBFpyRptTable(this.fpyReport);
 		//new FirstPassYieldReportDao().updateFirstPassYieldReport(this.fpyReport);		
 		

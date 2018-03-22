@@ -32,7 +32,7 @@ public class ViewHorizontalReportFilterByExpField {
 	private String vwHorizontalRptFilterByExpFieldOperation;
 	
 	@Column(name="VwHorizontalRptFilterByExpFieldValue1")
-	private String vwHorizontalRptFilteByExpFieldValue1;
+	private String vwHorizontalRptFilterByExpFieldValue1;
 
 	@Column(name="VwHorizontalRptFilterByExpFieldValue2")
 	private String vwHorizontalRptFilterByExpFieldValue2;
@@ -47,12 +47,12 @@ public class ViewHorizontalReportFilterByExpField {
 
 	public ViewHorizontalReportFilterByExpField(Integer vwHorizontalRptFilterByExpFieldId,
 			String vwHorizontalRptFilterByExpFieldExpression, String vwHorizontalRptFilterByExpFieldOperation,
-			String vwHorizontalRptFilteByExpFieldValue1, String vwHorizontalRptFilterByExpFieldValue2,
+			String vwHorizontalRptFilterByExpFieldValue1, String vwHorizontalRptFilterByExpFieldValue2,
 			ViewVerticalReportByExperiment vwHorizontalReportByExperiment, ExperimentField expField) {
 		this.vwHorizontalRptFilterByExpFieldId = vwHorizontalRptFilterByExpFieldId;
 		this.vwHorizontalRptFilterByExpFieldExpression = vwHorizontalRptFilterByExpFieldExpression;
 		this.vwHorizontalRptFilterByExpFieldOperation = vwHorizontalRptFilterByExpFieldOperation;
-		this.vwHorizontalRptFilteByExpFieldValue1 = vwHorizontalRptFilteByExpFieldValue1;
+		this.vwHorizontalRptFilterByExpFieldValue1 = vwHorizontalRptFilterByExpFieldValue1;
 		this.vwHorizontalRptFilterByExpFieldValue2 = vwHorizontalRptFilterByExpFieldValue2;
 		this.vwHorizontalReportByExperiment = vwHorizontalReportByExperiment;
 		this.expField = expField;
@@ -62,7 +62,7 @@ public class ViewHorizontalReportFilterByExpField {
 		this.vwHorizontalRptFilterByExpFieldId = null;
 		this.vwHorizontalRptFilterByExpFieldExpression = null;
 		this.vwHorizontalRptFilterByExpFieldOperation = null;
-		this.vwHorizontalRptFilteByExpFieldValue1 = null;
+		this.vwHorizontalRptFilterByExpFieldValue1 = null;
 		this.vwHorizontalRptFilterByExpFieldValue2 = null;
 		this.vwHorizontalReportByExperiment = null;
 		this.expField = null;
@@ -92,12 +92,12 @@ public class ViewHorizontalReportFilterByExpField {
 		this.vwHorizontalRptFilterByExpFieldOperation = vwHorizontalRptFilterByExpFieldOperation;
 	}
 
-	public String getVwHorizontalRptFilteByExpFieldValue1() {
-		return vwHorizontalRptFilteByExpFieldValue1;
+	public String getVwHorizontalRptFilterByExpFieldValue1() {
+		return vwHorizontalRptFilterByExpFieldValue1;
 	}
 
-	public void setVwHorizontalRptFilteByExpFieldValue1(String vwHorizontalRptFilteByExpFieldValue1) {
-		this.vwHorizontalRptFilteByExpFieldValue1 = vwHorizontalRptFilteByExpFieldValue1;
+	public void setVwHorizontalRptFilterByExpFieldValue1(String vwHorizontalRptFilteByExpFieldValue1) {
+		this.vwHorizontalRptFilterByExpFieldValue1 = vwHorizontalRptFilteByExpFieldValue1;
 	}
 
 	public String getVwHorizontalRptFilterByExpFieldValue2() {

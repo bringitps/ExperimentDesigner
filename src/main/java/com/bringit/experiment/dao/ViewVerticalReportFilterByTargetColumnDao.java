@@ -11,7 +11,7 @@ import com.bringit.experiment.dal.HibernateUtil;
 
 public class ViewVerticalReportFilterByTargetColumnDao {
 
-public void addVwVerticalReportFilterByTargetColumn(ViewVerticalReportFilterByTargetColumn vwVerticalReportFilterByTargetColumn) {
+	public void addVwVerticalReportFilterByTargetColumn(ViewVerticalReportFilterByTargetColumn vwVerticalReportFilterByTargetColumn) {
     	
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();

@@ -6,19 +6,19 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.ViewVerticalReportFilterByFnyField;
+import com.bringit.experiment.bll.ViewHorizontalReportFilterByFnyField;
 import com.bringit.experiment.dal.HibernateUtil;
 
-public class ViewVerticalReportFilterByFnyFieldDao {
+public class ViewHorizontalReportFilterByFnyFieldDao {
 
-	public void addVwVerticalReportFilterByFnyField(ViewVerticalReportFilterByFnyField vwVerticalReportFilterByFnyField) {
+	public void addVwHorizontalReportFilterByFnyField(ViewHorizontalReportFilterByFnyField vwHorizontalReportFilterByFnyField) {
     	
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         
         try {
             trns = session.beginTransaction();
-            session.save(vwVerticalReportFilterByFnyField);
+            session.save(vwHorizontalReportFilterByFnyField);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -31,13 +31,13 @@ public class ViewVerticalReportFilterByFnyFieldDao {
         }
     }
 
-    public void deleteVwVerticalReportFilterByFnyField(int vwVerticalReportFilterByFnyFieldId) {
+    public void deleteVwHorizontalReportFilterByFnyField(int vwHorizontalReportFilterByFnyFieldId) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            ViewVerticalReportFilterByFnyField vwVerticalReportFilterByFnyField = (ViewVerticalReportFilterByFnyField)session.load(ViewVerticalReportFilterByFnyField.class, new Integer(vwVerticalReportFilterByFnyFieldId));
-            session.delete(vwVerticalReportFilterByFnyField);
+            ViewHorizontalReportFilterByFnyField vwHorizontalReportFilterByFnyField = (ViewHorizontalReportFilterByFnyField)session.load(ViewHorizontalReportFilterByFnyField.class, new Integer(vwHorizontalReportFilterByFnyFieldId));
+            session.delete(vwHorizontalReportFilterByFnyField);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -50,12 +50,12 @@ public class ViewVerticalReportFilterByFnyFieldDao {
         }
     }
 
-    public void updateVwVerticalReportFilterByFnyField(ViewVerticalReportFilterByFnyField vwVerticalReportFilterByFnyField) {
+    public void updateVwHorizontalReportFilterByFnyField(ViewHorizontalReportFilterByFnyField vwHorizontalReportFilterByFnyField) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            session.update(vwVerticalReportFilterByFnyField);
+            session.update(vwHorizontalReportFilterByFnyField);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -69,19 +69,19 @@ public class ViewVerticalReportFilterByFnyFieldDao {
     }
 
     @SuppressWarnings({"unchecked", "unused"})
-    public List<ViewVerticalReportFilterByFnyField> getAllVwVerticalReportFiltersByFnyRptId(Integer vwVerticalRptByFnyId) {
-        List<ViewVerticalReportFilterByFnyField> vwVerticalRptFiltersByFny = new ArrayList<ViewVerticalReportFilterByFnyField>();
+    public List<ViewHorizontalReportFilterByFnyField> getAllVwHorizontalReportFiltersByFnyRptId(Integer vwHorizontalRptByFnyId) {
+        List<ViewHorizontalReportFilterByFnyField> vwHorizontalRptFiltersByFny = new ArrayList<ViewHorizontalReportFilterByFnyField>();
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            vwVerticalRptFiltersByFny = session.createQuery("from ViewVerticalReportFilterByFnyField where VwVerticalFnyRptId = " + vwVerticalRptByFnyId).list();
+            vwHorizontalRptFiltersByFny = session.createQuery("from ViewHorizontalReportFilterByFnyField where VwHorizontalFnyRptId = " + vwHorizontalRptByFnyId).list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return vwVerticalRptFiltersByFny;
+        return vwHorizontalRptFiltersByFny;
     }
 }

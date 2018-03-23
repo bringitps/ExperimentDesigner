@@ -40,6 +40,10 @@ public class ViewHorizontalReportColumn {
 	private String vwVerticalRptColumnDataType;
 	
 	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
+	private ExperimentField expField;	
+	
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FnyInfoFieldId", unique=false, updatable=true)
 	private FinalPassYieldInfoField fnyInfoField;
 	
@@ -50,8 +54,7 @@ public class ViewHorizontalReportColumn {
 	private Boolean vwHorizontalFnyIsSNExpField;
 
 	@Column(name="VwHorizontalFnyIsResultExpField")
-	private Boolean vwHorizontalFnyIsResultExpField;
-	
+	private Boolean vwHorizontalFnyIsResultExpField;	
 
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FpyInfoFieldId", unique=false, updatable=true)
@@ -84,8 +87,8 @@ public class ViewHorizontalReportColumn {
 	private TargetColumn targetColumn;
 
 	public ViewHorizontalReportColumn(Integer vwHorizontalRptColumnId, ViewVerticalReport viewHorizontalReport,
-			String vwHorizontalRptColumnName, String vwHorizontalRptColumnDbId, String vwVerticalRptColumnDataType,
-			FinalPassYieldInfoField fnyInfoField, Boolean vwHorizontalFnyIsDateTimeExpField,
+			String vwHorizontalRptColumnName, String vwHorizontalRptColumnDbId, String vwVerticalRptColumnDataType,			
+			ExperimentField expField, FinalPassYieldInfoField fnyInfoField, Boolean vwHorizontalFnyIsDateTimeExpField,
 			Boolean vwHorizontalFnyIsSNExpField, Boolean vwHorizontalFnyIsResultExpField,
 			FirstPassYieldInfoField fpyInfoField, Boolean vwHorizontalFpyIsDateTimeExpField,
 			Boolean vwHorizontalFpyIsSNExpField, Boolean vwHorizontalFpyIsResultExpField,
@@ -96,6 +99,7 @@ public class ViewHorizontalReportColumn {
 		this.vwHorizontalRptColumnName = vwHorizontalRptColumnName;
 		this.vwHorizontalRptColumnDbId = vwHorizontalRptColumnDbId;
 		this.vwVerticalRptColumnDataType = vwVerticalRptColumnDataType;
+		this.expField = expField;
 		this.fnyInfoField = fnyInfoField;
 		this.vwHorizontalFnyIsDateTimeExpField = vwHorizontalFnyIsDateTimeExpField;
 		this.vwHorizontalFnyIsSNExpField = vwHorizontalFnyIsSNExpField;
@@ -117,6 +121,7 @@ public class ViewHorizontalReportColumn {
 		this.vwHorizontalRptColumnName = null;
 		this.vwHorizontalRptColumnDbId = null;
 		this.vwVerticalRptColumnDataType = null;
+		this.expField = null;
 		this.fnyInfoField = null;
 		this.vwHorizontalFnyIsDateTimeExpField = null;
 		this.vwHorizontalFnyIsSNExpField = null;
@@ -170,6 +175,14 @@ public class ViewHorizontalReportColumn {
 
 	public void setVwVerticalRptColumnDataType(String vwVerticalRptColumnDataType) {
 		this.vwVerticalRptColumnDataType = vwVerticalRptColumnDataType;
+	}
+
+	public ExperimentField getExpField() {
+		return expField;
+	}
+
+	public void setExpField(ExperimentField expField) {
+		this.expField = expField;
 	}
 
 	public FinalPassYieldInfoField getFnyInfoField() {

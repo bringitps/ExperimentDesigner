@@ -6,19 +6,18 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.bringit.experiment.bll.ViewVerticalReportFilterByFnyField;
+import com.bringit.experiment.bll.ViewVerticalReportColumnByEnrichment;
 import com.bringit.experiment.dal.HibernateUtil;
 
-public class ViewVerticalReportFilterByFnyFieldDao {
-
-	public void addVwVerticalReportFilterByFnyField(ViewVerticalReportFilterByFnyField vwVerticalReportFilterByFnyField) {
+public class ViewHorizontalReportColumnByEnrichmentDao {
+public void addVwVerticalReportColumnByEnrichment(ViewVerticalReportColumnByEnrichment vwVerticalReportColumnByEnrichment) {
     	
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         
         try {
             trns = session.beginTransaction();
-            session.save(vwVerticalReportFilterByFnyField);
+            session.save(vwVerticalReportColumnByEnrichment);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -31,13 +30,13 @@ public class ViewVerticalReportFilterByFnyFieldDao {
         }
     }
 
-    public void deleteVwVerticalReportFilterByFnyField(int vwVerticalReportFilterByFnyFieldId) {
+    public void deleteVwVerticalReportColumnByEnrichment(int vwVerticalReportColumnByEnrichmentId) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            ViewVerticalReportFilterByFnyField vwVerticalReportFilterByFnyField = (ViewVerticalReportFilterByFnyField)session.load(ViewVerticalReportFilterByFnyField.class, new Integer(vwVerticalReportFilterByFnyFieldId));
-            session.delete(vwVerticalReportFilterByFnyField);
+            ViewVerticalReportColumnByEnrichment vwVerticalReportColumnByEnrichment = (ViewVerticalReportColumnByEnrichment)session.load(ViewVerticalReportColumnByEnrichment.class, new Integer(vwVerticalReportColumnByEnrichmentId));
+            session.delete(vwVerticalReportColumnByEnrichment);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -50,12 +49,12 @@ public class ViewVerticalReportFilterByFnyFieldDao {
         }
     }
 
-    public void updateVwVerticalReportFilterByFnyField(ViewVerticalReportFilterByFnyField vwVerticalReportFilterByFnyField) {
+    public void updateVwVerticalReportColumnByEnrichment(ViewVerticalReportColumnByEnrichment vwVerticalReportColumnByEnrichment) {
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            session.update(vwVerticalReportFilterByFnyField);
+            session.update(vwVerticalReportColumnByEnrichment);
             session.getTransaction().commit();
         } catch (RuntimeException e) {
             if (trns != null) {
@@ -67,21 +66,21 @@ public class ViewVerticalReportFilterByFnyFieldDao {
             session.close();
         }
     }
-
+	
     @SuppressWarnings({"unchecked", "unused"})
-    public List<ViewVerticalReportFilterByFnyField> getAllVwVerticalReportFiltersByFnyRptId(Integer vwVerticalRptByFnyId) {
-        List<ViewVerticalReportFilterByFnyField> vwVerticalRptFiltersByFny = new ArrayList<ViewVerticalReportFilterByFnyField>();
+    public List<ViewVerticalReportColumnByEnrichment> getAllVwVerticalRptColsByEnrichmentByColId(Integer vwVerticalRptColumnId) {
+        List<ViewVerticalReportColumnByEnrichment> vwVerticalRptColEnrichments = new ArrayList<ViewVerticalReportColumnByEnrichment>();
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            vwVerticalRptFiltersByFny = session.createQuery("from ViewVerticalReportFilterByFnyField where VwVerticalFnyRptId = " + vwVerticalRptByFnyId).list();
+            vwVerticalRptColEnrichments = session.createQuery("from ViewVerticalReportColumnByEnrichment where VwVerticalRptColumnId = " + vwVerticalRptColumnId).list();
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             session.flush();
             session.close();
         }
-        return vwVerticalRptFiltersByFny;
-    }
+        return vwVerticalRptColEnrichments;
+    }  
 }

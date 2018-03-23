@@ -11,7 +11,7 @@ import com.bringit.experiment.dal.HibernateUtil;
 
 public class ViewVerticalReportFilterByExpFieldDao {
 
-public void addVwVerticalReportFilterByExpField(ViewVerticalReportFilterByExpField vwVerticalReportFilterByExpField) {
+	public void addVwVerticalReportFilterByExpField(ViewVerticalReportFilterByExpField vwVerticalReportFilterByExpField) {
     	
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();

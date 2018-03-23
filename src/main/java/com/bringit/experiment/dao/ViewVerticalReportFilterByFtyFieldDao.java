@@ -12,7 +12,7 @@ import com.bringit.experiment.dal.HibernateUtil;
 
 public class ViewVerticalReportFilterByFtyFieldDao {
 
-public void addVwVerticalReportFilterByFtyField(ViewVerticalReportFilterByFtyField vwVerticalReportFilterByFtyField) {
+	public void addVwVerticalReportFilterByFtyField(ViewVerticalReportFilterByFtyField vwVerticalReportFilterByFtyField) {
     	
         Transaction trns = null;
         Session session = HibernateUtil.getSessionFactory().openSession();

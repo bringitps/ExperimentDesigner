@@ -45,10 +45,14 @@ public class ViewHorizontalReportFilterByExpField {
     @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
 	private ExperimentField expField;
 
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CustomListId", unique=false, updatable=true)
+	private CustomList customList;
+
 	public ViewHorizontalReportFilterByExpField(Integer vwHorizontalRptFilterByExpFieldId,
 			String vwHorizontalRptFilterByExpFieldExpression, String vwHorizontalRptFilterByExpFieldOperation,
 			String vwHorizontalRptFilterByExpFieldValue1, String vwHorizontalRptFilterByExpFieldValue2,
-			ViewVerticalReportByExperiment vwHorizontalReportByExperiment, ExperimentField expField) {
+			ViewVerticalReportByExperiment vwHorizontalReportByExperiment, ExperimentField expField, CustomList customList) {
 		this.vwHorizontalRptFilterByExpFieldId = vwHorizontalRptFilterByExpFieldId;
 		this.vwHorizontalRptFilterByExpFieldExpression = vwHorizontalRptFilterByExpFieldExpression;
 		this.vwHorizontalRptFilterByExpFieldOperation = vwHorizontalRptFilterByExpFieldOperation;
@@ -56,6 +60,7 @@ public class ViewHorizontalReportFilterByExpField {
 		this.vwHorizontalRptFilterByExpFieldValue2 = vwHorizontalRptFilterByExpFieldValue2;
 		this.vwHorizontalReportByExperiment = vwHorizontalReportByExperiment;
 		this.expField = expField;
+		this.customList = customList;
 	}
 	
 	public ViewHorizontalReportFilterByExpField() {
@@ -66,6 +71,7 @@ public class ViewHorizontalReportFilterByExpField {
 		this.vwHorizontalRptFilterByExpFieldValue2 = null;
 		this.vwHorizontalReportByExperiment = null;
 		this.expField = null;
+		this.customList = null;
 	}
 
 	public Integer getVwHorizontalRptFilterByExpFieldId() {
@@ -123,6 +129,12 @@ public class ViewHorizontalReportFilterByExpField {
 	public void setExpField(ExperimentField expField) {
 		this.expField = expField;
 	}
-	
-	
+
+	public CustomList getCustomList() {
+		return customList;
+	}
+
+	public void setCustomList(CustomList customList) {
+		this.customList = customList;
+	}
 }

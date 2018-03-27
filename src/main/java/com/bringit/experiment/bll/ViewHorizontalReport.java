@@ -59,6 +59,9 @@ public class ViewHorizontalReport {
 	@Column(name="vwHorizontalRptKeyColumnName")
 	private String vwHorizontalRptKeyColumnName;
 
+	@Column(name="vwHorizontalRptKeyColumnDbId")
+	private String vwHorizontalRptKeyColumnDbId;
+
 	@Column(name="vwHorizontalRptKeyColumnDataType")
 	private String vwHorizontalRptKeyColumnDataType;
 
@@ -66,7 +69,7 @@ public class ViewHorizontalReport {
 			SysUser lastModifiedBy, Boolean vwHorizontalRptIsActive, String vwHorizontalRptName,
 			String vwHorizontalRptDbTableNameId, Date vwHorizontalRptDbTableLastUpdate,
 			String vwHorizontalRptDescription, String vwHorizontalRptKeyColumnName,
-			String vwHorizontalRptKeyColumnDataType) {
+			String vwHorizontalRptKeyColumnDbId, String vwHorizontalRptKeyColumnDataType) {
 		this.vwHorizontalRptId = vwHorizontalRptId;
 		this.createdDate = createdDate;
 		this.modifiedDate = modifiedDate;
@@ -78,6 +81,7 @@ public class ViewHorizontalReport {
 		this.vwHorizontalRptDbTableLastUpdate = vwHorizontalRptDbTableLastUpdate;
 		this.vwHorizontalRptDescription = vwHorizontalRptDescription;
 		this.vwHorizontalRptKeyColumnName = vwHorizontalRptKeyColumnName;
+		this.vwHorizontalRptKeyColumnDbId = vwHorizontalRptKeyColumnDbId;
 		this.vwHorizontalRptKeyColumnDataType = vwHorizontalRptKeyColumnDataType;
 	}
 	
@@ -93,6 +97,7 @@ public class ViewHorizontalReport {
 		this.vwHorizontalRptDbTableLastUpdate = null;
 		this.vwHorizontalRptDescription = null;
 		this.vwHorizontalRptKeyColumnName = null;
+		this.vwHorizontalRptKeyColumnDbId = null;
 		this.vwHorizontalRptKeyColumnDataType = null;
 	}
 
@@ -182,6 +187,14 @@ public class ViewHorizontalReport {
 
 	public void setVwHorizontalRptKeyColumnName(String vwHorizontalRptKeyColumnName) {
 		this.vwHorizontalRptKeyColumnName = vwHorizontalRptKeyColumnName;
+	}
+	
+	public String getVwHorizontalRptKeyColumnDbId() {
+		return vwHorizontalRptKeyColumnDbId;
+	}
+
+	public void setVwHorizontalRptKeyColumnDbId(String vwHorizontalRptKeyColumnDbId) {
+		this.vwHorizontalRptKeyColumnDbId = vwHorizontalRptKeyColumnDbId;
 	}
 
 	public String getVwHorizontalRptKeyColumnDataType() {

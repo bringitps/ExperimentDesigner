@@ -2,7 +2,7 @@
 <html>
  <head>
   <meta charset="UTF-8">
-  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;}">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
   <meta name="vaadin-version" content="7.7.0">
  </head> 
  <body> 
@@ -114,10 +114,47 @@
         </vaadin-horizontal-split-panel> 
        </vaadin-vertical-layout> 
       </tab> 
+      <tab caption="Key Column"> 
+       <vaadin-vertical-layout size-full margin _id="vwHorizontalRptKeyColumn"> 
+        <vaadin-horizontal-split-panel locked split-position="20%" _id="pnlVwHorizontalRptKeyColumn"> 
+         <vaadin-vertical-layout size-full _id="lytVwHorizontalRptKeyColumnTbl"> 
+          <vaadin-grid-layout width-full _id="gridKeyColumnDefinition"> 
+           <row> 
+            <column> 
+             <vaadin-text-field required-error="This field is mandatory." caption="Key Column Name:" required style-name="tiny" width="90%" _id="txtVwHorizontalRptKeyColName"></vaadin-text-field> 
+            </column> 
+           </row> 
+           <row> 
+            <column> 
+             <vaadin-text-field required-error="This field is mandatory. Only alphaNumeric characters, spaces and underscores are allowed." caption="Key Column Custom Id:" required style-name="tiny" width="90%" _id="txtVwHorizontalRptKeyColCustomId"></vaadin-text-field> 
+            </column> 
+           </row> 
+           <row> 
+            <column> 
+             <vaadin-combo-box required-error="This field is mandatory." caption="Key Column Data Type:" required style-name="tiny" width="90%" _id="cbxVwHorizontalRptKeyColDataType"></vaadin-combo-box> 
+            </column> 
+           </row> 
+          </vaadin-grid-layout> 
+         </vaadin-vertical-layout> 
+         <vaadin-vertical-layout style-name="well" size-full margin _id="lytVwHorizontalRptKeyColumnMapTbl"> 
+          <vaadin-table selectable caption="Key Column Mapping" size-full _id="tblKeyColumnMapping"> 
+           <table> 
+            <colgroup> 
+             <col property-id="*"> 
+             <col property-id="Data Source Table/Report"> 
+             <col property-id="Data Source Field"> 
+            </colgroup> 
+            <tbody></tbody> 
+           </table> 
+          </vaadin-table> 
+         </vaadin-vertical-layout> 
+        </vaadin-horizontal-split-panel> 
+       </vaadin-vertical-layout> 
+      </tab> 
       <tab caption="Report Columns"> 
        <vaadin-vertical-layout size-full margin _id="vwHorizontalRptColumns"> 
         <vaadin-horizontal-split-panel locked split-position="82%" _id="pnlVwHorizontalRptColumns"> 
-         <vaadin-vertical-layout size-full _id="lytVwHorizontalRptColumnsTbl"></vaadin-vertical-layout> 
+         <vaadin-horizontal-layout height="350px" _id="lytVwHorizontalRptColumnsPnls"></vaadin-horizontal-layout> 
          <vaadin-grid-layout spacing width-full height="70px" _id="gridBtnsVwHorizontalBtnColumns"> 
           <row> 
            <column> 

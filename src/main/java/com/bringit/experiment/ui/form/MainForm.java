@@ -301,6 +301,10 @@ public class MainForm extends MainFormDesign {
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new ViewVerticalReportForm());
                     break;
+                case "horizontal view report":
+                    formContentLayout.removeAllComponents();
+                    formContentLayout.addComponent(new ViewHorizontalReportForm());
+                    break;
                 case "contract manufacturers":
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new ContractManufacturerConfigForm());

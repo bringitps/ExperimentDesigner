@@ -32,7 +32,7 @@ public class ViewHorizontalReportFilterByTargetColumn {
 	private String vwHorizontalRptFilterByTargetColumnOperation;
 	
 	@Column(name="VwHorizontalRptFilterByTargetColumnValue1")
-	private String vwHorizontalRptFilteByTargetColumnValue1;
+	private String vwHorizontalRptFilterByTargetColumnValue1;
 
 	@Column(name="VwHorizontalRptFilterByTargetColumnValue2")
 	private String vwHorizontalRptFilterByTargetColumnValue2;
@@ -45,27 +45,33 @@ public class ViewHorizontalReportFilterByTargetColumn {
     @JoinColumn(name="targetColumnId", unique=false, updatable=true)
 	private TargetColumn targetColumn;
 
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CustomListId", unique=false, updatable=true)
+	private CustomList customList;
+	
 	public ViewHorizontalReportFilterByTargetColumn(Integer vwHorizontalRptFilterByTargetColumnId,
 			String vwHorizontalRptFilterByTargetColumnExpression, String vwHorizontalRptFilterByTargetColumnOperation,
-			String vwHorizontalRptFilteByTargetColumnValue1, String vwHorizontalRptFilterByTargetColumnValue2,
-			ViewHorizontalReportByTargetRpt vwHorizontalTargetRpt, TargetColumn targetColumn) {
+			String vwHorizontalRptFilterByTargetColumnValue1, String vwHorizontalRptFilterByTargetColumnValue2,
+			ViewHorizontalReportByTargetRpt vwHorizontalTargetRpt, TargetColumn targetColumn, CustomList customList) {
 		VwHorizontalRptFilterByTargetColumnId = vwHorizontalRptFilterByTargetColumnId;
 		this.vwHorizontalRptFilterByTargetColumnExpression = vwHorizontalRptFilterByTargetColumnExpression;
 		this.vwHorizontalRptFilterByTargetColumnOperation = vwHorizontalRptFilterByTargetColumnOperation;
-		this.vwHorizontalRptFilteByTargetColumnValue1 = vwHorizontalRptFilteByTargetColumnValue1;
+		this.vwHorizontalRptFilterByTargetColumnValue1 = vwHorizontalRptFilterByTargetColumnValue1;
 		this.vwHorizontalRptFilterByTargetColumnValue2 = vwHorizontalRptFilterByTargetColumnValue2;
 		this.vwHorizontalTargetRpt = vwHorizontalTargetRpt;
 		this.targetColumn = targetColumn;
+		this.customList = customList;
 	}
 
 	public ViewHorizontalReportFilterByTargetColumn() {
 		VwHorizontalRptFilterByTargetColumnId = null;
 		this.vwHorizontalRptFilterByTargetColumnExpression = null;
 		this.vwHorizontalRptFilterByTargetColumnOperation = null;
-		this.vwHorizontalRptFilteByTargetColumnValue1 = null;
+		this.vwHorizontalRptFilterByTargetColumnValue1 = null;
 		this.vwHorizontalRptFilterByTargetColumnValue2 = null;
 		this.vwHorizontalTargetRpt = null;
 		this.targetColumn = null;
+		this.customList = null;
 	}
 
 	public Integer getVwHorizontalRptFilterByTargetColumnId() {
@@ -92,12 +98,12 @@ public class ViewHorizontalReportFilterByTargetColumn {
 		this.vwHorizontalRptFilterByTargetColumnOperation = vwHorizontalRptFilterByTargetColumnOperation;
 	}
 
-	public String getVwHorizontalRptFilteByTargetColumnValue1() {
-		return vwHorizontalRptFilteByTargetColumnValue1;
+	public String getVwHorizontalRptFilterByTargetColumnValue1() {
+		return vwHorizontalRptFilterByTargetColumnValue1;
 	}
 
-	public void setVwHorizontalRptFilteByTargetColumnValue1(String vwHorizontalRptFilteByTargetColumnValue1) {
-		this.vwHorizontalRptFilteByTargetColumnValue1 = vwHorizontalRptFilteByTargetColumnValue1;
+	public void setVwHorizontalRptFilterByTargetColumnValue1(String vwHorizontalRptFilterByTargetColumnValue1) {
+		this.vwHorizontalRptFilterByTargetColumnValue1 = vwHorizontalRptFilterByTargetColumnValue1;
 	}
 
 	public String getVwHorizontalRptFilterByTargetColumnValue2() {
@@ -124,5 +130,11 @@ public class ViewHorizontalReportFilterByTargetColumn {
 		this.targetColumn = targetColumn;
 	}
 
-	
+	public CustomList getCustomList() {
+		return customList;
+	}
+
+	public void setCustomList(CustomList customList) {
+		this.customList = customList;
+	}	
 }

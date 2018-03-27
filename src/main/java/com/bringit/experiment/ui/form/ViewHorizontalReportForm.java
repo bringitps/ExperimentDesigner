@@ -71,7 +71,7 @@ public class ViewHorizontalReportForm extends ViewHorizontalReportDesign {
 		Window vwHorizontalReportBuilderModalWindow = new Window("View Horizontal Report Builder");
 		vwHorizontalReportBuilderModalWindow.setModal(true);
 		vwHorizontalReportBuilderModalWindow.setResizable(false);
-		vwHorizontalReportBuilderModalWindow.setContent(new ViewVerticalReportBuilderForm(vwHorizontalReportId));
+		vwHorizontalReportBuilderModalWindow.setContent(new ViewHorizontalReportBuilderForm(vwHorizontalReportId));
 		vwHorizontalReportBuilderModalWindow.setWidth(993, Unit.PIXELS);
 		vwHorizontalReportBuilderModalWindow.setHeight(660, Unit.PIXELS);
 		vwHorizontalReportBuilderModalWindow.center();

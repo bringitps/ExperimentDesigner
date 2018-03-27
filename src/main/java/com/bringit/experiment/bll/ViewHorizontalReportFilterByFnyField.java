@@ -53,13 +53,17 @@ public class ViewHorizontalReportFilterByFnyField {
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FnyInfoFieldId", unique=false, updatable=true)
 	private FinalPassYieldInfoField FnyInfoField;
-	
+
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CustomListId", unique=false, updatable=true)
+	private CustomList customList;
+
 	public ViewHorizontalReportFilterByFnyField(Integer vwHorizontalRptFilterByFnyFieldId,
 			String vwHorizontalRptFilterByFnyFieldExpression, String vwHorizontalRptFilterByFnyFieldOperation,
 			String vwHorizontalRptFilterByFnyFieldValue1, String vwHorizontalRptFilterByFnyFieldValue2,
 			Boolean vwHorizontalRptFilterByFnyIsDateTimeExpField, Boolean vwHorizontalRptFilterByFnySNExpField,
 			Boolean vwHorizontalRptFilterByFnyIsResultExpField, ViewHorizontalReportByFnyRpt vwHorizontalFnyRpt,
-			FinalPassYieldInfoField FnyInfoField) {
+			FinalPassYieldInfoField FnyInfoField, CustomList customList) {
 		this.vwHorizontalRptFilterByFnyFieldId = vwHorizontalRptFilterByFnyFieldId;
 		this.vwHorizontalRptFilterByFnyFieldExpression = vwHorizontalRptFilterByFnyFieldExpression;
 		this.vwHorizontalRptFilterByFnyFieldOperation = vwHorizontalRptFilterByFnyFieldOperation;
@@ -70,6 +74,7 @@ public class ViewHorizontalReportFilterByFnyField {
 		this.vwHorizontalRptFilterByFnyIsResultExpField = vwHorizontalRptFilterByFnyIsResultExpField;
 		this.vwHorizontalFnyRpt = vwHorizontalFnyRpt;
 		this.FnyInfoField = FnyInfoField;
+		this.customList = customList;
 	}
 
 	public ViewHorizontalReportFilterByFnyField() {
@@ -83,6 +88,7 @@ public class ViewHorizontalReportFilterByFnyField {
 		this.vwHorizontalRptFilterByFnyIsResultExpField = null;
 		this.vwHorizontalFnyRpt = null;
 		this.FnyInfoField = null;
+		this.customList = null;
 	}
 
 	public Integer getVwHorizontalRptFilterByFnyFieldId() {
@@ -164,6 +170,12 @@ public class ViewHorizontalReportFilterByFnyField {
 	public void setFnyInfoField(FinalPassYieldInfoField FnyInfoField) {
 		this.FnyInfoField = FnyInfoField;
 	}
-	
-	
+
+	public CustomList getCustomList() {
+		return customList;
+	}
+
+	public void setCustomList(CustomList customList) {
+		this.customList = customList;
+	}
 }

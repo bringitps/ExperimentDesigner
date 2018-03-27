@@ -139,7 +139,5 @@ public class ViewVerticalReportFilterByExpField {
 	public void setCustomList(CustomList customList) {
 		this.customList = customList;
 	}
-	
-	
-	
+		
 }

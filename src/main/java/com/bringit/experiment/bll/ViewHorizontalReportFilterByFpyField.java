@@ -54,12 +54,16 @@ public class ViewHorizontalReportFilterByFpyField {
     @JoinColumn(name="FpyInfoFieldId", unique=false, updatable=true)
 	private FirstPassYieldInfoField fpyInfoField;
 
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="CustomListId", unique=false, updatable=true)
+	private CustomList customList;
+	
 	public ViewHorizontalReportFilterByFpyField(Integer vwHorizontalRptFilterByFpyFieldId,
 			String vwHorizontalRptFilterByFpyFieldExpression, String vwHorizontalRptFilterByFpyFieldOperation,
 			String vwHorizontalRptFilterByFpyFieldValue1, String vwHorizontalRptFilterByFpyFieldValue2,
 			Boolean vwHorizontalRptFilterByFpyIsDateTimeExpField, Boolean vwHorizontalRptFilterByFpySNExpField,
 			Boolean vwHorizontalRptFilterByFpyIsResultExpField, ViewHorizontalReportByFpyRpt vwHorizontalFpyRpt,
-			FirstPassYieldInfoField fpyInfoField) {
+			FirstPassYieldInfoField fpyInfoField, CustomList customList) {
 		this.vwHorizontalRptFilterByFpyFieldId = vwHorizontalRptFilterByFpyFieldId;
 		this.vwHorizontalRptFilterByFpyFieldExpression = vwHorizontalRptFilterByFpyFieldExpression;
 		this.vwHorizontalRptFilterByFpyFieldOperation = vwHorizontalRptFilterByFpyFieldOperation;
@@ -70,6 +74,7 @@ public class ViewHorizontalReportFilterByFpyField {
 		this.vwHorizontalRptFilterByFpyIsResultExpField = vwHorizontalRptFilterByFpyIsResultExpField;
 		this.vwHorizontalFpyRpt = vwHorizontalFpyRpt;
 		this.fpyInfoField = fpyInfoField;
+		this.customList = customList;
 	}
 	
 	public ViewHorizontalReportFilterByFpyField() {
@@ -83,6 +88,7 @@ public class ViewHorizontalReportFilterByFpyField {
 		this.vwHorizontalRptFilterByFpyIsResultExpField = null;
 		this.vwHorizontalFpyRpt = null;
 		this.fpyInfoField = null;
+		this.customList = null;
 	}
 
 	public Integer getVwHorizontalRptFilterByFpyFieldId() {
@@ -164,6 +170,12 @@ public class ViewHorizontalReportFilterByFpyField {
 	public void setFpyInfoField(FirstPassYieldInfoField fpyInfoField) {
 		this.fpyInfoField = fpyInfoField;
 	}
-	
-	
+
+	public CustomList getCustomList() {
+		return customList;
+	}
+
+	public void setCustomList(CustomList customList) {
+		this.customList = customList;
+	}
 }

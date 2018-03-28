@@ -504,6 +504,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		//START: Load report columns enrichment
 		loadTblEnrichmentRulesData();
 		
+		
+		
 		this.btnAddEnrichment.addClickListener(new Button.ClickListener() {
 			
 			@Override

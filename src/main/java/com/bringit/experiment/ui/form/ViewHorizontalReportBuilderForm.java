@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -156,6 +157,30 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 	
 	public ViewHorizontalReportBuilderForm(Integer vwHorizontalRptId)
 	{
+
+		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
+		
+		Config configuration = new Config();
+		if(configuration.getProperty("dbms").equals("sqlserver"))
+			dbfieldTypes = configuration.getProperty("sqlserverdatatypes").split(",");
+		 
+		for(int j=0; j<dbfieldTypes.length; j++)
+		{
+			cbxVwHorizontalRptKeyColDataType.addItem(dbfieldTypes[j]);
+			cbxVwHorizontalRptKeyColDataType.setItemCaption(dbfieldTypes[j], dbfieldTypes[j]);
+		}
+		
+		//START: load report key columns
+		loadReportKeyColumnsTable();
+		
+		cbxVwHorizontalRptKeyColDataType.addValueChangeListener(new ValueChangeListener() {
+
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+            	onChangeCbxVwHorizontalRptKeyColDataType(cbxVwHorizontalRptKeyColDataType);
+            }
+        });
+		
 		if(vwHorizontalRptId == null || vwHorizontalRptId == -1)
 			isNewRecord = true;
 		else
@@ -229,13 +254,13 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			this.txtVwHorizontalRptCustomId.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptDbTableNameId().replace("vwhorizontal#", ""));
 			this.txtVwHorizontalDescription.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptDescription());
 			this.chxActive.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptIsActive());
+			
+			//Load Key Column information
+			this.txtVwHorizontalRptKeyColName.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptKeyColumnName());
+			this.txtVwHorizontalRptKeyColCustomId.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptDbTableNameId());
+			this.cbxVwHorizontalRptKeyColDataType.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptKeyColumnDataType());
 		}
 		
-		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
-		
-		Config configuration = new Config();
-		if(configuration.getProperty("dbms").equals("sqlserver"))
-			dbfieldTypes = configuration.getProperty("sqlserverdatatypes").split(",");
 		
 		//START: Data source selection
 		
@@ -251,16 +276,22 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		for(int i=0; activeExperiments != null && i<activeExperiments.size(); i++)
 		{
 			optGrpPnlExperiments.addItem(activeExperiments.get(i).getExpId());
-			optGrpPnlExperiments.setItemCaption(activeExperiments.get(i).getExpId(), activeExperiments.get(i).getExpName());
-			
+			optGrpPnlExperiments.setItemCaption(activeExperiments.get(i).getExpId(), activeExperiments.get(i).getExpName());			
 			if(vwHorizontalRptId != null && vwHorizontalRptId > -1 && vwHorizontalRptByExperimentDbIds.indexOf(activeExperiments.get(i).getExpId()) != -1)
-				optGrpPnlExperiments.select(activeExperiments.get(i).getExpId());			
+			{
+				optGrpPnlExperiments.select(activeExperiments.get(i).getExpId());
+				
+				//Add report key column
+				//addReportKeyColumn(activeExperiments.get(i).getExpId(), null, null, null, null);
+			}
 		}
 		
 		optGrpPnlExperiments.addValueChangeListener(new ValueChangeListener(){
            @Override
 			public void valueChange(ValueChangeEvent event) {
+        	   refreshColumnKeysTable();
         	   //refreshExperimentDataSourceElements();
+        	   //System.out.println("Selected experiment:" + event.getProperty().getValue());
            }
         });
 		
@@ -291,6 +322,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		optGrpPnlFpyReports.addValueChangeListener(new ValueChangeListener(){
            @Override
 			public void valueChange(ValueChangeEvent event) {
+        	   refreshColumnKeysTable();
         	   //refreshFpyRptDataSourceElements();
            }
         });
@@ -321,6 +353,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		optGrpPnlFnyReports.addValueChangeListener(new ValueChangeListener(){
            @Override
 			public void valueChange(ValueChangeEvent event) {
+        	   refreshColumnKeysTable();
         	   //refreshFnyRptDataSourceElements();
            }
         });
@@ -350,6 +383,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		optGrpPnlFtyReports.addValueChangeListener(new ValueChangeListener(){
            @Override
 			public void valueChange(ValueChangeEvent event) {
+        	   refreshColumnKeysTable();
         	   //refreshFtyRptDataSourceElements();
            }
         });
@@ -392,6 +426,13 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 
 		//END: Data source selection
 		
+		this.cbxVwHorizontalRptKeyColDataType.addValueChangeListener(new ValueChangeListener(){
+	           @Override
+				public void valueChange(ValueChangeEvent event) {
+	        	   refreshColumnKeysTable();
+	           }
+	        });
+		
 		//START: Load data tables
 		loadDataSourceFilterTable();
 		
@@ -415,10 +456,61 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 					tblReportFilters.removeItem(tblReportFilters.getValue());
 				}	
 			}
-		}));
+		}));					
+		
+		//START: Load report columns enrichment
+		loadTblEnrichmentRulesData();
+		
+		
+		this.btnAddEnrichment.addClickListener(new Button.ClickListener() {
 			
-		//START: load report key columns
-		loadReportKeyColumnsTable();		
+			@Override
+			public void buttonClick(ClickEvent event) {
+				addTblEnrichmentRule(null, null);
+			}
+
+		});
+
+		this.btnRemoveEnrichment.addClickListener((new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				if(tblColumnsEnrichment.getValue() != null)
+				{
+					dbIdOfVwVertRptEnrichmentToDelete.add(Integer.parseInt(tblColumnsEnrichment.getValue().toString()));
+					tblColumnsEnrichment.removeItem(tblColumnsEnrichment.getValue());
+				}	
+			}
+		}));
+		
+		this.btnSave.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				//onSave();
+			}
+		});
+		
+		
+
+		this.btnCancel.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				//closeModalWindow();
+			}
+
+		});
+		
+		this.btnDelete.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				//onDelete();
+			}
+
+		});		
+		
 		
 		this.btnAddVwHorizontalRptColumn.addClickListener(new Button.ClickListener() {
 		
@@ -427,8 +519,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				addReportColumn(null, null);
 			}
 
-		});
-		
+		});	
 		
 		
 	}
@@ -1505,7 +1596,510 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		tblKeyColumnMapping.setEditable(true);
 		tblKeyColumnMapping.setPageLength(0);		
 	}
+	
+	private void loadTblEnrichmentRulesData()
+	{
+		this.tblColumnsEnrichment.setContainerDataSource(null);
+		this.tblColumnsEnrichment.setStyleName("small");
+		this.tblColumnsEnrichment.addContainerProperty("*", CheckBox.class, null);
+		this.tblColumnsEnrichment.addContainerProperty("Report Column", ComboBox.class, null);
+		this.tblColumnsEnrichment.addContainerProperty("Operator", ComboBox.class, null);
+		this.tblColumnsEnrichment.addContainerProperty("Value", TextField.class, null);
+		this.tblColumnsEnrichment.addContainerProperty("Enrichment Type", ComboBox.class, null);
+		this.tblColumnsEnrichment.addContainerProperty("Custom List", ComboBox.class, null);
+		this.tblColumnsEnrichment.addContainerProperty("List Value", ComboBox.class, null);
+		this.tblColumnsEnrichment.addContainerProperty("Static Value", TextField.class, null);
+		this.tblColumnsEnrichment.setEditable(true);
+		this.tblColumnsEnrichment.setPageLength(0);
+		this.tblColumnsEnrichment.setColumnWidth("*", 20);
+	}
+	
+	private void addTblEnrichmentRule(Integer horizontalRptEnrichmentRuleId, ViewHorizontalReportColumnByEnrichment vwHorizontalRptColumnsByEnrichment)
+	{		
+		Integer itemId = horizontalRptEnrichmentRuleId;
+		if(itemId == null)
+		{	
+			this.lastHorizontalRptEnrichmentItemId = this.lastHorizontalRptEnrichmentItemId - 1;
+			itemId = this.lastHorizontalRptEnrichmentItemId;
+		}
 		
+		Object[] itemValues = new Object[8];
+		
+		//Dummy Initial Column
+		CheckBox chxSelect = new CheckBox();
+		chxSelect.setStyleName("tiny");
+		chxSelect.setVisible(false);
+		chxSelect.setHeight(20, Unit.PIXELS);
+		itemValues[0] = chxSelect;
+		
+		//Fill Report Columns ComboBox
+		ComboBox cbxRptColumnSource = new ComboBox("");
+		cbxRptColumnSource.setStyleName("tiny");
+		cbxRptColumnSource.setRequired(true);
+		cbxRptColumnSource.setRequiredError("This field is required.");
+		
+		/*
+		Collection rptColumnItemIds = this.tblVwHorizontalRptCols.getContainerDataSource().getItemIds();
+		
+		for (Object rptColumnItemIdObj : rptColumnItemIds) 
+		{
+			//int rptColumnItemId = (int)rptColumnItemIdObj;
+			Item tblEnrichmentRuleRowItem = this.tblVwVerticalRptCols.getContainerDataSource().getItem(rptColumnItemIdObj);
+			
+			if (tblVwVerticalRptCols.hasChildren(rptColumnItemIdObj))
+			{
+				cbxRptColumnSource.addItem(((TextField)(tblEnrichmentRuleRowItem.getItemProperty("DB Column Name").getValue())).getValue().toString());
+				cbxRptColumnSource.setItemCaption(((TextField)(tblEnrichmentRuleRowItem.getItemProperty("DB Column Name").getValue())).getValue().toString(), ((TextField)(tblEnrichmentRuleRowItem.getItemProperty("Column Name").getValue())).getValue().toString());
+				cbxRptColumnSource.setWidth(100, Unit.PERCENTAGE);
+			}
+		}
+		*/
+		
+		cbxRptColumnSource.setHeight(20, Unit.PIXELS);
+		itemValues[1] = cbxRptColumnSource;
+		
+				
+		//Fill Operator ComboBox
+		ComboBox cbxOperator = new ComboBox("");
+		cbxOperator.setContainerDataSource(null);
+		cbxOperator.setStyleName("tiny");		
+		cbxOperator.addItem("contains");
+		cbxOperator.setItemCaption("contains", "contains");
+		cbxOperator.addItem("doesnotcontain");
+		cbxOperator.setItemCaption("doesnotcontain", "does not contain");
+		cbxOperator.addItem("doesnotstartwith");
+		cbxOperator.setItemCaption("doesnotstartwith", "does not start with");
+		cbxOperator.addItem("endswith");
+		cbxOperator.setItemCaption("endswith", "ends with");
+		cbxOperator.addItem("is");
+		cbxOperator.setItemCaption("is", "is");
+		cbxOperator.addItem("isempty");
+		cbxOperator.setItemCaption("isempty", "is empty");
+		cbxOperator.addItem("isnot");
+		cbxOperator.setItemCaption("isnot", "is not");
+		cbxOperator.addItem("isnotempty");
+		cbxOperator.setItemCaption("isnotempty", "is not empty");
+		cbxOperator.addItem("startswith");
+		cbxOperator.setItemCaption("startswith", "starts with");
+		cbxOperator.addItem("matchesregex");
+		cbxOperator.setItemCaption("matchesregex", "matches Regular Expression");
+		cbxOperator.select("is");
+		cbxOperator.setHeight(20, Unit.PIXELS);
+		itemValues[2] = cbxOperator;
+		
+		//Comparison Value TextField
+		TextField txtComparisonValue = new TextField();
+		txtComparisonValue.addStyleName("tiny");
+		txtComparisonValue.setWidth(100, Unit.PIXELS);
+		txtComparisonValue.setHeight(20, Unit.PIXELS);
+		itemValues[3] = txtComparisonValue;
+		
+		//Fill Enrichment Type ComboBox
+		ComboBox cbxEnrichmentType = new ComboBox("");
+		cbxEnrichmentType.setContainerDataSource(null);
+		cbxEnrichmentType.setStyleName("tiny");		
+		cbxEnrichmentType.addItem("customlist");
+		cbxEnrichmentType.setItemCaption("customlist", "Custom List XREF");
+		cbxEnrichmentType.addItem("staticvalue");
+		cbxEnrichmentType.setItemCaption("staticvalue", "Static Value");
+		cbxEnrichmentType.addItem("positivenumber");
+		cbxEnrichmentType.setItemCaption("positivenumber", "Cast to Positive Number");
+		cbxEnrichmentType.addItem("negativenumber");
+		cbxEnrichmentType.setItemCaption("negativenumber", "Cast to Negative Number");
+		cbxEnrichmentType.select("customlist");
+		cbxEnrichmentType.setId(itemId.toString()); //Item Id to be reused on Change event
+
+		cbxEnrichmentType.setHeight(20, Unit.PIXELS);
+		itemValues[4] = cbxEnrichmentType;
+		
+		//Fill Custom List ComboBox
+		ComboBox cbxCustomList = new ComboBox("");
+		cbxCustomList.setContainerDataSource(null);
+		cbxCustomList.setStyleName("tiny");		
+		cbxCustomList.setId(itemId.toString()); //Item Id to be reused on Change event
+		List<CustomList> customLists = new CustomListDao().getAllCustomLists();
+
+		for(int i=0; i<customLists.size(); i++)
+		{
+			cbxCustomList.addItem(customLists.get(i).getCustomListId());
+			cbxCustomList.setItemCaption(customLists.get(i).getCustomListId(), customLists.get(i).getCustomListName());
+			cbxCustomList.setWidth(100, Unit.PERCENTAGE);
+		}
+		
+		cbxCustomList.setHeight(20, Unit.PIXELS);
+		itemValues[5] = cbxCustomList;
+		
+		//Fill Custom List Value ComboBox
+		ComboBox cbxCustomListValue = new ComboBox("");
+		cbxCustomListValue.setContainerDataSource(null);
+		cbxCustomListValue.setStyleName("tiny");	
+		cbxCustomListValue.setHeight(20, Unit.PIXELS);
+		itemValues[6] = cbxCustomListValue;
+		
+		//Static Value TextField
+		TextField txtStaticValue = new TextField();
+		txtStaticValue.addStyleName("tiny");
+		txtStaticValue.setWidth(100, Unit.PIXELS);
+		txtStaticValue.setEnabled(false);
+		txtStaticValue.setHeight(20, Unit.PIXELS);
+		itemValues[7] = txtStaticValue;
+		
+
+		cbxEnrichmentType.addValueChangeListener(new ValueChangeListener() {
+
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+            	onChangeEnrichmentType(cbxCustomList, cbxCustomListValue, txtStaticValue, cbxEnrichmentType);
+            }
+        });
+
+		cbxCustomList.addValueChangeListener(new ValueChangeListener() {
+
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+            	onChangeCustomList(cbxCustomListValue, cbxCustomList);
+            }
+        });		
+		
+		if(itemId != null && vwHorizontalRptColumnsByEnrichment != null)
+		{
+			cbxRptColumnSource.setValue(vwHorizontalRptColumnsByEnrichment.getVwHorizontalReportColumn().getVwHorizontalRptColumnDbId());
+			cbxOperator.setValue(vwHorizontalRptColumnsByEnrichment.getVwHorizontalRptColumnEnrichmentOperation());
+			txtComparisonValue.setValue(vwHorizontalRptColumnsByEnrichment.getVwHorizontalRptColumnEnrichmentValue());
+			cbxEnrichmentType.setValue(vwHorizontalRptColumnsByEnrichment.getVwHorizontalRptColumnEnrichmentType());
+			cbxCustomList.setValue(vwHorizontalRptColumnsByEnrichment.getCustomListValue());
+			cbxCustomListValue.setValue(vwHorizontalRptColumnsByEnrichment.getCustomListValue());
+			txtStaticValue.setValue(vwHorizontalRptColumnsByEnrichment.getVwHorizontalRptColumnEnrichmentStaticValue());			
+		}
+		
+		this.tblColumnsEnrichment.addItem(itemValues, itemId);		
+	}
+	
+	private void onChangeEnrichmentType(ComboBox cbxCustomList, ComboBox cbxCustomListValue, TextField txtStaticValue, ComboBox cbxEnrichmentType)
+	{
+		if(cbxEnrichmentType.getValue() != null && !cbxEnrichmentType.getValue().toString().isEmpty())
+		{
+			if("customlist".equals(cbxEnrichmentType.getValue()))
+			{
+				cbxCustomList.setEnabled(true);
+				cbxCustomListValue.setEnabled(true);
+				txtStaticValue.setValue("");
+				txtStaticValue.setEnabled(false);
+			}
+			if("staticvalue".equals(cbxEnrichmentType.getValue()))
+			{
+				cbxCustomList.setValue(null);
+				cbxCustomList.setEnabled(false);
+				cbxCustomListValue.setValue(null);
+				cbxCustomListValue.setEnabled(false);
+				txtStaticValue.setEnabled(true);
+			}
+			if(!"customlist".equals(cbxEnrichmentType.getValue()) && !"staticvalue".equals(cbxEnrichmentType.getValue()))
+			{
+				cbxCustomList.setValue(null);
+				cbxCustomList.setEnabled(false);
+				cbxCustomListValue.setValue(null);
+				cbxCustomListValue.setEnabled(false);
+				txtStaticValue.setValue("");
+				txtStaticValue.setEnabled(false);
+			}
+			
+		}
+	}
+
+	private void onChangeCustomList(ComboBox cbxCustomListValue, ComboBox cbxCustomList)
+	{
+		cbxCustomListValue.setContainerDataSource(null);
+		
+		if(cbxCustomList.getValue() != null && !cbxCustomList.getValue().toString().isEmpty())
+		{
+			Integer selectedCustomListId = (Integer)cbxCustomList.getValue();
+			
+			List<CustomListValue> customListValues = new CustomListValueDao().getAllCustomListValuesByCustomList(new CustomListDao().getCustomListById(selectedCustomListId));
+			for(int i=0; i<customListValues.size(); i++)
+			{
+				cbxCustomListValue.addItem(customListValues.get(i).getCustomListValueId());
+				cbxCustomListValue.setItemCaption(customListValues.get(i).getCustomListValueId(), customListValues.get(i).getCustomListValueString());
+			}
+		}
+	}
+	
+	private void onChangeCbxVwHorizontalRptKeyColDataType(ComboBox cbxVwHorizontalRptKeyColDataType)
+	{
+		refreshColumnKeysTable();
+	}
+	
+	private void refreshColumnKeysTable()
+	{
+		List<String> currentDataSourcesIds = new ArrayList<String>();
+		List<String> changedDataSourcesIds = new ArrayList<String>();
+		List<String> changedDataSourcesNames = new ArrayList<String>();
+		List<String> dataSourcesIdsToAdd = new ArrayList<String>();
+		List<String> dataSourcesNamesToAdd = new ArrayList<String>();
+		List<String> dataSourcesIdsToDelete = new ArrayList<String>();
+		
+		if(this.tblKeyColumnMapping.getContainerDataSource().getItemIds() != null)
+		{
+			for (Object rptKeyColMappingItemId: this.tblKeyColumnMapping.getContainerDataSource().getItemIds()) 
+			{
+				Item tblVwHorizontalRptKeyColMappingRowItem = tblKeyColumnMapping.getContainerDataSource().getItem(rptKeyColMappingItemId);
+				
+				ComboBox cbxDataSource = (ComboBox)(tblVwHorizontalRptKeyColMappingRowItem.getItemProperty("Data Source Table/Report").getValue());
+				//ComboBox cbxDataSourceField = (ComboBox)(tblVwHorizontalRptKeyColMappingRowItem.getItemProperty("Data Source Field").getValue());
+				if(cbxDataSource != null)
+					currentDataSourcesIds.add(cbxDataSource.getValue().toString());
+			}
+		}
+		
+		Set<Item> selectedOptGrpPnlExperiments = (Set<Item>) optGrpPnlExperiments.getValue();
+		for (Object selectedExperiment : selectedOptGrpPnlExperiments)
+		{
+			for(int i=0; activeExperiments != null && i<activeExperiments.size(); i++)
+			{
+				int selectedExperimentId = Integer.parseInt(selectedExperiment.toString());				
+				if(activeExperiments.get(i).getExpId() == selectedExperimentId)
+				{
+					//System.out.println("Selected experiment:" + selectedExperimentId);
+					changedDataSourcesIds.add("exp_" + selectedExperimentId);
+					changedDataSourcesNames.add("EXP : " + activeExperiments.get(i).getExpName());
+					break;
+				}
+			}
+		}
+		
+		Set<Item> selectedOptGrpPnlFpyRpts = (Set<Item>) optGrpPnlFpyReports.getValue();
+		for (Object selectedFpyRpt : selectedOptGrpPnlFpyRpts)
+		{
+			for(int i=0; activeFpyReports != null && i<activeFpyReports.size(); i++)
+			{
+				int selectedFpyReportId = Integer.parseInt(selectedFpyRpt.toString());
+				if(activeFpyReports.get(i).getFpyReportId() == selectedFpyReportId)
+				{
+					//System.out.println("Selected fpy report:" + selectedFpyReportId);
+					changedDataSourcesIds.add("fpy_" + selectedFpyReportId);
+					changedDataSourcesNames.add("FPY : " + activeFpyReports.get(i).getFpyReportName());					
+					break;
+				}
+			}
+		}
+		
+		Set<Item> selectedOptGrpPnlFnyRpts = (Set<Item>) optGrpPnlFnyReports.getValue();
+		for (Object selectedFnyRpt : selectedOptGrpPnlFnyRpts)
+		{
+			for(int i=0; activeFnyReports != null && i<activeFnyReports.size(); i++)
+			{
+				int selectedFnyReportId = Integer.parseInt(selectedFnyRpt.toString());
+				if(activeFnyReports.get(i).getFnyReportId() == selectedFnyReportId)
+				{
+					//System.out.println("Selected fny report:" + selectedFnyReportId);
+					changedDataSourcesIds.add("fny_" + selectedFnyReportId);
+					changedDataSourcesNames.add("FNY : " + activeFnyReports.get(i).getFnyReportName());
+					break;
+				}
+			}
+		}
+		
+		Set<Item> selectedOptGrpPnlFtyRpts = (Set<Item>) optGrpPnlFtyReports.getValue();
+		for (Object selectedFtyRpt : selectedOptGrpPnlFtyRpts)
+		{
+			for(int i=0; activeFtyReports != null && i<activeFtyReports.size(); i++)
+			{
+				int selectedFtyReportId = Integer.parseInt(selectedFtyRpt.toString());
+				if(activeFtyReports.get(i).getFtyReportId() == selectedFtyReportId)
+				{
+					//System.out.println("Selected fty report:" + selectedFtyReportId);
+					changedDataSourcesIds.add("fty_" + selectedFtyReportId);
+					changedDataSourcesNames.add("FTY : " + activeFtyReports.get(i).getFtyReportName());
+					break;
+				}
+			}
+		}	
+		
+		Set<Item> selectedOptGrpPnlTargetRpts = (Set<Item>) optGrpPnlTargetReports.getValue();
+		for (Object selectedTargetRpt : selectedOptGrpPnlTargetRpts)
+		{
+			for(int i=0; activeTargetReports != null && i<activeTargetReports.size(); i++)
+			{
+				int selectedTargetReportId = Integer.parseInt(selectedTargetRpt.toString());
+				if(activeTargetReports.get(i).getTargetReportId() == selectedTargetReportId)
+				{
+					//System.out.println("Selected target report:" + selectedTargetReportId);
+					changedDataSourcesIds.add("tgt_" + selectedTargetReportId);
+					changedDataSourcesNames.add("Target : " + activeTargetReports.get(i).getTargetReportName());
+					break;
+				}
+			}
+		}
+		
+		//Identify new datasources
+		for(int i=0; i<changedDataSourcesIds.size(); i++)
+		{
+			if(currentDataSourcesIds.indexOf(changedDataSourcesIds.get(i)) == -1)
+			{
+				dataSourcesIdsToAdd.add(changedDataSourcesIds.get(i));
+				dataSourcesNamesToAdd.add(changedDataSourcesNames.get(i));
+			}
+		}		
+
+		//Identify datasources to remove
+		for(int i=0; i<currentDataSourcesIds.size(); i++)
+		{
+			if(changedDataSourcesIds.indexOf(currentDataSourcesIds.get(i)) == -1)
+				dataSourcesIdsToDelete.add(currentDataSourcesIds.get(i));
+		}
+		
+		
+		for(int i=0; i<dataSourcesIdsToAdd.size(); i++)
+		{
+			Object[] rptKeyColMapItemValues = new Object[2];
+
+			//Loading field types				
+			ComboBox cbxDataSource = new ComboBox("");
+			cbxDataSource.setStyleName("tiny");
+			cbxDataSource.setRequired(true);
+			cbxDataSource.setRequiredError("This field is required.");
+			cbxDataSource.setHeight(20, Unit.PIXELS);
+			cbxDataSource.setWidth(100, Unit.PERCENTAGE);	
+			cbxDataSource.addItem(dataSourcesIdsToAdd.get(i));
+			cbxDataSource.setItemCaption(dataSourcesIdsToAdd.get(i), dataSourcesNamesToAdd.get(i));
+			cbxDataSource.setValue(dataSourcesIdsToAdd.get(i));
+			cbxDataSource.setReadOnly(true);
+			rptKeyColMapItemValues[0] = cbxDataSource;
+			
+			ComboBox cbxDataSourceField = new ComboBox("");
+			cbxDataSourceField.setStyleName("tiny");
+			cbxDataSourceField.setRequired(true);
+			cbxDataSourceField.setRequiredError("This field is required.");
+			cbxDataSourceField.setHeight(20, Unit.PIXELS);
+			cbxDataSourceField.setWidth(100, Unit.PERCENTAGE);
+			rptKeyColMapItemValues[1] = cbxDataSourceField;
+			
+			tblKeyColumnMapping.addItem(rptKeyColMapItemValues, dataSourcesIdsToAdd.get(i));
+		}
+		
+		for(int i=0; i<dataSourcesIdsToDelete.size(); i++)
+			tblKeyColumnMapping.removeItem(dataSourcesIdsToDelete.get(i));
+		
+		System.out.println("Selected Key Col Data Type: " + cbxVwHorizontalRptKeyColDataType.getValue());
+		
+		if(this.cbxVwHorizontalRptKeyColDataType != null && this.cbxVwHorizontalRptKeyColDataType.getValue() != null)
+		{
+			if(this.tblKeyColumnMapping.getContainerDataSource().getItemIds() != null)
+			{
+				for (Object rptKeyColMappingItemId: this.tblKeyColumnMapping.getContainerDataSource().getItemIds()) 
+				{
+					Item tblVwHorizontalRptKeyColMappingRowItem = tblKeyColumnMapping.getContainerDataSource().getItem(rptKeyColMappingItemId);
+					ComboBox cbxDataSource = (ComboBox)(tblVwHorizontalRptKeyColMappingRowItem.getItemProperty("Data Source Table/Report").getValue());
+					ComboBox cbxDataSourceField = (ComboBox)(tblVwHorizontalRptKeyColMappingRowItem.getItemProperty("Data Source Field").getValue());
+					String dataSourceIdStr = cbxDataSource.getValue().toString();
+					
+					Integer expDataSourceId = dataSourceIdStr.startsWith("exp") ? Integer.parseInt(dataSourceIdStr.substring(4)) : null;
+					Integer fpyDataSourceId = dataSourceIdStr.startsWith("fpy") ? Integer.parseInt(dataSourceIdStr.substring(4)) : null;
+					Integer fnyDataSourceId = dataSourceIdStr.startsWith("fny") ? Integer.parseInt(dataSourceIdStr.substring(4)) : null;
+					Integer ftyDataSourceId = dataSourceIdStr.startsWith("fty") ? Integer.parseInt(dataSourceIdStr.substring(4)) : null;
+					Integer tgtDataSourceId = dataSourceIdStr.startsWith("tgt") ? Integer.parseInt(dataSourceIdStr.substring(4)) : null;
+
+					cbxDataSourceField.setContainerDataSource(null);
+					
+					fillCbxDataSourceFields(this.cbxVwHorizontalRptKeyColDataType.getValue().toString(), cbxDataSourceField, expDataSourceId, fpyDataSourceId, fnyDataSourceId, ftyDataSourceId, tgtDataSourceId);
+				}
+			}			
+		}	
+	}
+	
+
+	private void fillCbxDataSourceFields(String dataFieldType, ComboBox cbxDataSourceFields, Integer expDataSourceId, Integer fpyDataSourceId, 
+			Integer fnyDataSourceId, Integer ftyDataSourceId, Integer tgtDataSourceId)
+	{		
+		if(expDataSourceId != null)
+		{
+			Experiment selectedExperiment = new ExperimentDao().getExperimentById(expDataSourceId);
+			List<ExperimentField> selectedExperimentFields = new ExperimentFieldDao().getAllExperimentFieldsByExperiment(selectedExperiment);
+			
+			for(int i=0; selectedExperimentFields!=null && i<selectedExperimentFields.size(); i++)
+				addItemIfTypeMatches(dataFieldType, "expfield_" + selectedExperimentFields.get(i).getExpFieldId(), selectedExperimentFields.get(i).getExpFieldName(), selectedExperimentFields.get(i).getExpFieldType(), cbxDataSourceFields);
+		}
+		
+		if(fnyDataSourceId != null)
+		{
+			List<FinalPassYieldInfoField> fnyFields = new FinalPassYieldInfoFieldDao().getFinalPassYieldInfoFieldByReportById(fnyDataSourceId);
+			for(int i=0; fnyFields != null && i<fnyFields.size(); i++)
+				addItemIfTypeMatches(dataFieldType, "fnyfield_" + fnyFields.get(i).getFnyInfoFieldId(), fnyFields.get(i).getFnyInfoFieldLabel(), fnyFields.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
+	
+			addItemIfTypeMatches(dataFieldType, "fny_datetime", "Datetime (FNY)", "datetime", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fny_sn", "Serial Number (FNY)", "nvarchar(max)", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fny_result", "Result (FNY)", "nvarchar(max)", cbxDataSourceFields);
+		}
+		
+		if(fpyDataSourceId != null)
+		{
+			List<FirstPassYieldInfoField> fpyFields = new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldByReportById(fpyDataSourceId);
+			for(int i=0; fpyFields != null && i<fpyFields.size(); i++)
+				addItemIfTypeMatches(dataFieldType, "fpyfield_" + fpyFields.get(i).getFpyInfoFieldId(), fpyFields.get(i).getFpyInfoFieldLabel(), fpyFields.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
+	
+			addItemIfTypeMatches(dataFieldType, "fpy_datetime", "Datetime (FPY)", "datetime", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fpy_sn", "Serial Number (FPY)", "nvarchar(max)", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fpy_result", "Result (FPY)", "nvarchar(max)", cbxDataSourceFields);
+		}
+		
+		if(ftyDataSourceId != null)
+		{
+			List<FirstTimeYieldInfoField> ftyFields = new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldByReportById(ftyDataSourceId);
+			for(int i=0; ftyFields != null && i<ftyFields.size(); i++)
+				addItemIfTypeMatches(dataFieldType, "ftyfield_" + ftyFields.get(i).getFtyInfoFieldId(), ftyFields.get(i).getFtyInfoFieldLabel(), ftyFields.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
+	
+			addItemIfTypeMatches(dataFieldType, "fty_datetime", "Datetime (FTY)", "datetime", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fty_sn", "Serial Number (FTY)", "nvarchar(max)", cbxDataSourceFields);
+			addItemIfTypeMatches(dataFieldType, "fty_result", "Result (FTY)", "nvarchar(max)", cbxDataSourceFields);
+		}
+		
+		if(tgtDataSourceId != null)
+		{
+			List<TargetColumn> targetColumns = new TargetColumnDao().getTargetColumnByTargetReportId(tgtDataSourceId);
+			
+			for(int i=0; targetColumns!=null && i<targetColumns.size(); i++)
+				addItemIfTypeMatches(dataFieldType, "tgtfield_" + targetColumns.get(i).getTargetColumnId(), targetColumns.get(i).getTargetColumnLabel(), targetColumns.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
+		}				
+	}
+	
+	private void addItemIfTypeMatches(String dataType, String dataSourceFieldId, String dataSourceFieldName, String dataSourceFieldType, ComboBox cbxDataSourceField)
+	{
+		if(dataType.equals(dataSourceFieldType) || (dataType.equals("float") && dataSourceFieldType.equals("int")))
+		{
+			cbxDataSourceField.addItem(dataSourceFieldId);
+			cbxDataSourceField.setItemCaption(dataSourceFieldId, dataSourceFieldName);
+		}
+		else if(dataType.equals("nvarchar(max)") || dataType.equals("varchar(max)") || dataType.equals("text")
+				&& (dataSourceFieldType.startsWith("varchar") || dataSourceFieldType.startsWith("char")
+		                || dataSourceFieldType.startsWith("text") || dataSourceFieldType.startsWith("nvarchar")
+		                || dataSourceFieldType.startsWith("nchar") || dataSourceFieldType.startsWith("ntext")))			
+		{
+			cbxDataSourceField.addItem(dataSourceFieldId);
+			cbxDataSourceField.setItemCaption(dataSourceFieldId, dataSourceFieldName);
+		}
+		else if((dataType.startsWith("varchar") || dataType.startsWith("char")
+                || dataType.startsWith("text") || dataType.startsWith("nvarchar")
+                || dataType.startsWith("nchar") || dataType.startsWith("ntext"))
+				&& (dataSourceFieldType.startsWith("varchar") || dataSourceFieldType.startsWith("char")
+		                || dataSourceFieldType.startsWith("text") || dataSourceFieldType.startsWith("nvarchar")
+		                || dataSourceFieldType.startsWith("nchar") || dataSourceFieldType.startsWith("ntext")))
+		{
+			String selectedDataTypeStringStrLength = dataType.replaceAll("\\D+","");
+			String dataSourcFieldDataTypeStringStrLength = dataSourceFieldType.replaceAll("\\D+","");	
+			
+			if(selectedDataTypeStringStrLength != null && selectedDataTypeStringStrLength.length() > 0 && dataSourcFieldDataTypeStringStrLength != null && dataSourcFieldDataTypeStringStrLength.length() > 0)
+			{
+				if(Integer.parseInt(selectedDataTypeStringStrLength)>Integer.parseInt(dataSourcFieldDataTypeStringStrLength))
+				{
+					cbxDataSourceField.addItem(dataSourceFieldId);
+					cbxDataSourceField.setItemCaption(dataSourceFieldId, dataSourceFieldName);
+				}
+			}
+		}		
+	}
+	
+	
+	
 	private void addReportColumn(Integer reportColumnId, ViewHorizontalReportColumn vwHorizontalRptCol)
 	{
 		VerticalLayout vwHorizontalColumnPnl = new VerticalLayout();

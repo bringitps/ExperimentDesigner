@@ -27,7 +27,7 @@ public class ViewHorizontalReportByExperiment {
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="VwHorizontalReportId", unique=false, updatable=true)
-	private ViewVerticalReport viewHorizontalReport;	
+	private ViewHorizontalReport viewHorizontalReport;	
 
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExperimentId", unique=false, updatable=true)
@@ -38,7 +38,7 @@ public class ViewHorizontalReportByExperiment {
 	private ExperimentField expKeyField;
 
 	public ViewHorizontalReportByExperiment(Integer vwHorizontalRptByExperimentId,
-			ViewVerticalReport viewHorizontalReport, Experiment experiment, ExperimentField expKeyField) {
+			ViewHorizontalReport viewHorizontalReport, Experiment experiment, ExperimentField expKeyField) {
 		this.vwHorizontalRptByExperimentId = vwHorizontalRptByExperimentId;
 		this.viewHorizontalReport = viewHorizontalReport;
 		this.experiment = experiment;
@@ -60,11 +60,11 @@ public class ViewHorizontalReportByExperiment {
 		this.vwHorizontalRptByExperimentId = vwHorizontalRptByExperimentId;
 	}
 
-	public ViewVerticalReport getViewHorizontalReport() {
+	public ViewHorizontalReport getViewHorizontalReport() {
 		return viewHorizontalReport;
 	}
 
-	public void setViewHorizontalReport(ViewVerticalReport viewHorizontalReport) {
+	public void setViewHorizontalReport(ViewHorizontalReport viewHorizontalReport) {
 		this.viewHorizontalReport = viewHorizontalReport;
 	}
 

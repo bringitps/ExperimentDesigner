@@ -28,7 +28,7 @@ public class ViewHorizontalReportColumn {
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="VwHorizontalReportId", unique=false, updatable=true)
-	private ViewVerticalReport viewHorizontalReport;	
+	private ViewHorizontalReport viewHorizontalReport;	
 	
 	@Column(name="VwHorizontalRptColumnName")
 	private String vwHorizontalRptColumnName;
@@ -86,7 +86,7 @@ public class ViewHorizontalReportColumn {
     @JoinColumn(name="targetColumnId", unique=false, updatable=true)
 	private TargetColumn targetColumn;
 
-	public ViewHorizontalReportColumn(Integer vwHorizontalRptColumnId, ViewVerticalReport viewHorizontalReport,
+	public ViewHorizontalReportColumn(Integer vwHorizontalRptColumnId, ViewHorizontalReport viewHorizontalReport,
 			String vwHorizontalRptColumnName, String vwHorizontalRptColumnDbId, String vwVerticalRptColumnDataType,			
 			ExperimentField expField, FinalPassYieldInfoField fnyInfoField, Boolean vwHorizontalFnyIsDateTimeExpField,
 			Boolean vwHorizontalFnyIsSNExpField, Boolean vwHorizontalFnyIsResultExpField,
@@ -145,11 +145,11 @@ public class ViewHorizontalReportColumn {
 		this.vwHorizontalRptColumnId = vwHorizontalRptColumnId;
 	}
 
-	public ViewVerticalReport getViewHorizontalReport() {
+	public ViewHorizontalReport getViewHorizontalReport() {
 		return viewHorizontalReport;
 	}
 
-	public void setViewHorizontalReport(ViewVerticalReport viewHorizontalReport) {
+	public void setViewHorizontalReport(ViewHorizontalReport viewHorizontalReport) {
 		this.viewHorizontalReport = viewHorizontalReport;
 	}
 

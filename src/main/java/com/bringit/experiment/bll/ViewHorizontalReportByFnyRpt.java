@@ -27,7 +27,7 @@ public class ViewHorizontalReportByFnyRpt {
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="VwHorizontalReportId", unique=false, updatable=true)
-	private ViewVerticalReport viewHorizontalReport;	
+	private ViewHorizontalReport viewHorizontalReport;	
 
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="fnyRptId", unique=false, updatable=true)
@@ -46,7 +46,7 @@ public class ViewHorizontalReportByFnyRpt {
 	@Column(name="VwHorizontalFnyKeyIsResultExpField")
 	private Boolean vwHorizontalFnyKeyIsResultExpField;
 
-	public ViewHorizontalReportByFnyRpt(Integer vwHorizontalRptByFnyId, ViewVerticalReport viewHorizontalReport,
+	public ViewHorizontalReportByFnyRpt(Integer vwHorizontalRptByFnyId, ViewHorizontalReport viewHorizontalReport,
 			FinalPassYieldReport fnyRpt, FinalPassYieldInfoField fnyKeyInfoField,
 			Boolean vwHorizontalFnyKeyIsDateTimeExpField, Boolean vwHorizontalFnyKeyIsSNExpField,
 			Boolean vwHorizontalFnyKeyIsResultExpField) {
@@ -77,11 +77,11 @@ public class ViewHorizontalReportByFnyRpt {
 		this.vwHorizontalRptByFnyId = vwHorizontalRptByFnyId;
 	}
 
-	public ViewVerticalReport getViewHorizontalReport() {
+	public ViewHorizontalReport getViewHorizontalReport() {
 		return viewHorizontalReport;
 	}
 
-	public void setViewHorizontalReport(ViewVerticalReport viewHorizontalReport) {
+	public void setViewHorizontalReport(ViewHorizontalReport viewHorizontalReport) {
 		this.viewHorizontalReport = viewHorizontalReport;
 	}
 

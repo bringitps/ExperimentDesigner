@@ -27,7 +27,7 @@ public class ViewHorizontalReportByFpyRpt {
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="VwHorizontalReportId", unique=false, updatable=true)
-	private ViewVerticalReport viewHorizontalReport;	
+	private ViewHorizontalReport viewHorizontalReport;	
 
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="fpyRptId", unique=false, updatable=true)
@@ -43,20 +43,20 @@ public class ViewHorizontalReportByFpyRpt {
 	@Column(name="VwHorizontalFpyKeyIsSNExpField")
 	private Boolean vwHorizontalFpyKeyIsSNExpField;
 
-	@Column(name="VwHorizontalFtyKeyIsResultExpField")
-	private Boolean vwHorizontalFtyKeyIsResultExpField;
+	@Column(name="VwHorizontalFpyKeyIsResultExpField")
+	private Boolean vwHorizontalFpyKeyIsResultExpField;
 
-	public ViewHorizontalReportByFpyRpt(Integer vwHorizontalRptByFpyId, ViewVerticalReport viewHorizontalReport,
+	public ViewHorizontalReportByFpyRpt(Integer vwHorizontalRptByFpyId, ViewHorizontalReport viewHorizontalReport,
 			FirstPassYieldReport fpyRpt, FirstPassYieldInfoField fpyKeyInfoField,
 			Boolean vwHorizontalFpyKeyIsDateTimeExpField, Boolean vwHorizontalFpyKeyIsSNExpField,
-			Boolean vwHorizontalFtyKeyIsResultExpField) {
+			Boolean vwHorizontalFpyKeyIsResultExpField) {
 		this.vwHorizontalRptByFpyId = vwHorizontalRptByFpyId;
 		this.viewHorizontalReport = viewHorizontalReport;
 		this.fpyRpt = fpyRpt;
 		this.fpyKeyInfoField = fpyKeyInfoField;
 		this.vwHorizontalFpyKeyIsDateTimeExpField = vwHorizontalFpyKeyIsDateTimeExpField;
 		this.vwHorizontalFpyKeyIsSNExpField = vwHorizontalFpyKeyIsSNExpField;
-		this.vwHorizontalFtyKeyIsResultExpField = vwHorizontalFtyKeyIsResultExpField;
+		this.vwHorizontalFpyKeyIsResultExpField = vwHorizontalFpyKeyIsResultExpField;
 	}
 	
 	public ViewHorizontalReportByFpyRpt() {
@@ -66,7 +66,7 @@ public class ViewHorizontalReportByFpyRpt {
 		this.fpyKeyInfoField = null;
 		this.vwHorizontalFpyKeyIsDateTimeExpField = null;
 		this.vwHorizontalFpyKeyIsSNExpField = null;
-		this.vwHorizontalFtyKeyIsResultExpField = null;
+		this.vwHorizontalFpyKeyIsResultExpField = null;
 	}
 
 	public Integer getVwHorizontalRptByFpyId() {
@@ -77,11 +77,11 @@ public class ViewHorizontalReportByFpyRpt {
 		this.vwHorizontalRptByFpyId = vwHorizontalRptByFpyId;
 	}
 
-	public ViewVerticalReport getViewHorizontalReport() {
+	public ViewHorizontalReport getViewHorizontalReport() {
 		return viewHorizontalReport;
 	}
 
-	public void setViewHorizontalReport(ViewVerticalReport viewHorizontalReport) {
+	public void setViewHorizontalReport(ViewHorizontalReport viewHorizontalReport) {
 		this.viewHorizontalReport = viewHorizontalReport;
 	}
 
@@ -117,12 +117,12 @@ public class ViewHorizontalReportByFpyRpt {
 		this.vwHorizontalFpyKeyIsSNExpField = vwHorizontalFpyKeyIsSNExpField;
 	}
 
-	public Boolean getVwHorizontalFtyKeyIsResultExpField() {
-		return vwHorizontalFtyKeyIsResultExpField;
+	public Boolean getVwHorizontalFpyKeyIsResultExpField() {
+		return vwHorizontalFpyKeyIsResultExpField;
 	}
 
-	public void setVwHorizontalFtyKeyIsResultExpField(Boolean vwHorizontalFtyKeyIsResultExpField) {
-		this.vwHorizontalFtyKeyIsResultExpField = vwHorizontalFtyKeyIsResultExpField;
+	public void setVwHorizontalFpyKeyIsResultExpField(Boolean vwHorizontalFpyKeyIsResultExpField) {
+		this.vwHorizontalFpyKeyIsResultExpField = vwHorizontalFpyKeyIsResultExpField;
 	}
 	
 	

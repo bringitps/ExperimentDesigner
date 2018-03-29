@@ -27,23 +27,30 @@ public class ViewHorizontalReportByTargetRpt {
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="VwHorizontalReportId", unique=false, updatable=true)
-	private ViewVerticalReport viewHorizontalReport;	
+	private ViewHorizontalReport viewHorizontalReport;	
 
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="TargetRptId", unique=false, updatable=true)
 	private TargetReport targetRpt;
+	
+
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="TargetKeyColumnId", unique=false, updatable=true)
+	private TargetColumn targetKeyColumn;
 
 	public ViewHorizontalReportByTargetRpt(Integer vwHorizontalRptByTargetRptId,
-			ViewVerticalReport viewHorizontalReport, TargetReport targetRpt) {
+			ViewHorizontalReport viewHorizontalReport, TargetReport targetRpt, TargetColumn targetKeyColumn) {
 		this.vwHorizontalRptByTargetRptId = vwHorizontalRptByTargetRptId;
 		this.viewHorizontalReport = viewHorizontalReport;
 		this.targetRpt = targetRpt;
+		this.targetKeyColumn = targetKeyColumn;
 	}
 	
 	public ViewHorizontalReportByTargetRpt() {
 		this.vwHorizontalRptByTargetRptId = null;
 		this.viewHorizontalReport = null;
 		this.targetRpt = null;
+		this.targetKeyColumn = null;
 	}
 
 	public Integer getVwHorizontalRptByTargetRptId() {
@@ -54,11 +61,11 @@ public class ViewHorizontalReportByTargetRpt {
 		this.vwHorizontalRptByTargetRptId = vwHorizontalRptByTargetRptId;
 	}
 
-	public ViewVerticalReport getViewHorizontalReport() {
+	public ViewHorizontalReport getViewHorizontalReport() {
 		return viewHorizontalReport;
 	}
 
-	public void setViewHorizontalReport(ViewVerticalReport viewHorizontalReport) {
+	public void setViewHorizontalReport(ViewHorizontalReport viewHorizontalReport) {
 		this.viewHorizontalReport = viewHorizontalReport;
 	}
 
@@ -69,4 +76,14 @@ public class ViewHorizontalReportByTargetRpt {
 	public void setTargetRpt(TargetReport targetRpt) {
 		this.targetRpt = targetRpt;
 	}
+
+	public TargetColumn getTargetKeyColumn() {
+		return targetKeyColumn;
+	}
+
+	public void setTargetKeyColumn(TargetColumn targetKeyColumn) {
+		this.targetKeyColumn = targetKeyColumn;
+	}
+	
+	
 }

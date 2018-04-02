@@ -309,9 +309,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		pnlExperiments.setWidth(95, Unit.PERCENTAGE);
 		pnlExperiments.setStyleName("well");
 		pnlExperiments.setCaption("");
-		
-		System.out.println(vwHorizontalRptByExperimentKeyColStrIds);
-		
+				
 		for(int i=0; activeExperiments != null && i<activeExperiments.size(); i++)
 		{
 			optGrpPnlExperiments.addItem(activeExperiments.get(i).getExpId());
@@ -324,9 +322,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
            @Override
 			public void valueChange(ValueChangeEvent event) {
         	   refreshColumnKeysTable();
-        	   //refreshExperimentDataSourceElements();
-        	   //System.out.println("Selected experiment:" + event.getProperty().getValue());
-           }
+        	}
         });
 		
 		lytPnlExperiments.addComponent(optGrpPnlExperiments);
@@ -460,9 +456,32 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		pnlTargetReportDataSource.addComponent(pnlTargetReports);
 
 		//END: Data source selection
+
+		//START: Load data source filter tables
+		loadDataSourceFilterTable();
+
+		//START: Load report columns enrichment
+		loadTblEnrichmentRulesData();
 		
 		if(!isNewRecord)
-		{
+		{			
+			//Load Data Source Filters
+			for(int i=0; vwHorizontalRptFiltersByExpField != null && i<vwHorizontalRptFiltersByExpField.size(); i++)
+				addDataSourceFilter("exp_", vwHorizontalRptFiltersByExpField.get(i).getVwHorizontalRptFilterByExpFieldId(), vwHorizontalRptFiltersByExpField.get(i), null, null, null, null);
+			
+			for(int i=0; vwHorizontalRptFiltersByFpyField != null && i<vwHorizontalRptFiltersByFpyField.size(); i++)
+				addDataSourceFilter("fpy_", vwHorizontalRptFiltersByFpyField.get(i).getVwHorizontalRptFilterByFpyFieldId(), null, vwHorizontalRptFiltersByFpyField.get(i), null, null, null);
+			
+			for(int i=0; vwHorizontalRptFiltersByFnyField != null && i<vwHorizontalRptFiltersByFnyField.size(); i++)
+				addDataSourceFilter("fny_", vwHorizontalRptFiltersByFnyField.get(i).getVwHorizontalRptFilterByFnyFieldId(), null, null, vwHorizontalRptFiltersByFnyField.get(i), null, null);
+			
+			for(int i=0; vwHorizontalRptFiltersByFtyField != null && i<vwHorizontalRptFiltersByFtyField.size(); i++)
+				addDataSourceFilter("fty_", vwHorizontalRptFiltersByFtyField.get(i).getVwHorizontalRptFilterByFtyFieldId(), null, null, null, vwHorizontalRptFiltersByFtyField.get(i), null);
+			
+			for(int i=0; vwHorizontalRptFiltersByTgtCol != null && i<vwHorizontalRptFiltersByTgtCol.size(); i++)
+				addDataSourceFilter("tgt_", vwHorizontalRptFiltersByTgtCol.get(i).getVwHorizontalRptFilterByTargetColumnId(), null, null, null, null, vwHorizontalRptFiltersByTgtCol.get(i));
+			
+			
 			//Load Report Header information
 			this.txtVwHorizontalRptName.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptName());
 			this.txtVwHorizontalRptCustomId.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptDbTableNameId().replace("vwhorizontal#", ""));
@@ -489,6 +508,10 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 					vwHorizontalRptColumnsByEnrichment.add(currentVwHorizontalRptColumnsByEnrichment.get(j));
 			}
 			
+			//Load Rpt Columns Enrichment
+			for(int i=0; i<vwHorizontalRptColumnsByEnrichment.size(); i++)
+				addTblEnrichmentRule(vwHorizontalRptColumnsByEnrichment.get(i).getVwHorizontalRptColumnByEnrichmentId(), vwHorizontalRptColumnsByEnrichment.get(i));			
+		
 		}
 		
 		
@@ -497,10 +520,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				public void valueChange(ValueChangeEvent event) {
 	        	   refreshColumnKeysTable();
 	           }
-	        });
-		
-		//START: Load data tables
-		loadDataSourceFilterTable();
+	        });		
 		
 		//START: Data source filters
 		this.btnAddFilter.addClickListener(new Button.ClickListener() {
@@ -523,9 +543,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				}	
 			}
 		}));					
-		
-		//START: Load report columns enrichment
-		loadTblEnrichmentRulesData();
 		
 		
 		this.btnAddEnrichment.addClickListener(new Button.ClickListener() {
@@ -610,9 +627,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 	}
 	
 	private void addDataSourceFilter(String dataSourceType, Integer dataSourceFilterId, ViewHorizontalReportFilterByExpField vwHorizontalRptFiltersByExpField, ViewHorizontalReportFilterByFpyField vwHorizontalRptFiltersByFpyField, ViewHorizontalReportFilterByFnyField vwHorizontalRptFiltersByFnyField, ViewHorizontalReportFilterByFtyField vwHorizontalRptFiltersByFtyField, ViewHorizontalReportFilterByTargetColumn vwHorizontalRptFiltersByTargetColumn)
-	{
-		//System.out.println("Data source type: " + dataSourceType + " Data source filter id: " + dataSourceFilterId);
-		
+	{		
 		Integer itemId = dataSourceFilterId;
 		if(itemId == null)
 		{	
@@ -806,7 +821,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		
 		
 		if(itemId != null && dataSourceType!=null)
-		{				
+		{	
 			//Adding Data Source Filters
 			if(dataSourceType.equals("exp_"))
 			{
@@ -1158,7 +1173,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				
 				cbxExpression.setValue(vwHorizontalRptFiltersByTargetColumn.getVwHorizontalRptFilterByTargetColumnExpression());
 			}
-			
 		}
 		
 		this.tblReportFilters.addItem(itemValues, itemId);
@@ -1717,27 +1731,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			cbxRptColumnSource.setItemCaption(txtVwHorizontalRptColumnDbId.getValue().toString(), txtVwHorizontalRptColumnName.getValue().toString());
 			cbxRptColumnSource.setWidth(100, Unit.PERCENTAGE);
 			
-			//System.out.println("Txt Column Name: " + txtVwHorizontalRptColumnName.getValue() + "Txt Column DbId: " + txtVwHorizontalRptColumnDbId.getValue()
-			//+ "Horizontal DataSource: " + cbxVwHorizontalRptColDataSource.getValue() + "Horizontal DataSource Field: " + cbxVwHorizontalRptColDataSourceField.getValue());
-		}
-		
-		
-		/*
-		Collection rptColumnItemIds = this.tblVwHorizontalRptCols.getContainerDataSource().getItemIds();
-		
-		for (Object rptColumnItemIdObj : rptColumnItemIds) 
-		{
-			//int rptColumnItemId = (int)rptColumnItemIdObj;
-			Item tblEnrichmentRuleRowItem = this.tblVwVerticalRptCols.getContainerDataSource().getItem(rptColumnItemIdObj);
-			
-			if (tblVwVerticalRptCols.hasChildren(rptColumnItemIdObj))
-			{
-				cbxRptColumnSource.addItem(((TextField)(tblEnrichmentRuleRowItem.getItemProperty("DB Column Name").getValue())).getValue().toString());
-				cbxRptColumnSource.setItemCaption(((TextField)(tblEnrichmentRuleRowItem.getItemProperty("DB Column Name").getValue())).getValue().toString(), ((TextField)(tblEnrichmentRuleRowItem.getItemProperty("Column Name").getValue())).getValue().toString());
-				cbxRptColumnSource.setWidth(100, Unit.PERCENTAGE);
-			}
-		}
-		*/
+		}	
 		
 		cbxRptColumnSource.setHeight(20, Unit.PIXELS);
 		itemValues[1] = cbxRptColumnSource;
@@ -1953,7 +1947,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				int selectedFpyReportId = Integer.parseInt(selectedFpyRpt.toString());
 				if(activeFpyReports.get(i).getFpyReportId() == selectedFpyReportId)
 				{
-					//System.out.println("Selected fpy report:" + selectedFpyReportId);
 					changedDataSourcesIds.add("fpy_" + selectedFpyReportId);
 					changedDataSourcesNames.add("FPY : " + activeFpyReports.get(i).getFpyReportName());					
 					break;
@@ -1969,7 +1962,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				int selectedFnyReportId = Integer.parseInt(selectedFnyRpt.toString());
 				if(activeFnyReports.get(i).getFnyReportId() == selectedFnyReportId)
 				{
-					//System.out.println("Selected fny report:" + selectedFnyReportId);
 					changedDataSourcesIds.add("fny_" + selectedFnyReportId);
 					changedDataSourcesNames.add("FNY : " + activeFnyReports.get(i).getFnyReportName());
 					break;
@@ -1985,7 +1977,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				int selectedFtyReportId = Integer.parseInt(selectedFtyRpt.toString());
 				if(activeFtyReports.get(i).getFtyReportId() == selectedFtyReportId)
 				{
-					//System.out.println("Selected fty report:" + selectedFtyReportId);
 					changedDataSourcesIds.add("fty_" + selectedFtyReportId);
 					changedDataSourcesNames.add("FTY : " + activeFtyReports.get(i).getFtyReportName());
 					break;
@@ -2001,7 +1992,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				int selectedTargetReportId = Integer.parseInt(selectedTargetRpt.toString());
 				if(activeTargetReports.get(i).getTargetReportId() == selectedTargetReportId)
 				{
-					//System.out.println("Selected target report:" + selectedTargetReportId);
 					changedDataSourcesIds.add("tgt_" + selectedTargetReportId);
 					changedDataSourcesNames.add("Target : " + activeTargetReports.get(i).getTargetReportName());
 					break;
@@ -2122,8 +2112,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			addItemIfTypeMatches(dataFieldType, "fpy_sn", "Serial Number (FPY)", "nvarchar(max)", cbxDataSourceFields);
 			addItemIfTypeMatches(dataFieldType, "fpy_result", "Result (FPY)", "nvarchar(max)", cbxDataSourceFields);
 	
-			System.out.println("DB Ids: " + vwHorizontalRptByFpyRptDbIds + "KeyCols: " + vwHorizontalRptByFpyRptKeyColStrIds);
-			
 			if(vwHorizontalRptByFpyRptDbIds.indexOf(fpyDataSourceId) != -1 && vwHorizontalRptByFpyRptKeyColStrIds.size() > 0)
 				cbxDataSourceFields.setValue(vwHorizontalRptByFpyRptKeyColStrIds.get(vwHorizontalRptByFpyRptDbIds.indexOf(fpyDataSourceId)));
 		}
@@ -2246,7 +2234,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				int selectedExperimentId = Integer.parseInt(selectedExperiment.toString());				
 				if(activeExperiments.get(i).getExpId() == selectedExperimentId)
 				{
-					//System.out.println("Selected experiment:" + selectedExperimentId);
 					cbxDataSource.addItem("exp_" + selectedExperimentId);
 					cbxDataSource.setItemCaption("exp_" + selectedExperimentId, "EXP : " + activeExperiments.get(i).getExpName());
 					break;
@@ -2262,7 +2249,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				int selectedFpyReportId = Integer.parseInt(selectedFpyRpt.toString());
 				if(activeFpyReports.get(i).getFpyReportId() == selectedFpyReportId)
 				{
-					//System.out.println("Selected fpy report:" + selectedFpyReportId);
 					cbxDataSource.addItem("fpy_" + selectedFpyReportId);
 					cbxDataSource.setItemCaption("fpy_" + selectedFpyReportId, "FPY : " + activeFpyReports.get(i).getFpyReportName());
 					break;
@@ -2278,7 +2264,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				int selectedFnyReportId = Integer.parseInt(selectedFnyRpt.toString());
 				if(activeFnyReports.get(i).getFnyReportId() == selectedFnyReportId)
 				{
-					//System.out.println("Selected fny report:" + selectedFnyReportId);
 					cbxDataSource.addItem("fny_" + selectedFnyReportId);
 					cbxDataSource.setItemCaption("fny_" + selectedFnyReportId, "FPY : " + activeFnyReports.get(i).getFnyReportName());
 					break;
@@ -2294,7 +2279,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				int selectedFtyReportId = Integer.parseInt(selectedFtyRpt.toString());
 				if(activeFtyReports.get(i).getFtyReportId() == selectedFtyReportId)
 				{
-					//System.out.println("Selected fty report:" + selectedFtyReportId);
 					cbxDataSource.addItem("fty_" + selectedFtyReportId);
 					cbxDataSource.setItemCaption("fty_" + selectedFtyReportId, "FTY : " + activeFtyReports.get(i).getFtyReportName());
 					break;
@@ -2310,7 +2294,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				int selectedTargetReportId = Integer.parseInt(selectedTargetRpt.toString());
 				if(activeTargetReports.get(i).getTargetReportId() == selectedTargetReportId)
 				{
-					//System.out.println("Selected target report:" + selectedTargetReportId);
 					cbxDataSource.addItem("tgt_" + selectedTargetReportId);
 					cbxDataSource.setItemCaption("tgt_" + selectedTargetReportId, "Target : " + activeTargetReports.get(i).getTargetReportName());
 					break;

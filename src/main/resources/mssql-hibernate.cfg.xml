@@ -87,6 +87,7 @@
  		<mapping class="com.bringit.experiment.bll.FirstTimeYieldInfoField"/>
  		<mapping class="com.bringit.experiment.bll.FirstTimeYieldReportJobData"/>
 		<mapping class="com.bringit.experiment.bll.ViewVerticalReport"/>
+		<mapping class="com.bringit.experiment.bll.ViewVerticalReportJobData"/>
 		<mapping class="com.bringit.experiment.bll.ViewVerticalReportByExperiment"/>
 		<mapping class="com.bringit.experiment.bll.ViewVerticalReportByFnyRpt"/>
 		<mapping class="com.bringit.experiment.bll.ViewVerticalReportByFpyRpt"/>
@@ -111,6 +112,7 @@
 		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportByFtyRpt"/>
 		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportByTargetRpt"/>
 		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportColumn"/>
+		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportColumnByEnrichment"/>
 		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportFilterByExpField"/>
 		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportFilterByFnyField"/>
 		<mapping class="com.bringit.experiment.bll.ViewHorizontalReportFilterByFpyField"/>

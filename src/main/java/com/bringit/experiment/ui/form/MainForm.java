@@ -9,12 +9,14 @@ import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.TargetReport;
+import com.bringit.experiment.bll.ViewVerticalReport;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.FinalPassYieldReportDao;
 import com.bringit.experiment.dao.FirstPassYieldReportDao;
 import com.bringit.experiment.dao.FirstTimeYieldReportDao;
 import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.TargetReportDao;
+import com.bringit.experiment.dao.ViewVerticalReportDao;
 import com.bringit.experiment.ui.design.MainFormDesign;
 import com.vaadin.data.Item;
 import com.vaadin.event.ItemClickEvent;
@@ -37,12 +39,28 @@ public class MainForm extends MainFormDesign {
 
     @SuppressWarnings("deprecation")
     public MainForm(WebApplication webApplication, String selectedForm) {
-        this.webApplication = webApplication;
+
+    	
+    	this.webApplication = webApplication;
 
         this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
         
         treeMainMenu.setItemCaptionMode(ItemCaptionMode.EXPLICIT_DEFAULTS_ID);
-  		
+        
+        treeMainMenu.addContainerProperty("isExperimentDataReport", Boolean.class, null);
+        treeMainMenu.addContainerProperty("experimentId", Integer.class, null);
+        treeMainMenu.addContainerProperty("isTargetReport", Boolean.class, null);
+        treeMainMenu.addContainerProperty("targetReportId", Integer.class, null);
+        treeMainMenu.addContainerProperty("isFpyReport", Boolean.class, null);
+        treeMainMenu.addContainerProperty("fpyReportId", Integer.class, null);
+        treeMainMenu.addContainerProperty("isFnyReport", Boolean.class, null);
+        treeMainMenu.addContainerProperty("fnyReportId", Integer.class, null);
+        treeMainMenu.addContainerProperty("isFtyReport", Boolean.class, null);
+        treeMainMenu.addContainerProperty("ftyReportId", Integer.class, null);
+        treeMainMenu.addContainerProperty("isVwVerticalReport", Boolean.class, null);
+        treeMainMenu.addContainerProperty("vwVerticalReportId", Integer.class, null);
+
+        
         for (Object id : treeMainMenu.getItemIds()) 
         {
     	  	if("Experiments".equals(id.toString().trim()))
@@ -52,80 +70,100 @@ public class MainForm extends MainFormDesign {
     	  		treeMainMenu.setItemCaption(id, "Manage " + this.systemSettings.getExperimentPluralLabel());
     	
     	  	if("Experiment Types".equals(id.toString().trim()))
-    	  		treeMainMenu.setItemCaption(id, this.systemSettings.getExperimentTypePluralLabel());
-       
-    	}
-        
-        
-        treeMainMenu.addContainerProperty("isExperimentDataReport", Boolean.class, null);
-        treeMainMenu.addContainerProperty("experimentId", Integer.class, null);
-
+    	  		treeMainMenu.setItemCaption(id, this.systemSettings.getExperimentTypePluralLabel());       
+    	}        
+      
         for (Object id : treeMainMenu.rootItemIds()) {
             treeMainMenu.expandItemsRecursively(id);
         }
 
+        List<String> dataMenuItemAdded = new ArrayList<String>();
+        
         treeMainMenu.collapseItem("Reports Builder");
         treeMainMenu.collapseItem("Configuration");
             
         List<Experiment> experimentsAvailable = new ExperimentDao().getActiveExperiments();
         if (experimentsAvailable != null) {
             for (int i = 0; i < experimentsAvailable.size(); i++) {
-                Item item = treeMainMenu.addItem(experimentsAvailable.get(i).getExpName());
-                item.getItemProperty("isExperimentDataReport").setValue(true);
-                item.getItemProperty("experimentId").setValue(experimentsAvailable.get(i).getExpId());
-                treeMainMenu.setParent(experimentsAvailable.get(i).getExpName(), "Data");
+            	if(experimentsAvailable.get(i).getExpName() != null && !experimentsAvailable.get(i).getExpName().isEmpty() && dataMenuItemAdded.indexOf(experimentsAvailable.get(i).getExpName()) == -1)
+            	{
+            		dataMenuItemAdded.add(experimentsAvailable.get(i).getExpName()); 
+            		Item item = treeMainMenu.addItem(experimentsAvailable.get(i).getExpName());
+            		item.getItemProperty("isExperimentDataReport").setValue(true);
+            		item.getItemProperty("experimentId").setValue(experimentsAvailable.get(i).getExpId());
+            		treeMainMenu.setParent(experimentsAvailable.get(i).getExpName(), "Data");
+            	}
             }
         }
-
-        treeMainMenu.addContainerProperty("isTargetReport", Boolean.class, null);
-        treeMainMenu.addContainerProperty("targetReportId", Integer.class, null);
 
         List<TargetReport> targetReportsAvailable = new TargetReportDao().getAllActiveTargetReports();
         if (targetReportsAvailable != null) {
             for (int i = 0; i < targetReportsAvailable.size(); i++) {
-                Item item = treeMainMenu.addItem(targetReportsAvailable.get(i).getTargetReportName());
-                item.getItemProperty("isTargetReport").setValue(true);
-                item.getItemProperty("targetReportId").setValue(targetReportsAvailable.get(i).getTargetReportId());
-                treeMainMenu.setParent(targetReportsAvailable.get(i).getTargetReportName(), "Target Reports");
+            	if(targetReportsAvailable.get(i).getTargetReportName() != null && !targetReportsAvailable.get(i).getTargetReportName().isEmpty() && dataMenuItemAdded.indexOf(targetReportsAvailable.get(i).getTargetReportName()) == -1)
+            	{
+            		dataMenuItemAdded.add(targetReportsAvailable.get(i).getTargetReportName()); 
+            		Item item = treeMainMenu.addItem(targetReportsAvailable.get(i).getTargetReportName());
+            		item.getItemProperty("isTargetReport").setValue(true);
+            		item.getItemProperty("targetReportId").setValue(targetReportsAvailable.get(i).getTargetReportId());
+            		treeMainMenu.setParent(targetReportsAvailable.get(i).getTargetReportName(), "Target Reports");
+            	}
             }
         }
-
-        treeMainMenu.addContainerProperty("isFpyReport", Boolean.class, null);
-        treeMainMenu.addContainerProperty("fpyReportId", Integer.class, null);
-
+        
         List<FirstPassYieldReport> fpyReportsAvailable = new FirstPassYieldReportDao().getAllFirstPassYieldReports();
         if (fpyReportsAvailable != null) {
             for (int i = 0; i < fpyReportsAvailable.size(); i++) {
-                Item item = treeMainMenu.addItem(fpyReportsAvailable.get(i).getFpyReportName());
-                item.getItemProperty("isFpyReport").setValue(true);
-                item.getItemProperty("fpyReportId").setValue(fpyReportsAvailable.get(i).getFpyReportId());
-                treeMainMenu.setParent(fpyReportsAvailable.get(i).getFpyReportName(), "First Pass Yield Reports");
+            	if(fpyReportsAvailable.get(i).getFpyReportName() != null && !fpyReportsAvailable.get(i).getFpyReportName().isEmpty() && dataMenuItemAdded.indexOf(fpyReportsAvailable.get(i).getFpyReportName()) == -1)
+            	{
+            		dataMenuItemAdded.add(fpyReportsAvailable.get(i).getFpyReportName()); 
+            		Item item = treeMainMenu.addItem(fpyReportsAvailable.get(i).getFpyReportName());
+            		item.getItemProperty("isFpyReport").setValue(true);
+               		item.getItemProperty("fpyReportId").setValue(fpyReportsAvailable.get(i).getFpyReportId());
+               		treeMainMenu.setParent(fpyReportsAvailable.get(i).getFpyReportName(), "First Pass Yield Reports");
+            	}
             }
         }   
-
-        treeMainMenu.addContainerProperty("isFnyReport", Boolean.class, null);
-        treeMainMenu.addContainerProperty("fnyReportId", Integer.class, null);
 
         List<FinalPassYieldReport> fnyReportsAvailable = new FinalPassYieldReportDao().getAllFinalPassYieldReports();
         if (fnyReportsAvailable != null) {
             for (int i = 0; i < fnyReportsAvailable.size(); i++) {
-                Item item = treeMainMenu.addItem(fnyReportsAvailable.get(i).getFnyReportName());
-                item.getItemProperty("isFnyReport").setValue(true);
-                item.getItemProperty("fnyReportId").setValue(fnyReportsAvailable.get(i).getFnyReportId());
-                treeMainMenu.setParent(fnyReportsAvailable.get(i).getFnyReportName(), "Final Pass Yield Reports");
+            	if(fnyReportsAvailable.get(i).getFnyReportName() != null && !fnyReportsAvailable.get(i).getFnyReportName().isEmpty() && dataMenuItemAdded.indexOf(fnyReportsAvailable.get(i).getFnyReportName()) == -1)
+            	{
+            		dataMenuItemAdded.add(fnyReportsAvailable.get(i).getFnyReportName()); 
+	                Item item = treeMainMenu.addItem(fnyReportsAvailable.get(i).getFnyReportName());
+	                item.getItemProperty("isFnyReport").setValue(true);
+	                item.getItemProperty("fnyReportId").setValue(fnyReportsAvailable.get(i).getFnyReportId());
+	                treeMainMenu.setParent(fnyReportsAvailable.get(i).getFnyReportName(), "Final Pass Yield Reports");
+            	}
             }
         }  
-
-        treeMainMenu.addContainerProperty("isFtyReport", Boolean.class, null);
-        treeMainMenu.addContainerProperty("ftyReportId", Integer.class, null);
-
+        
         List<FirstTimeYieldReport> ftyReportsAvailable = new FirstTimeYieldReportDao().getAllFirstTimeYieldReports();
         if (ftyReportsAvailable != null) {
             for (int i = 0; i < ftyReportsAvailable.size(); i++) {
-                Item item = treeMainMenu.addItem(ftyReportsAvailable.get(i).getFtyReportName());
-                item.getItemProperty("isFtyReport").setValue(true);
-                item.getItemProperty("ftyReportId").setValue(ftyReportsAvailable.get(i).getFtyReportId());
-                treeMainMenu.setParent(ftyReportsAvailable.get(i).getFtyReportName(), "First Time Yield Reports");
+            	if(ftyReportsAvailable.get(i).getFtyReportName() != null && !ftyReportsAvailable.get(i).getFtyReportName().isEmpty() && dataMenuItemAdded.indexOf(ftyReportsAvailable.get(i).getFtyReportName()) == -1)
+            	{
+            		dataMenuItemAdded.add(ftyReportsAvailable.get(i).getFtyReportName()); 
+	                Item item = treeMainMenu.addItem(ftyReportsAvailable.get(i).getFtyReportName());
+	                item.getItemProperty("isFtyReport").setValue(true);
+	                item.getItemProperty("ftyReportId").setValue(ftyReportsAvailable.get(i).getFtyReportId());
+	                treeMainMenu.setParent(ftyReportsAvailable.get(i).getFtyReportName(), "First Time Yield Reports");
+	           
+            	}
+            }
+        }         
+
+        List<ViewVerticalReport> vwVerticalReportsAvailable = new ViewVerticalReportDao().getAllViewVerticalReports();
+        if (vwVerticalReportsAvailable != null) {
+            for (int i = 0; i < vwVerticalReportsAvailable.size(); i++) {
+            	if(vwVerticalReportsAvailable.get(i).getVwVerticalRptName() != null && !vwVerticalReportsAvailable.get(i).getVwVerticalRptName().isEmpty() && dataMenuItemAdded.indexOf(vwVerticalReportsAvailable.get(i).getVwVerticalRptName()) == -1)
+            	{
+            		dataMenuItemAdded.add(vwVerticalReportsAvailable.get(i).getVwVerticalRptName());            		
+                	Item item = treeMainMenu.addItem(vwVerticalReportsAvailable.get(i).getVwVerticalRptName());
+            		item.getItemProperty("isVwVerticalReport").setValue(true);
+            		item.getItemProperty("vwVerticalReportId").setValue(vwVerticalReportsAvailable.get(i).getVwVerticalRptId());
+            		treeMainMenu.setParent(vwVerticalReportsAvailable.get(i).getVwVerticalRptName(), "Vertical View Reports");
+            	}
             }
         } 
         
@@ -214,7 +252,8 @@ public class MainForm extends MainFormDesign {
                                 && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isTargetReport").getValue() == null
                                 && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isFpyReport").getValue() == null
                                 && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isFnyReport").getValue() == null
-                                && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isFtyReport").getValue() == null)) {
+                                && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isFtyReport").getValue() == null
+                                && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isVwVerticalReport").getValue() == null)) {
                             if (mnuAccessTrimmed.indexOf(mainMenuItemIds.get(i).toString().trim()) == -1) {
                                 if (treeMainMenu.getChildren(mainMenuItemIds.get(i)) == null)
                                     treeMainMenu.removeItem(mainMenuItemIds.get(i));
@@ -243,11 +282,15 @@ public class MainForm extends MainFormDesign {
     }
 
     private void setFormContent(String itemClickedText, Item treeItemClicked) {
+    	
+    	System.out.println((Integer) treeItemClicked.getItemProperty("vwVerticalReportId").getValue());
+    	
         if (treeItemClicked == null || (treeItemClicked.getItemProperty("isExperimentDataReport").getValue() == null
                 && treeItemClicked.getItemProperty("isTargetReport").getValue() == null
                 && treeItemClicked.getItemProperty("isFpyReport").getValue() == null
                 && treeItemClicked.getItemProperty("isFnyReport").getValue() == null
-                && treeItemClicked.getItemProperty("isFtyReport").getValue() == null)) {
+                && treeItemClicked.getItemProperty("isFtyReport").getValue() == null
+                && treeItemClicked.getItemProperty("isVwVerticalReport").getValue() == null)) {
             switch (itemClickedText.toLowerCase()) {
                 case "manage experiments":
                     formContentLayout.removeAllComponents();
@@ -351,6 +394,9 @@ public class MainForm extends MainFormDesign {
         } else if (treeItemClicked.getItemProperty("ftyReportId").getValue() != null) {
             formContentLayout.removeAllComponents();
             formContentLayout.addComponent(new FirstTimeYieldReportDataForm((Integer) treeItemClicked.getItemProperty("ftyReportId").getValue()));
+        } else if (treeItemClicked.getItemProperty("vwVerticalReportId").getValue() != null) {
+            formContentLayout.removeAllComponents();
+            formContentLayout.addComponent(new ViewVerticalReportDataForm((Integer) treeItemClicked.getItemProperty("vwVerticalReportId").getValue()));
         }
     }
 }

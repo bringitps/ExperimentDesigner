@@ -65,7 +65,6 @@ public class ViewHorizontalReportBuilderDesign extends VerticalLayout {
 	protected HorizontalLayout lytVwHorizontalRptColumnsPnls;
 	protected GridLayout gridBtnsVwHorizontalBtnColumns;
 	protected Button btnAddVwHorizontalRptColumn;
-	protected Button btnRemoveVwHorizontalRptColumn;
 	protected VerticalLayout columnsEnrichmentLayout;
 	protected HorizontalSplitPanel pnlColumnsEnrichment;
 	protected Table tblColumnsEnrichment;

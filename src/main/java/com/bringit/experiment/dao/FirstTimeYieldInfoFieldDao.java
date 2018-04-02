@@ -93,7 +93,7 @@ public class FirstTimeYieldInfoFieldDao {
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             trns = session.beginTransaction();
-            String queryString = "from FirstPassYieldInfoField where FpyInfoFieldId = :id";
+            String queryString = "from FirstTimeYieldInfoField where FtyInfoFieldId = :id";
             Query query = session.createQuery(queryString);
             query.setInteger("id", ftyInfoFieldId);
             ftyInfoField = (FirstTimeYieldInfoField) query.uniqueResult();

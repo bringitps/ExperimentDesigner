@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ import com.bringit.experiment.bll.FirstPassYieldInfoField;
 import com.bringit.experiment.bll.FirstPassYieldReport;
 import com.bringit.experiment.bll.FirstTimeYieldInfoField;
 import com.bringit.experiment.bll.FirstTimeYieldReport;
+import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.TargetColumn;
 import com.bringit.experiment.bll.TargetReport;
@@ -103,6 +105,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.Sizeable;
+import com.vaadin.server.VaadinService;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -152,14 +155,19 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 	//Data Sources
 	private List<ViewHorizontalReportByExperiment> vwHorizontalRptByExperimentList = new ArrayList<ViewHorizontalReportByExperiment>();
 	private List<Integer> vwHorizontalRptByExperimentDbIds =  new ArrayList<Integer>();
+	private List<String> vwHorizontalRptByExperimentKeyColStrIds = new ArrayList<String>();
 	private List<ViewHorizontalReportByFpyRpt> vwHorizontalRptByFpyRptList = new ArrayList<ViewHorizontalReportByFpyRpt>();
 	private List<Integer> vwHorizontalRptByFpyRptDbIds =  new ArrayList<Integer>();	
+	private List<String> vwHorizontalRptByFpyRptKeyColStrIds = new ArrayList<String>();
 	private List<ViewHorizontalReportByFnyRpt> vwHorizontalRptByFnyRptList = new ArrayList<ViewHorizontalReportByFnyRpt>();
 	private List<Integer> vwHorizontalRptByFnyRptDbIds =  new ArrayList<Integer>();
+	private List<String> vwHorizontalRptByFnyRptKeyColStrIds = new ArrayList<String>();
 	private List<ViewHorizontalReportByFtyRpt> vwHorizontalRptByFtyRptList = new ArrayList<ViewHorizontalReportByFtyRpt>();
 	private List<Integer> vwHorizontalRptByFtyRptDbIds =  new ArrayList<Integer>();
+	private List<String> vwHorizontalRptByFtyRptKeyColStrIds = new ArrayList<String>();
 	private List<ViewHorizontalReportByTargetRpt> vwHorizontalRptByTgtRptList = new ArrayList<ViewHorizontalReportByTargetRpt>();
 	private List<Integer> vwHorizontalRptByTargetDbIds =  new ArrayList<Integer>();
+	private List<String> vwHorizontalRptByTargetRptKeyColStrIds = new ArrayList<String>();
 	
 	//Data Source filters
 	private List<ViewHorizontalReportFilterByExpField> vwHorizontalRptFiltersByExpField = new ArrayList<ViewHorizontalReportFilterByExpField>();
@@ -219,6 +227,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			for(int i=0; vwHorizontalRptByExperimentList != null && i<vwHorizontalRptByExperimentList.size(); i++)
 			{
 				vwHorizontalRptByExperimentDbIds.add(vwHorizontalRptByExperimentList.get(i).getExperiment().getExpId());
+				vwHorizontalRptByExperimentKeyColStrIds.add("expfield_" + vwHorizontalRptByExperimentList.get(i).getExpKeyField().getExpFieldId());
 				List<ViewHorizontalReportFilterByExpField> currentVwHorizontalRptFiltersByExpField = new ViewHorizontalReportFilterByExpFieldDao().getAllVwHorizontalReportFiltersByExpRptId(vwHorizontalRptByExperimentList.get(i).getVwHorizontalRptByExperimentId());
 				for(int j=0; currentVwHorizontalRptFiltersByExpField!= null && j<currentVwHorizontalRptFiltersByExpField.size(); j++)
 					vwHorizontalRptFiltersByExpField.add(currentVwHorizontalRptFiltersByExpField.get(j));
@@ -227,6 +236,16 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			for(int i=0; vwHorizontalRptByFpyRptList != null && i<vwHorizontalRptByFpyRptList.size(); i++)
 			{
 				vwHorizontalRptByFpyRptDbIds.add(vwHorizontalRptByFpyRptList.get(i).getFpyRpt().getFpyReportId());
+				
+				if(vwHorizontalRptByFpyRptList.get(i).getFpyKeyInfoField() != null)
+					vwHorizontalRptByFpyRptKeyColStrIds.add("fpyfield_" + vwHorizontalRptByFpyRptList.get(i).getFpyKeyInfoField().getFpyInfoFieldId());
+				else if(vwHorizontalRptByFpyRptList.get(i).getVwHorizontalFpyKeyIsDateTimeExpField() != null && vwHorizontalRptByFpyRptList.get(i).getVwHorizontalFpyKeyIsDateTimeExpField())
+					vwHorizontalRptByFpyRptKeyColStrIds.add("fpy_datetime");
+				else if(vwHorizontalRptByFpyRptList.get(i).getVwHorizontalFpyKeyIsResultExpField() != null && vwHorizontalRptByFpyRptList.get(i).getVwHorizontalFpyKeyIsResultExpField())
+					vwHorizontalRptByFpyRptKeyColStrIds.add("fpy_result");
+				else if(vwHorizontalRptByFpyRptList.get(i).getVwHorizontalFpyKeyIsSNExpField() != null && vwHorizontalRptByFpyRptList.get(i).getVwHorizontalFpyKeyIsSNExpField())
+					vwHorizontalRptByFpyRptKeyColStrIds.add("fpy_sn");
+			
 				List<ViewHorizontalReportFilterByFpyField> currentVwHorizontalRptFiltersByFpyField = new ViewHorizontalReportFilterByFpyFieldDao().getAllVwHorizontalReportFiltersByFpyRptId(vwHorizontalRptByFpyRptList.get(i).getVwHorizontalRptByFpyId());
 				for(int j=0; currentVwHorizontalRptFiltersByFpyField != null && j<currentVwHorizontalRptFiltersByFpyField.size(); j++)
 					vwHorizontalRptFiltersByFpyField.add(currentVwHorizontalRptFiltersByFpyField.get(j));
@@ -235,6 +254,16 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			for(int i=0; vwHorizontalRptByFnyRptList != null && i<vwHorizontalRptByFnyRptList.size(); i++)
 			{
 				vwHorizontalRptByFnyRptDbIds.add(vwHorizontalRptByFnyRptList.get(i).getFnyRpt().getFnyReportId());
+				
+				if(vwHorizontalRptByFnyRptList.get(i).getFnyKeyInfoField() != null)
+					vwHorizontalRptByFnyRptKeyColStrIds.add("fnyfield_" + vwHorizontalRptByFnyRptList.get(i).getFnyKeyInfoField().getFnyInfoFieldId());
+				else if(vwHorizontalRptByFnyRptList.get(i).getVwHorizontalFnyKeyIsDateTimeExpField() != null && vwHorizontalRptByFnyRptList.get(i).getVwHorizontalFnyKeyIsDateTimeExpField())
+					vwHorizontalRptByFnyRptKeyColStrIds.add("fny_datetime");
+				else if(vwHorizontalRptByFnyRptList.get(i).getVwHorizontalFnyKeyIsResultExpField() != null && vwHorizontalRptByFnyRptList.get(i).getVwHorizontalFnyKeyIsResultExpField())
+					vwHorizontalRptByFnyRptKeyColStrIds.add("fny_result");
+				else if(vwHorizontalRptByFnyRptList.get(i).getVwHorizontalFnyKeyIsSNExpField() != null && vwHorizontalRptByFnyRptList.get(i).getVwHorizontalFnyKeyIsSNExpField())
+					vwHorizontalRptByFnyRptKeyColStrIds.add("fny_sn");
+				
 				List<ViewHorizontalReportFilterByFnyField> currentVwHorizontalRptFiltersByFnyField = new ViewHorizontalReportFilterByFnyFieldDao().getAllVwHorizontalReportFiltersByFnyRptId(vwHorizontalRptByFnyRptList.get(i).getVwHorizontalRptByFnyId());
 				for(int j=0; currentVwHorizontalRptFiltersByFnyField != null && j<currentVwHorizontalRptFiltersByFnyField.size(); j++)
 					vwHorizontalRptFiltersByFnyField.add(currentVwHorizontalRptFiltersByFnyField.get(j));
@@ -243,6 +272,16 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			for(int i=0; vwHorizontalRptByFtyRptList != null && i<vwHorizontalRptByFtyRptList.size(); i++)
 			{
 				vwHorizontalRptByFtyRptDbIds.add(vwHorizontalRptByFtyRptList.get(i).getFtyRpt().getFtyReportId());
+				
+				if(vwHorizontalRptByFtyRptList.get(i).getFtyKeyInfoField() != null)
+					vwHorizontalRptByFtyRptKeyColStrIds.add("ftyfield_" + vwHorizontalRptByFtyRptList.get(i).getFtyKeyInfoField().getFtyInfoFieldId());
+				else if(vwHorizontalRptByFtyRptList.get(i).getVwHorizontalFtyKeyIsDateTimeExpField() != null && vwHorizontalRptByFtyRptList.get(i).getVwHorizontalFtyKeyIsDateTimeExpField())
+					vwHorizontalRptByFtyRptKeyColStrIds.add("fty_datetime");
+				else if(vwHorizontalRptByFtyRptList.get(i).getVwHorizontalFtyKeyIsResultExpField() != null && vwHorizontalRptByFtyRptList.get(i).getVwHorizontalFtyKeyIsResultExpField())
+					vwHorizontalRptByFtyRptKeyColStrIds.add("fty_result");
+				else if(vwHorizontalRptByFtyRptList.get(i).getVwHorizontalFtyKeyIsSNExpField() != null && vwHorizontalRptByFtyRptList.get(i).getVwHorizontalFtyKeyIsSNExpField())
+					vwHorizontalRptByFtyRptKeyColStrIds.add("fty_sn");
+				
 				List<ViewHorizontalReportFilterByFtyField> currentVwHorizontalRptFiltersByFtyField = new ViewHorizontalReportFilterByFtyFieldDao().getAllVwHorizontalReportFiltersByFtyRptId(vwHorizontalRptByFtyRptList.get(i).getVwHorizontalRptByFtyId());
 				for(int j=0; currentVwHorizontalRptFiltersByFtyField != null && j<currentVwHorizontalRptFiltersByFtyField.size(); j++)
 					vwHorizontalRptFiltersByFtyField.add(currentVwHorizontalRptFiltersByFtyField.get(j));
@@ -251,34 +290,12 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			for(int i=0; vwHorizontalRptByTgtRptList != null && i<vwHorizontalRptByTgtRptList.size(); i++)
 			{
 				vwHorizontalRptByTargetDbIds.add(vwHorizontalRptByTgtRptList.get(i).getTargetRpt().getTargetReportId());
+				vwHorizontalRptByTargetRptKeyColStrIds.add("tgtfield_" + vwHorizontalRptByTgtRptList.get(i).getTargetKeyColumn().getTargetColumnId());
+				
 				List<ViewHorizontalReportFilterByTargetColumn> currentVwHorizontalRptFiltersByTgtColumn = new ViewHorizontalReportFilterByTargetColumnDao().getAllVwHorizontalReportFiltersByTargetRptId(vwHorizontalRptByTgtRptList.get(i).getVwHorizontalRptByTargetRptId());
 				for(int j=0; currentVwHorizontalRptFiltersByTgtColumn != null && j<currentVwHorizontalRptFiltersByTgtColumn.size(); j++)
 					vwHorizontalRptFiltersByTgtCol.add(currentVwHorizontalRptFiltersByTgtColumn.get(j));
 			}
-			
-			//Load report columns 
-			vwHorizontalRptColumns = new ViewHorizontalReportColumnDao().getAllVwHorizontalReportColumnsByRptId(vwHorizontalRptId);
-			
-			//Load report columns enrichment
-			for(int i=0; vwHorizontalRptColumns != null && i<vwHorizontalRptColumns.size(); i++)
-			{
-				List<ViewHorizontalReportColumnByEnrichment> currentVwHorizontalRptColumnsByEnrichment = new ViewHorizontalReportColumnByEnrichmentDao().getAllVwHorizontalRptColsByEnrichmentByColId(vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnId());
-
-				for(int j=0; currentVwHorizontalRptColumnsByEnrichment != null && j<currentVwHorizontalRptColumnsByEnrichment.size(); j++)
-					vwHorizontalRptColumnsByEnrichment.add(currentVwHorizontalRptColumnsByEnrichment.get(j));
-			}
-
-			
-			//Load Report Header information
-			this.txtVwHorizontalRptName.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptName());
-			this.txtVwHorizontalRptCustomId.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptDbTableNameId().replace("vwhorizontal#", ""));
-			this.txtVwHorizontalDescription.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptDescription());
-			this.chxActive.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptIsActive());
-			
-			//Load Key Column information
-			this.txtVwHorizontalRptKeyColName.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptKeyColumnName());
-			this.txtVwHorizontalRptKeyColCustomId.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptDbTableNameId());
-			this.cbxVwHorizontalRptKeyColDataType.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptKeyColumnDataType());
 		}
 		
 		
@@ -293,17 +310,14 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		pnlExperiments.setStyleName("well");
 		pnlExperiments.setCaption("");
 		
+		System.out.println(vwHorizontalRptByExperimentKeyColStrIds);
+		
 		for(int i=0; activeExperiments != null && i<activeExperiments.size(); i++)
 		{
 			optGrpPnlExperiments.addItem(activeExperiments.get(i).getExpId());
 			optGrpPnlExperiments.setItemCaption(activeExperiments.get(i).getExpId(), activeExperiments.get(i).getExpName());			
 			if(vwHorizontalRptId != null && vwHorizontalRptId > -1 && vwHorizontalRptByExperimentDbIds.indexOf(activeExperiments.get(i).getExpId()) != -1)
-			{
 				optGrpPnlExperiments.select(activeExperiments.get(i).getExpId());
-				
-				//Add report key column
-				//addReportKeyColumn(activeExperiments.get(i).getExpId(), null, null, null, null);
-			}
 		}
 		
 		optGrpPnlExperiments.addValueChangeListener(new ValueChangeListener(){
@@ -368,6 +382,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			
 			if(vwHorizontalRptId != null && vwHorizontalRptId > -1 && vwHorizontalRptByFnyRptDbIds.indexOf(activeFnyReports.get(i).getFnyReportId()) != -1)
 				optGrpPnlFnyReports.select(activeFnyReports.get(i).getFnyReportId());
+
 		}
 
 		optGrpPnlFnyReports.addValueChangeListener(new ValueChangeListener(){
@@ -397,7 +412,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			optGrpPnlFtyReports.setItemCaption(activeFtyReports.get(i).getFtyReportId(), activeFtyReports.get(i).getFtyReportName());
 
 			if(vwHorizontalRptId != null && vwHorizontalRptId > -1 && vwHorizontalRptByFtyRptDbIds.indexOf(activeFtyReports.get(i).getFtyReportId()) != -1)
-				optGrpPnlFtyReports.select(activeFtyReports.get(i).getFtyReportId());
+				optGrpPnlFtyReports.select(activeFtyReports.get(i).getFtyReportId());			
 		}
 
 		optGrpPnlFtyReports.addValueChangeListener(new ValueChangeListener(){
@@ -445,6 +460,37 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		pnlTargetReportDataSource.addComponent(pnlTargetReports);
 
 		//END: Data source selection
+		
+		if(!isNewRecord)
+		{
+			//Load Report Header information
+			this.txtVwHorizontalRptName.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptName());
+			this.txtVwHorizontalRptCustomId.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptDbTableNameId().replace("vwhorizontal#", ""));
+			this.txtVwHorizontalDescription.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptDescription());
+			this.chxActive.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptIsActive());
+			
+			//Load Key Column information
+			this.txtVwHorizontalRptKeyColName.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptKeyColumnName());
+			this.txtVwHorizontalRptKeyColCustomId.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptKeyColumnDbId());
+			this.cbxVwHorizontalRptKeyColDataType.setValue(this.savedVwHorizontalRpt.getVwHorizontalRptKeyColumnDataType());
+			
+			//Load report columns 
+			vwHorizontalRptColumns = new ViewHorizontalReportColumnDao().getAllVwHorizontalReportColumnsByRptId(vwHorizontalRptId);
+			
+			for(int i=0; vwHorizontalRptColumns != null && i<vwHorizontalRptColumns.size(); i++)
+				addReportColumn(vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnId(), vwHorizontalRptColumns.get(i));
+			
+			//Load report columns enrichment
+			for(int i=0; vwHorizontalRptColumns != null && i<vwHorizontalRptColumns.size(); i++)
+			{
+				List<ViewHorizontalReportColumnByEnrichment> currentVwHorizontalRptColumnsByEnrichment = new ViewHorizontalReportColumnByEnrichmentDao().getAllVwHorizontalRptColsByEnrichmentByColId(vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnId());
+
+				for(int j=0; currentVwHorizontalRptColumnsByEnrichment != null && j<currentVwHorizontalRptColumnsByEnrichment.size(); j++)
+					vwHorizontalRptColumnsByEnrichment.add(currentVwHorizontalRptColumnsByEnrichment.get(j));
+			}
+			
+		}
+		
 		
 		this.cbxVwHorizontalRptKeyColDataType.addValueChangeListener(new ValueChangeListener(){
 	           @Override
@@ -526,7 +572,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				//onDelete();
+				onDelete();
 			}
 
 		});		
@@ -1863,7 +1909,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 	}
 	
 	private void refreshColumnKeysTable()
-	{
+	{				
 		List<String> currentDataSourcesIds = new ArrayList<String>();
 		List<String> changedDataSourcesIds = new ArrayList<String>();
 		List<String> changedDataSourcesNames = new ArrayList<String>();
@@ -1892,7 +1938,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				int selectedExperimentId = Integer.parseInt(selectedExperiment.toString());				
 				if(activeExperiments.get(i).getExpId() == selectedExperimentId)
 				{
-					//System.out.println("Selected experiment:" + selectedExperimentId);
 					changedDataSourcesIds.add("exp_" + selectedExperimentId);
 					changedDataSourcesNames.add("EXP : " + activeExperiments.get(i).getExpName());
 					break;
@@ -2038,7 +2083,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		}	
 	}
 	
-
 	private void fillCbxDataSourceFields(String dataFieldType, ComboBox cbxDataSourceFields, Integer expDataSourceId, Integer fpyDataSourceId, 
 			Integer fnyDataSourceId, Integer ftyDataSourceId, Integer tgtDataSourceId)
 	{		
@@ -2049,6 +2093,9 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			
 			for(int i=0; selectedExperimentFields!=null && i<selectedExperimentFields.size(); i++)
 				addItemIfTypeMatches(dataFieldType, "expfield_" + selectedExperimentFields.get(i).getExpFieldId(), selectedExperimentFields.get(i).getExpFieldName(), selectedExperimentFields.get(i).getExpFieldType(), cbxDataSourceFields);
+		
+			if(vwHorizontalRptByExperimentDbIds.indexOf(expDataSourceId) != -1 && vwHorizontalRptByExperimentKeyColStrIds.size() > 0)
+				cbxDataSourceFields.setValue(vwHorizontalRptByExperimentKeyColStrIds.get(vwHorizontalRptByExperimentDbIds.indexOf(expDataSourceId)));
 		}
 		
 		if(fnyDataSourceId != null)
@@ -2060,6 +2107,9 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			addItemIfTypeMatches(dataFieldType, "fny_datetime", "Datetime (FNY)", "datetime", cbxDataSourceFields);
 			addItemIfTypeMatches(dataFieldType, "fny_sn", "Serial Number (FNY)", "nvarchar(max)", cbxDataSourceFields);
 			addItemIfTypeMatches(dataFieldType, "fny_result", "Result (FNY)", "nvarchar(max)", cbxDataSourceFields);
+		
+			if(vwHorizontalRptByFnyRptDbIds.indexOf(fnyDataSourceId) != -1 && vwHorizontalRptByFnyRptKeyColStrIds.size() > 0)
+				cbxDataSourceFields.setValue(vwHorizontalRptByFnyRptKeyColStrIds.get(vwHorizontalRptByFnyRptDbIds.indexOf(fnyDataSourceId)));
 		}
 		
 		if(fpyDataSourceId != null)
@@ -2071,6 +2121,11 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			addItemIfTypeMatches(dataFieldType, "fpy_datetime", "Datetime (FPY)", "datetime", cbxDataSourceFields);
 			addItemIfTypeMatches(dataFieldType, "fpy_sn", "Serial Number (FPY)", "nvarchar(max)", cbxDataSourceFields);
 			addItemIfTypeMatches(dataFieldType, "fpy_result", "Result (FPY)", "nvarchar(max)", cbxDataSourceFields);
+	
+			System.out.println("DB Ids: " + vwHorizontalRptByFpyRptDbIds + "KeyCols: " + vwHorizontalRptByFpyRptKeyColStrIds);
+			
+			if(vwHorizontalRptByFpyRptDbIds.indexOf(fpyDataSourceId) != -1 && vwHorizontalRptByFpyRptKeyColStrIds.size() > 0)
+				cbxDataSourceFields.setValue(vwHorizontalRptByFpyRptKeyColStrIds.get(vwHorizontalRptByFpyRptDbIds.indexOf(fpyDataSourceId)));
 		}
 		
 		if(ftyDataSourceId != null)
@@ -2082,6 +2137,9 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			addItemIfTypeMatches(dataFieldType, "fty_datetime", "Datetime (FTY)", "datetime", cbxDataSourceFields);
 			addItemIfTypeMatches(dataFieldType, "fty_sn", "Serial Number (FTY)", "nvarchar(max)", cbxDataSourceFields);
 			addItemIfTypeMatches(dataFieldType, "fty_result", "Result (FTY)", "nvarchar(max)", cbxDataSourceFields);
+			
+			if(vwHorizontalRptByFtyRptDbIds.indexOf(ftyDataSourceId) != -1 && vwHorizontalRptByFtyRptKeyColStrIds.size() > 0)
+				cbxDataSourceFields.setValue(vwHorizontalRptByFtyRptKeyColStrIds.get(vwHorizontalRptByFtyRptDbIds.indexOf(ftyDataSourceId)));
 		}
 		
 		if(tgtDataSourceId != null)
@@ -2090,6 +2148,10 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			
 			for(int i=0; targetColumns!=null && i<targetColumns.size(); i++)
 				addItemIfTypeMatches(dataFieldType, "tgtfield_" + targetColumns.get(i).getTargetColumnId(), targetColumns.get(i).getTargetColumnLabel(), targetColumns.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
+		
+			if(vwHorizontalRptByTargetDbIds.indexOf(tgtDataSourceId) != -1 && vwHorizontalRptByTargetRptKeyColStrIds.size() > 0)
+				cbxDataSourceFields.setValue(vwHorizontalRptByTargetRptKeyColStrIds.get(vwHorizontalRptByTargetDbIds.indexOf(ftyDataSourceId)));
+		
 		}				
 	}
 	
@@ -2129,8 +2191,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		}		
 	}
 	
-	
-	
 	private void addReportColumn(Integer reportColumnId, ViewHorizontalReportColumn vwHorizontalRptCol)
 	{
 		VerticalLayout vwHorizontalColumnPnl = new VerticalLayout();
@@ -2141,21 +2201,25 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		TextField txtColumnName = new TextField();
 		txtColumnName.setCaption("Column Name");
 		txtColumnName.setWidth(90, Unit.PERCENTAGE);
+		txtColumnName.setRequired(true);
 		txtColumnName.setStyleName("tiny");
 		
 		TextField txtColumnDbId = new TextField();
 		txtColumnDbId.setCaption("Column Db Id");
 		txtColumnDbId.setWidth(90, Unit.PERCENTAGE);
+		txtColumnDbId.setRequired(true);
 		txtColumnDbId.setStyleName("tiny");
 		
 		ComboBox cbxDataSource = new ComboBox();
 		cbxDataSource.setCaption("Data Source");
 		cbxDataSource.setWidth(90, Unit.PERCENTAGE);
+		cbxDataSource.setRequired(true);
 		cbxDataSource.setStyleName("tiny");
 		
 		ComboBox cbxDataSourceFieldColumn = new ComboBox();
 		cbxDataSourceFieldColumn.setCaption("Data Source Field/Column");
 		cbxDataSourceFieldColumn.setWidth(90, Unit.PERCENTAGE);
+		cbxDataSourceFieldColumn.setRequired(true);
 		cbxDataSourceFieldColumn.setStyleName("tiny");
 		
 		Button btnRemoveColumn = new Button();
@@ -2261,8 +2325,82 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 	           }
 	        });
 		
+		if(reportColumnId != null)
+		{
+			txtColumnName.setValue(vwHorizontalRptCol.getVwHorizontalRptColumnName());
+			txtColumnDbId.setValue(vwHorizontalRptCol.getVwHorizontalRptColumnDbId());
+			
+			if(vwHorizontalRptCol.getExperiment() != null)
+			{
+				cbxDataSource.setValue("exp_" + vwHorizontalRptCol.getExperiment().getExpId());
+				cbxDataSourceFieldColumn.setValue("expfield_" + vwHorizontalRptCol.getExpField().getExpFieldId());
+			}
+
+			if(vwHorizontalRptCol.getFpyRpt() != null)
+			{
+				cbxDataSource.setValue("fpy_" + vwHorizontalRptCol.getFpyRpt().getFpyReportId());
+				
+				if(vwHorizontalRptCol.getFpyInfoField() != null)
+					cbxDataSourceFieldColumn.setValue("fpyfield_" + vwHorizontalRptCol.getFpyInfoField().getFpyInfoFieldId());
+				else if(vwHorizontalRptCol.getVwHorizontalFpyIsDateTimeExpField() != null && vwHorizontalRptCol.getVwHorizontalFpyIsDateTimeExpField())
+					cbxDataSourceFieldColumn.setValue("fpy_datetime");
+				else if(vwHorizontalRptCol.getVwHorizontalFpyIsResultExpField() != null && vwHorizontalRptCol.getVwHorizontalFpyIsResultExpField())
+					cbxDataSourceFieldColumn.setValue("fpy_result");
+				else if(vwHorizontalRptCol.getVwHorizontalFpyIsSNExpField() != null && vwHorizontalRptCol.getVwHorizontalFpyIsSNExpField())
+					cbxDataSourceFieldColumn.setValue("fpy_sn");				
+			}
+			
+			if(vwHorizontalRptCol.getFtyRpt() != null)
+			{
+				cbxDataSource.setValue("fty_" + vwHorizontalRptCol.getFtyRpt().getFtyReportId());
+				
+				if(vwHorizontalRptCol.getFtyInfoField() != null)
+					cbxDataSourceFieldColumn.setValue("ftyfield_" + vwHorizontalRptCol.getFtyInfoField().getFtyInfoFieldId());
+				else if(vwHorizontalRptCol.getVwHorizontalFtyIsDateTimeExpField() != null && vwHorizontalRptCol.getVwHorizontalFtyIsDateTimeExpField())
+					cbxDataSourceFieldColumn.setValue("fty_datetime");
+				else if(vwHorizontalRptCol.getVwHorizontalFtyIsResultExpField() != null && vwHorizontalRptCol.getVwHorizontalFtyIsResultExpField())
+					cbxDataSourceFieldColumn.setValue("fty_result");
+				else if(vwHorizontalRptCol.getVwHorizontalFtyIsSNExpField() != null && vwHorizontalRptCol.getVwHorizontalFtyIsSNExpField())
+					cbxDataSourceFieldColumn.setValue("fty_sn");
+			}
+			
+			if(vwHorizontalRptCol.getFnyRpt() != null)
+			{				
+				cbxDataSource.setValue("fny_" + vwHorizontalRptCol.getFnyRpt().getFnyReportId());
+				
+				if(vwHorizontalRptCol.getFnyInfoField() != null)
+					cbxDataSourceFieldColumn.setValue("fnyfield_" + vwHorizontalRptCol.getFnyInfoField().getFnyInfoFieldId());
+				else if(vwHorizontalRptCol.getVwHorizontalFnyIsDateTimeExpField() != null && vwHorizontalRptCol.getVwHorizontalFnyIsDateTimeExpField())
+					cbxDataSourceFieldColumn.setValue("fny_datetime");
+				else if(vwHorizontalRptCol.getVwHorizontalFnyIsResultExpField() != null && vwHorizontalRptCol.getVwHorizontalFnyIsResultExpField())
+					cbxDataSourceFieldColumn.setValue("fny_result");
+				else if(vwHorizontalRptCol.getVwHorizontalFnyIsSNExpField() != null && vwHorizontalRptCol.getVwHorizontalFnyIsSNExpField())
+					cbxDataSourceFieldColumn.setValue("fny_sn");
+			}
+			
+			if(vwHorizontalRptCol.getTargetRpt() != null)
+			{
+				cbxDataSource.setValue("tgt_" + vwHorizontalRptCol.getTargetRpt().getTargetReportId());
+				cbxDataSourceFieldColumn.setValue("tgtfield_" + vwHorizontalRptCol.getTargetColumn().getTargetColumnId());				
+			}
+			
+			//cbxDataSource
+			//cbxDataSourceFieldColumn
+		}
+		
 		this.lytVwHorizontalRptColumnsPnls.addComponent(vwHorizontalColumnPnl);
 		txtColumnName.focus();
+		
+		btnRemoveColumn.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				//addDataSourceFilter(null,null,null,null,null,null,null);
+				//vwHorizontalColumnPnl.
+				lytVwHorizontalRptColumnsPnls.removeComponent(vwHorizontalColumnPnl);
+			}
+
+		});
 	}
 	
 	private void refreshDataSourceFields(ComboBox cbxDataSource, ComboBox cbxDataSourceFieldColumn)
@@ -2348,7 +2486,6 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		}				
 	}
 	
-
 	private void onSave()
 	{
 		boolean dataSourcesSelected = false;
@@ -2356,11 +2493,8 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		boolean isKeySelected = false;
 		int totalKeysSelected = 0;
 		
-		//boolean validateRequiredFieldsResult = validateRequiredFields();
-		//boolean validateNotDuplicatedReportColumnsResult = validateNotDuplicatedReportColumns();
-		
-		boolean validateRequiredFieldsResult = true;
-		boolean validateNotDuplicatedReportColumnsResult = true;
+		boolean validateRequiredFieldsResult = validateRequiredFields();
+		boolean validateNotDuplicatedReportColumnsResult = validateNotDuplicatedReportColumns();
 		
 		if(validateRequiredFieldsResult && validateNotDuplicatedReportColumnsResult)
 		{
@@ -3054,60 +3188,70 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 					Integer dataSourceFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));
 					ExperimentField expField = new ExperimentFieldDao().getExperimentFieldById(dataSourceFieldId);
 					vwHorizontalRptColumn.setExpField(expField);
-					vwHorizontalRptColumn.setVwVerticalRptColumnDataType(expField.getExpFieldType());
+					vwHorizontalRptColumn.setExperiment(expField.getExperiment());
+					vwHorizontalRptColumn.setVwHorizontalRptColumnDataType(expField.getExpFieldType());
 				}
 				
 				if(dataSourceStrId.startsWith("fpy"))
 				{
+					Integer fpyRptId = Integer.parseInt(dataSourceStrId.substring(4));
+					vwHorizontalRptColumn.setFpyRpt(new FirstPassYieldReportDao().getFirstPassYieldReportById(fpyRptId));
+					
 					if("fpy_sn".equals(dataSourceFieldStrId) || "fpy_result".equals(dataSourceFieldStrId) || "fpy_datetime".equals(dataSourceFieldStrId))
 					{
 						vwHorizontalRptColumn.setVwHorizontalFpyIsSNExpField("fpy_sn".equals(dataSourceFieldStrId));
 						vwHorizontalRptColumn.setVwHorizontalFpyIsResultExpField("fpy_result".equals(dataSourceFieldStrId));
 						vwHorizontalRptColumn.setVwHorizontalFpyIsDateTimeExpField("fpy_datetime".equals(dataSourceFieldStrId));
-						vwHorizontalRptColumn.setVwVerticalRptColumnDataType((("fpy_sn".equals(dataSourceFieldStrId) || "fpy_result".equals(dataSourceFieldStrId) ? "nvarchar(max)" : "datetime")));
+						vwHorizontalRptColumn.setVwHorizontalRptColumnDataType((("fpy_sn".equals(dataSourceFieldStrId) || "fpy_result".equals(dataSourceFieldStrId) ? "nvarchar(max)" : "datetime")));
 					}
 					else
 					{
 						Integer dataSourceFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));
 						FirstPassYieldInfoField fpyInfoField = new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldById(dataSourceFieldId);
 						vwHorizontalRptColumn.setFpyInfoField(fpyInfoField);
-						vwHorizontalRptColumn.setVwVerticalRptColumnDataType(fpyInfoField.getExperimentField().getExpFieldType());
+						vwHorizontalRptColumn.setVwHorizontalRptColumnDataType(fpyInfoField.getExperimentField().getExpFieldType());
 					}
 				}
 			
 				if(dataSourceStrId.startsWith("fny"))
 				{
+					Integer fnyRptId = Integer.parseInt(dataSourceStrId.substring(4));
+					vwHorizontalRptColumn.setFnyRpt(new FinalPassYieldReportDao().getFinalPassYieldReportById(fnyRptId));
+					
 					if("fny_sn".equals(dataSourceFieldStrId) || "fny_result".equals(dataSourceFieldStrId) || "fny_datetime".equals(dataSourceFieldStrId))
 					{
 						vwHorizontalRptColumn.setVwHorizontalFnyIsSNExpField("fny_sn".equals(dataSourceFieldStrId));
 						vwHorizontalRptColumn.setVwHorizontalFnyIsResultExpField("fny_result".equals(dataSourceFieldStrId));
 						vwHorizontalRptColumn.setVwHorizontalFnyIsDateTimeExpField("fny_datetime".equals(dataSourceFieldStrId));	
-						vwHorizontalRptColumn.setVwVerticalRptColumnDataType((("fny_sn".equals(dataSourceFieldStrId) || "fny_result".equals(dataSourceFieldStrId) ? "nvarchar(max)" : "datetime")));
+						vwHorizontalRptColumn.setVwHorizontalRptColumnDataType((("fny_sn".equals(dataSourceFieldStrId) || "fny_result".equals(dataSourceFieldStrId) ? "nvarchar(max)" : "datetime")));
 					}
 					else
 					{
 						Integer dataSourceFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));
 						FinalPassYieldInfoField fnyInfoField = new FinalPassYieldInfoFieldDao().getFinalPassYieldInfoFieldById(dataSourceFieldId);
 						vwHorizontalRptColumn.setFnyInfoField(fnyInfoField);
-						vwHorizontalRptColumn.setVwVerticalRptColumnDataType(fnyInfoField.getExperimentField().getExpFieldType());
+						vwHorizontalRptColumn.setVwHorizontalRptColumnDataType(fnyInfoField.getExperimentField().getExpFieldType());
 					}
 				}
 				
 				if(dataSourceStrId.startsWith("fty"))
 				{
+					Integer ftyRptId = Integer.parseInt(dataSourceStrId.substring(4));
+					vwHorizontalRptColumn.setFtyRpt(new FirstTimeYieldReportDao().getFirstTimeYieldReportById(ftyRptId));
+					
 					if("fty_sn".equals(dataSourceFieldStrId) || "fty_result".equals(dataSourceFieldStrId) || "fty_datetime".equals(dataSourceFieldStrId))
 					{
 						vwHorizontalRptColumn.setVwHorizontalFtyIsSNExpField("fty_sn".equals(dataSourceFieldStrId));
 						vwHorizontalRptColumn.setVwHorizontalFtyIsResultExpField("fty_result".equals(dataSourceFieldStrId));
 						vwHorizontalRptColumn.setVwHorizontalFtyIsDateTimeExpField("fty_datetime".equals(dataSourceFieldStrId));						
-						vwHorizontalRptColumn.setVwVerticalRptColumnDataType((("fty_sn".equals(dataSourceFieldStrId) || "fty_result".equals(dataSourceFieldStrId) ? "nvarchar(max)" : "datetime")));
+						vwHorizontalRptColumn.setVwHorizontalRptColumnDataType((("fty_sn".equals(dataSourceFieldStrId) || "fty_result".equals(dataSourceFieldStrId) ? "nvarchar(max)" : "datetime")));
 					}
 					else
 					{
 						Integer dataSourceFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));
 						FirstTimeYieldInfoField ftyInfoField = new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldById(dataSourceFieldId);
 						vwHorizontalRptColumn.setFtyInfoField(ftyInfoField);
-						vwHorizontalRptColumn.setVwVerticalRptColumnDataType(ftyInfoField.getExperimentField().getExpFieldType());
+						vwHorizontalRptColumn.setVwHorizontalRptColumnDataType(ftyInfoField.getExperimentField().getExpFieldType());
 					}
 				}
 				
@@ -3116,7 +3260,8 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 					Integer dataSourceFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));
 					TargetColumn targetColumn = new TargetColumnDao().getTargetColumnById(dataSourceFieldId);
 					vwHorizontalRptColumn.setTargetColumn(targetColumn);
-					vwHorizontalRptColumn.setVwVerticalRptColumnDataType(targetColumn.getExperimentField().getExpFieldType());
+					vwHorizontalRptColumn.setTargetRpt(targetColumn.getTargetColumnGroup().getTargetReport());
+					vwHorizontalRptColumn.setVwHorizontalRptColumnDataType(targetColumn.getExperimentField().getExpFieldType());
 				}
 				
 				new ViewHorizontalReportColumnDao().addVwHorizontalReportColumn(vwHorizontalRptColumn);
@@ -3162,75 +3307,55 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 			}
 			else
 			{
-				/*
-				ViewVerticalReportColumnByEnrichmentDao vwVerticalRptColEnrichmentDao = new ViewVerticalReportColumnByEnrichmentDao();
-				for(int i=0; vwVerticalRptColumnsByEnrichment != null &&i<vwVerticalRptColumnsByEnrichment.size(); i++)
-					vwVerticalRptColEnrichmentDao.deleteVwVerticalReportColumnByEnrichment(vwVerticalRptColumnsByEnrichment.get(i).getVwVerticalRptColumnByEnrichmentId()); 
 				
-				ViewVerticalReportColumnByExpFieldDao vwVerticalRptColumnByExpFieldDao = new ViewVerticalReportColumnByExpFieldDao();
-				for(int i=0; vwVerticalRptColumnsByExpField != null &&i<vwVerticalRptColumnsByExpField.size(); i++)
-					vwVerticalRptColumnByExpFieldDao.deleteVwVerticalReportColumnByExpField(vwVerticalRptColumnsByExpField.get(i).getVwVerticalRptColumnByExpFieldId());
+				ViewHorizontalReportColumnByEnrichmentDao deleteVwHorizontalRptColEnrichmentDao = new ViewHorizontalReportColumnByEnrichmentDao();
+				for(int i=0; vwHorizontalRptColumnsByEnrichment != null &&i<vwHorizontalRptColumnsByEnrichment.size(); i++)
+					deleteVwHorizontalRptColEnrichmentDao.deleteVwHorizontalReportColumnByEnrichment(vwHorizontalRptColumnsByEnrichment.get(i).getVwHorizontalRptColumnByEnrichmentId()); 
+			
+				ViewHorizontalReportFilterByExpFieldDao vwHorizontalReportFilterByExpFieldDao = new ViewHorizontalReportFilterByExpFieldDao();
+				for(int i=0; vwHorizontalRptFiltersByExpField != null &&i<vwHorizontalRptFiltersByExpField.size(); i++)
+					vwHorizontalReportFilterByExpFieldDao.deleteVwHorizontalReportFilterByExpField(vwHorizontalRptFiltersByExpField.get(i).getVwHorizontalRptFilterByExpFieldId());
 				
-				ViewVerticalReportColumnByFpyFieldDao vwVerticalRptColumnByFpyFieldDao = new ViewVerticalReportColumnByFpyFieldDao();
-				for(int i=0; vwVerticalRptColumnsByFpyField != null &&i<vwVerticalRptColumnsByFpyField.size(); i++)
-					vwVerticalRptColumnByFpyFieldDao.deleteVwVerticalReportColumnByFpyField(vwVerticalRptColumnsByFpyField.get(i).getVwVerticalRptColumnByFpyFieldId());
+				ViewHorizontalReportFilterByFpyFieldDao vwHorizontalReportFilterByFpyFieldDao = new ViewHorizontalReportFilterByFpyFieldDao();
+				for(int i=0; vwHorizontalRptFiltersByFpyField != null &&i<vwHorizontalRptFiltersByFpyField.size(); i++)
+					vwHorizontalReportFilterByFpyFieldDao.deleteVwHorizontalReportFilterByFpyField(vwHorizontalRptFiltersByFpyField.get(i).getVwHorizontalRptFilterByFpyFieldId());
 				
-				ViewVerticalReportColumnByFnyFieldDao vwVerticalRptColumnByFnyFieldDao = new ViewVerticalReportColumnByFnyFieldDao();
-				for(int i=0; vwVerticalRptColumnsByFnyField != null &&i<vwVerticalRptColumnsByFnyField.size(); i++)
-					vwVerticalRptColumnByFnyFieldDao.deleteVwVerticalReportColumnByFnyField(vwVerticalRptColumnsByFnyField.get(i).getVwVerticalRptColumnByFnyFieldId());
+				ViewHorizontalReportFilterByFnyFieldDao vwHorizontalReportFilterByFnyFieldDao = new ViewHorizontalReportFilterByFnyFieldDao();
+				for(int i=0; vwHorizontalRptFiltersByFnyField != null &&i<vwHorizontalRptFiltersByFnyField.size(); i++)
+					vwHorizontalReportFilterByFnyFieldDao.deleteVwHorizontalReportFilterByFnyField(vwHorizontalRptFiltersByFnyField.get(i).getVwHorizontalRptFilterByFnyFieldId());
 				
-				ViewVerticalReportColumnByFtyFieldDao vwVerticalRptColumnByFtyFieldDao = new ViewVerticalReportColumnByFtyFieldDao();
-				for(int i=0; vwVerticalRptColumnsByFtyField != null &&i<vwVerticalRptColumnsByFtyField.size(); i++)
-					vwVerticalRptColumnByFtyFieldDao.deleteVwVerticalReportColumnByFtyField(vwVerticalRptColumnsByFtyField.get(i).getVwVerticalRptColumnByFtyFieldId());
+				ViewHorizontalReportFilterByFtyFieldDao vwHorizontalReportFilterByFtyFieldDao = new ViewHorizontalReportFilterByFtyFieldDao();
+				for(int i=0; vwHorizontalRptFiltersByFtyField != null &&i<vwHorizontalRptFiltersByFtyField.size(); i++)
+					vwHorizontalReportFilterByFtyFieldDao.deleteVwHorizontalReportFilterByFtyField(vwHorizontalRptFiltersByFtyField.get(i).getVwHorizontalRptFilterByFtyFieldId());
 				
-				ViewVerticalReportColumnByTargetColumnDao vwVerticalReportColumnByTargetColumnDao = new ViewVerticalReportColumnByTargetColumnDao();
-				for(int i=0; vwVerticalRptColumnsByTgtCol != null &&i<vwVerticalRptColumnsByTgtCol.size(); i++)
-					vwVerticalReportColumnByTargetColumnDao.deleteVwVerticalReportColumnByTargetColumn(vwVerticalRptColumnsByTgtCol.get(i).getVwVerticalRptColumnByTargetColumnId());
+				ViewHorizontalReportFilterByTargetColumnDao vwHorizontalReportFilterByTargetColumnDao = new ViewHorizontalReportFilterByTargetColumnDao();
+				for(int i=0; vwHorizontalRptFiltersByTgtCol != null &&i<vwHorizontalRptFiltersByTgtCol.size(); i++)
+					vwHorizontalReportFilterByTargetColumnDao.deleteVwHorizontalReportFilterByTargetColumn(vwHorizontalRptFiltersByTgtCol.get(i).getVwHorizontalRptFilterByTargetColumnId());
 				
-				ViewVerticalReportFilterByExpFieldDao vwVerticalReportFilterByExpFieldDao = new ViewVerticalReportFilterByExpFieldDao();
-				for(int i=0; vwVerticalRptFiltersByExpField != null &&i<vwVerticalRptFiltersByExpField.size(); i++)
-					vwVerticalReportFilterByExpFieldDao.deleteVwVerticalReportFilterByExpField(vwVerticalRptFiltersByExpField.get(i).getVwVerticalRptFilterByExpFieldId());
+				ViewHorizontalReportColumnDao vwHorizontalReportColumnDao = new ViewHorizontalReportColumnDao();
+				for(int i=0; vwHorizontalRptColumns != null && i<vwHorizontalRptColumns.size(); i++)
+					vwHorizontalReportColumnDao.deleteVwHorizontalReportColumn(vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnId());
 				
-				ViewVerticalReportFilterByFpyFieldDao vwVerticalReportFilterByFpyFieldDao = new ViewVerticalReportFilterByFpyFieldDao();
-				for(int i=0; vwVerticalRptFiltersByFpyField != null &&i<vwVerticalRptFiltersByFpyField.size(); i++)
-					vwVerticalReportFilterByFpyFieldDao.deleteVwVerticalReportFilterByFpyField(vwVerticalRptFiltersByFpyField.get(i).getVwVerticalRptFilterByFpyFieldId());
-				
-				ViewVerticalReportFilterByFnyFieldDao vwVerticalReportFilterByFnyFieldDao = new ViewVerticalReportFilterByFnyFieldDao();
-				for(int i=0; vwVerticalRptFiltersByFnyField != null &&i<vwVerticalRptFiltersByFnyField.size(); i++)
-					vwVerticalReportFilterByFnyFieldDao.deleteVwVerticalReportFilterByFnyField(vwVerticalRptFiltersByFnyField.get(i).getVwVerticalRptFilterByFnyFieldId());
-				
-				ViewVerticalReportFilterByFtyFieldDao vwVerticalReportFilterByFtyFieldDao = new ViewVerticalReportFilterByFtyFieldDao();
-				for(int i=0; vwVerticalRptFiltersByFtyField != null &&i<vwVerticalRptFiltersByFtyField.size(); i++)
-					vwVerticalReportFilterByFtyFieldDao.deleteVwVerticalReportFilterByFtyField(vwVerticalRptFiltersByFtyField.get(i).getVwVerticalRptFilterByFtyFieldId());
-				
-				ViewVerticalReportFilterByTargetColumnDao vwVerticalReportFilterByTargetColumnDao = new ViewVerticalReportFilterByTargetColumnDao();
-				for(int i=0; vwVerticalRptFiltersByTgtCol != null &&i<vwVerticalRptFiltersByTgtCol.size(); i++)
-					vwVerticalReportFilterByTargetColumnDao.deleteVwVerticalReportFilterByTargetColumn(vwVerticalRptFiltersByTgtCol.get(i).getVwVerticalRptFilterByTargetColumnId());
-				
-				ViewVerticalReportColumnDao vwVerticalReportColumnDao = new ViewVerticalReportColumnDao();
-				for(int i=0; vwVerticalRptColumns != null && i<vwVerticalRptColumns.size(); i++)
-					vwVerticalReportColumnDao.deleteVwVerticalReportColumn(vwVerticalRptColumns.get(i).getVwVerticalRptColumnId());
-				
-				ViewVerticalReportByExperimentDao vwVerticalReportByExperimentDao = new ViewVerticalReportByExperimentDao();
-				for(int i=0; vwVerticalRptByExperimentList != null && i<vwVerticalRptByExperimentList.size(); i++)
-					vwVerticalReportByExperimentDao.deleteVwVerticalReportByExperiment(vwVerticalRptByExperimentList.get(i).getVwVerticalRptByExperimentId());
+				ViewHorizontalReportByExperimentDao vwHorizontalReportByExperimentDao = new ViewHorizontalReportByExperimentDao();
+				for(int i=0; vwHorizontalRptByExperimentList != null && i<vwHorizontalRptByExperimentList.size(); i++)
+					vwHorizontalReportByExperimentDao.deleteVwHorizontalReportByExperiment(vwHorizontalRptByExperimentList.get(i).getVwHorizontalRptByExperimentId());
 
-				ViewVerticalReportByFpyRptDao vwVerticalReportByFpyRptDao = new ViewVerticalReportByFpyRptDao();
-				for(int i=0; vwVerticalRptByFpyRptList != null && i<vwVerticalRptByFpyRptList.size(); i++)
-					vwVerticalReportByFpyRptDao.deleteVwVerticalReportByFpyRpt(vwVerticalRptByFpyRptList.get(i).getVwVerticalRptByFpyId());
+				ViewHorizontalReportByFpyRptDao vwHorizontalReportByFpyRptDao = new ViewHorizontalReportByFpyRptDao();
+				for(int i=0; vwHorizontalRptByFpyRptList != null && i<vwHorizontalRptByFpyRptList.size(); i++)
+					vwHorizontalReportByFpyRptDao.deleteVwHorizontalReportByFpyRpt(vwHorizontalRptByFpyRptList.get(i).getVwHorizontalRptByFpyId());
 
-				ViewVerticalReportByFtyRptDao vwVerticalReportByFtyRptDao = new ViewVerticalReportByFtyRptDao();
-				for(int i=0; vwVerticalRptByFtyRptList != null && i<vwVerticalRptByFtyRptList.size(); i++)
-					vwVerticalReportByFtyRptDao.deleteVwVerticalReportByFtyRpt(vwVerticalRptByFtyRptList.get(i).getVwVerticalRptByFtyId());
+				ViewHorizontalReportByFtyRptDao vwHorizontalReportByFtyRptDao = new ViewHorizontalReportByFtyRptDao();
+				for(int i=0; vwHorizontalRptByFtyRptList != null && i<vwHorizontalRptByFtyRptList.size(); i++)
+					vwHorizontalReportByFtyRptDao.deleteVwHorizontalReportByFtyRpt(vwHorizontalRptByFtyRptList.get(i).getVwHorizontalRptByFtyId());
 				
-				ViewVerticalReportByFnyRptDao vwVerticalReportByFnyRptDao = new ViewVerticalReportByFnyRptDao();
-				for(int i=0; vwVerticalRptByFnyRptList != null && i<vwVerticalRptByFnyRptList.size(); i++)
-					vwVerticalReportByFnyRptDao.deleteVwVerticalReportByFnyRpt(vwVerticalRptByFnyRptList.get(i).getVwVerticalRptByFnyId());
+				ViewHorizontalReportByFnyRptDao vwHorizontalReportByFnyRptDao = new ViewHorizontalReportByFnyRptDao();
+				for(int i=0; vwHorizontalRptByFnyRptList != null && i<vwHorizontalRptByFnyRptList.size(); i++)
+					vwHorizontalReportByFnyRptDao.deleteVwHorizontalReportByFnyRpt(vwHorizontalRptByFnyRptList.get(i).getVwHorizontalRptByFnyId());
 				
-				ViewVerticalReportByTargetRptDao vwVerticalReportByTargetRptDao = new ViewVerticalReportByTargetRptDao();
-				for(int i=0; vwVerticalRptByTgtRptList != null && i<vwVerticalRptByTgtRptList.size(); i++)
-					vwVerticalReportByTargetRptDao.deleteVwVerticalReportByTargetRpt(vwVerticalRptByTgtRptList.get(i).getVwVerticalRptByTargetRptId());
-				*/
+				ViewHorizontalReportByTargetRptDao vwHorizontalReportByTargetRptDao = new ViewHorizontalReportByTargetRptDao();
+				for(int i=0; vwHorizontalRptByTgtRptList != null && i<vwHorizontalRptByTgtRptList.size(); i++)
+					vwHorizontalReportByTargetRptDao.deleteVwHorizontalReportByTargetRpt(vwHorizontalRptByTgtRptList.get(i).getVwHorizontalRptByTargetRptId());
+				
 			}
 			
 			closeModalWindow();		
@@ -3245,7 +3370,156 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 		}
 	}	
 
+	private boolean validateRequiredFields()
+	{
+		if(!this.txtVwHorizontalRptName.isValid() || !this.txtVwHorizontalRptCustomId.isValid() || !this.txtVwHorizontalRptKeyColCustomId.isValid() || !this.txtVwHorizontalRptKeyColName.isValid())
+			return false;		
+		
+		//Validate Key Column Map
+		//Add Key column for Target
+		Collection rptKeyColumnsMapItemIds = this.tblKeyColumnMapping.getContainerDataSource().getItemIds();
+		
+		for (Object rptKeyColumnMapItemIdObj : rptKeyColumnsMapItemIds) 
+		{
+			Item tblKeyColumnMapRowItem = this.tblKeyColumnMapping.getContainerDataSource().getItem(rptKeyColumnMapItemIdObj);
+			ComboBox cbxKeyColumnMapField = (ComboBox)(tblKeyColumnMapRowItem.getItemProperty("Data Source Table/Report").getValue());
 
+			if(!cbxKeyColumnMapField.isValid())
+				return false;
+		}
+		
+		//Validate Horizontal Columns
+		for(int i=0; i<lytVwHorizontalRptColumnsPnls.getComponentCount(); i++)
+		{
+			VerticalLayout pnlRptColumn = (VerticalLayout)lytVwHorizontalRptColumnsPnls.getComponent(i);
+
+			TextField txtVwHorizontalRptColumnName = (TextField)pnlRptColumn.getComponent(0);
+			TextField txtVwHorizontalRptColumnDbId = (TextField)pnlRptColumn.getComponent(1);
+			ComboBox cbxVwHorizontalRptColDataSource = (ComboBox)pnlRptColumn.getComponent(2);
+			ComboBox cbxVwHorizontalRptColDataSourceField = (ComboBox)pnlRptColumn.getComponent(3);
+			
+			if(!txtVwHorizontalRptColumnName.isValid() || !txtVwHorizontalRptColumnDbId.isValid() || !cbxVwHorizontalRptColDataSource.isValid() || !cbxVwHorizontalRptColDataSourceField.isValid())
+				return false;	
+		}
+		
+		Collection filterItemIds = this.tblReportFilters.getContainerDataSource().getItemIds();
+		if(filterItemIds != null)
+		{
+			for (Object itemIdObj : filterItemIds) 
+			{
+				int itemId = (int)itemIdObj;
+				Item tblRowItem = this.tblReportFilters.getContainerDataSource().getItem(itemId);
+	
+				if(((ComboBox)(tblRowItem.getItemProperty("Data Source").getValue())).getValue() == null)
+					return false;
+				if(((ComboBox)(tblRowItem.getItemProperty("Source Column/Field").getValue())).getValue() == null)
+					return false;
+				if(((ComboBox)(tblRowItem.getItemProperty("Filter Operator").getValue())).getValue() == null)
+					return false;
+				
+				String filterOperatorSelected = ((ComboBox)(tblRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString();
+				GridLayout gridFilterValues = (GridLayout)tblRowItem.getItemProperty("Filter Value").getValue();
+				
+				if(filterOperatorSelected.equals("between") || filterOperatorSelected.equals("notbetween"))
+				{
+					TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+					TextField txtFilterValue2 = (TextField)gridFilterValues.getComponent(1, 0);
+					if(txtFilterValue1.getValue() == null || txtFilterValue2.getValue() == null || txtFilterValue1.getValue().isEmpty() || txtFilterValue2.getValue().isEmpty())
+						return false;
+				}
+				else if(filterOperatorSelected.equals("customrange"))
+				{
+					DateField fromDateField = (DateField)gridFilterValues.getComponent(0, 0);
+					DateField toDateField = (DateField)gridFilterValues.getComponent(1, 0);
+					if(fromDateField.getValue() == null || toDateField.getValue() == null)
+						return false;
+				}
+				else if(filterOperatorSelected.equals("after") || filterOperatorSelected.equals("before")
+	    				|| filterOperatorSelected.equals("on") || filterOperatorSelected.equals("onorafter")
+	    				|| filterOperatorSelected.equals("onorbefore"))
+				{
+					DateField dtFilterValue = (DateField)gridFilterValues.getComponent(0, 0);
+					if(dtFilterValue.getValue() == null)
+						return false;									
+				}
+				else if(!filterOperatorSelected.equals("today"))
+				{
+					TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+					if(txtFilterValue1.getValue() == null)
+						return false;
+				}
+			}
+		}
+
+		Collection enrichmentItemIds = this.tblColumnsEnrichment.getContainerDataSource().getItemIds();
+		if(enrichmentItemIds != null)
+		{
+			for (Object itemIdObj : enrichmentItemIds) 
+			{
+				int itemId = (int)itemIdObj;
+				Item tblRowItem = this.tblColumnsEnrichment.getContainerDataSource().getItem(itemId);
+	
+				if(((ComboBox)(tblRowItem.getItemProperty("Report Column").getValue())).getValue() == null)
+					return false;
+				if(((ComboBox)(tblRowItem.getItemProperty("Operator").getValue())).getValue() == null)
+					return false;
+				if(((TextField)(tblRowItem.getItemProperty("Value").getValue())).getValue() == null)
+					return false;
+				if(((ComboBox)(tblRowItem.getItemProperty("Enrichment Type").getValue())).getValue() == null)
+					return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean validateNotDuplicatedReportColumns()
+	{		
+		List<String> addedReportColumnNames = new ArrayList<String>(); 
+		List<String> addedReportColumnDBNames = new ArrayList<String>();
+		
+		//Validate Horizontal Columns
+		for(int i=0; i<lytVwHorizontalRptColumnsPnls.getComponentCount(); i++)
+		{
+			VerticalLayout pnlRptColumn = (VerticalLayout)lytVwHorizontalRptColumnsPnls.getComponent(i);
+
+			TextField txtVwHorizontalRptColumnName = (TextField)pnlRptColumn.getComponent(0);
+			TextField txtVwHorizontalRptColumnDbId = (TextField)pnlRptColumn.getComponent(1);
+			
+			if(txtVwHorizontalRptColumnName != null)
+			{
+				if(addedReportColumnNames.indexOf(txtVwHorizontalRptColumnName.getValue()) == -1)
+					addedReportColumnNames.add(txtVwHorizontalRptColumnName.getValue());
+				else
+					return false;			
+			}
+			
+			if(txtVwHorizontalRptColumnDbId != null)
+			{
+				if(addedReportColumnDBNames.indexOf(txtVwHorizontalRptColumnDbId.getValue()) == -1)
+					addedReportColumnDBNames.add(txtVwHorizontalRptColumnDbId.getValue());
+				else
+					return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	
+	private void onDelete()
+	{
+		this.savedVwHorizontalRpt.setVwHorizontalRptIsActive(false);
+		SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
+		this.savedVwHorizontalRpt.setLastModifiedBy(sessionUser);
+		this.savedVwHorizontalRpt.setModifiedDate(new Date());	
+		new ViewHorizontalReportDao().updateVwHorizontalReport(this.savedVwHorizontalRpt);
+		
+		WebApplication webApp = (WebApplication)this.getParent().getParent();
+		webApp.reloadMainForm("horizontal view report");
+		closeModalWindow();
+    }
+	
+	
 	private void closeModalWindow()
 	{
 		//Close Parent Modal Window

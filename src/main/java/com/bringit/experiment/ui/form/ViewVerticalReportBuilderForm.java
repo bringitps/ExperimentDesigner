@@ -172,9 +172,12 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 	public ViewVerticalReportBuilderForm(Integer vwVerticalRptId)
 	{
 		if(vwVerticalRptId == null || vwVerticalRptId == -1)
+		{
 			isNewRecord = true;
+			this.btnDelete.setEnabled(false);
+		}
 		else
-		{	
+		{				
 			//Load report data from DB
 			this.savedVwVerticalRpt = new ViewVerticalReportDao().getVwVerticalRptById(vwVerticalRptId);
 			
@@ -761,6 +764,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		ComboBox cbxFilterOperator = new ComboBox("");
 		cbxFilterOperator.setStyleName("tiny");
 		cbxFilterOperator.setHeight(20, Unit.PIXELS);		
+		cbxFilterOperator.setRequired(true);
 		itemValues[3] = cbxFilterOperator;
 
 		GridLayout gridFilterValues = new GridLayout(2,1);
@@ -884,7 +888,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 						e.printStackTrace();
 					}									
 				}
-				else
+				else if(!filterOperator.equals("today"))
 				{
 					txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
 					txtFilterValue1.setValue(vwVerticalRptFiltersByExpField.getVwVerticalRptFilterByExpFieldValue1());
@@ -958,7 +962,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 						e.printStackTrace();
 					}									
 				}
-				else
+				else if(!filterOperator.equals("today"))
 				{
 					txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
 					txtFilterValue1.setValue(vwVerticalRptFiltersByFpyField.getVwVerticalRptFilterByFpyFieldValue1());
@@ -1031,7 +1035,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 						e.printStackTrace();
 					}									
 				}
-				else
+				else if(!filterOperator.equals("today"))
 				{
 					txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
 					txtFilterValue1.setValue(vwVerticalRptFiltersByFnyField.getVwVerticalRptFilterByFnyFieldValue1());
@@ -1104,7 +1108,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 						e.printStackTrace();
 					}									
 				}
-				else
+				else if(!filterOperator.equals("today"))
 				{
 					txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
 					txtFilterValue1.setValue(vwVerticalRptFiltersByFtyField.getVwVerticalRptFilterByFtyFieldValue1());
@@ -1171,7 +1175,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 						e.printStackTrace();
 					}									
 				}
-				else
+				else if(!filterOperator.equals("today"))
 				{
 					txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
 					txtFilterValue1.setValue(vwVerticalRptFiltersByTargetColumn.getVwVerticalRptFilterByTargetColumnValue1());
@@ -1655,12 +1659,14 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     	fromDateField.setWidth(95, Sizeable.UNITS_PIXELS);
     	fromDateField.setHeight(25, Sizeable.UNITS_PIXELS);
     	fromDateField.setStyleName("tiny");
+    	fromDateField.setRequired(true);
 		gridFilterValues.addComponent(fromDateField, 0, 0);
     	
     	DateField toDateField = new DateField();
     	toDateField.setWidth(95, Sizeable.UNITS_PIXELS);
     	toDateField.setHeight(25, Sizeable.UNITS_PIXELS);
     	toDateField.setStyleName("tiny");
+    	toDateField.setRequired(true);
 		gridFilterValues.addComponent(toDateField, 1, 0);
 		
     	cbxDateFilterOperators.addValueChangeListener(new ValueChangeListener() {
@@ -1721,6 +1727,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		txtFilterValue1.setHeight(20, Unit.PIXELS);
 		txtFilterValue1.setWidth(110, Unit.PIXELS);
 		txtFilterValue1.setInputPrompt("Value1");
+		txtFilterValue1.setRequired(true);
 		gridFilterValues.addComponent(txtFilterValue1, 0, 0);
     }    
 
@@ -1799,6 +1806,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     		txtFilterValue1.setHeight(20, Unit.PIXELS);
     		txtFilterValue1.setWidth(110, Unit.PIXELS);
     		txtFilterValue1.setInputPrompt("Value1");
+    		txtFilterValue1.setRequired(true);
     		gridFilterValues.addComponent(txtFilterValue1, 0, 0);
 
     		TextField txtFilterValue2 = new TextField("");
@@ -1807,7 +1815,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     		txtFilterValue2.setHeight(20, Unit.PIXELS);
     		txtFilterValue2.setWidth(110, Unit.PIXELS);
     		txtFilterValue2.setInputPrompt("Value2");
-    		gridFilterValues.setCaption(null);		
+    		txtFilterValue2.setRequired(true);	
+    		gridFilterValues.setCaption(null);	
     		gridFilterValues.addComponent(txtFilterValue2, 1, 0);
     		txtFilterValue2.setVisible(false);
     		
@@ -1824,6 +1833,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     		txtFilterValue1.setHeight(20, Unit.PIXELS);
     		txtFilterValue1.setWidth(110, Unit.PIXELS);
     		txtFilterValue1.setInputPrompt("Value1");
+    		txtFilterValue1.setRequired(true);	
     		gridFilterValues.addComponent(txtFilterValue1, 0, 0);
 
     		TextField txtFilterValue2 = new TextField("");
@@ -1832,6 +1842,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     		txtFilterValue2.setHeight(20, Unit.PIXELS);
     		txtFilterValue2.setWidth(110, Unit.PIXELS);
     		txtFilterValue2.setInputPrompt("Value2");
+    		txtFilterValue2.setRequired(true);	
     		gridFilterValues.setCaption(null);		
     		gridFilterValues.addComponent(txtFilterValue2, 1, 0);
     		txtFilterValue2.setVisible(false);
@@ -1852,12 +1863,14 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     	    	fromDateField.setWidth(95, Sizeable.UNITS_PIXELS);
     	    	fromDateField.setHeight(25, Sizeable.UNITS_PIXELS);
     	    	fromDateField.setStyleName("tiny");
+    	    	fromDateField.setRequired(true);	
         		gridFilterValues.addComponent(fromDateField, 0, 0);
     	    	
     	    	DateField toDateField = new DateField();
     	    	toDateField.setWidth(95, Sizeable.UNITS_PIXELS);
     	    	toDateField.setHeight(25, Sizeable.UNITS_PIXELS);
     	    	toDateField.setStyleName("tiny");
+    	    	toDateField.setRequired(true);	
         		gridFilterValues.addComponent(toDateField, 1, 0);
     		}
     		
@@ -1869,6 +1882,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
     	    	fromDateField.setWidth(95, Sizeable.UNITS_PIXELS);
     	    	fromDateField.setHeight(25, Sizeable.UNITS_PIXELS);
     	    	fromDateField.setStyleName("tiny");
+    	    	fromDateField.setRequired(true);	
         		gridFilterValues.addComponent(fromDateField, 0, 0);
     	    }
     		
@@ -1880,6 +1894,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
         		TextField txtFilterValue1 = new TextField("");
         		txtFilterValue1.setCaption(null);	
         		txtFilterValue1.setStyleName("tiny");
+        		txtFilterValue1.setRequired(true);	
         		txtFilterValue1.setHeight(20, Unit.PIXELS);
         		txtFilterValue1.setWidth(110, Unit.PIXELS);
         		txtFilterValue1.setInputPrompt("N");
@@ -3108,7 +3123,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 									DateField dtFilterValue = (DateField)gridFilterValues.getComponent(0, 0);
 									vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnValue1(new SimpleDateFormat("yyyyMMdd").format(dtFilterValue.getValue()));									
 								}
-								else
+								else if(!filterOperator.equals("today"))
 								{
 									TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
 									vwVerticalRptFilterByTgtCol.setVwVerticalRptFilterByTargetColumnValue1(txtFilterValue1.getValue());
@@ -3426,6 +3441,38 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 					return false;
 				if(((ComboBox)(tblRowItem.getItemProperty("Filter Operator").getValue())).getValue() == null)
 					return false;
+				
+				String filterOperatorSelected = ((ComboBox)(tblRowItem.getItemProperty("Filter Operator").getValue())).getValue().toString();
+				GridLayout gridFilterValues = (GridLayout)tblRowItem.getItemProperty("Filter Value").getValue();
+				
+				if(filterOperatorSelected.equals("between") || filterOperatorSelected.equals("notbetween"))
+				{
+					TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+					TextField txtFilterValue2 = (TextField)gridFilterValues.getComponent(1, 0);
+					if(txtFilterValue1.getValue() == null || txtFilterValue2.getValue() == null || txtFilterValue1.getValue().isEmpty() || txtFilterValue2.getValue().isEmpty())
+						return false;
+				}
+				else if(filterOperatorSelected.equals("customrange"))
+				{
+					DateField fromDateField = (DateField)gridFilterValues.getComponent(0, 0);
+					DateField toDateField = (DateField)gridFilterValues.getComponent(1, 0);
+					if(fromDateField.getValue() == null || toDateField.getValue() == null)
+						return false;
+				}
+				else if(filterOperatorSelected.equals("after") || filterOperatorSelected.equals("before")
+	    				|| filterOperatorSelected.equals("on") || filterOperatorSelected.equals("onorafter")
+	    				|| filterOperatorSelected.equals("onorbefore"))
+				{
+					DateField dtFilterValue = (DateField)gridFilterValues.getComponent(0, 0);
+					if(dtFilterValue.getValue() == null)
+						return false;									
+				}
+				else if(!filterOperatorSelected.equals("today"))
+				{
+					TextField txtFilterValue1 = (TextField)gridFilterValues.getComponent(0, 0);
+					if(txtFilterValue1.getValue() == null)
+						return false;
+				}
 			}
 		}
 

@@ -28,8 +28,7 @@ public class ViewVerticalReportColumnByExpField {
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="VwVerticalRptColumnId", unique=false, updatable=true)
 	private ViewVerticalReportColumn vwVerticalReportColumn;	
-	
-	
+		
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
 	private ExperimentField experimentField;

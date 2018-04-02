@@ -15,7 +15,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Table(name="ViewHorizontalReportColumnByFnyField")
+@Table(name="ViewHorizontalReportFilterByFnyField")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region="entity")
 @Cacheable
 public class ViewHorizontalReportFilterByFnyField {

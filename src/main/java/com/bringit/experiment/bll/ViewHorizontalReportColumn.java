@@ -36,12 +36,20 @@ public class ViewHorizontalReportColumn {
 	@Column(name="VwHorizontalRptColumnDbId")
 	private String vwHorizontalRptColumnDbId;
 	
-	@Column(name="VwVerticalRptColumnDataType")
-	private String vwVerticalRptColumnDataType;
+	@Column(name="VwHorizontalRptColumnDataType")
+	private String vwHorizontalRptColumnDataType;
+	
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="ExperimentId", unique=false, updatable=true)
+	private Experiment experiment;	
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="ExpFieldId", unique=false, updatable=true)
-	private ExperimentField expField;	
+	private ExperimentField expField;		
+
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="fnyRptId", unique=false, updatable=true)
+	private FinalPassYieldReport fnyRpt;
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FnyInfoFieldId", unique=false, updatable=true)
@@ -57,6 +65,10 @@ public class ViewHorizontalReportColumn {
 	private Boolean vwHorizontalFnyIsResultExpField;	
 
 	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="fpyRptId", unique=false, updatable=true)
+	private FirstPassYieldReport fpyRpt;
+	
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FpyInfoFieldId", unique=false, updatable=true)
 	private FirstPassYieldInfoField fpyInfoField;
 	
@@ -70,6 +82,10 @@ public class ViewHorizontalReportColumn {
 	private Boolean vwHorizontalFpyIsResultExpField;
 	
 	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="ftyRptId", unique=false, updatable=true)
+	private FirstTimeYieldReport ftyRpt;
+	
+	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FtyInfoFieldId", unique=false, updatable=true)
 	private FirstTimeYieldInfoField ftyInfoField;
 	
@@ -81,37 +97,46 @@ public class ViewHorizontalReportColumn {
 
 	@Column(name="VwHorizontalFtyIsResultExpField")
 	private Boolean vwHorizontalFtyIsResultExpField;
+
+	@OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="TargetRptId", unique=false, updatable=true)
+	private TargetReport targetRpt;
 	
 	@OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="targetColumnId", unique=false, updatable=true)
 	private TargetColumn targetColumn;
 
 	public ViewHorizontalReportColumn(Integer vwHorizontalRptColumnId, ViewHorizontalReport viewHorizontalReport,
-			String vwHorizontalRptColumnName, String vwHorizontalRptColumnDbId, String vwVerticalRptColumnDataType,			
-			ExperimentField expField, FinalPassYieldInfoField fnyInfoField, Boolean vwHorizontalFnyIsDateTimeExpField,
-			Boolean vwHorizontalFnyIsSNExpField, Boolean vwHorizontalFnyIsResultExpField,
+			String vwHorizontalRptColumnName, String vwHorizontalRptColumnDbId, String vwHorizontalRptColumnDataType,			
+			Experiment experiment, ExperimentField expField, FinalPassYieldReport fnyRpt, FinalPassYieldInfoField fnyInfoField, Boolean vwHorizontalFnyIsDateTimeExpField,
+			Boolean vwHorizontalFnyIsSNExpField, Boolean vwHorizontalFnyIsResultExpField, FirstPassYieldReport fpyRpt,
 			FirstPassYieldInfoField fpyInfoField, Boolean vwHorizontalFpyIsDateTimeExpField,
-			Boolean vwHorizontalFpyIsSNExpField, Boolean vwHorizontalFpyIsResultExpField,
+			Boolean vwHorizontalFpyIsSNExpField, Boolean vwHorizontalFpyIsResultExpField, FirstTimeYieldReport ftyRpt,
 			FirstTimeYieldInfoField ftyInfoField, Boolean vwHorizontalFtyIsDateTimeExpField,
-			Boolean vwHorizontalFtyIsSNExpField, Boolean vwHorizontalFtyIsResultExpField, TargetColumn targetColumn) {
+			Boolean vwHorizontalFtyIsSNExpField, Boolean vwHorizontalFtyIsResultExpField, TargetReport targetRpt, TargetColumn targetColumn) {
 		this.vwHorizontalRptColumnId = vwHorizontalRptColumnId;
 		this.viewHorizontalReport = viewHorizontalReport;
 		this.vwHorizontalRptColumnName = vwHorizontalRptColumnName;
 		this.vwHorizontalRptColumnDbId = vwHorizontalRptColumnDbId;
-		this.vwVerticalRptColumnDataType = vwVerticalRptColumnDataType;
+		this.vwHorizontalRptColumnDataType = vwHorizontalRptColumnDataType;
+		this.experiment = experiment;
 		this.expField = expField;
+		this.fnyRpt = fnyRpt;
 		this.fnyInfoField = fnyInfoField;
 		this.vwHorizontalFnyIsDateTimeExpField = vwHorizontalFnyIsDateTimeExpField;
 		this.vwHorizontalFnyIsSNExpField = vwHorizontalFnyIsSNExpField;
 		this.vwHorizontalFnyIsResultExpField = vwHorizontalFnyIsResultExpField;
+		this.fpyRpt = fpyRpt;
 		this.fpyInfoField = fpyInfoField;
 		this.vwHorizontalFpyIsDateTimeExpField = vwHorizontalFpyIsDateTimeExpField;
 		this.vwHorizontalFpyIsSNExpField = vwHorizontalFpyIsSNExpField;
 		this.vwHorizontalFpyIsResultExpField = vwHorizontalFpyIsResultExpField;
+		this.ftyRpt = ftyRpt;
 		this.ftyInfoField = ftyInfoField;
 		this.vwHorizontalFtyIsDateTimeExpField = vwHorizontalFtyIsDateTimeExpField;
 		this.vwHorizontalFtyIsSNExpField = vwHorizontalFtyIsSNExpField;
 		this.vwHorizontalFtyIsResultExpField = vwHorizontalFtyIsResultExpField;
+		this.targetRpt = targetRpt;
 		this.targetColumn = targetColumn;
 	}
 	
@@ -120,20 +145,25 @@ public class ViewHorizontalReportColumn {
 		this.viewHorizontalReport = null;
 		this.vwHorizontalRptColumnName = null;
 		this.vwHorizontalRptColumnDbId = null;
-		this.vwVerticalRptColumnDataType = null;
+		this.vwHorizontalRptColumnDataType = null;
+		this.experiment = null;
 		this.expField = null;
+		this.fnyRpt = null;
 		this.fnyInfoField = null;
 		this.vwHorizontalFnyIsDateTimeExpField = null;
 		this.vwHorizontalFnyIsSNExpField = null;
 		this.vwHorizontalFnyIsResultExpField = null;
+		this.fpyRpt = null;
 		this.fpyInfoField = null;
 		this.vwHorizontalFpyIsDateTimeExpField = null;
 		this.vwHorizontalFpyIsSNExpField = null;
 		this.vwHorizontalFpyIsResultExpField = null;
+		this.ftyRpt = null;
 		this.ftyInfoField = null;
 		this.vwHorizontalFtyIsDateTimeExpField = null;
 		this.vwHorizontalFtyIsSNExpField = null;
 		this.vwHorizontalFtyIsResultExpField = null;
+		this.targetRpt = null;
 		this.targetColumn = null;
 	}
 
@@ -169,12 +199,20 @@ public class ViewHorizontalReportColumn {
 		this.vwHorizontalRptColumnDbId = vwHorizontalRptColumnDbId;
 	}
 
-	public String getVwVerticalRptColumnDataType() {
-		return vwVerticalRptColumnDataType;
+	public String getVwHorizontalRptColumnDataType() {
+		return vwHorizontalRptColumnDataType;
 	}
 
-	public void setVwVerticalRptColumnDataType(String vwVerticalRptColumnDataType) {
-		this.vwVerticalRptColumnDataType = vwVerticalRptColumnDataType;
+	public void setVwHorizontalRptColumnDataType(String vwHorizontalRptColumnDataType) {
+		this.vwHorizontalRptColumnDataType = vwHorizontalRptColumnDataType;
+	}
+	
+	public Experiment getExperiment() {
+		return experiment;
+	}
+
+	public void setExperiment(Experiment experiment) {
+		this.experiment = experiment;
 	}
 
 	public ExperimentField getExpField() {
@@ -183,6 +221,14 @@ public class ViewHorizontalReportColumn {
 
 	public void setExpField(ExperimentField expField) {
 		this.expField = expField;
+	}
+
+	public FinalPassYieldReport getFnyRpt() {
+		return fnyRpt;
+	}
+
+	public void setFnyRpt(FinalPassYieldReport fnyRpt) {
+		this.fnyRpt = fnyRpt;
 	}
 
 	public FinalPassYieldInfoField getFnyInfoField() {
@@ -217,6 +263,14 @@ public class ViewHorizontalReportColumn {
 		this.vwHorizontalFnyIsResultExpField = vwHorizontalFnyIsResultExpField;
 	}
 
+	public FirstPassYieldReport getFpyRpt() {
+		return fpyRpt;
+	}
+
+	public void setFpyRpt(FirstPassYieldReport fpyRpt) {
+		this.fpyRpt = fpyRpt;
+	}
+
 	public FirstPassYieldInfoField getFpyInfoField() {
 		return fpyInfoField;
 	}
@@ -249,6 +303,14 @@ public class ViewHorizontalReportColumn {
 		this.vwHorizontalFpyIsResultExpField = vwHorizontalFpyIsResultExpField;
 	}
 
+	public FirstTimeYieldReport getFtyRpt() {
+		return ftyRpt;
+	}
+
+	public void setFtyRpt(FirstTimeYieldReport ftyRpt) {
+		this.ftyRpt = ftyRpt;
+	}
+
 	public FirstTimeYieldInfoField getFtyInfoField() {
 		return ftyInfoField;
 	}
@@ -279,6 +341,14 @@ public class ViewHorizontalReportColumn {
 
 	public void setVwHorizontalFtyIsResultExpField(Boolean vwHorizontalFtyIsResultExpField) {
 		this.vwHorizontalFtyIsResultExpField = vwHorizontalFtyIsResultExpField;
+	}
+
+	public TargetReport getTargetRpt() {
+		return targetRpt;
+	}
+
+	public void setTargetRpt(TargetReport targetRpt) {
+		this.targetRpt = targetRpt;
 	}
 
 	public TargetColumn getTargetColumn() {

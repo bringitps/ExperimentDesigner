@@ -74,7 +74,7 @@ public class WebApplication extends UI {
 	
 	@Override
 	protected void init(VaadinRequest vaadinRequest) {
-		UI.getCurrent().setLocale(new Locale.Builder().setLanguage("en").setRegion("US").build());
+       UI.getCurrent().setLocale(new Locale.Builder().setLanguage("en").setRegion("US").build());
 		buildContent();
 	}
 

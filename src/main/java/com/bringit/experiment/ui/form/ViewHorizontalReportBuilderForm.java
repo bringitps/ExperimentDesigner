@@ -1933,7 +1933,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				if(activeExperiments.get(i).getExpId() == selectedExperimentId)
 				{
 					changedDataSourcesIds.add("exp_" + selectedExperimentId);
-					changedDataSourcesNames.add("EXP : " + activeExperiments.get(i).getExpName());
+					changedDataSourcesNames.add(this.systemSettings.getExperimentLabel() + " : " + activeExperiments.get(i).getExpName());
 					break;
 				}
 			}
@@ -2235,7 +2235,7 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 				if(activeExperiments.get(i).getExpId() == selectedExperimentId)
 				{
 					cbxDataSource.addItem("exp_" + selectedExperimentId);
-					cbxDataSource.setItemCaption("exp_" + selectedExperimentId, "EXP : " + activeExperiments.get(i).getExpName());
+					cbxDataSource.setItemCaption("exp_" + selectedExperimentId, this.systemSettings.getExperimentLabel() + " : " + activeExperiments.get(i).getExpName());
 					break;
 				}
 			}
@@ -2704,9 +2704,9 @@ public class ViewHorizontalReportBuilderForm extends ViewHorizontalReportBuilder
 							{
 								if(dataSourceFieldIdStr.equals("fpy_datetime") || dataSourceFieldIdStr.equals("fpy_sn") || dataSourceFieldIdStr.equals("fpy_result"))
 								{
-									vwHorizontalRptByFpyRpt.setVwHorizontalFpyKeyIsDateTimeExpField(dataSourceFieldIdStr.equals("fty_datetime"));
-									vwHorizontalRptByFpyRpt.setVwHorizontalFpyKeyIsResultExpField(dataSourceFieldIdStr.equals("fty_result"));
-									vwHorizontalRptByFpyRpt.setVwHorizontalFpyKeyIsSNExpField(dataSourceFieldIdStr.equals("fty_sn"));
+									vwHorizontalRptByFpyRpt.setVwHorizontalFpyKeyIsDateTimeExpField(dataSourceFieldIdStr.equals("fpy_datetime"));
+									vwHorizontalRptByFpyRpt.setVwHorizontalFpyKeyIsResultExpField(dataSourceFieldIdStr.equals("fpy_result"));
+									vwHorizontalRptByFpyRpt.setVwHorizontalFpyKeyIsSNExpField(dataSourceFieldIdStr.equals("fpy_sn"));
 								}
 								else
 								{	

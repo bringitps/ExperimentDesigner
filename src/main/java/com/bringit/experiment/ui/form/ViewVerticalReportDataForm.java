@@ -190,7 +190,12 @@ private SystemSettings systemSettings;
 		 
 		ViewVerticalReportJobDataDao vwVerticalReportJobDataDao = new ViewVerticalReportJobDataDao();
 		Map<String, Object> result = vwVerticalReportJobDataDao.vwVerticalProcedureJob(vwVerticalReport.getVwVerticalRptId());
-		vaadinTblContainer.refresh();
+		
+		if(vaadinTblContainer != null)
+			vaadinTblContainer.refresh();
+		else
+			bindVWverticalReportRptTable();
+
 		vwVerticalReport = new ViewVerticalReportDao().getVwVerticalRptById(vwVerticalReport.getVwVerticalRptId());
 	
 		
@@ -223,13 +228,34 @@ private SystemSettings systemSettings;
 			
 			SimpleJDBCConnectionPool connectionPool;
 		    
+			//Validate that DB Table of View Vertical Report exists
+			String validateDbTableSqlQuery = "SELECT 1 FROM sys.Objects WHERE  Object_id = OBJECT_ID('" + this.vwVerticalReport.getVwVerticalRptDbTableNameId() + "')";
+			
+			ResultSet validateDbTableSqlResults = new ExecuteQueryDao().getSqlSelectQueryResults(validateDbTableSqlQuery);
+     		if(validateDbTableSqlResults == null)
+     			return;
+     		else
+     		{
+     			try {
+					validateDbTableSqlResults.last();
+	     			if(validateDbTableSqlResults.getRow() == 0)
+	     				return;
+	     			//System.out.println("Total Rows " +  numRows);	     			
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					return;
+				} 
+     			
+     		
+			
 		    try {
 		    	connectionPool = new SimpleJDBCConnectionPool("com.microsoft.sqlserver.jdbc.SQLServerDriver",
 						"jdbc:sqlserver://"+dbHost+":"+dbPort+";databaseName="+dbDatabase,
 						dbUsername, dbPassword);
 		    
 		    	TableQuery tblQuery = new TableQuery(this.vwVerticalReport.getVwVerticalRptDbTableNameId(), connectionPool, new MSSQLGenerator());
-				//tblQuery.setVersionColumn("FtyRecordId");
+				tblQuery.setVersionColumn("vwRecordId");
 
 				vaadinTblContainer = new SQLContainer(tblQuery);
 				
@@ -320,7 +346,7 @@ private SystemSettings systemSettings;
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}	
-		    
+     		}
 		    Integer totalRecords = tblVwVerticalDataReport.size();
 	    	if (vwVerticalReport.getVwVerticalRptDbTableLastUpdate() != null)
 	            this.lblLastRefreshDate.setValue("Last Refresh Date: " + vwVerticalReport.getVwVerticalRptDbTableLastUpdate() + "  [Total Records: " + totalRecords + "]");

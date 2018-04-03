@@ -39,7 +39,7 @@ BEGIN
 
 	DECLARE @CreateTable NVARCHAR(MAX);--Variable to store the create table statement
 
-	SELECT @CreateTable = 'CREATE TABLE ' + @ReportTableName + '(Station varchar(MAX), ' + LEFT(@ReportColums, LEN(@ReportColums) - 1) + ')'--Get create table estatement
+	SELECT @CreateTable = 'CREATE TABLE ' + @ReportTableName + '(vwRecordId int IDENTITY(1,1) NOT NULL PRIMARY KEY,Station varchar(MAX), ' + LEFT(@ReportColums, LEN(@ReportColums) - 1) + ')'--Get create table estatement
 	PRINT 'CREATE TABLE : ' + @CreateTable
 	EXECUTE sp_executesql @CreateTable;--Execute create table 
 
@@ -110,7 +110,7 @@ BEGIN
 	inner join ExperimentField on ViewVerticalReportColumnByExpField.ExpFieldId = ExperimentField.ExpFieldId
 	inner join Experiment on ExperimentField.ExpId = Experiment.ExpId
 	--inner join ViewVerticalReportFilterByExpField on ExperimentField.ExpFieldId = ViewVerticalReportFilterByExpField.ExpFieldId
-	inner join ViewVerticalReportFilterByExpField on ExperimentField.ExpFieldId = ViewVerticalReportFilterByExpField.ExpFieldId
+	left join ViewVerticalReportFilterByExpField on ExperimentField.ExpFieldId = ViewVerticalReportFilterByExpField.ExpFieldId
 	inner join ViewVerticalReportByExperiment on ViewVerticalReport.VwVerticalRptId = ViewVerticalReportByExperiment.VwVerticalReportId
 	WHERE ViewVerticalReportColumn.VwVerticalReportId = @Report_ID
 	GROUP BY Experiment.ExpDbTableNameId,ViewVerticalReportFilterByExpField.ExpFieldId,ViewVerticalReportFilterByExpField.VwVerticalRptFilterByExpFieldValue1,ViewVerticalReportFilterByExpField.VwVerticalRptFilterByExpFieldExpression,ViewVerticalReportFilterByExpField.VwVerticalRptFilterByExpFieldOperation,Experiment.ExpId,ViewVerticalReportFilterByExpField.VwVerticalRptFilterByExpFieldValue2,ViewVerticalReport.VwVerticalRptId,ViewVerticalReportByExperiment.VwVerticalReportId
@@ -384,7 +384,7 @@ BEGIN
 							--INNER JOIN FirstPassYieldReport ON ViewVerticalReportColumnByFpyField.fpyRptId = FirstPassYieldReport.FpyReportId
 							INNER JOIN FirstPassYieldInfoField ON ViewVerticalReportColumnByFpyField.FpyInfoFieldId = FirstPassYieldInfoField.FpyInfoFieldId
 							inner JOIN ExperimentField ON FirstPassYieldInfoField.ExpFieldId = ExperimentField.ExpFieldId
-							inner join ViewVerticalReportFilterByFpyField on ViewVerticalReportByFpyRpt.VwVerticalRptByFpyId = ViewVerticalReportFilterByFpyField.VwVerticalFpyRptId
+							left join ViewVerticalReportFilterByFpyField on ViewVerticalReportByFpyRpt.VwVerticalRptByFpyId = ViewVerticalReportFilterByFpyField.VwVerticalFpyRptId
 							WHERE ViewVerticalReportByFpyRpt.fpyRptId = FirstPassYieldReport.FpyReportId  
 							--ExperimentField.ExpFieldId = ViewVerticalReportFilterByFpyField.FpyInfoFieldId
 							and ViewVerticalReportByFpyRpt.VwVerticalRptByFpyId = ViewVerticalReportFilterByFpyField.VwVerticalFpyRptId
@@ -397,9 +397,9 @@ BEGIN
   INNER JOIN FirstPassYieldInfoField ON ViewVerticalReportColumnByFpyField.FpyInfoFieldId = FirstPassYieldInfoField.FpyInfoFieldId
   inner JOIN ExperimentField ON FirstPassYieldInfoField.ExpFieldId = ExperimentField.ExpFieldId
   inner JOIN ViewVerticalReportByFpyRpt ON ViewVerticalReport.VwVerticalRptId = ViewVerticalReportByFpyRpt.VwVerticalReportId
-  inner join ViewVerticalReportFilterByFpyField on ViewVerticalReportByFpyRpt.VwVerticalRptByFpyId = ViewVerticalReportFilterByFpyField.VwVerticalFpyRptId
+  left join ViewVerticalReportFilterByFpyField on ViewVerticalReportByFpyRpt.VwVerticalRptByFpyId = ViewVerticalReportFilterByFpyField.VwVerticalFpyRptId
   inner join Experiment on ExperimentField.ExpId = Experiment.ExpId
-  WHERE ViewVerticalReport.VwVerticalRptId = 20
+  WHERE ViewVerticalReport.VwVerticalRptId = @Report_ID
   GROUP BY ViewVerticalReportColumn.VwVerticalReportId,FirstPassYieldReport.FpyReportId,FirstPassYieldReport.FpyReportDbRptTableNameId,ExperimentField.ExpDbFieldNameId,ViewVerticalReportByFpyRpt.VwVerticalReportId
   ,ViewVerticalReportByFpyRpt.fpyRptId
   ,ViewVerticalReportFilterByFpyField.FpyInfoFieldId
@@ -676,7 +676,7 @@ BEGIN
 							--INNER JOIN FirstTimeYieldReport ON ViewVerticalReportColumnByFtyField.ftyRptId = FirstTimeYieldReport.FtyReportId
 							INNER JOIN FirstTimeYieldInfoField ON ViewVerticalReportColumnByFtyField.FtyInfoFieldId = FirstTimeYieldInfoField.FtyInfoFieldId
 							inner JOIN ExperimentField ON FirstTimeYieldInfoField.ExpFieldId = ExperimentField.ExpFieldId
-							inner join ViewVerticalReportFilterByFtyField on ViewVerticalReportByFtyRpt.VwVerticalRptByFtyId = ViewVerticalReportFilterByFtyField.VwVerticalftyRptId
+							left join ViewVerticalReportFilterByFtyField on ViewVerticalReportByFtyRpt.VwVerticalRptByFtyId = ViewVerticalReportFilterByFtyField.VwVerticalftyRptId
 							WHERE ViewVerticalReportByFtyRpt.ftyRptId = FirstTimeYieldReport.FtyReportId  
 							--ExperimentField.ExpFieldId = ViewVerticalReportFilterByFtyField.FtyInfoFieldId
 							and ViewVerticalReportByFtyRpt.VwVerticalRptByFtyId = ViewVerticalReportFilterByFtyField.VwVerticalftyRptId
@@ -689,9 +689,9 @@ BEGIN
   INNER JOIN FirstTimeYieldInfoField ON ViewVerticalReportColumnByFtyField.FtyInfoFieldId = FirstTimeYieldInfoField.FtyInfoFieldId
   inner JOIN ExperimentField ON FirstTimeYieldInfoField.ExpFieldId = ExperimentField.ExpFieldId
   inner JOIN ViewVerticalReportByFtyRpt ON ViewVerticalReport.VwVerticalRptId = ViewVerticalReportByFtyRpt.VwVerticalReportId
-  inner join ViewVerticalReportFilterByFtyField on ViewVerticalReportByFtyRpt.VwVerticalRptByFtyId = ViewVerticalReportFilterByFtyField.VwVerticalftyRptId
+  left join ViewVerticalReportFilterByFtyField on ViewVerticalReportByFtyRpt.VwVerticalRptByFtyId = ViewVerticalReportFilterByFtyField.VwVerticalftyRptId
   inner join Experiment on ExperimentField.ExpId = Experiment.ExpId
-  WHERE ViewVerticalReport.VwVerticalRptId = 20
+  WHERE ViewVerticalReport.VwVerticalRptId = @Report_ID
   GROUP BY ViewVerticalReportColumn.VwVerticalReportId,FirstTimeYieldReport.FtyReportId,FirstTimeYieldReport.FtyReportDbRptTableNameId,ExperimentField.ExpDbFieldNameId,ViewVerticalReportByFtyRpt.VwVerticalReportId
   ,ViewVerticalReportByFtyRpt.ftyRptId
   ,ViewVerticalReportFilterByFtyField.FtyInfoFieldId
@@ -968,7 +968,7 @@ BEGIN
 							--INNER JOIN FinalPassYieldReport ON ViewVerticalReportColumnByFnyField.fnyRptId = FinalPassYieldReport.FnyReportId
 							INNER JOIN FinalPassYieldInfoField ON ViewVerticalReportColumnByFnyField.FnyInfoFieldId = FinalPassYieldInfoField.FnyInfoFieldId
 							inner JOIN ExperimentField ON FinalPassYieldInfoField.ExpFieldId = ExperimentField.ExpFieldId
-							inner join ViewVerticalReportFilterByFnyField on ViewVerticalReportByFnyRpt.VwVerticalRptByFnyId = ViewVerticalReportFilterByFnyField.VwVerticalfnyRptId
+							left join ViewVerticalReportFilterByFnyField on ViewVerticalReportByFnyRpt.VwVerticalRptByFnyId = ViewVerticalReportFilterByFnyField.VwVerticalfnyRptId
 							WHERE ViewVerticalReportByFnyRpt.fnyRptId = FinalPassYieldReport.FnyReportId  
 							--ExperimentField.ExpFieldId = ViewVerticalReportFilterByFnyField.FnyInfoFieldId
 							and ViewVerticalReportByFnyRpt.VwVerticalRptByFnyId = ViewVerticalReportFilterByFnyField.VwVerticalfnyRptId
@@ -981,9 +981,9 @@ BEGIN
   INNER JOIN FinalPassYieldInfoField ON ViewVerticalReportColumnByFnyField.FnyInfoFieldId = FinalPassYieldInfoField.FnyInfoFieldId
   inner JOIN ExperimentField ON FinalPassYieldInfoField.ExpFieldId = ExperimentField.ExpFieldId
   inner JOIN ViewVerticalReportByFnyRpt ON ViewVerticalReport.VwVerticalRptId = ViewVerticalReportByFnyRpt.VwVerticalReportId
-  inner join ViewVerticalReportFilterByFnyField on ViewVerticalReportByFnyRpt.VwVerticalRptByFnyId = ViewVerticalReportFilterByFnyField.VwVerticalfnyRptId
+  left join ViewVerticalReportFilterByFnyField on ViewVerticalReportByFnyRpt.VwVerticalRptByFnyId = ViewVerticalReportFilterByFnyField.VwVerticalfnyRptId
   inner join Experiment on ExperimentField.ExpId = Experiment.ExpId
-  WHERE ViewVerticalReport.VwVerticalRptId = 20
+  WHERE ViewVerticalReport.VwVerticalRptId = @Report_ID
   GROUP BY ViewVerticalReportColumn.VwVerticalReportId,FinalPassYieldReport.FnyReportId,FinalPassYieldReport.FnyReportDbRptTableNameId,ExperimentField.ExpDbFieldNameId,ViewVerticalReportByFnyRpt.VwVerticalReportId
   ,ViewVerticalReportByFnyRpt.fnyRptId
   ,ViewVerticalReportFilterByFnyField.FnyInfoFieldId
@@ -1023,31 +1023,31 @@ BEGIN
 
 	SELECT @EnrichmentCount = (SELECT COUNT(ViewVerticalReportColumnByEnrichment.vwVerticalRptColumnEnrichmentStaticValue)
 							   FROM ViewVerticalReport
-							   join ViewVerticalReportColumn on ViewVerticalReport.VwVerticalRptId = ViewVerticalReportColumn.VwVerticalReportId
-							   inner join ViewVerticalReportColumnByExpField on ViewVerticalReportColumn.VwVerticalRptColumnId = ViewVerticalReportColumnByExpField.VwVerticalRptColumnId
-							   inner join ExperimentField on ViewVerticalReportColumnByExpField.ExpFieldId = ExperimentField.ExpFieldId
+							   inner join ViewVerticalReportColumn on ViewVerticalReport.VwVerticalRptId = ViewVerticalReportColumn.VwVerticalReportId
 							   left join ViewVerticalReportColumnByEnrichment on ViewVerticalReportColumn.VwVerticalRptColumnId =  ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnId
-							   where ViewVerticalReport.VwVerticalRptId = @Report_ID AND ViewVerticalReportColumnByEnrichment.vwVerticalRptColumnEnrichmentStaticValue is not null)
+							   where ViewVerticalReport.VwVerticalRptId = @Report_ID)
 
 	DECLARE @InsertData NVARCHAR(MAX);
 	SELECT @InsertData = 'INSERT INTO ' + @ReportTableName + ' ' + LEFT(@ColumnsFromTables, LEN(@ColumnsFromTables) - 9)
 
 	IF (@EnrichmentCount < 1)
 	BEGIN
-		PRINT @InsertData
+		PRINT ' Insert: ' +  @InsertData
+		PRINT @EnrichmentCount
 		EXECUTE sp_executesql @InsertData
 	END
 	ELSE
 	BEGIN
+		PRINT @ReportTableName
 		DECLARE @ReportTableNameRep NVARCHAR(MAX);
 		SELECT @ReportTableNameRep = @ReportTableName + 'RepTable'
 		IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES 
 		WHERE TABLE_NAME = @ReportTableNameRep)
 		BEGIN
 			SELECT @DropTableRpt = 'DROP TABLE ' + @ReportTableNameRep
-			PRINT 'Drop table: ' + @DropTableRpt
 			EXECUTE sp_executesql @DropTableRpt;
 		END
+		
 		DECLARE @ColumnsForEnrichment NVARCHAR(MAX);
 		SELECT @ColumnsForEnrichment =STUFF(--
         (	SELECT CONCAT(VwVerticalRptColumnDbId,' VARCHAR(MAX), ') 
@@ -1057,11 +1057,13 @@ BEGIN
         ), 1, 0, '')
 
 		DECLARE @ReplicateTable NVARCHAR(MAX);
-		SELECT @ReplicateTable = 'CREATE TABLE ' + @ReportTableName + 'RepTable( ' + LEFT(@ColumnsForEnrichment, LEN(@ColumnsForEnrichment) - 1) + ' )' 
+		SELECT @ReplicateTable = 'CREATE TABLE ' + @ReportTableName + 'RepTable( Station VARCHAR(MAX),' + LEFT(@ColumnsForEnrichment, LEN(@ColumnsForEnrichment) - 1) + ' )' 
+		PRINT @ReplicateTable
 		EXECUTE sp_executesql @ReplicateTable
 		
 		DECLARE @InsertDataRpt NVARCHAR(MAX);
 		SELECT @InsertDataRpt = 'INSERT INTO ' + @ReportTableName + 'RepTable ' + LEFT(@ColumnsFromTables, LEN(@ColumnsFromTables) - 9)
+		PRINT @InsertDataRpt
 		EXECUTE sp_executesql @InsertDataRpt
 		
 		DECLARE @Enrichment NVARCHAR(MAX);
@@ -1069,12 +1071,12 @@ BEGIN
 		SELECT @Enrichment = STUFF(--
 			(
 				SELECT 
-				CONCAT(' UPDATE ',@ReportTableName,'RepTable SET ', ViewVerticalReportColumn.VwVerticalRptColumnName,' = ','''',ViewVerticalReportColumnByEnrichment.vwVerticalRptColumnEnrichmentStaticValue,'''',' WHERE ',ViewVerticalReportColumn.VwVerticalRptColumnName,
+				CONCAT(' UPDATE ',@ReportTableName,'RepTable SET ', ViewVerticalReportColumn.VwVerticalRptColumnDbId,' = ','''',ViewVerticalReportColumnByEnrichment.vwVerticalRptColumnEnrichmentStaticValue,'''',' WHERE ',ViewVerticalReportColumn.VwVerticalRptColumnDbId,
 				CASE 
-					WHEN ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentOperation = 'contains' THEN CONCAT(' LIKE ','''',' ',ViewVerticalReportColumnByEnrichment.vwVerticalRptColumnEnrichmentStaticValue,'%','''')
-					WHEN ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentOperation = 'doesnotcontain' THEN CONCAT(' NOT LIKE ','''',' ',ViewVerticalReportColumnByEnrichment.vwVerticalRptColumnEnrichmentStaticValue,'%','''')
-					WHEN ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentOperation = 'doesnotstartwith' THEN CONCAT(' NOT LIKE ','''',ViewVerticalReportColumnByEnrichment.vwVerticalRptColumnEnrichmentStaticValue,'%','''')
-					WHEN ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentOperation = 'endswith' THEN CONCAT(' LIKE ','''','%',ViewVerticalReportColumnByEnrichment.vwVerticalRptColumnEnrichmentStaticValue,'''')
+					WHEN ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentOperation = 'contains' THEN CONCAT(' LIKE ','''','%',ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentValue,'%','''')
+					WHEN ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentOperation = 'doesnotcontain' THEN CONCAT(' NOT LIKE ','''','%',ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentValue,'%','''')
+					WHEN ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentOperation = 'doesnotstartwith' THEN CONCAT(' NOT LIKE ','''',ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentValue,'%','''')
+					WHEN ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentOperation = 'endswith' THEN CONCAT(' LIKE ','''','%',ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentValue,'''')
 					WHEN ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentOperation = 'is' THEN  CONCAT(' = ','''',ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentValue,'''')
 					WHEN ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentOperation = 'isempty' THEN  CONCAT(' IS NULL OR ',ViewVerticalReportColumn.VwVerticalRptColumnName,' = ','''','''')
 					WHEN ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentOperation = 'isnot' THEN  CONCAT(' <> ','''',ViewVerticalReportColumnByEnrichment.VwVerticalRptColumnEnrichmentValue,'''')
@@ -1090,28 +1092,12 @@ BEGIN
 			), 1, 0, '')
 
 		EXECUTE sp_executesql @Enrichment
-
+		print @Enrichment
 		DECLARE @InsertDataTable NVARCHAR(MAX);
 		SELECT @InsertDataTable = 'INSERT INTO ' + @ReportTableName + ' SELECT * FROM ' + @ReportTableName + 'RepTable '
-		SELECT * FROM #StructTable
-		--EXECUTE sp_executesql @InsertDataTable
-		
-		--PRINT @Enrichment
+		EXECUTE sp_executesql @InsertDataTable
 	END
-	DECLARE @SELECT NVARCHAR(MAX);
-	SELECT @SELECT = 'SELECT * FROM ' + @ReportTableName
-	--SELECT * FROM #StructTable0
-	
-	--EXECUTE sp_executesql @SELECT
-	--PRINT @InsertData
-	--PRINT @EnrichmentCount
-	--SELECT * FROM #StructTable0
-	--LEFT(@ReportColums, LEN(@ReportColums) - 1)
-	--EXECUTE SPVerticalReport 21
-
+	--EXECUTE SPVerticalReport 30
 END
 
-
 GO
-
-

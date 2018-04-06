@@ -47,6 +47,12 @@ public class ViewVerticalReportColumnByFtyField {
 
 	@Column(name="VwVerticalRptColumnByFtyIsResultExpField")
 	private Boolean VwVerticalRptColumnByFtyIsResultExpField;
+
+	@Column(name="VwVerticalRptColumnByFtyFieldIsFixedValue")
+	private Boolean vwVerticalRptColumnByFtyFieldIsFixedValue;
+	
+	@Column(name="VwVerticalRptColumnByFtyFieldFixedValue")
+	private String vwVerticalRptColumnByFtyFieldFixedValue;
 	
 	public ViewVerticalReportColumnByFtyField(Integer vwVerticalRptColumnByFtyFieldId,
 			ViewVerticalReportColumn vwVerticalReportColumn,
@@ -54,7 +60,9 @@ public class ViewVerticalReportColumnByFtyField {
 			FirstTimeYieldReport ftyRpt,
 			Boolean VwVerticalRptColumnByFtyIsDateTimeExpField,
 			Boolean VwVerticalRptColumnByFtyIsSNExpField,
-			Boolean VwVerticalRptColumnByFtyIsResultExpField) {
+			Boolean VwVerticalRptColumnByFtyIsResultExpField, 
+			Boolean vwVerticalRptColumnByFtyFieldIsFixedValue,
+			String vwVerticalRptColumnByFtyFieldFixedValue) {
 		this.vwVerticalRptColumnByFtyFieldId = vwVerticalRptColumnByFtyFieldId;
 		this.vwVerticalReportColumn = vwVerticalReportColumn;
 		this.firstTimeYieldInfoField = firstTimeYieldInfoField;
@@ -62,6 +70,8 @@ public class ViewVerticalReportColumnByFtyField {
 		this.VwVerticalRptColumnByFtyIsDateTimeExpField = VwVerticalRptColumnByFtyIsDateTimeExpField;
 		this.VwVerticalRptColumnByFtyIsSNExpField = VwVerticalRptColumnByFtyIsSNExpField;
 		this.VwVerticalRptColumnByFtyIsResultExpField = VwVerticalRptColumnByFtyIsResultExpField;
+		this.vwVerticalRptColumnByFtyFieldIsFixedValue = vwVerticalRptColumnByFtyFieldIsFixedValue;
+		this.vwVerticalRptColumnByFtyFieldFixedValue = vwVerticalRptColumnByFtyFieldFixedValue;
 	}	
 
 	public ViewVerticalReportColumnByFtyField() {
@@ -72,6 +82,8 @@ public class ViewVerticalReportColumnByFtyField {
 		this.VwVerticalRptColumnByFtyIsDateTimeExpField = null;
 		this.VwVerticalRptColumnByFtyIsSNExpField = null;
 		this.VwVerticalRptColumnByFtyIsResultExpField = null;
+		this.vwVerticalRptColumnByFtyFieldIsFixedValue = null;
+		this.vwVerticalRptColumnByFtyFieldFixedValue = null;
 	}
 
 	public Integer getVwVerticalRptColumnByFtyFieldId() {
@@ -128,6 +140,22 @@ public class ViewVerticalReportColumnByFtyField {
 
 	public void setVwVerticalRptColumnByFtyIsResultExpField(Boolean VwVerticalRptColumnByFtyIsResultExpField) {
 		this.VwVerticalRptColumnByFtyIsResultExpField = VwVerticalRptColumnByFtyIsResultExpField;
+	}
+
+	public Boolean getVwVerticalRptColumnByFtyFieldIsFixedValue() {
+		return vwVerticalRptColumnByFtyFieldIsFixedValue;
+	}
+
+	public void setVwVerticalRptColumnByFtyFieldIsFixedValue(Boolean vwVerticalRptColumnByFtyFieldIsFixedValue) {
+		this.vwVerticalRptColumnByFtyFieldIsFixedValue = vwVerticalRptColumnByFtyFieldIsFixedValue;
+	}
+
+	public String getVwVerticalRptColumnByFtyFieldFixedValue() {
+		return vwVerticalRptColumnByFtyFieldFixedValue;
+	}
+
+	public void setVwVerticalRptColumnByFtyFieldFixedValue(String vwVerticalRptColumnByFtyFieldFixedValue) {
+		this.vwVerticalRptColumnByFtyFieldFixedValue = vwVerticalRptColumnByFtyFieldFixedValue;
 	}
 	
 

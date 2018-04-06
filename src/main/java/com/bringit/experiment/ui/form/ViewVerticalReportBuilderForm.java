@@ -1935,6 +1935,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		tblVwVerticalRptCols.addContainerProperty("Data Type", ComboBox.class, null);
 		tblVwVerticalRptCols.addContainerProperty("Data Source Table/Report", ComboBox.class, null);
 		tblVwVerticalRptCols.addContainerProperty("Data Source Field", ComboBox.class, null);
+		tblVwVerticalRptCols.addContainerProperty("Fixed Value", TextField.class, null);
 		tblVwVerticalRptCols.addContainerProperty("To Map", CheckBox.class, null);
 		tblVwVerticalRptCols.setEditable(true);
 		tblVwVerticalRptCols.setSelectable(true);
@@ -1954,7 +1955,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			itemId = this.lastReportColumnItemId;
 		}
 		
-		Object[] rptColItemValues = new Object[7];
+		Object[] rptColItemValues = new Object[8];
 				
 		TextField txtRptColumnName = new TextField("");
 		txtRptColumnName.setStyleName("tiny");
@@ -2047,6 +2048,13 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		cbxDataSourceField.setReadOnly(true);
 		rptColItemValues[5] = cbxDataSourceField;
 
+		TextField txtRptFixedColumnValue = new TextField("");
+		txtRptFixedColumnValue.setStyleName("tiny");
+		txtRptFixedColumnValue.setRequired(true);
+		txtRptFixedColumnValue.setHeight(20, Unit.PIXELS);
+		txtRptFixedColumnValue.setWidth(100, Unit.PERCENTAGE);
+		rptColItemValues[6] = txtRptFixedColumnValue;		
+		
 		CheckBox chxMappedData = new CheckBox();
 		chxMappedData.setStyleName("tiny");
 		chxMappedData.setVisible(true);
@@ -2054,7 +2062,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		chxMappedData.setReadOnly(true);
 		chxMappedData.setHeight(20, Unit.PIXELS);
 		chxMappedData.setWidth(100, Unit.PERCENTAGE);
-		rptColItemValues[6] = chxMappedData;
+		rptColItemValues[7] = chxMappedData;
 		
 		tblVwVerticalRptCols.addItem(rptColItemValues, itemId);
 		tblVwVerticalRptCols.select(itemId);
@@ -2158,6 +2166,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 
 				ComboBox childCbxDataSource = (ComboBox)(tblVwVerticalRptColRowItem.getItemProperty("Data Source Table/Report").getValue());
 				ComboBox childCbxDataSourceField = (ComboBox)(tblVwVerticalRptColRowItem.getItemProperty("Data Source Field").getValue());
+				TextField childTxtRptFixedColumnValue = (TextField)(tblVwVerticalRptColRowItem.getItemProperty("Fixed Value").getValue());
 
 				Integer dataSourceId = Integer.parseInt(childCbxDataSource.getValue().toString().substring(4));
 										
@@ -2165,7 +2174,14 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 				{
 					for(int i=0; vwVerticalRptColumnsByExpField!= null && i<vwVerticalRptColumnsByExpField.size(); i++)
 					{
-						if(vwVerticalRptColumnsByExpField.get(i).getExperimentField()!= null && vwVerticalRptColumnsByExpField.get(i).getExperimentField().getExperiment().getExpId() == dataSourceId)
+						//System.out.println("ExpFieldIdCol: " + vwVerticalRptColumnsByExpField.get(i).getVwVerticalRptColumnByExpFieldId() + " Exp Field: " + vwVerticalRptColumnsByExpField.get(i).getVwVerticalRptColumnByExpFieldIsFixedValue());
+						if(vwVerticalRptColumnsByExpField.get(i).getVwVerticalRptColumnByExpFieldIsFixedValue() != null
+								&& vwVerticalRptColumnsByExpField.get(i).getVwVerticalRptColumnByExpFieldIsFixedValue())
+						{
+							childCbxDataSourceField.setValue("expfield_-1");
+							childTxtRptFixedColumnValue.setValue(vwVerticalRptColumnsByExpField.get(i).getVwVerticalRptColumnByExpFieldFixedValue());
+						}
+						else if(vwVerticalRptColumnsByExpField.get(i).getExperimentField()!= null && vwVerticalRptColumnsByExpField.get(i).getExperimentField().getExperiment().getExpId() == dataSourceId)
 							childCbxDataSourceField.setValue("expfield_"+ vwVerticalRptColumnsByExpField.get(i).getExperimentField().getExpFieldId());
 					}
 				}
@@ -2184,6 +2200,12 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 							else if(vwVerticalRptColumnsByFpyField.get(i).getVwVerticalRptColumnByFpyIsResultExpField() != null
 									&& vwVerticalRptColumnsByFpyField.get(i).getVwVerticalRptColumnByFpyIsResultExpField())
 								childCbxDataSourceField.setValue("fpy_result");
+							else if(vwVerticalRptColumnsByFpyField.get(i).getVwVerticalRptColumnByFpyFieldIsFixedValue() != null
+									&& vwVerticalRptColumnsByFpyField.get(i).getVwVerticalRptColumnByFpyFieldIsFixedValue())
+							{
+								childCbxDataSourceField.setValue("fpyfield_-1");
+								childTxtRptFixedColumnValue.setValue(vwVerticalRptColumnsByFpyField.get(i).getVwVerticalRptColumnByFpyFieldFixedValue());
+							}
 							else
 								childCbxDataSourceField.setValue("fpyfield_"+ vwVerticalRptColumnsByFpyField.get(i).getFirstPassYieldInfoField().getFpyInfoFieldId());
 						}						
@@ -2204,6 +2226,12 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 							else if(vwVerticalRptColumnsByFnyField.get(i).getVwVerticalRptColumnByFnyIsDateTimeExpField() != null
 									&& vwVerticalRptColumnsByFnyField.get(i).getVwVerticalRptColumnByFnyIsResultExpField())
 								childCbxDataSourceField.setValue("fny_result");
+							else if(vwVerticalRptColumnsByFnyField.get(i).getVwVerticalRptColumnByFnyFieldIsFixedValue() != null
+									&& vwVerticalRptColumnsByFnyField.get(i).getVwVerticalRptColumnByFnyFieldIsFixedValue())
+							{
+								childCbxDataSourceField.setValue("fnyfield_-1");
+								childTxtRptFixedColumnValue.setValue(vwVerticalRptColumnsByFnyField.get(i).getVwVerticalRptColumnByFnyFieldFixedValue());
+							}
 							else
 								childCbxDataSourceField.setValue("fnyfield_"+ vwVerticalRptColumnsByFnyField.get(i).getFinalPassYieldInfoField().getFnyInfoFieldId());
 						}						
@@ -2224,6 +2252,12 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 							else if(vwVerticalRptColumnsByFtyField.get(i).getVwVerticalRptColumnByFtyIsDateTimeExpField() != null
 									&& vwVerticalRptColumnsByFtyField.get(i).getVwVerticalRptColumnByFtyIsResultExpField())
 								childCbxDataSourceField.setValue("fty_result");
+							else if(vwVerticalRptColumnsByFtyField.get(i).getVwVerticalRptColumnByFtyFieldIsFixedValue() != null
+									&& vwVerticalRptColumnsByFtyField.get(i).getVwVerticalRptColumnByFtyFieldIsFixedValue())
+							{
+								childCbxDataSourceField.setValue("ftyfield_-1");
+								childTxtRptFixedColumnValue.setValue(vwVerticalRptColumnsByFtyField.get(i).getVwVerticalRptColumnByFtyFieldFixedValue());
+							}
 							else
 								childCbxDataSourceField.setValue("ftyfield_"+ vwVerticalRptColumnsByFtyField.get(i).getFirstTimeYieldInfoField().getFtyInfoFieldId());
 						}						
@@ -2233,7 +2267,13 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 				{
 					for(int i=0; vwVerticalRptColumnsByTgtCol!= null && i<vwVerticalRptColumnsByTgtCol.size(); i++)
 					{
-						if(vwVerticalRptColumnsByTgtCol.get(i).getTargetColumn() != null && vwVerticalRptColumnsByTgtCol.get(i).getTargetColumn().getTargetColumnGroup().getTargetReport().getTargetReportId() == dataSourceId)
+						if(vwVerticalRptColumnsByTgtCol.get(i).getVwVerticalRptColumnByTargetColumnIsFixedValue() != null
+								&& vwVerticalRptColumnsByTgtCol.get(i).getVwVerticalRptColumnByTargetColumnIsFixedValue())
+						{
+							childCbxDataSourceField.setValue("tgtfield_-1");
+							childTxtRptFixedColumnValue.setValue(vwVerticalRptColumnsByTgtCol.get(i).getVwVerticalRptColumnByTargetColumnFixedValue());
+						}
+						else if(vwVerticalRptColumnsByTgtCol.get(i).getTargetColumn() != null && vwVerticalRptColumnsByTgtCol.get(i).getTargetColumn().getTargetColumnGroup().getTargetReport().getTargetReportId() == dataSourceId)
 							childCbxDataSourceField.setValue("tgtfield_"+ vwVerticalRptColumnsByTgtCol.get(i).getTargetColumn().getTargetColumnId());
 					}
 					
@@ -2246,7 +2286,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			Integer fpyDataSourceId, Integer fpyDataSourceFieldId, Integer fnyDataSourceId, Integer fnyDataSourceFieldId, Integer ftyDataSourceId, Integer ftyDataSourceFieldId, 
 			Integer tgtDataSourceId, Integer tgtDataSourceFieldId)
 	{
-		Object[] rptColItemValues = new Object[7];
+		Object[] rptColItemValues = new Object[8];
 
 		TextField txtRptColumnName = new TextField("");
 		txtRptColumnName.setStyleName("tiny");
@@ -2255,8 +2295,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		txtRptColumnName.setRequiredError("This field is required.");
 		txtRptColumnName.setHeight(20, Unit.PIXELS);
 		txtRptColumnName.setWidth(100, Unit.PERCENTAGE);
-		rptColItemValues[0] = txtRptColumnName;
-		
+		rptColItemValues[0] = txtRptColumnName;		
 
 		CheckBox chxKeyColumn = new CheckBox();
 		chxKeyColumn.setStyleName("tiny");
@@ -2310,8 +2349,13 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			{
 				for(int i=0; i<vwVerticalRptColumnsByExpField.size(); i++)
 				{
+					
 					if(vwVerticalRptColumnsByExpField.get(i).getVwVerticalReportColumn().getVwVerticalRptColumnId() == parentRptColumnId)
-						cbxDataSourceFieldValue =  vwVerticalRptColumnsByExpField.get(i).getExperimentField().getExpFieldId();					
+					{
+						System.out.println("Exp Field Fixed Value:" + vwVerticalRptColumnsByExpField.get(i).getVwVerticalRptColumnByExpFieldIsFixedValue());
+						if( vwVerticalRptColumnsByExpField.get(i).getVwVerticalRptColumnByExpFieldIsFixedValue() == null || (vwVerticalRptColumnsByExpField.get(i).getVwVerticalRptColumnByExpFieldIsFixedValue() != null && !vwVerticalRptColumnsByExpField.get(i).getVwVerticalRptColumnByExpFieldIsFixedValue()))
+							cbxDataSourceFieldValue =  vwVerticalRptColumnsByExpField.get(i).getExperimentField().getExpFieldId();					
+					}
 				}
 			}
 		}
@@ -2357,6 +2401,13 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		cbxDataFieldSource.setWidth(100, Unit.PERCENTAGE);
 		rptColItemValues[5] = cbxDataFieldSource;
 		
+		TextField txtRptFixedColumnValue = new TextField("");
+		txtRptFixedColumnValue.setStyleName("tiny");
+		txtRptFixedColumnValue.setRequired(true);
+		txtRptFixedColumnValue.setHeight(20, Unit.PIXELS);
+		txtRptFixedColumnValue.setWidth(100, Unit.PERCENTAGE);
+		rptColItemValues[6] = txtRptFixedColumnValue;		
+		
 		CheckBox chxMappedData = new CheckBox();
 		chxMappedData.setStyleName("tiny");
 		chxMappedData.setVisible(true);
@@ -2364,7 +2415,7 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		chxMappedData.setReadOnly(true);
 		chxMappedData.setHeight(20, Unit.PIXELS);
 		chxMappedData.setWidth(100, Unit.PERCENTAGE);
-		rptColItemValues[6] = chxMappedData;	
+		rptColItemValues[7] = chxMappedData;	
 		
 		
 		tblVwVerticalRptCols.addItem(rptColItemValues, rptColumnId);
@@ -2490,12 +2541,16 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 			Experiment selectedExperiment = new ExperimentDao().getExperimentById(expDataSourceId);
 			List<ExperimentField> selectedExperimentFields = new ExperimentFieldDao().getAllExperimentFieldsByExperiment(selectedExperiment);
 			
+			addItemIfTypeMatches("nvarchar(max)", "expfield_-1" , "--Fixed Value--", "nvarchar(max)", cbxDataSourceFields);
+			
 			for(int i=0; selectedExperimentFields!=null && i<selectedExperimentFields.size(); i++)
 				addItemIfTypeMatches(dataFieldType, "expfield_" + selectedExperimentFields.get(i).getExpFieldId(), selectedExperimentFields.get(i).getExpFieldName(), selectedExperimentFields.get(i).getExpFieldType(), cbxDataSourceFields);
 		}
 		
 		if(fnyDataSourceId != null)
 		{
+			addItemIfTypeMatches("nvarchar(max)", "fnyfield_-1" , "--Fixed Value--", "nvarchar(max)", cbxDataSourceFields);
+			
 			List<FinalPassYieldInfoField> fnyFields = new FinalPassYieldInfoFieldDao().getFinalPassYieldInfoFieldByReportById(fnyDataSourceId);
 			for(int i=0; fnyFields != null && i<fnyFields.size(); i++)
 				addItemIfTypeMatches(dataFieldType, "fnyfield_" + fnyFields.get(i).getFnyInfoFieldId(), fnyFields.get(i).getFnyInfoFieldLabel(), fnyFields.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
@@ -2507,6 +2562,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		
 		if(fpyDataSourceId != null)
 		{
+			addItemIfTypeMatches("nvarchar(max)", "fpyfield_-1" , "--Fixed Value--", "nvarchar(max)", cbxDataSourceFields);
+			
 			List<FirstPassYieldInfoField> fpyFields = new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldByReportById(fpyDataSourceId);
 			for(int i=0; fpyFields != null && i<fpyFields.size(); i++)
 				addItemIfTypeMatches(dataFieldType, "fpyfield_" + fpyFields.get(i).getFpyInfoFieldId(), fpyFields.get(i).getFpyInfoFieldLabel(), fpyFields.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
@@ -2518,6 +2575,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		
 		if(ftyDataSourceId != null)
 		{
+			addItemIfTypeMatches("nvarchar(max)", "ftyfield_-1" , "--Fixed Value--", "nvarchar(max)", cbxDataSourceFields);
+			
 			List<FirstTimeYieldInfoField> ftyFields = new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldByReportById(ftyDataSourceId);
 			for(int i=0; ftyFields != null && i<ftyFields.size(); i++)
 				addItemIfTypeMatches(dataFieldType, "ftyfield_" + ftyFields.get(i).getFtyInfoFieldId(), ftyFields.get(i).getFtyInfoFieldLabel(), ftyFields.get(i).getExperimentField().getExpFieldType(), cbxDataSourceFields);
@@ -2529,6 +2588,8 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 		
 		if(tgtDataSourceId != null)
 		{
+			addItemIfTypeMatches("nvarchar(max)", "tgtfield_-1" , "--Fixed Value--", "nvarchar(max)", cbxDataSourceFields);
+			
 			List<TargetColumn> targetColumns = new TargetColumnDao().getTargetColumnByTargetReportId(tgtDataSourceId);
 			
 			for(int i=0; targetColumns!=null && i<targetColumns.size(); i++)
@@ -2822,6 +2883,9 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 							{
 								ViewVerticalReportFilterByFpyField vwVerticalRptFilterByFpyField = new ViewVerticalReportFilterByFpyField();
 								vwVerticalRptFilterByFpyField.setVwVerticalFpyRpt(vwVerticalRptByFpyRpt);
+								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyIsDateTimeExpField(false);
+								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpyIsResultExpField(false);
+								vwVerticalRptFilterByFpyField.setVwVerticalRptFilterByFpySNExpField(false);
 							
 								String fpyInfoFieldStrId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString();
 								if(fpyInfoFieldStrId.equals("fpy_datetime") ||fpyInfoFieldStrId.equals("fpy_sn") ||fpyInfoFieldStrId.equals("fpy_result"))
@@ -2913,6 +2977,9 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 							{
 								ViewVerticalReportFilterByFnyField vwVerticalRptFilterByFnyField = new ViewVerticalReportFilterByFnyField();
 								vwVerticalRptFilterByFnyField.setVwVerticalFnyRpt(vwVerticalRptByFnyRpt);
+								vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyIsDateTimeExpField(false);
+								vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnyIsResultExpField(false);
+								vwVerticalRptFilterByFnyField.setVwVerticalRptFilterByFnySNExpField(false);
 							
 								String fnyInfoFieldStrId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString();
 								if(fnyInfoFieldStrId.equals("fny_datetime") ||fnyInfoFieldStrId.equals("fny_sn") ||fnyInfoFieldStrId.equals("fny_result"))
@@ -3005,6 +3072,9 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 							{
 								ViewVerticalReportFilterByFtyField vwVerticalRptFilterByFtyField = new ViewVerticalReportFilterByFtyField();
 								vwVerticalRptFilterByFtyField.setVwVerticalFtyRpt(vwVerticalRptByFtyRpt);
+								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyIsDateTimeExpField(false);
+								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtyIsResultExpField(false);
+								vwVerticalRptFilterByFtyField.setVwVerticalRptFilterByFtySNExpField(false);
 							
 								String ftyInfoFieldStrId = ((ComboBox)(tblDataSourceFilterRowItem.getItemProperty("Source Column/Field").getValue())).getValue().toString();
 								if(ftyInfoFieldStrId.equals("fty_datetime") || ftyInfoFieldStrId.equals("fty_sn") ||ftyInfoFieldStrId.equals("fty_result"))
@@ -3198,13 +3268,22 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 						if(((ComboBox)(tblVwVerticalChildRptColRowItem.getItemProperty("Data Source Field").getValue())).getValue() != null)
 						{
 							String dataSourceFieldStrId = ((ComboBox)(tblVwVerticalChildRptColRowItem.getItemProperty("Data Source Field").getValue())).getValue().toString();
-							
+							String fixedValue = ((TextField)(tblVwVerticalChildRptColRowItem.getItemProperty("Fixed Value").getValue())).getValue();
+													
 							if(dataSourceStrId.startsWith("exp"))
 							{
 								Integer dataSourceFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));
 								ViewVerticalReportColumnByExpField vwVerticalRptColByExpField = new ViewVerticalReportColumnByExpField();
-								vwVerticalRptColByExpField.setExperimentField(new ExperimentFieldDao().getExperimentFieldById(dataSourceFieldId));
 								vwVerticalRptColByExpField.setVwVerticalReportColumn(vwRptColumn);
+								vwVerticalRptColByExpField.setExperiment(new ExperimentDao().getExperimentById(Integer.parseInt(dataSourceStrId.substring(4))));
+								if(dataSourceFieldId == -1)
+								{
+									vwVerticalRptColByExpField.setVwVerticalRptColumnByExpFieldIsFixedValue(true);
+									vwVerticalRptColByExpField.setVwVerticalRptColumnByExpFieldFixedValue(fixedValue);
+								}
+								else
+									vwVerticalRptColByExpField.setExperimentField(new ExperimentFieldDao().getExperimentFieldById(dataSourceFieldId));
+								
 								new ViewVerticalReportColumnByExpFieldDao().addVwVerticalReportColumnByExpField(vwVerticalRptColByExpField);
 							}	
 		
@@ -3223,8 +3302,14 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								}
 								else
 								{
-									int selectedFpyFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));				
-									vwVerticalRptColByFpyField.setFirstPassYieldInfoField(new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldById(selectedFpyFieldId));
+									int selectedFpyFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));	
+									if(selectedFpyFieldId == -1)
+									{
+										vwVerticalRptColByFpyField.setVwVerticalRptColumnByFpyFieldIsFixedValue(true);
+										vwVerticalRptColByFpyField.setVwVerticalRptColumnByFpyFieldFixedValue(fixedValue);
+									}
+									else
+										vwVerticalRptColByFpyField.setFirstPassYieldInfoField(new FirstPassYieldInfoFieldDao().getFirstPassYieldInfoFieldById(selectedFpyFieldId));
 								}
 								vwVerticalRptColByFpyField.setVwVerticalReportColumn(vwRptColumn);
 								new ViewVerticalReportColumnByFpyFieldDao().addVwVerticalReportColumnByFpyField(vwVerticalRptColByFpyField);		
@@ -3246,7 +3331,13 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								else
 								{
 									int selectedFnyFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));				
-									vwVerticalRptColByFnyField.setFinalPassYieldInfoField(new FinalPassYieldInfoFieldDao().getFinalPassYieldInfoFieldById(selectedFnyFieldId));
+									if(selectedFnyFieldId == -1)
+									{
+										vwVerticalRptColByFnyField.setVwVerticalRptColumnByFnyFieldIsFixedValue(true);
+										vwVerticalRptColByFnyField.setVwVerticalRptColumnByFnyFieldFixedValue(fixedValue);
+									}
+									else
+										vwVerticalRptColByFnyField.setFinalPassYieldInfoField(new FinalPassYieldInfoFieldDao().getFinalPassYieldInfoFieldById(selectedFnyFieldId));
 								}
 								vwVerticalRptColByFnyField.setVwVerticalReportColumn(vwRptColumn);
 								new ViewVerticalReportColumnByFnyFieldDao().addVwVerticalReportColumnByFnyField(vwVerticalRptColByFnyField);			
@@ -3269,7 +3360,13 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 								else
 								{
 									int selectedFtyFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));				
-									vwVerticalRptColByFtyField.setFirstTimeYieldInfoField(new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldById(selectedFtyFieldId));
+									if(selectedFtyFieldId == -1)
+									{
+										vwVerticalRptColByFtyField.setVwVerticalRptColumnByFtyFieldIsFixedValue(true);
+										vwVerticalRptColByFtyField.setVwVerticalRptColumnByFtyFieldFixedValue(fixedValue);
+									}
+									else
+										vwVerticalRptColByFtyField.setFirstTimeYieldInfoField(new FirstTimeYieldInfoFieldDao().getFirstTimeYieldInfoFieldById(selectedFtyFieldId));
 								}
 								vwVerticalRptColByFtyField.setVwVerticalReportColumn(vwRptColumn);
 								new ViewVerticalReportColumnByFtyFieldDao().addVwVerticalReportColumnByFtyField(vwVerticalRptColByFtyField);			
@@ -3279,8 +3376,15 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 							{
 								Integer dataSourceFieldId = Integer.parseInt(dataSourceFieldStrId.substring(9));
 								ViewVerticalReportColumnByTargetColumn vwVerticalRptColByTargetColumn = new ViewVerticalReportColumnByTargetColumn();
-								vwVerticalRptColByTargetColumn.setTargetColumn(new TargetColumnDao().getTargetColumnById(dataSourceFieldId));
 								vwVerticalRptColByTargetColumn.setVwVerticalReportColumn(vwRptColumn);
+								vwVerticalRptColByTargetColumn.setTargetReport(new TargetReportDao().getTargetReportById(Integer.parseInt(dataSourceStrId.substring(4))));
+								if(dataSourceFieldId == -1)
+								{
+									vwVerticalRptColByTargetColumn.setVwVerticalRptColumnByTargetColumnIsFixedValue(true);
+									vwVerticalRptColByTargetColumn.setVwVerticalRptColumnByTargetColumnFixedValue(fixedValue);
+								}
+								else
+									vwVerticalRptColByTargetColumn.setTargetColumn(new TargetColumnDao().getTargetColumnById(dataSourceFieldId));
 								new ViewVerticalReportColumnByTargetColumnDao().addVwVerticalReportColumnByTargetColumn(vwVerticalRptColByTargetColumn);	
 							}
 						}									

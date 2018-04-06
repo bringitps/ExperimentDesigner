@@ -376,6 +376,10 @@ public class MainForm extends MainFormDesign {
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new CustomListManagementForm());
                     break;
+                case "frequency histogram":
+                    formContentLayout.removeAllComponents();
+                    formContentLayout.addComponent(new FrequencyHistogramForm());
+                    break;
                 default:
                     break;
             }

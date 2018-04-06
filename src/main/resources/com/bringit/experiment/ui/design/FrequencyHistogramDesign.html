@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head>
+ <body> 
+  <vaadin-vertical-layout size-full> 
+   <vaadin-horizontal-layout style-name="valo-menu" width-full :right> 
+    <vaadin-grid-layout spacing width-full height="46px"> 
+     <row> 
+      <column> 
+       <vaadin-label size-auto plain-text _id="lblFrequencyHistogramRptTitle">
+         Frequency Histogram Report 
+       </vaadin-label> 
+      </column> 
+      <column> 
+       <vaadin-grid-layout width-full height="20px" :right> 
+        <row> 
+         <column> 
+          <vaadin-label style-name="tiny" responsive size-auto plain-text _id="lblLastRefreshDate" :right>
+            Last Run: 
+          </vaadin-label> 
+         </column> 
+        </row> 
+        <row> 
+         <column> 
+          <vaadin-button icon="fonticon://FontAwesome/f021" style-name="tiny primary" height="20px" plain-text _id="btnRun" :right>
+            Run Now 
+          </vaadin-button> 
+         </column> 
+        </row> 
+       </vaadin-grid-layout> 
+      </column> 
+     </row> 
+     <row></row> 
+    </vaadin-grid-layout> 
+   </vaadin-horizontal-layout> 
+   <vaadin-horizontal-layout width="540px" height="40px" _id="layoutApplyFilters"> 
+    <vaadin-button icon="fonticon://FontAwesome/f0b0" style-name="tiny native" plain-text _id="btnApplyFilters" :middle :right>
+      Apply Filters 
+    </vaadin-button> 
+   </vaadin-horizontal-layout> 
+   <vaadin-horizontal-layout width-full _id="layoutDateFilter"> 
+    <vaadin-grid-layout width="540px" height="30px" _id="gridDateFilters"> 
+     <row> 
+      <column> 
+       <vaadin-combo-box input-prompt="Date Field Range" style-name="tiny" width="180px" _id="cbxDateFieldsFilter"> 
+        <option>Option 1</option> 
+        <option>Option 2</option> 
+        <option>Option 3</option> 
+       </vaadin-combo-box> 
+      </column> 
+      <column> 
+       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter1"></vaadin-popup-date-field> 
+      </column> 
+      <column> 
+       <vaadin-popup-date-field style-name="tiny" width="120px" _id="dtFilter2" :right></vaadin-popup-date-field> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-horizontal-layout> 
+   <vaadin-horizontal-layout style-name="top-bar" width="540px" height="40px" _id="layoutExpField"> 
+    <vaadin-combo-box input-prompt="Available Filters" style-name="tiny" width="180px" _id="cbxFnyFieldFilter" :middle></vaadin-combo-box> 
+    <vaadin-horizontal-layout width-full :middle :expand> 
+     <vaadin-text-field input-prompt="" style-name="tiny" width="320px" _id="txtExpFieldFilter" :right></vaadin-text-field> 
+    </vaadin-horizontal-layout> 
+   </vaadin-horizontal-layout> 
+   <vaadin-horizontal-layout width-full :right> 
+    <vaadin-grid-layout width-full height="30px"> 
+     <row> 
+      <column></column> 
+      <column> 
+       <vaadin-button icon="fonticon://FontAwesome/f1c3" style-name="tiny native friendly" height="20px" plain-text _id="btnExportExcel" :right>
+         Export to CSV 
+       </vaadin-button> 
+      </column> 
+     </row> 
+    </vaadin-grid-layout> 
+   </vaadin-horizontal-layout> 
+   <vaadin-horizontal-layout id="spcChartLayout" _id="spcChartLayout">
+   </vaadin-horizontal-layout> 
+  </vaadin-vertical-layout>  
+ </body>
+
+</html>

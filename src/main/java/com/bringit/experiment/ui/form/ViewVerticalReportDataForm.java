@@ -48,6 +48,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Button.ClickEvent;
+import com.quinncurtis.chart2djava.*;
+import com.quinncurtis.spcchartjava.*;
 
 public class ViewVerticalReportDataForm extends ViewVerticalReportDataDesign{
 
@@ -62,7 +64,7 @@ private SystemSettings systemSettings;
 	List<String> andSqlWhereClause = new ArrayList<String>();
 	
 	public ViewVerticalReportDataForm(Integer vwVerticalReportId)
-	{	
+	{			
 		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
 		
 		this.vwVerticalReport = new ViewVerticalReportDao().getVwVerticalRptById(vwVerticalReportId);

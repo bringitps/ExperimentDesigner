@@ -17,20 +17,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.bringit.experiment.bll.ViewVerticalReport;
-import com.bringit.experiment.bll.ViewVerticalReportColumn;
 import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SystemSettings;
+import com.bringit.experiment.bll.ViewHorizontalReport;
+import com.bringit.experiment.bll.ViewHorizontalReportColumn;
 import com.bringit.experiment.dao.ExecuteQueryDao;
-import com.bringit.experiment.dao.ViewVerticalReportColumnDao;
-import com.bringit.experiment.dao.ViewVerticalReportDao;
-import com.bringit.experiment.dao.ViewVerticalReportJobDataDao;
 import com.bringit.experiment.dao.SystemSettingsDao;
-import com.bringit.experiment.ui.design.ViewVerticalReportDataDesign;
+import com.bringit.experiment.dao.ViewHorizontalReportColumnDao;
+import com.bringit.experiment.dao.ViewHorizontalReportDao;
+import com.bringit.experiment.dao.ViewHorizontalReportJobDataDao;
+import com.bringit.experiment.ui.design.ViewHorizontalReportDataDesign;
 import com.bringit.experiment.util.Config;
 import com.bringit.experiment.util.Constants;
 import com.opencsv.CSVWriter;
-import com.vaadin.data.Item;
 import com.vaadin.data.util.converter.StringToDateConverter;
 import com.vaadin.data.util.converter.StringToDoubleConverter;
 import com.vaadin.data.util.filter.Between;
@@ -46,16 +45,13 @@ import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.Button.ClickEvent;
-import com.quinncurtis.chart2djava.*;
-import com.quinncurtis.spcchartjava.*;
 
-public class ViewVerticalReportDataForm extends ViewVerticalReportDataDesign{
+public class ViewHorizontalReportDataForm extends ViewHorizontalReportDataDesign {
 
-private SystemSettings systemSettings;
+	private SystemSettings systemSettings;
 	
-	ViewVerticalReport vwVerticalReport = new ViewVerticalReport();
+	ViewHorizontalReport vwHorizontalReport = new ViewHorizontalReport();
 	private SQLContainer vaadinTblContainer;
 	SysRole sysRoleSession = (SysRole) VaadinService.getCurrentRequest().getWrappedSession().getAttribute("RoleSession");
 	
@@ -63,36 +59,36 @@ private SystemSettings systemSettings;
 	String firstWhereClause = "";
 	List<String> andSqlWhereClause = new ArrayList<String>();
 	
-	public ViewVerticalReportDataForm(Integer vwVerticalReportId)
+	public ViewHorizontalReportDataForm(Integer vwHorizontalReportId)
 	{			
 		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
 		
-		this.vwVerticalReport = new ViewVerticalReportDao().getVwVerticalRptById(vwVerticalReportId);
-		this.lblVwVerticalRptTitle.setValue(lblVwVerticalRptTitle.getValue() + " - " + this.vwVerticalReport.getVwVerticalRptName()); 
+		this.vwHorizontalReport = new ViewHorizontalReportDao().getVwHorizontalRptById(vwHorizontalReportId);
+		this.lblVwHorizontalRptTitle.setValue(lblVwHorizontalRptTitle.getValue() + " - " + this.vwHorizontalReport.getVwHorizontalRptName()); 
 
 		this.cbxDateFieldsFilter.setContainerDataSource(null);
-		this.cbxVwVerticalFieldFilter.setContainerDataSource(null);
+		this.cbxVwHorizontalFieldFilter.setContainerDataSource(null);
 		
 		
-		List<ViewVerticalReportColumn> vwVerticalRptColumns = new ViewVerticalReportColumnDao().getAllVwVerticalReportColumnsByRptId(vwVerticalReportId);
+		List<ViewHorizontalReportColumn> vwHorizontalRptColumns = new ViewHorizontalReportColumnDao().getAllVwHorizontalReportColumnsByRptId(vwHorizontalReportId);
 		
-		for(int i=0; vwVerticalRptColumns != null && i<vwVerticalRptColumns.size(); i++)
+		for(int i=0; vwHorizontalRptColumns != null && i<vwHorizontalRptColumns.size(); i++)
 		{
-			if(vwVerticalRptColumns.get(i).getVwVerticalRptColumnDataType().toLowerCase().startsWith("varchar") || vwVerticalRptColumns.get(i).getVwVerticalRptColumnDataType().toLowerCase().startsWith("char")
-					|| vwVerticalRptColumns.get(i).getVwVerticalRptColumnDataType().toLowerCase().startsWith("text") || vwVerticalRptColumns.get(i).getVwVerticalRptColumnDataType().toLowerCase().startsWith("nvarchar") 
-					|| vwVerticalRptColumns.get(i).getVwVerticalRptColumnDataType().toLowerCase().startsWith("nchar") || vwVerticalRptColumns.get(i).getVwVerticalRptColumnDataType().toLowerCase().startsWith("ntext"))
+			if(vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnDataType().toLowerCase().startsWith("varchar") || vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnDataType().toLowerCase().startsWith("char")
+					|| vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnDataType().toLowerCase().startsWith("text") || vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnDataType().toLowerCase().startsWith("nvarchar") 
+					|| vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnDataType().toLowerCase().startsWith("nchar") || vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnDataType().toLowerCase().startsWith("ntext"))
 			{
-				this.cbxVwVerticalFieldFilter.addItem(vwVerticalRptColumns.get(i).getVwVerticalRptColumnDbId());
-				this.cbxVwVerticalFieldFilter.setItemCaption(vwVerticalRptColumns.get(i).getVwVerticalRptColumnDbId(), vwVerticalRptColumns.get(i).getVwVerticalRptColumnName());
+				this.cbxVwHorizontalFieldFilter.addItem(vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnDbId());
+				this.cbxVwHorizontalFieldFilter.setItemCaption(vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnDbId(), vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnName());
 			}
-			else if(vwVerticalRptColumns.get(i).getVwVerticalRptColumnDataType().toLowerCase().startsWith("date"))
+			else if(vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnDataType().toLowerCase().startsWith("date"))
 			{
-				this.cbxDateFieldsFilter.addItem(vwVerticalRptColumns.get(i).getVwVerticalRptColumnDbId());
-				this.cbxDateFieldsFilter.setItemCaption(vwVerticalRptColumns.get(i).getVwVerticalRptColumnDbId(), vwVerticalRptColumns.get(i).getVwVerticalRptColumnName());
+				this.cbxDateFieldsFilter.addItem(vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnDbId());
+				this.cbxDateFieldsFilter.setItemCaption(vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnDbId(), vwHorizontalRptColumns.get(i).getVwHorizontalRptColumnName());
 			}	
 		}
 		
-		bindVWverticalReportRptTable();
+		bindVWHorizontalReportRptTable();
 		
 		//Elements events
 		this.btnApplyFilters.addClickListener(new Button.ClickListener() {
@@ -139,9 +135,9 @@ private SystemSettings systemSettings;
 			                         "jdbc:sqlserver://" + dbHost + ":" + dbPort + ";databaseName=" + dbDatabase,
 			                         dbUsername, dbPassword);
 			                
-			                 TableQuery tblQuery = new TableQuery(vwVerticalReport.getVwVerticalRptDbTableNameId(), connectionPool, new MSSQLGenerator());
+			                 TableQuery tblQuery = new TableQuery(vwHorizontalReport.getVwHorizontalRptDbTableNameId(), connectionPool, new MSSQLGenerator());
 			                 List<OrderBy> tblOrderByRecordId = Arrays.asList(new OrderBy("RecordId", false));
-			                 StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(vwVerticalReport.getVwVerticalRptDbTableNameId(), null, null/*tblOrderByRecordId*/, 0, 0, null);
+			                 StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(vwHorizontalReport.getVwHorizontalRptDbTableNameId(), null, null/*tblOrderByRecordId*/, 0, 0, null);
 			                 sqlQuery = sh.getQueryString();
 			                 
 			                 firstWhereClause = andSqlWhereClause.get(0);
@@ -151,9 +147,9 @@ private SystemSettings systemSettings;
 			                 	 sqlWhereClause += " AND (" + andSqlWhereClause.get(i) + ")";
 			                 
 			                 String sqlColumnLabels = "";
-			                 List<Object> asList = new ArrayList<Object>(Arrays.asList(tblVwVerticalDataReport.getVisibleColumns()));
+			                 List<Object> asList = new ArrayList<Object>(Arrays.asList(tblVwHorizontalDataReport.getVisibleColumns()));
 			                 for(int i=0; i<asList.size(); i++)
-			                 	sqlColumnLabels += "\"" + asList.get(i).toString() + "\" AS \"" +  tblVwVerticalDataReport.getColumnHeader(asList.get(i)) + "\",";
+			                 	sqlColumnLabels += "\"" + asList.get(i).toString() + "\" AS \"" +  tblVwHorizontalDataReport.getColumnHeader(asList.get(i)) + "\",";
 			                 
 			                 sqlColumnLabels = sqlColumnLabels.substring(0, sqlColumnLabels.length() - 1);
 			                 
@@ -169,9 +165,9 @@ private SystemSettings systemSettings;
 			         }
 		        }	
 		  
-		        Integer totalRecords = tblVwVerticalDataReport.size();
-		    	if (vwVerticalReport.getVwVerticalRptDbTableLastUpdate() != null)
-		    		lblLastRefreshDate.setValue("Last Refresh Date: " + vwVerticalReport.getVwVerticalRptDbTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
+		        Integer totalRecords = tblVwHorizontalDataReport.size();
+		    	if (vwHorizontalReport.getVwHorizontalRptDbTableLastUpdate() != null)
+		    		lblLastRefreshDate.setValue("Last Refresh Date: " + vwHorizontalReport.getVwHorizontalRptDbTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
 		  }
 			
 		});
@@ -189,34 +185,34 @@ private SystemSettings systemSettings;
 	
 	 private void refreshData() {
 		 
-		ViewVerticalReportJobDataDao vwVerticalReportJobDataDao = new ViewVerticalReportJobDataDao();
-		Map<String, Object> result = vwVerticalReportJobDataDao.vwVerticalProcedureJob(vwVerticalReport.getVwVerticalRptId());
+		ViewHorizontalReportJobDataDao vwHorizontalReportJobDataDao = new ViewHorizontalReportJobDataDao();
+		Map<String, Object> result = vwHorizontalReportJobDataDao.vwHorizontalProcedureJob(vwHorizontalReport.getVwHorizontalRptId());
 		
 		if(vaadinTblContainer != null)
 			vaadinTblContainer.refresh();
 		else
-			bindVWverticalReportRptTable();
+			bindVWHorizontalReportRptTable();
 
-		vwVerticalReport = new ViewVerticalReportDao().getVwVerticalRptById(vwVerticalReport.getVwVerticalRptId());
+		vwHorizontalReport = new ViewHorizontalReportDao().getVwHorizontalRptById(vwHorizontalReport.getVwHorizontalRptId());
 	
 		
-		Integer totalRecords = this.tblVwVerticalDataReport.size();
-		if (vwVerticalReport.getVwVerticalRptDbTableLastUpdate() != null)
-            this.lblLastRefreshDate.setValue("Last Refresh Date: " + vwVerticalReport.getVwVerticalRptDbTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
+		Integer totalRecords = this.tblVwHorizontalDataReport.size();
+		if (vwHorizontalReport.getVwHorizontalRptDbTableLastUpdate() != null)
+            this.lblLastRefreshDate.setValue("Last Refresh Date: " + vwHorizontalReport.getVwHorizontalRptDbTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
     
 		if (Constants.SUCCESS == result.get("status")) {
-			this.getUI().showNotification("View Vertical Report '" + vwVerticalReport.getVwVerticalRptName() + "' has been Refresh Successfully.", Notification.Type.HUMANIZED_MESSAGE);
+			this.getUI().showNotification("View Horizontal Report '" + vwHorizontalReport.getVwHorizontalRptName() + "' has been Refresh Successfully.", Notification.Type.HUMANIZED_MESSAGE);
 			this.btnApplyFilters.click();		
 		} else {
 			String msgToDisplay = result.get("statusMessage").toString();
 			if (Constants.JOB_NOT_EXECUTED.equalsIgnoreCase(msgToDisplay)) {
-				msgToDisplay = "same View Vertical Report is getting refresh by another user";
+				msgToDisplay = "same View Horizontal Report is getting refresh by another user";
 			}
-			this.getUI().showNotification("View Vertical Report '" + vwVerticalReport.getVwVerticalRptName() + "' can't refresh due to "+ msgToDisplay + ".", Notification.Type.WARNING_MESSAGE);
+			this.getUI().showNotification("View Horizontal Report '" + vwHorizontalReport.getVwHorizontalRptName() + "' can't refresh due to "+ msgToDisplay + ".", Notification.Type.WARNING_MESSAGE);
 		} 
 	}
 	
-	private void bindVWverticalReportRptTable()
+	private void bindVWHorizontalReportRptTable()
 	{
 		Config configuration = new Config();
 		if(configuration.getProperty("dbms").equals("sqlserver"))
@@ -229,8 +225,8 @@ private SystemSettings systemSettings;
 			
 			SimpleJDBCConnectionPool connectionPool;
 		    
-			//Validate that DB Table of View Vertical Report exists
-			String validateDbTableSqlQuery = "SELECT 1 FROM sys.Objects WHERE  Object_id = OBJECT_ID('" + this.vwVerticalReport.getVwVerticalRptDbTableNameId() + "')";
+			//Validate that DB Table of View Horizontal Report exists
+			String validateDbTableSqlQuery = "SELECT 1 FROM sys.Objects WHERE  Object_id = OBJECT_ID('" + this.vwHorizontalReport.getVwHorizontalRptDbTableNameId() + "')";
 			
 			ResultSet validateDbTableSqlResults = new ExecuteQueryDao().getSqlSelectQueryResults(validateDbTableSqlQuery);
      		if(validateDbTableSqlResults == null)
@@ -255,27 +251,27 @@ private SystemSettings systemSettings;
 						"jdbc:sqlserver://"+dbHost+":"+dbPort+";databaseName="+dbDatabase,
 						dbUsername, dbPassword);
 		    
-		    	TableQuery tblQuery = new TableQuery(this.vwVerticalReport.getVwVerticalRptDbTableNameId(), connectionPool, new MSSQLGenerator());
+		    	TableQuery tblQuery = new TableQuery(this.vwHorizontalReport.getVwHorizontalRptDbTableNameId(), connectionPool, new MSSQLGenerator());
 				tblQuery.setVersionColumn("vwRecordId");
 
 				vaadinTblContainer = new SQLContainer(tblQuery);
 				
-				tblVwVerticalDataReport.setContainerDataSource(vaadinTblContainer);
+				tblVwHorizontalDataReport.setContainerDataSource(vaadinTblContainer);
 				
-				List<ViewVerticalReportColumn> vwVerticalReportColumns = new ViewVerticalReportColumnDao().getAllVwVerticalReportColumnsByRptId(this.vwVerticalReport.getVwVerticalRptId());
-				if(vwVerticalReportColumns != null)
+				List<ViewHorizontalReportColumn> vwHorizontalReportColumns = new ViewHorizontalReportColumnDao().getAllVwHorizontalReportColumnsByRptId(this.vwHorizontalReport.getVwHorizontalRptId());
+				if(vwHorizontalReportColumns != null)
 				{
-					String[] vwVerticalReportVisibleColumns = new String[vwVerticalReportColumns.size()]; 
-					for(int i=0; i<vwVerticalReportColumns.size(); i++)
+					String[] vwHorizontalReportVisibleColumns = new String[vwHorizontalReportColumns.size()]; 
+					for(int i=0; i<vwHorizontalReportColumns.size(); i++)
 					{
-						this.tblVwVerticalDataReport.setColumnHeader(vwVerticalReportColumns.get(i).getVwVerticalRptColumnDbId(), vwVerticalReportColumns.get(i).getVwVerticalRptColumnName());
-						vwVerticalReportVisibleColumns[i] = vwVerticalReportColumns.get(i).getVwVerticalRptColumnDbId();
+						this.tblVwHorizontalDataReport.setColumnHeader(vwHorizontalReportColumns.get(i).getVwHorizontalRptColumnDbId(), vwHorizontalReportColumns.get(i).getVwHorizontalRptColumnName());
+						vwHorizontalReportVisibleColumns[i] = vwHorizontalReportColumns.get(i).getVwHorizontalRptColumnDbId();
 					
-						if(vwVerticalReportColumns.get(i).getVwVerticalRptColumnDataType().toLowerCase().contains("float") || 
-								vwVerticalReportColumns.get(i).getVwVerticalRptColumnDataType().toLowerCase().contains("decimal") || 
-								vwVerticalReportColumns.get(i).getVwVerticalRptColumnDataType().toLowerCase().contains("int"))
+						if(vwHorizontalReportColumns.get(i).getVwHorizontalRptColumnDataType().toLowerCase().contains("float") || 
+								vwHorizontalReportColumns.get(i).getVwHorizontalRptColumnDataType().toLowerCase().contains("decimal") || 
+								vwHorizontalReportColumns.get(i).getVwHorizontalRptColumnDataType().toLowerCase().contains("int"))
 						{
-							tblVwVerticalDataReport.setConverter(vwVerticalReportColumns.get(i).getVwVerticalRptColumnDbId(), new StringToDoubleConverter() {
+							tblVwHorizontalDataReport.setConverter(vwHorizontalReportColumns.get(i).getVwHorizontalRptColumnDbId(), new StringToDoubleConverter() {
 							    @Override
 							    protected NumberFormat getFormat(Locale locale) {
 							    	NumberFormat format = NumberFormat.getNumberInstance();
@@ -286,9 +282,9 @@ private SystemSettings systemSettings;
 							
 						}
 						
-						if(vwVerticalReportColumns.get(i).getVwVerticalRptColumnDataType().toLowerCase().contains("date"))
+						if(vwHorizontalReportColumns.get(i).getVwHorizontalRptColumnDataType().toLowerCase().contains("date"))
 						{
-							tblVwVerticalDataReport.setConverter(vwVerticalReportColumns.get(i).getVwVerticalRptColumnDbId(), new StringToDateConverter() {
+							tblVwHorizontalDataReport.setConverter(vwHorizontalReportColumns.get(i).getVwHorizontalRptColumnDbId(), new StringToDateConverter() {
 							    @Override
 							    protected DateFormat getFormat(Locale locale) {
 									return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -297,18 +293,18 @@ private SystemSettings systemSettings;
 						}
 					}
 					
-					tblVwVerticalDataReport.setVisibleColumns(vwVerticalReportVisibleColumns);					
+					tblVwHorizontalDataReport.setVisibleColumns(vwHorizontalReportVisibleColumns);					
 				}
 				
-				tblVwVerticalDataReport.setColumnCollapsingAllowed(true);				
+				tblVwHorizontalDataReport.setColumnCollapsingAllowed(true);				
 				
-				StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(vwVerticalReport.getVwVerticalRptDbTableNameId(), null, null, 0, 0, null);
+				StatementHelper sh = tblQuery.getSqlGenerator().generateSelectQuery(vwHorizontalReport.getVwHorizontalRptDbTableNameId(), null, null, 0, 0, null);
                 sqlQuery = sh.getQueryString();
                 
 				String sqlColumnLabels = "";
-                List<Object> asList = new ArrayList<Object>(Arrays.asList(tblVwVerticalDataReport.getVisibleColumns()));
+                List<Object> asList = new ArrayList<Object>(Arrays.asList(tblVwHorizontalDataReport.getVisibleColumns()));
                 for(int i=0; i<asList.size(); i++)
-                	sqlColumnLabels += "\"" + asList.get(i).toString() + "\" AS \"" +  tblVwVerticalDataReport.getColumnHeader(asList.get(i)) + "\",";
+                	sqlColumnLabels += "\"" + asList.get(i).toString() + "\" AS \"" +  tblVwHorizontalDataReport.getColumnHeader(asList.get(i)) + "\",";
                 
                 sqlColumnLabels = sqlColumnLabels.substring(0, sqlColumnLabels.length() - 1);
                 
@@ -324,9 +320,9 @@ private SystemSettings systemSettings;
 				e.printStackTrace();
 			}	
      		}
-		    Integer totalRecords = tblVwVerticalDataReport.size();
-	    	if (vwVerticalReport.getVwVerticalRptDbTableLastUpdate() != null)
-	            this.lblLastRefreshDate.setValue("Last Refresh Date: " + vwVerticalReport.getVwVerticalRptDbTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
+		    Integer totalRecords = tblVwHorizontalDataReport.size();
+	    	if (vwHorizontalReport.getVwHorizontalRptDbTableLastUpdate() != null)
+	            this.lblLastRefreshDate.setValue("Last Refresh Date: " + vwHorizontalReport.getVwHorizontalRptDbTableLastUpdate() + "  [Total Records: " + totalRecords + "]");
 	  
 		}
 	}
@@ -361,7 +357,7 @@ private SystemSettings systemSettings;
                        }
                           return is;
                      	}
-                 }, lblVwVerticalRptTitle.getValue().trim() + ".csv"));
+                 }, lblVwHorizontalRptTitle.getValue().trim() + ".csv"));
          downloader.extend(downloadBtn);
 		
 	}

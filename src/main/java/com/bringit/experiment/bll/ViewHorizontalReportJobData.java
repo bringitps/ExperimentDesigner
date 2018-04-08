@@ -17,13 +17,14 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Table(name="VerticalViewReportJobData")
+@Table(name="HorizontalViewReportJobData")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region="entity")
 @Cacheable
-public class ViewVerticalReportJobData {
+public class ViewHorizontalReportJobData {
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="vwVerticalJobId")
+	@Column(name="vwHorizontalJobId")
 	private Integer vwVerticalJobId;
 
 	@Column(name="CreatedDate")
@@ -46,8 +47,8 @@ public class ViewVerticalReportJobData {
 	private String status;
 
 	@OneToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="ViewVerticalReportId", unique=false, updatable=false)
-	private ViewVerticalReport vwVerticalReport;
+	@JoinColumn(name="ViewHorizontalReportId", unique=false, updatable=false)
+	private ViewHorizontalReport vwHorizontalReport;
 
 	public Integer getVwVerticalJobId() {
 		return vwVerticalJobId;
@@ -105,11 +106,11 @@ public class ViewVerticalReportJobData {
 		this.status = status;
 	}
 
-	public ViewVerticalReport getVwVerticalReport() {
-		return vwVerticalReport;
+	public ViewHorizontalReport getVwHorizontalReport() {
+		return vwHorizontalReport;
 	}
 
-	public void setVwVerticalReport(ViewVerticalReport vwVerticalReport) {
-		this.vwVerticalReport = vwVerticalReport;
-	}
+	public void setVwHorizontalReport(ViewHorizontalReport vwHorizontalReport) {
+		this.vwHorizontalReport = vwHorizontalReport;
+	}	
 }

@@ -1,11 +1,19 @@
 package com.bringit.experiment.dao;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import com.bringit.experiment.bll.ViewHorizontalReport;
+import com.bringit.experiment.bll.ViewHorizontalReportJobData;
 import com.bringit.experiment.dal.HibernateUtil;
+import com.bringit.experiment.util.Constants;
 
 public class ViewHorizontalReportDao {
 
@@ -64,6 +72,24 @@ public class ViewHorizontalReportDao {
             session.flush();
             session.close();
         }
+    }    
+    
+    @SuppressWarnings({"unchecked", "unused"})
+    public List<ViewHorizontalReport> getAllViewHorizontalReports() {
+        List<ViewHorizontalReport> vwHorizontalReports = new ArrayList<ViewHorizontalReport>();
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        //Session session = HibernateUtil.openSession(dialectXmlFile);
+        try {
+            trns = session.beginTransaction();
+            vwHorizontalReports = session.createQuery("from ViewHorizontalReport where VwHorizontalRptIsActive = 'true'").list();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.flush();
+            session.close();
+        }
+        return vwHorizontalReports;
     }
     
     @SuppressWarnings("unused")
@@ -85,6 +111,38 @@ public class ViewHorizontalReportDao {
             session.close();
         }
         return vwHorizontalRpt;
+    }
+    
+    public Map<String,Object> executeVwHorizontalRptProcedure(ViewHorizontalReportJobData vwHorizontalRptJobData, ViewHorizontalReport vwHorizontalRpt) {
+        Map<String,Object> map= new HashMap<>();
+        ViewHorizontalReportJobDataDao viewHorizontalReportJobDataDao = new ViewHorizontalReportJobDataDao();
+        String statusMessage = Constants.JOB_FINISHED;
+
+        map.put("statusMessage", statusMessage);
+        map.put("status", Constants.SUCCESS);
+        try {
+
+
+            List<String> lstVwHorizontalRptBean;
+            lstVwHorizontalRptBean = new ArrayList<>();
+            lstVwHorizontalRptBean.add(vwHorizontalRpt.getVwHorizontalRptId().toString());
+            new ExecuteQueryDao().executeUpdateStoredProcedure("spHorizontalReport", lstVwHorizontalRptBean);
+
+            vwHorizontalRpt.setVwHorizontalRptDbTableLastUpdate(new Date());
+            this.updateVwHorizontalReport(vwHorizontalRpt);
+
+            statusMessage = Constants.JOB_FINISHED;
+        } catch (Exception ex) {
+            statusMessage = Constants.JOB_EXCEPTION;
+
+            map.put("statusMessage", statusMessage);
+            map.put("status", Constants.ERROR);
+            ex.printStackTrace();
+        } finally {
+        	viewHorizontalReportJobDataDao.updateVwHorizontalJobStatus(vwHorizontalRptJobData, statusMessage);
+        }
+
+        return map;
     }
     
 }

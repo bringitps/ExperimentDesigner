@@ -8,48 +8,56 @@
  <body> 
   <vaadin-horizontal-layout style-name="app-shell" responsive size-full> 
    <vaadin-panel style-name="valo-menu borderless" width="250px" height-full> 
-    <vaadin-tree id="treeMainMenu" style-name="tiny" item-caption-mode="id" _id="treeMainMenu"> 
-     <node text="Menu" icon="fonticon://FontAwesome/f0c9"> 
-      <node text="Experiments" icon="fonticon://FontAwesome/f0c3"> 
-       <node text="Manage Experiments" icon="fonticon://FontAwesome/f085"></node> 
-       <node text="Manage XmlTemplates" icon="fonticon://FontAwesome/f085"></node> 
-       <node text="Manage CsvTemplates" icon="fonticon://FontAwesome/f085"></node> 
-       <node text="Data" icon="fonticon://FontAwesome/f044"></node> 
-      </node> 
-      <node text="Scheduled Jobs" icon="fonticon://FontAwesome/f017"> 
-       <node text="XML Data File Loads" icon="fonticon://FontAwesome/f1c9"></node> 
-       <node text="CSV Data File Loads" icon="fonticon://FontAwesome/f1c3"></node> 
-      </node> 
-      <node text="Data Visualization" icon="fonticon://FontAwesome/f0e4"> 
-       <node text="Target Reports" icon="fonticon://FontAwesome/f140"></node> 
-       <node text="First Pass Yield Reports" icon="fonticon://FontAwesome/f00c"></node> 
-       <node text="Final Pass Yield Reports" icon="fonticon://FontAwesome/f061"></node> 
-       <node text="First Time Yield Reports" icon="fonticon://FontAwesome/f05d"></node> 
-       <node text="Vertical View Reports" icon="fonticon://FontAwesome/f15c"></node> 
-      </node> 
-      <node text="Reports Builder" icon="fonticon://FontAwesome/f0ad"> 
-       <node text="Target Report" icon="fonticon://FontAwesome/f140"></node> 
-       <node text="First Pass Yield Report" icon="fonticon://FontAwesome/f00c"></node> 
-       <node text="Final Pass Yield Report" icon="fonticon://FontAwesome/f061"></node> 
-       <node text="First Time Yield Report" icon="fonticon://FontAwesome/f05d"></node> 
-       <node text="Vertical View Report" icon="fonticon://FontAwesome/f15c"></node> 
-       <node text="Horizontal View Report" icon="fonticon://FontAwesome/f0db"></node> 
-       <node text="Frequency Histogram" icon="fonticon://FontAwesome/f0db"></node> 
-      </node> 
-      <node text="Configuration" icon="fonticon://FontAwesome/f013"> 
-       <node text="User Roles" icon="fonticon://FontAwesome/f0c0"></node> 
-       <node text="Users" icon="fonticon://FontAwesome/f007"></node> 
-       <node text="Contract Manufacturers" icon="fonticon://FontAwesome/f1e6"></node> 
-       <node text="Files Repositories" icon="fonticon://FontAwesome/f115"></node> 
-       <node text="Unit Of Measures" icon="fonticon://FontAwesome/f12c"></node> 
-       <node text="Job Exec Repeat" icon="fonticon://FontAwesome/f01e"></node> 
-       <node text="Experiment Types" icon="fonticon://FontAwesome/f02b"></node> 
-       <node text="Custom Lists" icon="fonticon://FontAwesome/f0cb"></node> 
-       <node text="Smtp" icon="fonticon://FontAwesome/f003"></node> 
-       <node text="General Settings" icon="fonticon://FontAwesome/f00b"></node> 
-      </node> 
-     </node> 
-    </vaadin-tree> 
+    <vaadin-grid-layout> 
+     <row></row> 
+     <row> 
+      <column> 
+       <vaadin-tree id="treeMainMenu" style-name="tiny" item-caption-mode="id" _id="treeMainMenu"> 
+        <node text="Menu" icon="fonticon://FontAwesome/f0c9"> 
+         <node text="Experiments" icon="fonticon://FontAwesome/f0c3"> 
+          <node text="Manage Experiments" icon="fonticon://FontAwesome/f085"></node> 
+          <node text="Manage XmlTemplates" icon="fonticon://FontAwesome/f085"></node> 
+          <node text="Manage CsvTemplates" icon="fonticon://FontAwesome/f085"></node> 
+          <node text="Data" icon="fonticon://FontAwesome/f044"></node> 
+         </node> 
+         <node text="Scheduled Jobs" icon="fonticon://FontAwesome/f017"> 
+          <node text="XML Data File Loads" icon="fonticon://FontAwesome/f1c9"></node> 
+          <node text="CSV Data File Loads" icon="fonticon://FontAwesome/f1c3"></node> 
+         </node> 
+         <node text="Data Visualization" icon="fonticon://FontAwesome/f0e4"> 
+          <node text="Target Reports" icon="fonticon://FontAwesome/f140"></node> 
+          <node text="First Pass Yield Reports" icon="fonticon://FontAwesome/f00c"></node> 
+          <node text="Final Pass Yield Reports" icon="fonticon://FontAwesome/f061"></node> 
+          <node text="First Time Yield Reports" icon="fonticon://FontAwesome/f05d"></node> 
+          <node text="Vertical View Reports" icon="fonticon://FontAwesome/f15c"></node> 
+         </node> 
+         <node text="Reports Builder" icon="fonticon://FontAwesome/f0ad"> 
+          <node text="Target Report" icon="fonticon://FontAwesome/f140"></node> 
+          <node text="First Pass Yield Report" icon="fonticon://FontAwesome/f00c"></node> 
+          <node text="Final Pass Yield Report" icon="fonticon://FontAwesome/f061"></node> 
+          <node text="First Time Yield Report" icon="fonticon://FontAwesome/f05d"></node> 
+          <node text="Vertical View Report" icon="fonticon://FontAwesome/f15c"></node> 
+          <node text="Horizontal View Report" icon="fonticon://FontAwesome/f0db"></node> 
+          <node text="Frequency Histogram" icon="fonticon://FontAwesome/f0db"></node> 
+         </node> 
+         <node text="Configuration" icon="fonticon://FontAwesome/f013"> 
+          <node text="User Roles" icon="fonticon://FontAwesome/f0c0"></node> 
+          <node text="Users" icon="fonticon://FontAwesome/f007"></node> 
+          <node text="Contract Manufacturers" icon="fonticon://FontAwesome/f1e6"></node> 
+          <node text="Files Repositories" icon="fonticon://FontAwesome/f115"></node> 
+          <node text="Unit Of Measures" icon="fonticon://FontAwesome/f12c"></node> 
+          <node text="Job Exec Repeat" icon="fonticon://FontAwesome/f01e"></node> 
+          <node text="Experiment Types" icon="fonticon://FontAwesome/f02b"></node> 
+          <node text="Custom Lists" icon="fonticon://FontAwesome/f0cb"></node> 
+          <node text="Smtp" icon="fonticon://FontAwesome/f003"></node> 
+          <node text="General Settings" icon="fonticon://FontAwesome/f00b"></node> 
+         </node> 
+        </node> 
+       </vaadin-tree> 
+      </column> 
+     </row> 
+     <row></row> 
+    </vaadin-grid-layout> 
    </vaadin-panel> 
    <vaadin-vertical-layout style-name="content-container" id="formContentLayout" size-full _id="formContentLayout" :expand></vaadin-vertical-layout> 
   </vaadin-horizontal-layout>  

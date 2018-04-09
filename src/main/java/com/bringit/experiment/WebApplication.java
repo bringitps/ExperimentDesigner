@@ -1,6 +1,7 @@
 package com.bringit.experiment;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -17,6 +18,7 @@ import com.bringit.experiment.dao.JobExecutionRepeatDao;
 import com.bringit.experiment.dao.SysRoleDao;
 import com.bringit.experiment.dao.SysUserDao;
 import com.bringit.experiment.dao.UserRoleDao;
+import com.bringit.experiment.spc.FrequencyHistogramApplet;
 import com.bringit.experiment.ui.form.LoginForm;
 import com.bringit.experiment.ui.form.MainForm;
 import com.bringit.experiment.ui.form.SysUserSettingsForm;
@@ -62,6 +64,7 @@ import com.vaadin.ui.Window;
 //@Widgetset("AppWidgetset")
 public class WebApplication extends UI {
 
+	
 	private Grid grid = new Grid();
 	
 	
@@ -74,6 +77,7 @@ public class WebApplication extends UI {
 	
 	@Override
 	protected void init(VaadinRequest vaadinRequest) {
+		
        UI.getCurrent().setLocale(new Locale.Builder().setLanguage("en").setRegion("US").build());
 		buildContent();
 	}

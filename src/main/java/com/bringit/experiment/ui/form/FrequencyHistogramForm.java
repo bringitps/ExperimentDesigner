@@ -9,6 +9,7 @@ import com.vaadin.ui.Image;
 
 import java.awt.BorderLayout;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JPanel;
 
@@ -19,6 +20,33 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 	FrequencyHistogram freqHistogram;
 	public FrequencyHistogramForm()
 	{
+		/*
+		ProcessBuilder pb = new ProcessBuilder("java", "-jar", "C:\\Users\\Edgar Beltran\\Documents\\MicroVision\\Executable_JAR\\itt_rules.jar");
+        pb.directory(new File("C:\\Users\\Edgar Beltran\\Documents\\MicroVision\\"));
+        try {
+            Process p = pb.start();
+            try {
+                System.out.println("JAR open.");
+				p.waitFor();
+	            System.out.println("JAR closed.");
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+		*/
+		
+		/*System.out.println("Running");
+		
+
+		 System.out.println("About to build image");	
+		 FrequencyHistogramApplet freqHistApplet = new FrequencyHistogramApplet();
+		 freqHistApplet.initDemo();
+		 freqHistApplet.start();
+		*/
+		
 		 System.out.println("About to build image");	
 		 FrequencyHistogramApplet freqHistApplet = new FrequencyHistogramApplet();
 		 freqHistApplet.initDemo();

@@ -283,8 +283,6 @@ public class MainForm extends MainFormDesign {
 
     private void setFormContent(String itemClickedText, Item treeItemClicked) {
     	
-    	System.out.println((Integer) treeItemClicked.getItemProperty("vwVerticalReportId").getValue());
-    	
         if (treeItemClicked == null || (treeItemClicked.getItemProperty("isExperimentDataReport").getValue() == null
                 && treeItemClicked.getItemProperty("isTargetReport").getValue() == null
                 && treeItemClicked.getItemProperty("isFpyReport").getValue() == null

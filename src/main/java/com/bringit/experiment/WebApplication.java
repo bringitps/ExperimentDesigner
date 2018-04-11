@@ -93,6 +93,7 @@ public class WebApplication extends UI {
 	    FileResource imgResource = new FileResource(new File(basePath + "/WEB-INF/classes/images/customer_logo.png"));
 	    Image imgLogo = new Image("", imgResource);
 	    
+		final VerticalLayout mainLayout = new VerticalLayout();
 		final VerticalLayout headerLayout = new VerticalLayout();
 		final HorizontalLayout contentLayout = new HorizontalLayout((sysUserSession != null) ? mainForm : loginForm);
 		//final VerticalLayout footerLayout = new VerticalLayout(new Label("BringIT | Professional Services"));
@@ -132,7 +133,7 @@ public class WebApplication extends UI {
 			headerGrid.setComponentAlignment(mnuSession, Alignment.BOTTOM_RIGHT);
 			
 
-			VerticalLayout headerNonVisibleSeparatorLayout = new VerticalLayout();
+			/*VerticalLayout headerNonVisibleSeparatorLayout = new VerticalLayout();
 			headerNonVisibleSeparatorLayout.setWidth(100, Unit.PERCENTAGE);
 			headerNonVisibleSeparatorLayout.setHeight(1, Unit.PIXELS); 
 			headerNonVisibleSeparatorLayout.setStyleName("borderless");
@@ -140,12 +141,15 @@ public class WebApplication extends UI {
 			VerticalLayout headerBlueSeparatorLayout = new VerticalLayout();
 			headerBlueSeparatorLayout.setWidth(100, Unit.PERCENTAGE);
 			headerBlueSeparatorLayout.setHeight(10, Unit.PIXELS); 
-			headerBlueSeparatorLayout.setStyleName("valo-menu-title");
+			headerBlueSeparatorLayout.setStyleName("valo-menu-title");*/
 			
-			headerLayout.addComponent(headerGrid);
-			headerLayout.addComponent(headerNonVisibleSeparatorLayout);
-			headerLayout.addComponent(headerBlueSeparatorLayout);
+			//headerLayout.addComponent(headerGrid);
+			//headerLayout.addComponent(headerNonVisibleSeparatorLayout);
+			//headerLayout.addComponent(headerBlueSeparatorLayout);
+			
 			mainForm.updateMenuAccess();
+			mainForm.panelSession.setContent(mnuSession);
+			mainLayout.addComponent(contentLayout);
 		}
 		else
 		{
@@ -238,9 +242,11 @@ public class WebApplication extends UI {
 			headerGrid.addComponent(imgLogo, 0, 0);
 			headerGrid.setComponentAlignment(imgLogo, Alignment.BOTTOM_CENTER);
 			headerLayout.addComponent(headerGrid);
+			mainLayout.addComponent(headerLayout);
+			mainLayout.addComponent(contentLayout);
 		}
 		
-		final VerticalLayout mainLayout = new VerticalLayout(headerLayout, contentLayout/*, footerLayout*/);
+		//final VerticalLayout mainLayout = new VerticalLayout(headerLayout, contentLayout/*, footerLayout*/);
 		mainLayout.setSizeFull();
 		mainLayout.setExpandRatio(contentLayout, 1);
 		contentLayout.setSizeFull();

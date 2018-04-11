@@ -20,11 +20,14 @@ import com.bringit.experiment.dao.ViewVerticalReportDao;
 import com.bringit.experiment.ui.design.MainFormDesign;
 import com.vaadin.data.Item;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
+import com.vaadin.ui.Image;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.Tree.ItemStyleGenerator;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +39,10 @@ public class MainForm extends MainFormDesign {
     private SystemSettings systemSettings;
     SysUser sysUserSession = (SysUser) VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 
-
+  //--- Loading BringIT Logo ---//
+    String basePath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+    FileResource imgResource = new FileResource(new File(basePath + "/WEB-INF/classes/images/customer_logo_menu.png"));
+    
     @SuppressWarnings("deprecation")
     public MainForm(WebApplication webApplication, String selectedForm) {
 
@@ -45,8 +51,9 @@ public class MainForm extends MainFormDesign {
 
         this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
         
+        customerLogo.setIcon(imgResource);
+
         treeMainMenu.setItemCaptionMode(ItemCaptionMode.EXPLICIT_DEFAULTS_ID);
-        
         treeMainMenu.addContainerProperty("isExperimentDataReport", Boolean.class, null);
         treeMainMenu.addContainerProperty("experimentId", Integer.class, null);
         treeMainMenu.addContainerProperty("isTargetReport", Boolean.class, null);

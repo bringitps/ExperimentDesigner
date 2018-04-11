@@ -101,7 +101,7 @@ public class WebApplication extends UI {
 		if (sysUserSession != null)
 		{
 			
-			//--- Page Header Layout ---//
+			/*//--- Page Header Layout ---//
 			GridLayout headerGrid = new GridLayout();
 			headerGrid.setRows(1);
 			headerGrid.setColumns(2);
@@ -109,9 +109,8 @@ public class WebApplication extends UI {
 			headerGrid.setMargin(mg);
 			
 			headerGrid.setSizeFull();
-			
 			headerGrid.addComponent(imgLogo, 0, 0);
-			headerGrid.setComponentAlignment(imgLogo, Alignment.BOTTOM_LEFT);
+			headerGrid.setComponentAlignment(imgLogo, Alignment.BOTTOM_LEFT);*/
 			
 			MenuBar mnuSession = new MenuBar();
 			mnuSession.setStyleName("borderless");
@@ -129,8 +128,8 @@ public class WebApplication extends UI {
 			//mnuSession.getItems().get(0).addItem("Change Role 1: ", FontAwesome.EXCHANGE, changeUserRole);	
 			//mnuSession.getItems().get(0).addItem("Change Role 2: ", FontAwesome.EXCHANGE, changeUserRole);	
 			
-			headerGrid.addComponent(mnuSession, 1, 0);
-			headerGrid.setComponentAlignment(mnuSession, Alignment.BOTTOM_RIGHT);
+			/*headerGrid.addComponent(mnuSession, 1, 0);
+			headerGrid.setComponentAlignment(mnuSession, Alignment.BOTTOM_CENTER);*/
 			
 
 			/*VerticalLayout headerNonVisibleSeparatorLayout = new VerticalLayout();
@@ -242,6 +241,7 @@ public class WebApplication extends UI {
 			headerGrid.addComponent(imgLogo, 0, 0);
 			headerGrid.setComponentAlignment(imgLogo, Alignment.BOTTOM_CENTER);
 			headerLayout.addComponent(headerGrid);
+			
 			mainLayout.addComponent(headerLayout);
 			mainLayout.addComponent(contentLayout);
 		}

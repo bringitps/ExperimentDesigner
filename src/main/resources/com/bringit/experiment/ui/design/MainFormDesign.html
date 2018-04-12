@@ -8,16 +8,21 @@
  </head>
  <body>
   <vaadin-horizontal-layout style-name="app-shell" responsive size-full>
-   <vaadin-panel style-name="valo-menu borderless" width="250px" height-full>
-    <vaadin-grid-layout size-full _id="gridLayout">
+   <vaadin-panel style-name="valo-menu scroll-divider" width="250px" height-full>
+    <vaadin-grid-layout _id="gridLayout">
      <row>
       <column>
-       <vaadin-image width-full _id="customerLogo"></vaadin-image>
+       <vaadin-image width-full _id="customerLogo" width="250px" ></vaadin-image>
+      </column>
+     </row>
+     <row>
+      <column>
+       <vaadin-panel id="panelSession" _id="panelSession" width="250px" :bottom :center></vaadin-panel>
       </column>
      </row>
      <row expand="1">
       <column>
-       <vaadin-tree id="treeMainMenu" style-name="tiny" item-caption-mode="id" _id="treeMainMenu">
+       <vaadin-tree id="treeMainMenu" style-name="tiny" item-caption-mode="id" width="250px"  height-full tabindex="-1" _id="treeMainMenu">
         <node text="Menu" icon="fonticon://FontAwesome/f0c9">
          <node text="Experiments" icon="fonticon://FontAwesome/f0c3">
           <node text="Manage Experiments" icon="fonticon://FontAwesome/f085"></node>
@@ -59,11 +64,6 @@
          </node>
         </node>
        </vaadin-tree>
-      </column>
-     </row>
-     <row expand="1">
-      <column>
-       <vaadin-panel id="panelSession" _id="panelSession" :bottom :center></vaadin-panel>
       </column>
      </row>
     </vaadin-grid-layout>

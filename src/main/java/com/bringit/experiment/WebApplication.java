@@ -93,6 +93,7 @@ public class WebApplication extends UI {
 	    FileResource imgResource = new FileResource(new File(basePath + "/WEB-INF/classes/images/customer_logo.png"));
 	    Image imgLogo = new Image("", imgResource);
 	    
+		final VerticalLayout mainLayout = new VerticalLayout();
 		final VerticalLayout headerLayout = new VerticalLayout();
 		final HorizontalLayout contentLayout = new HorizontalLayout((sysUserSession != null) ? mainForm : loginForm);
 		//final VerticalLayout footerLayout = new VerticalLayout(new Label("BringIT | Professional Services"));
@@ -100,7 +101,7 @@ public class WebApplication extends UI {
 		if (sysUserSession != null)
 		{
 			
-			//--- Page Header Layout ---//
+			/*//--- Page Header Layout ---//
 			GridLayout headerGrid = new GridLayout();
 			headerGrid.setRows(1);
 			headerGrid.setColumns(2);
@@ -108,9 +109,8 @@ public class WebApplication extends UI {
 			headerGrid.setMargin(mg);
 			
 			headerGrid.setSizeFull();
-			
 			headerGrid.addComponent(imgLogo, 0, 0);
-			headerGrid.setComponentAlignment(imgLogo, Alignment.BOTTOM_LEFT);
+			headerGrid.setComponentAlignment(imgLogo, Alignment.BOTTOM_LEFT);*/
 			
 			MenuBar mnuSession = new MenuBar();
 			mnuSession.setStyleName("borderless");
@@ -128,11 +128,11 @@ public class WebApplication extends UI {
 			//mnuSession.getItems().get(0).addItem("Change Role 1: ", FontAwesome.EXCHANGE, changeUserRole);	
 			//mnuSession.getItems().get(0).addItem("Change Role 2: ", FontAwesome.EXCHANGE, changeUserRole);	
 			
-			headerGrid.addComponent(mnuSession, 1, 0);
-			headerGrid.setComponentAlignment(mnuSession, Alignment.BOTTOM_RIGHT);
+			/*headerGrid.addComponent(mnuSession, 1, 0);
+			headerGrid.setComponentAlignment(mnuSession, Alignment.BOTTOM_CENTER);*/
 			
 
-			VerticalLayout headerNonVisibleSeparatorLayout = new VerticalLayout();
+			/*VerticalLayout headerNonVisibleSeparatorLayout = new VerticalLayout();
 			headerNonVisibleSeparatorLayout.setWidth(100, Unit.PERCENTAGE);
 			headerNonVisibleSeparatorLayout.setHeight(1, Unit.PIXELS); 
 			headerNonVisibleSeparatorLayout.setStyleName("borderless");
@@ -140,12 +140,15 @@ public class WebApplication extends UI {
 			VerticalLayout headerBlueSeparatorLayout = new VerticalLayout();
 			headerBlueSeparatorLayout.setWidth(100, Unit.PERCENTAGE);
 			headerBlueSeparatorLayout.setHeight(10, Unit.PIXELS); 
-			headerBlueSeparatorLayout.setStyleName("valo-menu-title");
+			headerBlueSeparatorLayout.setStyleName("valo-menu-title");*/
 			
-			headerLayout.addComponent(headerGrid);
-			headerLayout.addComponent(headerNonVisibleSeparatorLayout);
-			headerLayout.addComponent(headerBlueSeparatorLayout);
+			//headerLayout.addComponent(headerGrid);
+			//headerLayout.addComponent(headerNonVisibleSeparatorLayout);
+			//headerLayout.addComponent(headerBlueSeparatorLayout);
+			
 			mainForm.updateMenuAccess();
+			mainForm.panelSession.setContent(mnuSession);
+			mainLayout.addComponent(contentLayout);
 		}
 		else
 		{
@@ -238,9 +241,12 @@ public class WebApplication extends UI {
 			headerGrid.addComponent(imgLogo, 0, 0);
 			headerGrid.setComponentAlignment(imgLogo, Alignment.BOTTOM_CENTER);
 			headerLayout.addComponent(headerGrid);
+			
+			mainLayout.addComponent(headerLayout);
+			mainLayout.addComponent(contentLayout);
 		}
 		
-		final VerticalLayout mainLayout = new VerticalLayout(headerLayout, contentLayout/*, footerLayout*/);
+		//final VerticalLayout mainLayout = new VerticalLayout(headerLayout, contentLayout/*, footerLayout*/);
 		mainLayout.setSizeFull();
 		mainLayout.setExpandRatio(contentLayout, 1);
 		contentLayout.setSizeFull();

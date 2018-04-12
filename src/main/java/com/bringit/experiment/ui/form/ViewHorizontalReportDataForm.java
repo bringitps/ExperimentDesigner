@@ -21,8 +21,12 @@ import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.ViewHorizontalReport;
 import com.bringit.experiment.bll.ViewHorizontalReportColumn;
+import com.bringit.experiment.bll.ViewHorizontalReportColumn;
 import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.SystemSettingsDao;
+import com.bringit.experiment.dao.ViewHorizontalReportColumnDao;
+import com.bringit.experiment.dao.ViewHorizontalReportDao;
+import com.bringit.experiment.dao.ViewHorizontalReportJobDataDao;
 import com.bringit.experiment.dao.ViewHorizontalReportColumnDao;
 import com.bringit.experiment.dao.ViewHorizontalReportDao;
 import com.bringit.experiment.dao.ViewHorizontalReportJobDataDao;
@@ -58,7 +62,7 @@ public class ViewHorizontalReportDataForm extends ViewHorizontalReportDataDesign
 	private String sqlQuery = "";    
 	String firstWhereClause = "";
 	List<String> andSqlWhereClause = new ArrayList<String>();
-	
+
 	public ViewHorizontalReportDataForm(Integer vwHorizontalReportId)
 	{			
 		this.systemSettings = new SystemSettingsDao().getCurrentSystemSettings();
@@ -183,7 +187,7 @@ public class ViewHorizontalReportDataForm extends ViewHorizontalReportDataDesign
 		
 	}	
 	
-	 private void refreshData() {
+	private void refreshData() {
 		 
 		ViewHorizontalReportJobDataDao vwHorizontalReportJobDataDao = new ViewHorizontalReportJobDataDao();
 		Map<String, Object> result = vwHorizontalReportJobDataDao.vwHorizontalProcedureJob(vwHorizontalReport.getVwHorizontalRptId());
@@ -361,6 +365,8 @@ public class ViewHorizontalReportDataForm extends ViewHorizontalReportDataDesign
          downloader.extend(downloadBtn);
 		
 	}
+	
+	
 	
 	
 }

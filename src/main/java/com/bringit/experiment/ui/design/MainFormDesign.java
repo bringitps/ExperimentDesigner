@@ -25,7 +25,7 @@ public class MainFormDesign extends HorizontalLayout {
 	protected GridLayout gridLayout;
 	protected Image customerLogo;
 	protected Tree treeMainMenu;
-	public Panel panelSession;
+	protected Panel panelSession;
 	protected VerticalLayout formContentLayout;
 
 	public MainFormDesign() {

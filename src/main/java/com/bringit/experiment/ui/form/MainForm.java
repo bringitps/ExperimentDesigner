@@ -9,6 +9,7 @@ import com.bringit.experiment.bll.SysRole;
 import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.TargetReport;
+import com.bringit.experiment.bll.ViewHorizontalReport;
 import com.bringit.experiment.bll.ViewVerticalReport;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.FinalPassYieldReportDao;
@@ -16,6 +17,7 @@ import com.bringit.experiment.dao.FirstPassYieldReportDao;
 import com.bringit.experiment.dao.FirstTimeYieldReportDao;
 import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.TargetReportDao;
+import com.bringit.experiment.dao.ViewHorizontalReportDao;
 import com.bringit.experiment.dao.ViewVerticalReportDao;
 import com.bringit.experiment.ui.design.MainFormDesign;
 import com.vaadin.data.Item;
@@ -24,6 +26,7 @@ import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Image;
+import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.Tree.ItemStyleGenerator;
 
@@ -65,7 +68,9 @@ public class MainForm extends MainFormDesign {
         treeMainMenu.addContainerProperty("isFtyReport", Boolean.class, null);
         treeMainMenu.addContainerProperty("ftyReportId", Integer.class, null);
         treeMainMenu.addContainerProperty("isVwVerticalReport", Boolean.class, null);
+        treeMainMenu.addContainerProperty("isVwHorizontalReport", Boolean.class, null);
         treeMainMenu.addContainerProperty("vwVerticalReportId", Integer.class, null);
+        treeMainMenu.addContainerProperty("vwHorizontalReportId", Integer.class, null);
 
         
         for (Object id : treeMainMenu.getItemIds()) 
@@ -172,6 +177,20 @@ public class MainForm extends MainFormDesign {
             		treeMainMenu.setParent(vwVerticalReportsAvailable.get(i).getVwVerticalRptName(), "Vertical View Reports");
             	}
             }
+        }   
+
+        List<ViewHorizontalReport> vwHorizontalReportsAvailable = new ViewHorizontalReportDao().getAllViewHorizontalReports();
+        if (vwHorizontalReportsAvailable != null) {
+            for (int i = 0; i < vwHorizontalReportsAvailable.size(); i++) {
+            	if(vwHorizontalReportsAvailable.get(i).getVwHorizontalRptName() != null && !vwHorizontalReportsAvailable.get(i).getVwHorizontalRptName().isEmpty() && dataMenuItemAdded.indexOf(vwHorizontalReportsAvailable.get(i).getVwHorizontalRptName()) == -1)
+            	{
+            		dataMenuItemAdded.add(vwHorizontalReportsAvailable.get(i).getVwHorizontalRptName());            		
+                	Item item = treeMainMenu.addItem(vwHorizontalReportsAvailable.get(i).getVwHorizontalRptName());
+            		item.getItemProperty("isVwHorizontalReport").setValue(true);
+            		item.getItemProperty("vwHorizontalReportId").setValue(vwHorizontalReportsAvailable.get(i).getVwHorizontalRptId());
+            		treeMainMenu.setParent(vwHorizontalReportsAvailable.get(i).getVwHorizontalRptName(), "Horizontal View Reports");
+            	}
+            }
         } 
         
         treeMainMenu.addItemClickListener(new ItemClickEvent.ItemClickListener() {
@@ -183,6 +202,11 @@ public class MainForm extends MainFormDesign {
 
         if (selectedForm != null)
             setFormContent(selectedForm, null);
+    }
+    
+    public void setPanelSessionMenuBar(MenuBar mnuSession)
+    {
+    	this.panelSession.setContent(mnuSession);
     }
 
     public void updateMenuLabels()
@@ -260,7 +284,8 @@ public class MainForm extends MainFormDesign {
                                 && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isFpyReport").getValue() == null
                                 && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isFnyReport").getValue() == null
                                 && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isFtyReport").getValue() == null
-                                && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isVwVerticalReport").getValue() == null)) {
+                                && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isVwVerticalReport").getValue() == null
+                                && treeMainMenu.getItem(mainMenuItemIds.get(i)).getItemProperty("isVwHorizontalReport").getValue() == null)) {
                             if (mnuAccessTrimmed.indexOf(mainMenuItemIds.get(i).toString().trim()) == -1) {
                                 if (treeMainMenu.getChildren(mainMenuItemIds.get(i)) == null)
                                     treeMainMenu.removeItem(mainMenuItemIds.get(i));
@@ -295,7 +320,8 @@ public class MainForm extends MainFormDesign {
                 && treeItemClicked.getItemProperty("isFpyReport").getValue() == null
                 && treeItemClicked.getItemProperty("isFnyReport").getValue() == null
                 && treeItemClicked.getItemProperty("isFtyReport").getValue() == null
-                && treeItemClicked.getItemProperty("isVwVerticalReport").getValue() == null)) {
+                && treeItemClicked.getItemProperty("isVwVerticalReport").getValue() == null
+                && treeItemClicked.getItemProperty("isVwHorizontalReport").getValue() == null)) {
             switch (itemClickedText.toLowerCase()) {
                 case "manage experiments":
                     formContentLayout.removeAllComponents();
@@ -406,6 +432,9 @@ public class MainForm extends MainFormDesign {
         } else if (treeItemClicked.getItemProperty("vwVerticalReportId").getValue() != null) {
             formContentLayout.removeAllComponents();
             formContentLayout.addComponent(new ViewVerticalReportDataForm((Integer) treeItemClicked.getItemProperty("vwVerticalReportId").getValue()));
+        } else if (treeItemClicked.getItemProperty("vwHorizontalReportId").getValue() != null) {
+            formContentLayout.removeAllComponents();
+            formContentLayout.addComponent(new ViewHorizontalReportDataForm((Integer) treeItemClicked.getItemProperty("vwHorizontalReportId").getValue()));
         }
     }
 }

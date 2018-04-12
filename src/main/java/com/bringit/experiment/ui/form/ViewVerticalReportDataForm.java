@@ -185,7 +185,7 @@ private SystemSettings systemSettings;
 		
 	}	
 	
-	 private void refreshData() {
+	private void refreshData() {
 		 
 		ViewVerticalReportJobDataDao vwVerticalReportJobDataDao = new ViewVerticalReportJobDataDao();
 		Map<String, Object> result = vwVerticalReportJobDataDao.vwVerticalProcedureJob(vwVerticalReport.getVwVerticalRptId());

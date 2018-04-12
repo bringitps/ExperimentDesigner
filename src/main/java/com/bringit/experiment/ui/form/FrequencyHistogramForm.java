@@ -1,8 +1,6 @@
 package com.bringit.experiment.ui.form;
 
 import com.bringit.experiment.ui.design.FrequencyHistogramDesign;
-import com.quinncurtis.chart2djava.ChartBufferedImage;
-import com.quinncurtis.chart2djava.ChartPrint;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
@@ -26,8 +24,6 @@ import java.util.Date;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import com.bringit.experiment.spc.*;
 
 public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 

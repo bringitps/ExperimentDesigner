@@ -18,7 +18,6 @@ import com.bringit.experiment.dao.JobExecutionRepeatDao;
 import com.bringit.experiment.dao.SysRoleDao;
 import com.bringit.experiment.dao.SysUserDao;
 import com.bringit.experiment.dao.UserRoleDao;
-import com.bringit.experiment.spc.FrequencyHistogramApplet;
 import com.bringit.experiment.ui.form.LoginForm;
 import com.bringit.experiment.ui.form.MainForm;
 import com.bringit.experiment.ui.form.SysUserSettingsForm;

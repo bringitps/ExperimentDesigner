@@ -31,9 +31,9 @@ import com.bringit.experiment.spc.*;
 
 public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 
-	FrequencyHistogram freqHistogram;
 	public FrequencyHistogramForm()
 	{
+		/*
     	JFrame freqHistogramFrame = new JFrame();
     	freqHistogramFrame.setSize(1024, 768);
 
@@ -99,7 +99,7 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
         
         freqHistogramFrame.removeAll();
         freqHistogramFrame.dispose();
-		 
+		 */
 	}
 	
 	private StreamResource createCharImageStreamResource(BufferedImage bufferedChartImage, String fileName) {

@@ -24,8 +24,8 @@ import com.vaadin.ui.declarative.Design;
 public class MainFormDesign extends HorizontalLayout {
 	protected GridLayout gridLayout;
 	protected Image customerLogo;
+	protected Panel panelSession;
 	protected Tree treeMainMenu;
-	public Panel panelSession;
 	protected VerticalLayout formContentLayout;
 
 	public MainFormDesign() {

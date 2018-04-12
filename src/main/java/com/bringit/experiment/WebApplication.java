@@ -146,7 +146,8 @@ public class WebApplication extends UI {
 			//headerLayout.addComponent(headerBlueSeparatorLayout);
 			
 			mainForm.updateMenuAccess();
-			mainForm.panelSession.setContent(mnuSession);
+			mainForm.setPanelSessionMenuBar(mnuSession);
+			//mainForm.panelSession.setContent(mnuSession);
 			mainLayout.addComponent(contentLayout);
 		}
 		else

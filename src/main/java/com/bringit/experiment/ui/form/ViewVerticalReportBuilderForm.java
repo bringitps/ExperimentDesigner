@@ -2178,9 +2178,6 @@ public class ViewVerticalReportBuilderForm extends ViewVerticalReportBuilderDesi
 				{
 					for(int i=0; vwVerticalRptColumnsByExpField!= null && i<vwVerticalRptColumnsByExpField.size(); i++)
 					{
-						System.out.println("Parent Vertical Column Id: " + parentVerticalColumnId + " Found: " + vwVerticalRptColumnsByExpField.get(i).getVwVerticalReportColumn().getVwVerticalRptColumnId());
-						System.out.println("Exp Id of field: " + vwVerticalRptColumnsByExpField.get(i).getExperimentField().getExperiment().getExpId() + " --> " + dataSourceId  + " Comparison result " +(parentVerticalColumnId.toString().trim().equals(vwVerticalRptColumnsByExpField.get(i).getVwVerticalReportColumn().getVwVerticalRptColumnId().toString().trim())));
-						
 						if(parentVerticalColumnId.equals(vwVerticalRptColumnsByExpField.get(i).getVwVerticalReportColumn().getVwVerticalRptColumnId()) &&
 								((vwVerticalRptColumnsByExpField.get(i).getExperimentField() != null && vwVerticalRptColumnsByExpField.get(i).getExperimentField().getExperiment().getExpId() == dataSourceId)
 								|| (vwVerticalRptColumnsByExpField.get(i).getExperiment() != null && vwVerticalRptColumnsByExpField.get(i).getExperiment().getExpId() == dataSourceId)))

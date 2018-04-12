@@ -40,7 +40,7 @@ public class ViewHorizontalReportByFtyRpt {
 	@Column(name="VwHorizontalFtyKeyIsDateTimeExpField")
 	private Boolean vwHorizontalFtyKeyIsDateTimeExpField;
 
-	@Column(name="VwHorizontalFnyKeyIsSNExpField")
+	@Column(name="VwHorizontalFtyKeyIsSNExpField")
 	private Boolean vwHorizontalFtyKeyIsSNExpField;
 
 	@Column(name="VwHorizontalFtyKeyIsResultExpField")

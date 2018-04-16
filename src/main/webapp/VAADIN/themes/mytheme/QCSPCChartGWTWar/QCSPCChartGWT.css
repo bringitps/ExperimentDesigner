@@ -1,0 +1,20 @@
+/** Add css rules here for your application. */
+
+
+/** Example rules used by the template application (remove for your app) */
+
+body {background-color:#5a84c5 !important;}
+
+ 
+.mainCanvas {
+    font-family:"Times New Roman", Times, serif;  
+} 
+
+  
+.verticalPanel {
+   width: 100%;
+   height: 100%;
+
+ 	margin: auto;
+
+}

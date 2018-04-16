@@ -1,0 +1,188 @@
+﻿<!doctype html>
+<!-- The DOCTYPE declaration above will set the     -->
+<!-- browser's rendering engine into                -->
+<!-- "Standards Mode". Replacing this declaration   -->
+<!-- with a "Quirks Mode" doctype is not supported. -->
+
+<html>
+  <head>
+ 
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <!--                                                               -->
+    <!-- Consider inlining CSS to reduce the number of requested files -->
+    <!--                                                               -->
+   <link type="text/css" rel="stylesheet" href="QCSPCChartGWT.css">
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  
+   <script src="chartDefPHPExample.js"></script>
+  
+    
+   <script>
+   
+	var SampleIntervalRecord = {
+		"SampleValues": [],
+		"BatchCount": 0,
+		"TimeStamp": 1371830829074 + 20 * 900000,
+		"Note": "" 
+	};
+
+
+   var counter = 0;
+   function defineChartUsingJSON( )
+   {
+      var s = JSON.stringify(TimeXBarR);
+     return s;
+   }
+
+   function JSONSPCAlarmEvent(s)
+   {
+       var jsonobj = JSON.parse(s);
+       var index = jsonobj.SPCAlarmEvent.DataIndex;
+       counter++;
+       
+
+   }
+   
+   function JSONChartMouseEvent( s )
+   {
+     var jsonobj = JSON.parse(s);
+     var jsonresult = 
+     { SPCChartMouseEventResult:
+     	{
+     		"Message": "Point #" + jsonobj.SPCChartMouseEvent.DataIndex,
+     		"Action": "TOOLTIP_ACTION_ANNOTATE",
+	 		"TextBoxWidthChar": 40,
+     		"TextBoxHeightChar": 10
+    	}
+    };
+    var result=JSON.stringify(jsonresult);
+    return result;
+  }
+
+   </script>  
+   <script>
+   var currentChartIndex = "1";
+      
+   
+   
+  function processJSONOverallStatisticsClick( )
+   {
+      var s = pushGetJSONOverallStatistics();
+ 
+      var jsonobj = JSON.parse(s);
+      
+      s = JSON.stringify(jsonobj,undefined,2);    
+
+      pushDisplayJSONScript(s.toString()); 
+ 
+   }
+   
+     function processJSONSampleIntervalDataClick( )
+   {
+      var s = pushGetJSONSampleIntervalData(52);
+ 
+      var jsonobj = JSON.parse(s);
+      
+      var s2 = jsonobj.SPCSampleIntervalData.PrimaryChartAlarmMessage;
+      
+      s = JSON.stringify(jsonobj,undefined,2);         
+      pushDisplayJSONScript(s); 
+ 
+ 
+   }
+   
+   function processJSONScriptClick( )
+   {
+
+     var s = JSON.stringify(TimeXBarR,undefined,2);
+
+     pushDisplayJSONScript(s);
+
+ }
+
+ var timerOn = true;
+ var timerID = 0;
+ var timerCount = 0;
+
+ function stopStartTimer() {
+
+     if (timerOn) {
+         clearInterval(timerID);
+         timerOn = false;
+     }
+     else {
+         timerID = setInterval(timerFunction, 2000);
+         timerOn = true;
+     }
+  }
+
+  function timerFunction()
+  {
+      $.ajax({
+          url: "phppushdata.php",
+          type: "GET",
+          dataType: "json",
+          error: function (jqXHR, textStatus, errorThrown) {
+              alert("Error");
+
+          },
+          success: function (result) {
+              //  alert(JSON.stringify(result));
+
+              result.BatchCount = timerCount;
+              // simulate a sample interval every 15 minutes
+              result.TimeStamp = result.TimeStamp + 900000 * timerCount;
+
+              TimeXBarR.SPCChart.SampleData.SampleIntervalRecords.push(result);
+              pushJSONChartCreate(JSON.stringify(TimeXBarR));
+              timerCount++;
+
+          }
+      });
+
+  }
+
+$(window).load(function () {
+    timerID = setInterval(function () { timerFunction() }, 5000);
+    timerOn = true;
+});   
+  
+   </script>  
+  
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+   <script type="text/javascript" language="javascript" src="qcspcchartgwt/qcspcchartgwt.nocache.js"></script> 
+  </head>
+
+
+  <body>
+  
+
+
+
+    <!-- OPTIONAL: include this if you want history support -->
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+    
+    <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+    <noscript>
+      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+        Your web browser must have JavaScript enabled
+        in order for this application to display correctly.
+      </div>
+    </noscript>
+
+
+  <INPUT TYPE="button" NAME="Stop Update" VALUE="Stop/Start" onClick="stopStartTimer();">
+  <INPUT TYPE="button" NAME="displayJSONScript" VALUE="Display JSON Script " onClick="processJSONScriptClick();">
+  <INPUT TYPE="button" NAME="displayJSONOverallStatistics" VALUE="Display Overall Stats " onClick="processJSONOverallStatisticsClick();">
+
+  <div id="prima"></div>
+  <br>
+  <div id="dopo"></div>
+  
+  </body>
+</html>

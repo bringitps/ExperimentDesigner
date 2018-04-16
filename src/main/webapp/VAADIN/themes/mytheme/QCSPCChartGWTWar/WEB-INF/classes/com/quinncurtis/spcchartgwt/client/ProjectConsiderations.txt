@@ -1,0 +1,31 @@
+Things you must have in project.
+
+Project Properties | Java Build Path
+	1. Place QCSPCChartGWT and QCChart2DGWT projects in required Projects
+	2. Place  QCSPCChartGWT.jar and QCChart2DGWT.jar files in required Libraries
+	3. Place json.jar in required Libraries (Quinn-Curtis Java Development/java/lib/json.jar
+
+Add to the projects src.com.quinncurtis.*.gwt.xml
+	Place the inherits references to the required jar files in the project xxx.gwt.xml file, found in 
+	the project src.com.quinncurtis.*.gwt.xml, example
+
+ 	<inherits name='com.quinncurtis.chart2dgwt.QCChart2DGWT'/>
+ 	<inherits name='com.quinncurtis.spcchartgwt.QCSPCChartGWT'/>
+ 	<inherits name="com.google.gwt.json.JSON" /> 
+
+Add the json.jar file to the war.WEB-INF.lib folder.
+
+Add to the projects war.WEB-INF.web.xml
+	Any changes you may have made to the servlet program found in src.com.quinncurtis.*.server, the name
+	and mapping in particular. Not applicable if you are using a Windows Service.
+
+  <!-- Servlets -->
+  <servlet>
+    <servlet-name>SampleValueServlet</servlet-name>
+    <servlet-class>com.quinncurtis.spcchartgwt_local.server.SampleValueServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>SampleValueServlet</servlet-name>
+    <url-pattern>/qcspcchartgwt_local/samplevalues.json</url-pattern>
+  </servlet-mapping>

@@ -407,7 +407,7 @@ public class MainForm extends MainFormDesign {
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new CustomListManagementForm());
                     break;
-                case "frequency histogram":
+                case "spc frequency histogram":
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new FrequencyHistogramForm());
                     break;

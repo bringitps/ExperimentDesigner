@@ -1,0 +1,266 @@
+<!doctype html>
+<!-- The DOCTYPE declaration above will set the     -->
+<!-- browser's rendering engine into                -->
+<!-- "Standards Mode". Replacing this declaration   -->
+<!-- with a "Quirks Mode" doctype is not supported. -->
+
+<html>
+  <head>
+ 
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <!--                                                               -->
+    <!-- Consider inlining CSS to reduce the number of requested files -->
+    <!--                                                               -->
+  <link type="text/css" rel="stylesheet" href="QCSPCChartGWT.css">
+  <script src="chartdefExampleScripts.js"></script>
+    
+   <script>
+   
+   var counter = 0;
+   function defineChartUsingJSON( )
+   {
+      var s = JSON.stringify(TimeXBarR);
+     return s;
+   }
+
+   function JSONSPCAlarmEvent(s)
+   {
+       var jsonobj = JSON.parse(s);
+       var index = jsonobj.SPCAlarmEvent.DataIndex;
+       counter++;
+       
+
+   }
+   
+   function JSONChartMouseEvent( s )
+   {
+     var jsonobj = JSON.parse(s);
+     var jsonresult = 
+     { SPCChartMouseEventResult:
+     	{
+     		"Message": "Point #" + jsonobj.SPCChartMouseEvent.DataIndex,
+     		"Action": "TOOLTIP_ACTION_ANNOTATE",
+	 		"TextBoxWidthChar": 40,
+     		"TextBoxHeightChar": 10
+    	}
+    };
+    var result=JSON.stringify(jsonresult);
+    return result;
+  }
+
+   </script>  
+   <script>
+   var currentChartIndex = "1";
+      
+   
+   function addDataClick( )
+   {
+     pushSimulateDataUpdatePercentChange(50, 0.1, 0.2); 
+
+   }
+   
+
+   
+  function processJSONOverallStatisticsClick( )
+   {
+      var s = pushGetJSONOverallStatistics();
+ 
+      var jsonobj = JSON.parse(s);
+      
+      s = JSON.stringify(jsonobj,undefined,2);    
+
+      pushDisplayJSONScript(s.toString()); 
+ 
+   }
+   
+     function processJSONSampleIntervalDataClick( )
+   {
+      var s = pushGetJSONSampleIntervalData(52);
+ 
+      var jsonobj = JSON.parse(s);
+      
+      var s2 = jsonobj.SPCSampleIntervalData.PrimaryChartAlarmMessage;
+      
+      s = JSON.stringify(jsonobj,undefined,2);         
+      pushDisplayJSONScript(s); 
+ 
+ 
+   }
+   
+   function processJSONScriptClick( )
+   {
+      var chartitem = getChartItem(currentChartIndex);
+
+      var s = JSON.stringify(chartitem,undefined,2);
+
+     pushDisplayJSONScript(s); 
+ 
+   }
+   
+function getChartItem(chartid) { 
+ currentChartIndex = chartid;
+ var chartitem = TimeXBarR;
+ switch(chartid)
+ {
+ case "1":  chartitem = TimeXBarR;  break;
+ case "2":  chartitem = TimeIR;  break;
+ case "3":   chartitem = TimeMeanSigma;  break;
+ case "4":   chartitem = TimeMultiLimitXBarR;  break;
+ case "6":   chartitem = CustomizeChartAppearance;  break;
+ case "11":  chartitem = BatchXBarR;  break;
+ case "12":  chartitem = BatchIR;  break;
+ case "13":   chartitem = BatchMeanSigma;  break; 
+ case "14":   chartitem = BatchMultiLimitXBarR;  break; 
+ case "15":   chartitem = BatchMedianRange;  break; 
+ case "21":  chartitem = TimePercentDefectiveParts;  break;
+ case "22":  chartitem = TimeFractionDefectiveParts;  break;
+ case "23":   chartitem = TimeNumberDefectiveParts;  break; 
+ case "24":   chartitem = TimeNumberDefects;  break;  
+ case "25":   chartitem = TimeNumberDefectsPerMillion;  break;  
+ case "26":   chartitem = TimeNumberDefectsPerUnit;  break;   
+ case "31":  chartitem = BatchPercentDefectiveParts;  break;
+ case "32":  chartitem = BatchFractionDefectiveParts;  break;
+ case "33":   chartitem = BatchNumberDefectiveParts;  break; 
+ case "34":   chartitem = BatchNumberDefects;  break;  
+ case "35":   chartitem = BatchNumberDefectsPerMillion;  break;  
+ case "36":   chartitem = BatchNumberDefectsPerUnit;  break;  
+ case "51":  chartitem = BatchEWMA;  break;
+ case "52":  chartitem = TimeMA;  break;
+ case "53":   chartitem = BatchMAMR;  break; 
+ case "54":   chartitem = TimeMAMS;  break;  
+ case "55":   chartitem = BatchCusum;  break; 
+ case "61":  chartitem = BatchMeanSigma_VSS;  break;
+ case "62":  chartitem = BatchFractionDefectiveParts_VSS;  break;
+ case "63":   chartitem = TimeNumberDefectsPerUnit_VSS;  break; 
+ case "64":   chartitem = BatchPercentDefectiveParts_VSS;  break;  
+ case "101":   chartitem = BasicRules;  break;  
+ case "102":   chartitem = WECORules;  break;  
+ case "103":   chartitem = WECOAndSupplementalRules;  break;  
+ case "104":   chartitem = NelsonRules;  break;  
+ case "105":   chartitem = AIAGRules;  break;  
+ case "106":   chartitem = HughesRules;  break;  
+ case "107":   chartitem = CustomRules;  break;  
+ case "121":   chartitem = FrequencyHistogram;  break;  
+ case "122":   chartitem = ParetoChart;  break;  
+ default: chartitem = TimeXBarR; 
+ }  
+   return chartitem;
+ }    
+   
+function displayChart(chartid) { 
+ var chartitem = getChartItem(chartid);
+ pushJSONChartCreate(JSON.stringify(chartitem)); 
+} 
+   
+ function chartSelect(selectObj) { 
+
+ var idx = selectObj.selectedIndex; 
+
+ var chartid = selectObj.options[idx].value; 
+ displayChart(chartid);
+ 
+ }   
+ 
+ function loadform() { 
+
+  document.getElementById('selectChart').options[0].selected = true;
+ } 
+  
+   </script>  
+  
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+   <script type="text/javascript" language="javascript" src="qcspcchartgwt/qcspcchartgwt.nocache.js"></script> 
+  </head>
+
+
+  <body onload="loadform()">
+  
+
+
+
+    <!-- OPTIONAL: include this if you want history support -->
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+    
+    <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+    <noscript>
+      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+        Your web browser must have JavaScript enabled
+        in order for this application to display correctly.
+      </div>
+    </noscript>
+
+  <INPUT TYPE="button" NAME="addData" VALUE="Add new data" onClick="addDataClick();">
+  
+
+  
+  <select name="selectChart" id = "selectChart" onchange="chartSelect(this)" title="Chart Select">
+   <optgroup label="Time Variable Control Charts">  
+   <option value="1" SELECTED>X-Bar R (Mean Range)</option>
+   <option value="2">IR (Individual Range)</option>
+   <option value="3">Mean Sigma</option>
+   <option value="4">Multi-Limit X-Bar R</option>
+   <option value="6">Custom Chart Appearance</option>
+   </optgroup>
+   <optgroup label="Batch Variable Control Charts">  
+   <option value="11">X-Bar R (Mean Range)</option>
+   <option value="12">IR (Individual Range)</option>
+   <option value="13">Mean Sigma</option>
+   <option value="14">Multi-Limit X-Bar R</option>
+   <option value="15">Median Range</option>
+   </optgroup>
+   <optgroup label="Time Attribute Control Charts">  
+   <option value="21">Percent Defective Parts</option>
+   <option value="22">Fraction Defective Parts</option>
+   <option value="23">Number Defective Parts</option>
+   <option value="24">Number Defects</option>
+   <option value="25">Number Defects per Million</option>
+   <option value="26">Number Defective Parts per Unit</option>
+   </optgroup>   
+   <optgroup label="Batch Attribute Control Charts">  
+   <option value="31">Percent Defective Parts</option>
+   <option value="32">Fraction Defective Parts</option>
+   <option value="33">Number Defective Parts</option>
+   <option value="34">Number Defects</option>
+   <option value="35">Number Defects per Million</option>
+   <option value="36">Number Defective Parts per Unit</option>
+   </optgroup>
+    </optgroup>   
+   <optgroup label="Misc. Control Charts">  
+   <option value="51">EWMA Chart</option>
+   <option value="52">MA Chart</option>
+   <option value="53">MAMR Chart</option>
+   <option value="54">MAMS Chart</option>
+   <option value="55">CUSumChart</option>
+   </optgroup>  
+    </optgroup>   
+   <optgroup label="Varaible Sample Size Control Charts">  
+   <option value="61">Mean Sigma VSS Chart</option>
+   <option value="62">Fraction Defective Parts VSS Chart</option>
+   <option value="63">Number Defects Per Unit VSS Chart</option>
+   <option value="64">Percent Defective Parts VSS Chart</option>
+   </optgroup>    
+   <optgroup label="Named Control Rules">  
+   <option value="101">Basic Rules</option>
+   <option value="102">WECO Rules</option>
+   <option value="103">WECO and Supplemental Rules</option>
+   <option value="104">Nelson Rules</option>
+   <option value="105">AIAG Rules</option>
+   <option value="106">Hughes Rules</option>
+   <option value="107">Custom Rules</option>
+   </optgroup>  
+   <optgroup label="Other Charts">  
+   <option value="121">Frequency Histogram</option>
+   <option value="122">Pareto Chart</option>
+   </optgroup>    
+ </select> 
+ 
+  <INPUT TYPE="button" NAME="displayJSONScript" VALUE="Display JSON Script " onClick="processJSONScriptClick();">
+  <INPUT TYPE="button" NAME="displayJSONOverallStatistics" VALUE="Display Overall Stats " onClick="processJSONOverallStatisticsClick();">
+
+  </body>
+</html>

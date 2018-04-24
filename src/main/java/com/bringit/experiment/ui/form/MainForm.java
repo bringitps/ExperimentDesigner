@@ -42,9 +42,9 @@ public class MainForm extends MainFormDesign {
     private SystemSettings systemSettings;
     SysUser sysUserSession = (SysUser) VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
 
-  //--- Loading BringIT Logo ---//
+    //--- Loading BringIT Logo ---//
     String basePath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-    FileResource imgResource = new FileResource(new File(basePath + "/WEB-INF/classes/images/customer_logo_menu.png"));
+    FileResource imgResource = new FileResource(new File(basePath + "/WEB-INF/classes/images/customer_logo_menu_v.png"));
     
     @SuppressWarnings("deprecation")
     public MainForm(WebApplication webApplication, String selectedForm) {
@@ -86,7 +86,7 @@ public class MainForm extends MainFormDesign {
     	}        
       
         for (Object id : treeMainMenu.rootItemIds()) {
-            treeMainMenu.expandItemsRecursively(id);
+           // treeMainMenu.expandItemsRecursively(id);
         }
 
         List<String> dataMenuItemAdded = new ArrayList<String>();
@@ -306,7 +306,6 @@ public class MainForm extends MainFormDesign {
                     //-- Finishes Hide/Show Not granted or granted Menu Items --//
 
                     treeMainMenu.setVisible(true);
-
                 } else
                     treeMainMenu.setVisible(false);
             }

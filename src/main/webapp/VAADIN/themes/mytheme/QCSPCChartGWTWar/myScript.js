@@ -1,9 +1,9 @@
 function defineChartUsingJSON()
 {
 	alert('Loading SPC 2...');
-  var s = JSON.stringify(TimeXBarR);
-  alert(TimeXBarR);
-  return s;
+  //var s = JSON.stringify(TimeXBarR);
+  //alert(TimeXBarR);
+  //return s;
 }
 
 

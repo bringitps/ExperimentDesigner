@@ -34,7 +34,7 @@ public class FrequencyHistogramDesign extends VerticalLayout {
 	protected Button btnAddFilters;
 	protected Panel pnlFilterLayout;
 	protected GridLayout multiFilterGrid;
-	protected ComboBox cbxExperimentField1;
+	protected ComboBox cbxSourceField1;
 	protected ComboBox cbxFilterOperator1;
 	protected TextField txtStringFilter1;
 	protected ComboBox cbxExpression1;
@@ -44,7 +44,7 @@ public class FrequencyHistogramDesign extends VerticalLayout {
 	protected ComboBox cbxUpperLimitSrc;
 	protected TextField txtUpperLimit;
 	protected TextField txtBarWidth;
-	protected Button btnApplyFilters;
+	protected Button btnRunReport;
 	protected HorizontalLayout spcChartLayout;
 
 	public FrequencyHistogramDesign() {

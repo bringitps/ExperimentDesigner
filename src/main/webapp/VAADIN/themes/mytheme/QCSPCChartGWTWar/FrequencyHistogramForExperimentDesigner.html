@@ -1,0 +1,158 @@
+<!doctype html>
+<!-- The DOCTYPE declaration above will set the     -->
+<!-- browser's rendering engine into                -->
+<!-- "Standards Mode". Replacing this declaration   -->
+<!-- with a "Quirks Mode" doctype is not supported. -->
+
+<html>
+  <head>
+ 
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<script type="text/javascript" language="javascript">
+	var FrequencyHistogram = 
+	{
+	"StaticProperties": {
+		        "Canvas": {
+		            "Width": 800,
+		            "Height": 560
+		        },
+		        "DefaultFontName": "Tahoma, Geneva, sans-serif",
+		        "DefaultTableFont": {
+		            "Name": "Tahoma, Geneva, sans-serif",
+		            "Size": 12,
+		            "Style": "Plain"
+		        },
+		         "DefaultChartFonts": {
+          			"AxisLabelFont": {
+              		"Name": "Tahoma, Geneva, sans-serif",
+              		"Size": 12,
+              		"Style": "PLAIN"
+           		},
+          		 "AxisTitleFont": {
+               		"Name": "Tahoma, Geneva, sans-serif",
+               		"Size": 12,
+               		"Style": "BOLD"
+				},
+		        "MainTitleFont": {
+		            "Name": "Tahoma, Geneva, sans-serif",
+		            "Size": 14,
+		            "Style": "Plain"
+		        }
+		    }
+		  	},
+		    "FrequencyHistogram": {
+		        "ChartSetup": {
+		            "HistogramPlot": {
+		                "LineColor": "BLACK",
+		                "LineWidth": 1,
+		                "FillColor": "GREEN"
+		            },
+		            "ControlLines": [
+		                {
+		                    "LimitValue": #LowerLimit,
+		                    "LineColor": "BLUE",
+		                    "LineWidth": 3
+		                },
+		                {
+		                    "LimitValue": #UpperLimit,
+		                    "LineColor": "RED",
+		                    "LineWidth": 3
+		                }
+		            ],
+		            "NormalCurveLine": {
+		                    "Enable": true,
+		                    "LineColor": "YELLOW",
+		                    "LineWidth": 3
+		            }
+		        },
+		        "FrequencyHistogramData": {
+		            "SampleValues": [#CsvData],
+		            "FrequencyBins": [#FrequencyBins]
+		        },
+		        "Methods": {
+		            "RebuildAndDraw": true
+		        }
+		    }
+		};
+	 	
+	   var counter = 0;
+	   function defineChartUsingJSON( )
+	   {
+	   	  var s = JSON.stringify(FrequencyHistogram);
+	      return s;
+	   }
+
+	   var currentChartIndex = "1";
+
+	   function getChartItem(chartid) 
+	   { 
+		   currentChartIndex = chartid;
+		   var chartitem = FrequencyHistogram;
+		   switch(chartid)
+		   {
+		   	case "121":   chartitem = FrequencyHistogram;  break;  
+		   	default: chartitem = FrequencyHistogram; 
+		   }  
+		   return chartitem;
+	   }    
+	   
+	   function displayChart(chartid) { 
+		   var chartitem = getChartItem(chartid);
+		   pushJSONChartCreate(JSON.stringify(chartitem)); 
+	   } 
+	   
+	   function chartSelect(selectObj) { 
+		   var idx = selectObj.selectedIndex;
+		   var chartid = selectObj.options[idx].value; 
+		   displayChart(chartid);
+	   }   
+	 
+	   function loadform() 
+	   { 
+		   document.getElementById('selectChart').options[0].selected = true;
+	   } 
+	
+	</script>
+    <!--                                                               -->
+    <!-- Consider inlining CSS to reduce the number of requested files -->
+    <!--                                                               -->
+  <link type="text/css" rel="stylesheet" href="QCSPCChartGWT.css">
+   
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+   <script type="text/javascript" language="javascript" src="qcspcchartgwt/qcspcchartgwt.nocache.js"></script>
+  </head>
+
+
+  <body onload="loadform()">
+  
+
+
+
+    <!-- OPTIONAL: include this if you want history support -->
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:620;border:0"></iframe>
+    
+    <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+    <noscript>
+      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+        Your web browser must have JavaScript enabled
+        in order for this application to display correctly.
+      </div>
+    </noscript>
+
+  <!--  <INPUT TYPE="button" NAME="addData" VALUE="Add new data" onClick="addDataClick();">-->
+  
+
+  
+  <select name="selectChart" id = "selectChart" onchange="chartSelect(this)" title="Chart Select">
+   <option value="121">Frequency Histogram</option>  
+ </select> 
+ <!-- 
+  <INPUT TYPE="button" NAME="displayJSONScript" VALUE="Display JSON Script " onClick="processJSONScriptClick();">
+  <INPUT TYPE="button" NAME="displayJSONOverallStatistics" VALUE="Display Overall Stats " onClick="processJSONOverallStatisticsClick();">
+-->
+  </body>
+</html>

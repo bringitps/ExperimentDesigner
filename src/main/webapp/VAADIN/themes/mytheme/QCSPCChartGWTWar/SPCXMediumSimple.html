@@ -1,0 +1,128 @@
+<!doctype html>
+<!-- The DOCTYPE declaration above will set the     -->
+<!-- browser's rendering engine into                -->
+<!-- "Standards Mode". Replacing this declaration   -->
+<!-- with a "Quirks Mode" doctype is not supported. -->
+
+<html>
+  <head>
+ 
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <!--                                                               -->
+    <!-- Consider inlining CSS to reduce the number of requested files -->
+    <!--                                                               -->
+  <link type="text/css" rel="stylesheet" href="QCSPCChartGWT.css">
+  <script src="mouse_click_event_chart.js"></script>
+  <script src="mediumSimpleDataUpdate.js"></script>
+    
+   <script>
+   var updatecounter = 0;
+   
+function JSONChartMouseEvent(s) {
+    
+		alert('hi');
+
+   
+
+}
+   function defineChartUsingJSON( )
+   {
+      var s = JSON.stringify(s17);
+     return s;
+   }
+
+   function JSONSPCAlarmEvent(s)
+   {
+       var jsonobj = JSON.parse(s);
+       var index = jsonobj.SPCAlarmEvent.DataIndex;
+    }
+   
+   
+   function addDataClick( )
+   {
+       <!-- Simulate data based on past data, with percentage change -->
+       <!--  pushSimulateDataUpdatePercentChange(20, 0.1, 0.2);  -->
+
+      <!--  Update chart with new data  -->
+      <!--  The MediumSimpleDataUpdateObject object is found in mediumSimpleDataUpdate.js  -->
+      
+      <!-- If you press the update button more than once, must adjust the batch numbers so  --> 
+      <!-- that they increase -->
+        
+      var numsamplesperupdate = 20;  
+      var sampleintervalmilliseconds = 900000;  
+      if (updatecounter > 0)
+      {
+        for (var i=0; i<numsamplesperupdate; i++)
+        {
+        
+           MediumSimpleDataUpdateObject.SPCChart.SampleData.SampleIntervalRecords[i].BatchCount +=  numsamplesperupdate;
+           
+           var timestamp = new Date( MediumSimpleDataUpdateObject.SPCChart.SampleData.SampleIntervalRecords[i].TimeStamp + sampleintervalmilliseconds);
+           MediumSimpleDataUpdateObject.SPCChart.SampleData.SampleIntervalRecords[i].TimeStamp = timestamp.getTime();
+  <!--          
+           MediumSimpleDataUpdateObject.SPCChart.SampleData.SampleIntervalRecords[i].TimeStamp +=  sampleintervalmilliseconds;
+  -->           
+        }
+      }
+       
+       var s = JSON.stringify(MediumSimpleDataUpdateObject);
+       pushJSONChartUpdate(s);
+
+		updatecounter++;
+   }
+
+   
+  function processJSONOverallStatisticsClick( )
+   {
+      var s = pushGetJSONOverallStatistics();
+ 
+      var jsonobj = JSON.parse(s);
+      
+      s = JSON.stringify(jsonobj,undefined,2);    
+
+      pushDisplayJSONScript(s.toString()); 
+ 
+   }
+   
+
+    function processJSONScriptClick( )
+   {
+     var s = JSON.stringify(TimeXBarR,undefined,2);
+
+     pushDisplayJSONScript(s); 
+ 
+   }  
+
+   
+   </script>  
+  
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+   <script type="text/javascript" language="javascript" src="qcspcchartgwt/qcspcchartgwt.nocache.js"></script> 
+  </head>
+
+
+  <body>
+  
+    <!-- OPTIONAL: include this if you want history support -->
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+    
+    <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+    <noscript>
+      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+        Your web browser must have JavaScript enabled
+        in order for this application to display correctly.
+      </div>
+    </noscript>
+
+  <INPUT TYPE="button" NAME="addData" VALUE="Add new data" onClick="addDataClick();">
+  <INPUT TYPE="button" NAME="displayJSONScript" VALUE="Display JSON Script " onClick="processJSONScriptClick();">
+  <INPUT TYPE="button" NAME="displayJSONOverallStatistics" VALUE="Display Overall Stats " onClick="processJSONOverallStatisticsClick();">
+
+  </body>
+</html>

@@ -208,8 +208,8 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
             	{
             		if(cbxLowerLimitSrc.getValue().equals("fixed_value"))
             		{
-                		txtLowerLimit.setValue("");
                 		txtLowerLimit.setReadOnly(false);
+                		txtLowerLimit.setValue("");
             		}
             		else
             		{
@@ -260,6 +260,7 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
             	}
             	else
             	{
+            		txtLowerLimit.setReadOnly(false);
             		txtLowerLimit.setValue("");
             		txtLowerLimit.setReadOnly(true);
             	}
@@ -276,8 +277,8 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
             	{
             		if(cbxUpperLimitSrc.getValue().equals("fixed_value"))
             		{
-                		txtUpperLimit.setValue("");
                 		txtUpperLimit.setReadOnly(false);
+                		txtUpperLimit.setValue("");
             		}
             		else
             		{
@@ -327,6 +328,7 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
             	}
             	else
             	{
+            		txtUpperLimit.setReadOnly(false);
             		txtUpperLimit.setValue("");
             		txtUpperLimit.setReadOnly(true);
             	}
@@ -337,6 +339,14 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 
             @Override
             public void buttonClick(ClickEvent event) {
+            	
+            	if(cbxDataSourceType.getValue() == null || cbxDataSource.getValue() == null || cbxMeasurementFieldColumn.getValue() == null
+            	|| !(txtLowerLimit.getValue() != null && !txtLowerLimit.getValue().isEmpty()) || !(txtUpperLimit.getValue() != null && !txtUpperLimit.getValue().isEmpty())
+            	|| !(txtBarWidth.getValue() != null && !txtBarWidth.getValue().isEmpty()))
+            	{
+            		 getUI().showNotification("Please fill in all the required fields to run report.", Type.WARNING_MESSAGE);
+     	      		return;
+            	}
             	
             	if(cbxDataSource.getValue() != null)
         		{
@@ -360,6 +370,9 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 
         			if(cbxDataSource.getValue().toString().startsWith("tgt"))
         				dataSourceDbTableName = new TargetReportDao().getTargetReportById(dataSourceId).getTargetReportDbRptTableNameId();
+        			
+        			if(!validateSelectedFilters())
+        				return;
         			
         			String sqlWhereClause = getSelectedFiltersSQL();
         			
@@ -1060,6 +1073,66 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
         System.out.println("SQL Where Clause: " + sqlWhereClause);
     	filtersApplied = true;  
     	return sqlWhereClause;
+    }
+	
+
+    private boolean validateSelectedFilters()
+    {
+    	if(multiFilterGrid.getRows() == 1 && ((ComboBox)multiFilterGrid.getComponent(0, 0)).getValue() == null)
+    	 	return true;
+    	
+    	
+    	for(int i=0; i<multiFilterGrid.getRows(); i++)
+    	{
+    		TextField txtStringFilterField = null;
+    		
+    		DateField fromDateFilterField = null;
+    		DateField toDateFilterField = null;
+    		
+    		ComboBox cbxExperimentField = (ComboBox)multiFilterGrid.getComponent(0, i);
+    		if(cbxExperimentField.getValue() == null)
+       		{
+    	             this.getUI().showNotification("Invalid Filter Expression.", Type.WARNING_MESSAGE);
+    	             filtersApplied = false;
+    	             return false;
+       		}
+    		
+    		ComboBox cbxFilterOperatorField = (ComboBox)multiFilterGrid.getComponent(1, i);
+    		if(cbxFilterOperatorField.getValue() == null)
+       		{
+    	             this.getUI().showNotification("Invalid Filter Expression.", Type.WARNING_MESSAGE);
+    	             filtersApplied = false;
+    	             return false;
+       		}
+    		
+    		Integer experimentFieldTypeRefIndex = srcFieldDbId.indexOf(cbxExperimentField.getValue());
+    		
+    		if(srcFieldType.get(experimentFieldTypeRefIndex).contains("date"))
+    		{
+    			HorizontalLayout dateFieldsLayout = (HorizontalLayout)multiFilterGrid.getComponent(2, i);
+    			fromDateFilterField = (DateField)dateFieldsLayout.getComponent(0);
+    			toDateFilterField = (DateField)dateFieldsLayout.getComponent(1);
+    			
+   			 	if ("between".equals(cbxFilterOperatorField.getValue()) && toDateFilterField == null) 
+   			 	{
+   	                this.getUI().showNotification("From Date and To Date should be set.", Type.WARNING_MESSAGE);
+   	                filtersApplied = false;
+   	                return false;
+   	            }    			
+    		}
+    		else
+    			txtStringFilterField = (TextField)multiFilterGrid.getComponent(2, i);
+    		
+    		ComboBox cbxExpressionField = (ComboBox)multiFilterGrid.getComponent(3, i);
+
+    		if((i+1) < multiFilterGrid.getRows() && cbxExpressionField.getValue() == null)
+    		{
+	             this.getUI().showNotification("Invalid Filter Expression.", Type.WARNING_MESSAGE);
+	             filtersApplied = false;
+	             return false;
+    		}
+    	}
+    	return true;
     }
 	
 	

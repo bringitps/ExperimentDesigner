@@ -1,0 +1,183 @@
+<!doctype html>
+<!-- The DOCTYPE declaration above will set the     -->
+<!-- browser's rendering engine into                -->
+<!-- "Standards Mode". Replacing this declaration   -->
+<!-- with a "Quirks Mode" doctype is not supported. -->
+
+<html>
+  <head>
+ 
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <!--                                                               -->
+    <!-- Consider inlining CSS to reduce the number of requested files -->
+    <!--                                                               -->
+  <link type="text/css" rel="stylesheet" href="QCSPCChartGWT.css">
+  <script src="chartdefExampleScriptsR36.js"></script>
+    
+   <script>
+   
+   var counter = 0;
+   function defineChartUsingJSON( )
+   {
+      var s = JSON.stringify(EnhancedAnnotations);
+     return s;
+   }
+
+   function JSONSPCAlarmEvent(s)
+   {
+       var jsonobj = JSON.parse(s);
+       var index = jsonobj.SPCAlarmEvent.DataIndex;
+       counter++;
+       
+
+   }
+   
+   function JSONChartMouseEvent( s )
+   {
+     var jsonobj = JSON.parse(s);
+     var jsonresult = 
+     { SPCChartMouseEventResult:
+     	{
+     		"Message": "Point #" + jsonobj.SPCChartMouseEvent.DataIndex,
+     		"Action": "TOOLTIP_ACTION_ANNOTATE",
+	 		"TextBoxWidthChar": 40,
+     		"TextBoxHeightChar": 10
+    	}
+    };
+    var result=JSON.stringify(jsonresult);
+    return result;
+  }
+
+   </script>  
+   <script>
+   var currentChartIndex = "1";
+      
+   
+   function addDataClick( )
+   {
+     pushSimulateDataUpdatePercentChange(50, 0.1, 0.2); 
+
+   }
+   
+
+   
+  function processJSONOverallStatisticsClick( )
+   {
+      var s = pushGetJSONOverallStatistics();
+ 
+      var jsonobj = JSON.parse(s);
+      
+      s = JSON.stringify(jsonobj,undefined,2);    
+
+      pushDisplayJSONScript(s.toString()); 
+ 
+   }
+   
+     function processJSONSampleIntervalDataClick( )
+   {
+      var s = pushGetJSONSampleIntervalData(52);
+ 
+      var jsonobj = JSON.parse(s);
+      
+      var s2 = jsonobj.SPCSampleIntervalData.PrimaryChartAlarmMessage;
+      
+      s = JSON.stringify(jsonobj,undefined,2);         
+      pushDisplayJSONScript(s); 
+ 
+ 
+   }
+   
+   function processJSONScriptClick( )
+   {
+      var chartitem = getChartItem(currentChartIndex);
+
+      var s = JSON.stringify(chartitem,undefined,2);
+
+     pushDisplayJSONScript(s); 
+ 
+   }
+   
+function getChartItem(chartid) { 
+ currentChartIndex = chartid;
+ var chartitem = EnhancedAnnotations;
+ switch(chartid)
+ {
+ case "1":  chartitem = EnhancedAnnotations;  break;
+ case "2":  chartitem = ResetNOfM;  break;
+ case "3":   chartitem = Zooming;  break;
+ case "4":   chartitem = CollapsibleRows;  break;
+ case "5":   chartitem = AutoRemoveLCLLimit;  break;
+ case "6":   chartitem = AltNofMTesting;  break;
+ case "7":   chartitem = LeveyJennings;  break;
+ default: chartitem = EnhancedAnnotations; 
+ }  
+   return chartitem;
+ }    
+   
+function displayChart(chartid) { 
+ var chartitem = getChartItem(chartid);
+ pushJSONChartCreate(JSON.stringify(chartitem)); 
+} 
+   
+ function chartSelect(selectObj) { 
+
+ var idx = selectObj.selectedIndex; 
+
+ var chartid = selectObj.options[idx].value; 
+ displayChart(chartid);
+ 
+ }   
+ 
+ function loadform() { 
+
+  document.getElementById('selectChart').options[0].selected = true;
+ } 
+  
+   </script>  
+  
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+   <script type="text/javascript" language="javascript" src="qcspcchartgwt/qcspcchartgwt.nocache.js"></script> 
+  </head>
+
+
+  <body onload="loadform()">
+  
+
+
+
+    <!-- OPTIONAL: include this if you want history support   -->  
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+
+    <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+    <noscript>
+      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+        Your web browser must have JavaScript enabled
+        in order for this application to display correctly.
+      </div>
+    </noscript>
+
+  <INPUT TYPE="button" NAME="addData" VALUE="Add new data" onClick="addDataClick();">
+  
+
+  
+  <select name="selectChart" id = "selectChart" onchange="chartSelect(this)" title="Feature Select">
+   <option value="1">Enhanced Annotations</option>
+   <option value="2">Reset N of M Counters</option>
+   <option value="3">Zooming</option>
+   <option value="4">Collapsible Rows and Charts</option>
+   <option value="5">Auto Remove LCL Limit</option>
+   <option value="6">N of M Testing When Most Recent Point Within Limits</option>
+   <option value="7">Levey-Jennings</option>
+   
+ </select> 
+ 
+  <INPUT TYPE="button" NAME="displayJSONScript" VALUE="Display JSON Script " onClick="processJSONScriptClick();">
+  <INPUT TYPE="button" NAME="displayJSONOverallStatistics" VALUE="Display Overall Stats " onClick="processJSONOverallStatisticsClick();">
+
+  </body>
+</html>

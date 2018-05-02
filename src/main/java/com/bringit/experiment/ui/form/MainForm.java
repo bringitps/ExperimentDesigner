@@ -85,21 +85,22 @@ public class MainForm extends MainFormDesign {
     	  		treeMainMenu.setItemCaption(id, this.systemSettings.getExperimentTypePluralLabel());       
     	}        
       
-        /*for (Object id : treeMainMenu.rootItemIds()) {
-            treeMainMenu.expandItemsRecursively(id);
-        }*/
+        for (Object id : treeMainMenu.rootItemIds()) {
+            treeMainMenu.collapseItemsRecursively(id);
+        }
         
-        // Expand all items that can be
-        for (Object itemId: treeMainMenu.getItemIds())
-        	treeMainMenu.expandItem(itemId);
-
+        /*for (Object itemId: treeMainMenu.getItemIds())
+        	treeMainMenu.expandItem(itemId);*/
+		
+        treeMainMenu.expandItem("Menu");
+        
         List<String> dataMenuItemAdded = new ArrayList<String>();
         
-        treeMainMenu.collapseItem("Experiments");
+        /*treeMainMenu.collapseItem("Experiments");
         treeMainMenu.collapseItem("Scheduled Jobs");
         treeMainMenu.collapseItem("Data Visualization");
         treeMainMenu.collapseItem("Reports Builder");
-        treeMainMenu.collapseItem("Configuration");
+        treeMainMenu.collapseItem("Configuration");*/
             
         List<Experiment> experimentsAvailable = new ExperimentDao().getActiveExperiments();
         if (experimentsAvailable != null) {

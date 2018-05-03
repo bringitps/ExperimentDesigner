@@ -418,6 +418,10 @@ public class MainForm extends MainFormDesign {
                     formContentLayout.removeAllComponents();
                     formContentLayout.addComponent(new FrequencyHistogramForm());
                     break;
+                case "spc x-bar r":
+                    formContentLayout.removeAllComponents();
+                    formContentLayout.addComponent(new XBarRForm());
+                    break;
                 default:
                     break;
             }

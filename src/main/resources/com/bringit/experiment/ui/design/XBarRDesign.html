@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;GENERATE_GETTERS&quot;:false,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta name="vaadin-version" content="7.7.7">
+ </head>
+ <body>
+  <vaadin-vertical-layout size-full>
+   <vaadin-horizontal-layout style-name="valo-menu" width-full height="26px">
+    <vaadin-label style-name="small" plain-text _id="lblExperimentTitle">
+      X Bar R Report 
+    </vaadin-label>
+   </vaadin-horizontal-layout>
+   <vaadin-horizontal-split-panel width="1200px" height-auto split-position="20%">
+    <vaadin-grid-layout caption="Data Source" width="240px" height="130px" _id="gridSourceSelection">
+     <row>
+      <column>
+       <vaadin-combo-box required input-prompt="Data Source Type" style-name="tiny" width="95%" height="25px" _id="cbxDataSourceType" :bottom>
+        <option>Option 1</option>
+        <option>Option 2</option>
+        <option>Option 3</option>
+       </vaadin-combo-box>
+      </column>
+     </row>
+     <row>
+      <column>
+       <vaadin-combo-box required input-prompt="Data Source" style-name="tiny" width="95%" height="25px" _id="cbxDataSource" :bottom>
+        <option>Option 1</option>
+        <option>Option 2</option>
+        <option>Option 3</option>
+       </vaadin-combo-box>
+      </column>
+     </row>
+     <row>
+      <column>
+       <vaadin-combo-box required input-prompt="Measurement Field/Column" style-name="tiny" width="95%" height="25px" _id="cbxMeasurementFieldColumn" :bottom>
+        <option>Option 1</option>
+        <option>Option 2</option>
+        <option>Option 3</option>
+       </vaadin-combo-box>
+      </column>
+     </row>
+     <row>
+      <column>
+       <vaadin-combo-box required input-prompt="Datetime Field/Column" style-name="tiny" width="95%" height="25px" _id="cbxDatetimeFieldColumn" :bottom>
+        <option>Option 1</option>
+        <option>Option 2</option>
+        <option>Option 3</option>
+       </vaadin-combo-box>
+      </column>
+     </row>
+     
+     <row></row>
+    </vaadin-grid-layout>
+    <vaadin-vertical-layout caption="Filters" size-auto>
+     <vaadin-horizontal-layout width="870px" _id="filterControlLayout">
+      <vaadin-grid-layout spacing width-full height="35px" _id="filterControlGrid" :middle>
+       <row>
+        <column>
+         <vaadin-button icon="fonticon://FontAwesome/f0b0" style-name="friendly" height="25px" plain-text _id="btnAddFilters" :middle>
+           + 
+         </vaadin-button>
+        </column>
+       </row>
+      </vaadin-grid-layout>
+     </vaadin-horizontal-layout>
+     <vaadin-panel style-name="borderless well tiny" width="870px" height="70px" _id="pnlFilterLayout">
+      <vaadin-grid-layout style-name="tiny" spacing width="855px" height="30px" _id="multiFilterGrid">
+       <row>
+        <column>
+         <vaadin-combo-box id="cbxExperimentField1" style-name="tiny" width="170px" height="25px" _id="cbxSourceField1"></vaadin-combo-box>
+        </column>
+        <column>
+         <vaadin-combo-box id="cbxFilterOperator1" style-name="tiny" width="190px" height="25px" _id="cbxFilterOperator1"></vaadin-combo-box>
+        </column>
+        <column>
+         <vaadin-text-field id="txtStringFilter1" input-prompt="" style-name="tiny" width="230px" height="25px" _id="txtStringFilter1"></vaadin-text-field>
+        </column>
+        <column>
+         <vaadin-combo-box id="cbxExpression1" style-name="tiny" width="70px" height="25px" _id="cbxExpression1"></vaadin-combo-box>
+        </column>
+        <column>
+         <vaadin-button icon="fonticon://FontAwesome/f0b0" style-name="danger" id="btnDeleteFilterRow1" height="25px" plain-text _id="btnDeleteFilterRow1">
+           x 
+         </vaadin-button>
+        </column>
+       </row>
+      </vaadin-grid-layout>
+     </vaadin-panel>
+    </vaadin-vertical-layout>
+   </vaadin-horizontal-split-panel>
+   <vaadin-horizontal-split-panel width="1200px" height="620px" split-position="20%">
+    <vaadin-grid-layout spacing width="240px" height="350px">
+    <row>
+      <column>
+       <vaadin-text-field caption="Capability LSL Value" required id="txtCapabilityLSLValue" input-prompt="" style-name="tiny" width="100%" height="25px" _id="txtCapabilityLSLValue"></vaadin-text-field>
+      </column>
+     </row>
+     <row>
+      <column>
+       <vaadin-text-field caption="Capability USL Value" required id="txtCapabilityUSLValue" input-prompt="" style-name="tiny" width="100%" height="25px" _id="txtCapabilityUSLValue"></vaadin-text-field>
+      </column>
+     </row>
+     <row>
+      <column>
+       <vaadin-combo-box caption="Spec Lower Limit" required input-prompt="Lower Limit" style-name="tiny" width-full height="25px" _id="cbxSpecLowerLimitSrc">
+        <option>Option 1</option>
+        <option>Option 2</option>
+        <option>Option 3</option>
+       </vaadin-combo-box>
+      </column>
+      <column>
+       <vaadin-text-field caption="Value" required id="txtSpecLowerLimit" input-prompt="" style-name="tiny" width-full height="25px" _id="txtSpecLowerLimit"></vaadin-text-field>
+      </column>
+     </row>
+     <row>
+      <column>
+       <vaadin-combo-box caption="Spec Upper Limit" required input-prompt="Upper Limit" style-name="tiny" width-full height="25px" _id="cbxSpecUpperLimitSrc">
+        <option>Option 1</option>
+        <option>Option 2</option>
+        <option>Option 3</option>
+       </vaadin-combo-box>
+      </column>
+      <column>
+       <vaadin-text-field caption="Value" required id="txtSpecUpperLimit" input-prompt="" style-name="tiny" width-full height="25px" _id="txtSpecUpperLimit"></vaadin-text-field>
+      </column>
+     </row>
+     <row>
+      <column>
+       <vaadin-text-field caption="Increment Minutes" required id="txtIncrementMins" input-prompt="" style-name="tiny" width-full height="25px" _id="txtIncrementMins"></vaadin-text-field>
+      </column>
+     </row>
+     <row>
+      <column>
+       <vaadin-button icon="fonticon://FontAwesome/f0e7" style-name="tiny primary" width="70%" height="25px" plain-text _id="btnRunReport">
+         Run 
+       </vaadin-button>
+      </column>
+     </row>
+    </vaadin-grid-layout>
+    <vaadin-panel width="870px" height-full>
+     <vaadin-horizontal-layout id="spcChartLayout" height="600px" _id="spcChartLayout"></vaadin-horizontal-layout>
+    </vaadin-panel>
+   </vaadin-horizontal-split-panel>
+   <vaadin-css-layout style-name="content" size-full :expand>
+    <vaadin-css-layout style-name="list" size-full></vaadin-css-layout>
+   </vaadin-css-layout>
+  </vaadin-vertical-layout>
+ </body>
+</html>

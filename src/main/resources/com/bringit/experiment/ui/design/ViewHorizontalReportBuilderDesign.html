@@ -7,11 +7,11 @@
  </head> 
  <body> 
   <vaadin-vertical-layout style-name="well" responsive margin> 
-   <vaadin-vertical-layout width="960px" height="40px" _id="layoutHeaderBtns" :middle :center> 
+   <vaadin-vertical-layout width="100%" height="40px" _id="layoutHeaderBtns" :middle :center> 
     <vaadin-grid-layout width-full> 
      <row> 
       <column> 
-       <vaadin-grid-layout width="100px" height="30px"> 
+       <vaadin-grid-layout width="100%" height="30px"> 
         <row> 
          <column> 
           <vaadin-button icon="fonticon://FontAwesome/f0c7" style-name="tiny primary" plain-text _id="btnSave">
@@ -32,7 +32,7 @@
      </row> 
     </vaadin-grid-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-vertical-layout width="960px" height="140px"> 
+   <vaadin-vertical-layout width="100%" height="140px"> 
     <vaadin-vertical-layout _id="ftyRptLayout"> 
      <vaadin-grid-layout spacing width-full _id="gridMainData" :middle :center> 
       <row> 
@@ -51,7 +51,7 @@
      </vaadin-grid-layout> 
     </vaadin-vertical-layout> 
    </vaadin-vertical-layout> 
-   <vaadin-vertical-layout style-name="well" width="960px" _id="colGroupLayout"> 
+   <vaadin-vertical-layout style-name="well" width="100%" _id="colGroupLayout"> 
     <vaadin-horizontal-layout width-full height="425px" _id="vwHorizontalFieldGroupsLayout"> 
      <vaadin-tab-sheet style-name="framed compact" size-full _id="tabColumnGroups"> 
       <tab caption="Report data source" selected> 
@@ -98,14 +98,14 @@
          <vaadin-grid-layout spacing width-full height="70px" _id="gridBtnsRptFilters"> 
           <row> 
            <column> 
-            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" width="120px" height="25px" plain-text _id="btnAddFilter">
+            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" width="100%" height="25px" plain-text _id="btnAddFilter">
               Add filter 
             </vaadin-button> 
            </column> 
           </row> 
           <row> 
            <column> 
-            <vaadin-button icon="fonticon://FontAwesome/f068" style-name="tiny danger" width="120px" height="25px" plain-text _id="btnRemoveFilter">
+            <vaadin-button icon="fonticon://FontAwesome/f068" style-name="tiny danger" width="100%" height="25px" plain-text _id="btnRemoveFilter">
               Remove filter 
             </vaadin-button> 
            </column> 
@@ -187,14 +187,14 @@
          <vaadin-grid-layout spacing width-full height="70px" _id="gridBtnsRptColumnsEnrichment"> 
           <row> 
            <column> 
-            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" width="150px" height="25px" plain-text _id="btnAddEnrichment">
+            <vaadin-button icon="fonticon://FontAwesome/f067" style-name="tiny friendly" width="100%" height="25px" plain-text _id="btnAddEnrichment">
               Add enrichment 
             </vaadin-button> 
            </column> 
           </row> 
           <row> 
            <column> 
-            <vaadin-button icon="fonticon://FontAwesome/f068" style-name="tiny danger" width="150px" height="25px" plain-text _id="btnRemoveEnrichment">
+            <vaadin-button icon="fonticon://FontAwesome/f068" style-name="tiny danger" width="100%" height="25px" plain-text _id="btnRemoveEnrichment">
               Remove enrichment 
             </vaadin-button> 
            </column> 

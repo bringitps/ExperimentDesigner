@@ -13,7 +13,7 @@
     </vaadin-label>
    </vaadin-horizontal-layout>
    <vaadin-horizontal-split-panel width="1200px" height-auto split-position="20%">
-    <vaadin-grid-layout caption="Data Source" width="240px" height="130px" _id="gridSourceSelection">
+    <vaadin-grid-layout caption="Data Source" width="240px" height="160px" _id="gridSourceSelection">
      <row>
       <column>
        <vaadin-combo-box required input-prompt="Data Source Type" style-name="tiny" width="95%" height="25px" _id="cbxDataSourceType" :bottom>
@@ -44,6 +44,15 @@
      <row>
       <column>
        <vaadin-combo-box required input-prompt="Datetime Field/Column" style-name="tiny" width="95%" height="25px" _id="cbxDatetimeFieldColumn" :bottom>
+        <option>Option 1</option>
+        <option>Option 2</option>
+        <option>Option 3</option>
+       </vaadin-combo-box>
+      </column>
+     </row>
+     <row>
+      <column>
+       <vaadin-combo-box input-prompt="SN Field/Column" style-name="tiny" width="95%" height="25px" _id="cbxSnFieldColumn" :bottom>
         <option>Option 1</option>
         <option>Option 2</option>
         <option>Option 3</option>

@@ -93,6 +93,27 @@ public class XBarRForm extends XBarRDesign{
     
 	public XBarRForm()
 	{	
+		//Remove all temp reports associated to User
+		SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
+		String qcSpcLibraryPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/VAADIN/themes/mytheme/QCSPCChartGWTWar";
+		
+		File folder = new File(qcSpcLibraryPath);
+	
+		File[] listOfFiles = folder.listFiles();
+
+	    for (int i = 0; listOfFiles != null && i < listOfFiles.length; i++) {
+	    	System.out.println(listOfFiles[i].getName());
+	    	
+	      if (listOfFiles[i].isFile() && listOfFiles[i].getName().startsWith("XBarRRpt") && !listOfFiles[i].getName().endsWith("__" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + "__" + sessionUser.getUserId() + ".html")) {
+	    	  listOfFiles[i].delete();
+	    	  i--;
+	      }
+	    }
+	    
+	    cbxDatetimeFieldColumn.setContainerDataSource(null);
+	    cbxSnFieldColumn.setContainerDataSource(null);
+	    
+	    
 		//Loading Data Source Types
 		cbxDataSourceType.setContainerDataSource(null);
 		cbxDataSourceType.addItem(this.systemSettings.getExperimentLabel());
@@ -200,6 +221,8 @@ public class XBarRForm extends XBarRDesign{
                 				dataSourceDbTableName = new TargetReportDao().getTargetReportById(dataSourceId).getTargetReportDbRptTableNameId();
                 			
                 			String sqlQuery = "SELECT MIN(" + dataSourceLowerLimitDbTableColumnName + ") as LowerLimit FROM " + dataSourceDbTableName + ";";
+                			if(cbxDataSource.getValue().toString().contains("_max"))
+                				sqlQuery = "SELECT Max(" + dataSourceLowerLimitDbTableColumnName + ") as LowerLimit FROM " + dataSourceDbTableName + ";";
                 			
                 			ResultSet dwLowerLimitResultSet = new ExecuteQueryDao().getSqlSelectQueryResults(sqlQuery);
                      		if(dwLowerLimitResultSet != null)
@@ -270,6 +293,9 @@ public class XBarRForm extends XBarRDesign{
                 			
                 			String sqlQuery = "SELECT Max(" + dataSourceUpperLimitDbTableColumnName + ") as UpperLimit FROM " + dataSourceDbTableName + ";";
                 			
+                			if(cbxDataSource.getValue().toString().contains("_min"))
+                				sqlQuery = "SELECT Min(" + dataSourceUpperLimitDbTableColumnName + ") as UpperLimit FROM " + dataSourceDbTableName + ";";
+                			
                 			ResultSet dwUpperLimitResultSet = new ExecuteQueryDao().getSqlSelectQueryResults(sqlQuery);
                      		if(dwUpperLimitResultSet != null)
                      		{ 
@@ -318,6 +344,7 @@ public class XBarRForm extends XBarRDesign{
         			String dataSourceDbTableName = "";
         			String dataSourceMeasurementDbTableColumnName = cbxMeasurementFieldColumn.getValue().toString();
         			String dataSourceDatetimeDbTableColumnName = cbxDatetimeFieldColumn.getValue().toString();
+        			String dataSourceSnDbTableColumnName = cbxSnFieldColumn.getValue() != null ? cbxSnFieldColumn.getValue().toString() : "''";
         			
         			int dataSourceId = Integer.parseInt(cbxDataSource.getValue().toString().substring(4));
         			
@@ -344,22 +371,31 @@ public class XBarRForm extends XBarRDesign{
         			//String sqlQuery = "SELECT STUFF((SELECT ',' + CAST(" + dataSourceMeasurementDbTableColumnName + " as varchar(10))" + 
         		    //" FROM " + dataSourceDbTableName + " " + sqlWhereClause + " FOR XML PATH('')), 1 , 1 , '' ) AS measurementValues;";
         			
-        			String sqlQuery = "SELECT " + dataSourceMeasurementDbTableColumnName + " AS Measurement," + dataSourceDatetimeDbTableColumnName + " AS Datetime" +
-        		    " FROM " + dataSourceDbTableName + " " + sqlWhereClause + ";";
+        			String sqlQuery = "SELECT " + dataSourceMeasurementDbTableColumnName + " AS Measurement, DATEDIFF(s, '1970-01-01 00:00:00', " + dataSourceDatetimeDbTableColumnName + ") AS 'UTCDatetime'," +
+        		    " " + dataSourceSnDbTableColumnName + " AS SerialNumber " +
+        			" FROM " + dataSourceDbTableName + " " + sqlWhereClause + ";";
         		
         			System.out.println(sqlQuery);
         			
         			//String sqlQuery = "SELECT Max(" + dataSourceUpperLimitDbTableColumnName + ") as UpperLimit FROM " + dataSourceDbTableName + ";";
         			
         			ResultSet dwMeasurementResultSet = new ExecuteQueryDao().getSqlSelectQueryResults(sqlQuery);
-        			String csvMeasurementValues = "";
+        			
+        			List<String> measurementList = new ArrayList<String>();
+        		    List<String> utcDatetimeList = new ArrayList<String>();
+        		    List<String> serialNumberList = new ArrayList<String>();
+        			
         			
              		if(dwMeasurementResultSet != null)
              		{ 
              			try 
              			{
              				while (dwMeasurementResultSet.next()) 
-             					csvMeasurementValues = dwMeasurementResultSet.getString("Measurement");
+             				{
+             					measurementList.add(dwMeasurementResultSet.getString("Measurement"));
+             					utcDatetimeList.add(dwMeasurementResultSet.getString("UTCDatetime"));
+             					serialNumberList.add(dwMeasurementResultSet.getString("SerialNumber"));
+             				}
              			}
              			catch (SQLException e) 
              			{
@@ -371,46 +407,41 @@ public class XBarRForm extends XBarRDesign{
              		//Build Report Unique Name
                 	SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
             		String themeResourcesPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/VAADIN/themes/mytheme/";
-            		String reportUniqueFileName = "QCSPCChartGWTWar/XBarRRpt-" + System.currentTimeMillis() + "__" + sessionUser.getUserId() + ".html";
+            		String reportUniqueFileName = "QCSPCChartGWTWar/XBarRRpt-" + System.currentTimeMillis() + "__" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + "__" + sessionUser.getUserId() + ".html";
             		String reportUniqueFileNameFullPath = themeResourcesPath + reportUniqueFileName;
                     
             		String reportTemplateContent = getFrequencyHistogramHtmlCode();//readFile(themeResourcesPath + "QCSPCChartGWTWar/FrequencyHistogramForExperimentDesigner.html");
 
-            		/*
-        			String frequencyBins = "";
-        					
-            		if(csvMeasurementValues != "")
+            		String sampleValuesBatches = "";
+            		if(measurementList.size() > 0)
             		{
-            			List<String> strArrayMeasurementValues = Arrays.asList(csvMeasurementValues.split("\\s*,\\s*"));
-            			List<Float> floatArrayMeasurementValues = new ArrayList<Float>();
+            			for(int i=0; i<measurementList.size(); i++)
+            			{
+            				sampleValuesBatches = sampleValuesBatches + "{" + 
+            				   "		                    \"SampleValues\": [" + 
+            				   "		                        " + measurementList.get(i) + 
+            				   "		                    ]," + 
+            				   "		                    \"BatchCount\": " + i + "," + 
+            				   "		                    \"TimeStamp\": "+ utcDatetimeList.get(i) + "," +
+            				   "		                    \"BatchIDString\": \""+ serialNumberList.get(i) + "\"," +
+             			       "		                    \"Note\": \"" + serialNumberList.get(i) + "\"" + 
+            				   "		                },"; 
+            			}
             			
-            			for(String s : strArrayMeasurementValues)
-            				floatArrayMeasurementValues.add(Float.parseFloat(s));
-
-            			Collections.sort(floatArrayMeasurementValues, Collections.reverseOrder());
-
-            			Integer intInitialValue = floatArrayMeasurementValues.get(floatArrayMeasurementValues.size()-1).intValue();
-            			Integer intFinalValue = floatArrayMeasurementValues.get(0).intValue();
-            			
-            			
-            			float barWidth = Float.parseFloat(txtIncrementMins.getValue());
-            			float initialValue = Float.parseFloat(intInitialValue.toString());
-            			float finalValue = Float.parseFloat(intFinalValue.toString());
-            			
-            			for(float i=initialValue; i<finalValue; i=i+barWidth)
-            				frequencyBins = frequencyBins + i + ",";
-            			
-            			frequencyBins = frequencyBins.substring(0, frequencyBins.length() - 1);
+            			//Remove last comma
+            			sampleValuesBatches = sampleValuesBatches.substring(0, sampleValuesBatches.length()-1);
             		}
             		
+            		reportTemplateContent = reportTemplateContent.replace("#LowSpecLimitValue", txtSpecLowerLimit.getValue());
+            		reportTemplateContent = reportTemplateContent.replace("#HighSpecLimitValue", txtSpecUpperLimit.getValue());
+            		reportTemplateContent = reportTemplateContent.replace("#LSLValue", txtCapabilityLSLValue.getValue());
+            		reportTemplateContent = reportTemplateContent.replace("#USLValue", txtCapabilityUSLValue.getValue());
+            		reportTemplateContent = reportTemplateContent.replace("#TimeIncrementMinutes", txtIncrementMins.getValue());
+            		reportTemplateContent = reportTemplateContent.replace("#SampleIntervalRecords", sampleValuesBatches);
             		
-            		//Load values from Database
-            		reportTemplateContent = reportTemplateContent.replace("#LowerLimit", txtSpecLowerLimit.getValue());
-            		reportTemplateContent = reportTemplateContent.replace("#UpperLimit", txtSpecUpperLimit.getValue());
-            		reportTemplateContent = reportTemplateContent.replace("#CsvData", csvMeasurementValues);
-            		reportTemplateContent = reportTemplateContent.replace("#FrequencyBins", frequencyBins);
-            		*/
+            		
             		try {
+            			
     					Files.write( Paths.get(reportUniqueFileNameFullPath), reportTemplateContent.getBytes(), StandardOpenOption.CREATE);
 
     	                ThemeResource tr = new ThemeResource(reportUniqueFileName);
@@ -472,7 +503,7 @@ public class XBarRForm extends XBarRDesign{
 		cbxDataSource.addValueChangeListener(new ValueChangeListener(){
 	           @Override
 				public void valueChange(ValueChangeEvent event) {
-	        	   onChangeCbxDataSource(cbxDataSource, cbxMeasurementFieldColumn, cbxDatetimeFieldColumn);
+	        	   onChangeCbxDataSource(cbxDataSource, cbxMeasurementFieldColumn, cbxDatetimeFieldColumn, cbxSnFieldColumn);
 	           }
 	        });
 	}
@@ -503,8 +534,7 @@ public class XBarRForm extends XBarRDesign{
 	    return content;
 	}
 	
-	
-	private void onChangeCbxDataSource(ComboBox cbxDataSource, ComboBox cbxDataSourceField, ComboBox cbxDataSourceDateTimeField)
+	private void onChangeCbxDataSource(ComboBox cbxDataSource, ComboBox cbxDataSourceField, ComboBox cbxDataSourceDateTimeField, ComboBox cbxDataSourceSnField)
 	{		
 		Integer dataSourceId = Integer.parseInt((cbxDataSource.getValue().toString().substring(4)));
 		cbxSpecLowerLimitSrc.setContainerDataSource(null);
@@ -522,6 +552,9 @@ public class XBarRForm extends XBarRDesign{
 			cbxDataSourceField.setContainerDataSource(null);
 			for(int i=0; expFields != null && i<expFields.size(); i++)
 			{
+				cbxDataSourceSnField.addItem(expFields.get(i).getExpDbFieldNameId());
+				cbxDataSourceSnField.setItemCaption(expFields.get(i).getExpDbFieldNameId(), expFields.get(i).getExpFieldName());
+
 				if(expFields.get(i).getExpFieldType().equals("float") || expFields.get(i).getExpFieldType().equals("int"))
 				{
 					cbxDataSourceField.addItem(expFields.get(i).getExpDbFieldNameId());
@@ -552,6 +585,9 @@ public class XBarRForm extends XBarRDesign{
 			cbxDataSourceField.setContainerDataSource(null);
 			for(int i=0; fpyFields != null && i<fpyFields.size(); i++)
 			{
+				cbxDataSourceSnField.addItem(fpyFields.get(i).getExperimentField().getExpDbFieldNameId());
+				cbxDataSourceSnField.setItemCaption(fpyFields.get(i).getExperimentField().getExpDbFieldNameId(), fpyFields.get(i).getFpyInfoFieldLabel());
+			
 				if(fpyFields.get(i).getExperimentField().getExpFieldType().equals("float") || fpyFields.get(i).getExperimentField().getExpFieldType().equals("int"))
 				{
 					cbxDataSourceField.addItem(fpyFields.get(i).getExperimentField().getExpDbFieldNameId());
@@ -593,6 +629,9 @@ public class XBarRForm extends XBarRDesign{
 			cbxDataSourceField.setContainerDataSource(null);
 			for(int i=0; fnyFields != null && i<fnyFields.size(); i++)
 			{
+				cbxDataSourceSnField.addItem(fnyFields.get(i).getExperimentField().getExpDbFieldNameId());
+				cbxDataSourceSnField.setItemCaption(fnyFields.get(i).getExperimentField().getExpDbFieldNameId(), fnyFields.get(i).getFnyInfoFieldLabel());
+
 				if(fnyFields.get(i).getExperimentField().getExpFieldType().equals("float") || fnyFields.get(i).getExperimentField().getExpFieldType().equals("int"))
 				{
 					cbxDataSourceField.addItem(fnyFields.get(i).getExperimentField().getExpDbFieldNameId());
@@ -633,11 +672,14 @@ public class XBarRForm extends XBarRDesign{
 			cbxDataSourceField.setContainerDataSource(null);
 			for(int i=0; ftyFields != null && i<ftyFields.size(); i++)
 			{
-				cbxDataSourceField.addItem(ftyFields.get(i).getExperimentField().getExpDbFieldNameId());
-				cbxDataSourceField.setItemCaption(ftyFields.get(i).getExperimentField().getExpDbFieldNameId(), ftyFields.get(i).getFtyInfoFieldLabel());
+				cbxDataSourceSnField.addItem(ftyFields.get(i).getExperimentField().getExpDbFieldNameId());
+				cbxDataSourceSnField.setItemCaption(ftyFields.get(i).getExperimentField().getExpDbFieldNameId(), ftyFields.get(i).getFtyInfoFieldLabel());
 
 				if(ftyFields.get(i).getExperimentField().getExpFieldType().equals("float") || ftyFields.get(i).getExperimentField().getExpFieldType().equals("int"))
 				{
+					cbxDataSourceField.addItem(ftyFields.get(i).getExperimentField().getExpDbFieldNameId());
+					cbxDataSourceField.setItemCaption(ftyFields.get(i).getExperimentField().getExpDbFieldNameId(), ftyFields.get(i).getFtyInfoFieldLabel());
+
 					cbxSpecLowerLimitSrc.addItem("fty_min_" + ftyFields.get(i).getExperimentField().getExpDbFieldNameId());
 					cbxSpecLowerLimitSrc.setItemCaption("fty_min_" + ftyFields.get(i).getExperimentField().getExpDbFieldNameId(), "MIN OF " + ftyFields.get(i).getFtyInfoFieldLabel());
 
@@ -673,6 +715,9 @@ public class XBarRForm extends XBarRDesign{
 			cbxDataSourceField.setContainerDataSource(null);
 			for(int i=0; tgtCols != null && i<tgtCols.size(); i++)
 			{
+				cbxDataSourceSnField.addItem(tgtCols.get(i).getTargetColumnLabel().replaceAll(" ", "_"));
+				cbxDataSourceSnField.setItemCaption(tgtCols.get(i).getTargetColumnLabel().replaceAll(" ", "_"), tgtCols.get(i).getTargetColumnLabel());
+			
 				if(tgtCols.get(i).getExperimentField().getExpFieldType().equals("float") || tgtCols.get(i).getExperimentField().getExpFieldType().equals("int"))
 				{
 					cbxDataSourceField.addItem(tgtCols.get(i).getTargetColumnLabel().replaceAll(" ", "_"));
@@ -1068,7 +1113,6 @@ public class XBarRForm extends XBarRDesign{
     	filtersApplied = true;  
     	return sqlWhereClause;
     }
-	
 
     private boolean validateSelectedFilters()
     {
@@ -1128,7 +1172,6 @@ public class XBarRForm extends XBarRDesign{
     	}
     	return true;
     }
-	
 	
     private void fillCbxExpressions(ComboBox cbxExpressions)
     {
@@ -1577,9 +1620,9 @@ public class XBarRForm extends XBarRDesign{
 		   "		        \"InitChartProperties\": {" + 
 		   "		            \"SPCChartType\": \"MEAN_RANGE_CHART\"," + 
 		   "		            \"ChartMode\": \"Time\"," + 
-		   "		            \"NumSamplesPerSubgroup\": 5," + 
+		   "		            \"NumSamplesPerSubgroup\": 1," + 
 		   "		            \"NumDatapointsInView\": 12," + 
-		   "		            \"TimeIncrementMinutes\": 15" + 
+		   "		            \"TimeIncrementMinutes\": #TimeIncrementMinutes" + 
 		   "		        }," + 
 		   "	        " + 
 		   "		        \"Scrollbar\": {" + 
@@ -1587,7 +1630,7 @@ public class XBarRForm extends XBarRDesign{
 		   "		            \"ScrollbarPosition\": \"SCROLLBAR_POSITION_MAX\"" + 
 		   "		        }," + 
 		   "		        \"TableSetup\": {" + 
-		   "		            \"HeaderStringsLevel\": \"HEADER_STRINGS_LEVEL2\"," + 
+		   "		            \"HeaderStringsLevel\": \"HEADER_STRINGS_LEVEL1\"," + 
 		   "		            \"EnableInputStringsDisplay\": true," + 
 		   "		            \"EnableCategoryValues\": false," + 
 		   "		            \"EnableCalculatedValues\": false," + 
@@ -1601,279 +1644,45 @@ public class XBarRForm extends XBarRDesign{
 		   "		            \"ChartAlarmEmphasisMode\": \"ALARM_HIGHLIGHT_SYMBOL\"," + 
 		   "		            \"ChartData\": {" + 
 		   "		                \"Title\": \"Variable Control Chart (X-Bar R)\"," + 
-		   "		                \"PartNumber\": \"283501\"," + 
-		   "		                \"ChartNumber\": \"17\"," + 
-		   "		                \"PartName\": \"Transmission Casing Bolt\"," + 
-		   "		                \"Operation\": \"Threading\"," + 
-		   "		                \"SpecificationLimits\": \"27.0 to 35.0\"," + 
-		   "		                \"Operator\": \"J. Fenamore\"," + 
-		   "		                \"Machine\": \"#11\"," + 
-		   "		                \"Gauge\": \"#8645\"," + 
+		   "		                \"SpecificationLimits\": \"#LSLValue to #USLValue\"," + 
+		   " 						\"ChartNumber\": \"X-Bar R\"," +
 		   "		                \"UnitOfMeasure\": \"0.0001 inch\"," + 
 		   "		                \"ZeroEquals\": \"zero\"," + 
-		   "		                \"DateString\": \"7/04/2013\"," + 
-		   "		                \"NotesMessage\": \"Control limits prepared May 10\"," + 
+		   "		                \"DateString\": \"" + (new Date()) + "\"," + 
+		   "		                \"NotesMessage\": \"\"," + 
 		   "		                \"NotesHeader\": \"NOTES\"," + 
 		   "		                \"CalculatedItemDecimals\": 1," + 
 		   "		                \"ProcessCapabilityDecimals\": 2," + 
 		   "		                \"SampleItemDecimals\": 1," + 
 		   "		                \"ProcessCapabilitySetup\": {" + 
-		   "		                    \"LSLValue\": 27," + 
-		   "		                    \"USLValue\": 35," + 
-		   "		                    \"EnableCPK\": false," + 
-		   "		                    \"EnableCPM\": false," + 
-		   "		                    \"EnablePPK\": false" + 
+		   "		                    \"LSLValue\": #LSLValue," + 
+		   "		                    \"USLValue\": #USLValue," + 
+		   "		                    \"EnableCPK\": true," + 
+		   "		                    \"EnableCPM\": true," + 
+		   "		                    \"EnablePPK\": true" + 
 		   "		                }" + 
 		   "		            }" + 
-		   "		        }," + 
+		   "		        }," +
+		   "				\"PrimaryChartSetup\": {" + 
+		   "      				\"XAxisLabels\": {" + 
+		   "       				 \"AxisLabelMode\": \"AXIS_LABEL_MODE_STRING\"" + 
+		   "      				}," + 
+		   "      				\"SpecificationLimits\": {" + 
+		   "        			\"LowSpecificationLimit\": {" + 
+		   "       				   \"LimitValue\": #LowSpecLimitValue" + 
+		   "      				  }," + 
+		   "      				  \"HighSpecificationLimit\": {" + 
+		   "      			    \"LimitValue\": #HighSpecLimitValue" + 
+		   "       				 }" + 
+		   "     			 }" + 
+		   "    			},	" +
 		   "		        \"Events\": {" + 
 		   "		            \"EnableDataToolTip\": true," + 
 		   "		            \"EnableNotesToolTip\": true" + 
 		   "" + 
 		   "		        }," + 
 		   "		        \"SampleData\": {" + 
-		   "		            \"SampleIntervalRecords\": [" + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        27.53131515148628," + 
-		   "		                        33.95771604022404," + 
-		   "		                        24.310097827061817," + 
-		   "		                        28.282642847792765," + 
-		   "		                        30.2908518818265" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 0," + 
-		   "		                    \"TimeStamp\": 1371830829074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        27.444285005240214," + 
-		   "		                        34.38930645615096," + 
-		   "		                        28.0203674441636," + 
-		   "		                        33.27153359969366," + 
-		   "		                        36.8305571558275" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 1," + 
-		   "		                    \"TimeStamp\": 1371831729074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        35.21321620109259," + 
-		   "		                        32.93940741018088," + 
-		   "		                        33.66485557976163," + 
-		   "		                        34.17314124609133," + 
-		   "		                        24.576683179863725" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 2," + 
-		   "		                    \"TimeStamp\": 1371832629074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        27.898302097237174," + 
-		   "		                        25.906531082892915," + 
-		   "		                        26.950768095191137," + 
-		   "		                        30.812058501916457," + 
-		   "		                        31.085075984847936" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 3," + 
-		   "		                    \"TimeStamp\": 1371833529074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        22.94549873989527," + 
-		   "		                        30.867679835728896," + 
-		   "		                        27.79692256857592," + 
-		   "		                        32.57962619388354," + 
-		   "		                        24.601635858609224" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 4," + 
-		   "		                    \"TimeStamp\": 1371834429074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        25.757197681039116," + 
-		   "		                        26.404591401588813," + 
-		   "		                        35.894483711583206," + 
-		   "		                        32.12852859671644," + 
-		   "		                        36.29883496126227" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 5," + 
-		   "		                    \"TimeStamp\": 1371835329074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        34.04503169439933," + 
-		   "		                        25.44613390413118," + 
-		   "		                        22.724021438882726," + 
-		   "		                        33.57327330013773," + 
-		   "		                        27.11566620945375" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 6," + 
-		   "		                    \"TimeStamp\": 1371836229074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        33.893820803904475," + 
-		   "		                        30.88079320043272," + 
-		   "		                        30.28128557255706," + 
-		   "		                        22.866135928123242," + 
-		   "		                        22.66263807377607" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 7," + 
-		   "		                    \"TimeStamp\": 1371837129074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        35.85689222409033," + 
-		   "		                        25.66069012425097," + 
-		   "		                        36.52188973776906," + 
-		   "		                        37.2538370091988," + 
-		   "		                        37.09011776089278" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 8," + 
-		   "		                    \"TimeStamp\": 1371838029074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        30.749686153841764," + 
-		   "		                        36.508559444966785," + 
-		   "		                        26.13767810973511," + 
-		   "		                        37.08032465061903," + 
-		   "		                        35.66542199068421" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 9," + 
-		   "		                    \"TimeStamp\": 1371838929074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        35.27238495008025," + 
-		   "		                        33.12277092009595," + 
-		   "		                        29.12017445753296," + 
-		   "		                        27.993405024903374," + 
-		   "		                        25.50152822137062" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 10," + 
-		   "		                    \"TimeStamp\": 1371839829074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        28.100740427272193," + 
-		   "		                        35.26755280950981," + 
-		   "		                        30.216381858411253," + 
-		   "		                        31.518942973184913," + 
-		   "		                        24.976185060190754" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 11," + 
-		   "		                    \"TimeStamp\": 1371840729074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        28.121815138825482," + 
-		   "		                        29.3505524617516," + 
-		   "		                        23.23952375446977," + 
-		   "		                        23.409277423044397," + 
-		   "		                        23.291225859674306" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 12," + 
-		   "		                    \"TimeStamp\": 1371841629074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        28.602514772277242," + 
-		   "		                        25.362590653075816," + 
-		   "		                        22.72198910384308," + 
-		   "		                        22.920387724885945," + 
-		   "		                        28.912077965025972" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 13," + 
-		   "		                    \"TimeStamp\": 1371842529074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        32.40532551477631," + 
-		   "		                        26.948806188170593," + 
-		   "		                        29.284169867825277," + 
-		   "		                        32.70409548305437," + 
-		   "		                        25.773609178760466" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 14," + 
-		   "		                    \"TimeStamp\": 1371843429074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        29.548933086870605," + 
-		   "		                        36.24857495241145," + 
-		   "		                        28.036723548132613," + 
-		   "		                        37.31376242884538," + 
-		   "		                        29.73936566095378" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 15," + 
-		   "		                    \"TimeStamp\": 1371844329074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        35.34918665138229," + 
-		   "		                        33.60402762568151," + 
-		   "		                        29.69203231293511," + 
-		   "		                        24.756849726860697," + 
-		   "		                        27.34428622213201" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 16," + 
-		   "		                    \"TimeStamp\": 1371845229074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        33.727605556103605," + 
-		   "		                        27.50821643159519," + 
-		   "		                        33.61161600390977," + 
-		   "		                        34.36241767438651," + 
-		   "		                        27.55491000970097" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 17," + 
-		   "		                    \"TimeStamp\": 1371846129074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        34.26565897109985," + 
-		   "		                        28.056929833331772," + 
-		   "		                        27.183128112177673," + 
-		   "		                        33.17121401058127," + 
-		   "		                        34.191900955504686" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 18," + 
-		   "		                    \"TimeStamp\": 1371847029074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }," + 
-		   "		                {" + 
-		   "		                    \"SampleValues\": [" + 
-		   "		                        30.56585901649224," + 
-		   "		                        26.764807472584284," + 
-		   "		                        30.22766077749437," + 
-		   "		                        29.43260723522982," + 
-		   "		                        27.080310485264213" + 
-		   "		                    ]," + 
-		   "		                    \"BatchCount\": 19," + 
-		   "		                    \"TimeStamp\": 1371847929074," + 
-		   "		                    \"Note\": \"\"" + 
-		   "		                }" + 
-		   "		            ]" + 
+		   "		            \"SampleIntervalRecords\": [ #SampleIntervalRecords ]" + 
 		   "		        }," + 
 		   "		        \"Methods\": {" + 
 		   "		            \"AutoCalculateControlLimits\": true," + 

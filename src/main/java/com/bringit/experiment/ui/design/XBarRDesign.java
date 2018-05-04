@@ -30,6 +30,7 @@ public class XBarRDesign extends VerticalLayout {
 	protected ComboBox cbxDataSource;
 	protected ComboBox cbxMeasurementFieldColumn;
 	protected ComboBox cbxDatetimeFieldColumn;
+	protected ComboBox cbxSnFieldColumn;
 	protected HorizontalLayout filterControlLayout;
 	protected GridLayout filterControlGrid;
 	protected Button btnAddFilters;

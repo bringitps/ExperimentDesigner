@@ -1,6 +1,5 @@
 package com.bringit.experiment.ui.form;
 
-import com.bringit.experiment.bll.ContractManufacturer;
 import com.bringit.experiment.bll.Experiment;
 import com.bringit.experiment.bll.ExperimentField;
 import com.bringit.experiment.bll.FinalPassYieldInfoField;
@@ -13,8 +12,6 @@ import com.bringit.experiment.bll.SysUser;
 import com.bringit.experiment.bll.SystemSettings;
 import com.bringit.experiment.bll.TargetColumn;
 import com.bringit.experiment.bll.TargetReport;
-import com.bringit.experiment.dao.CmForSysRoleDao;
-import com.bringit.experiment.dao.ContractManufacturerDao;
 import com.bringit.experiment.dao.ExecuteQueryDao;
 import com.bringit.experiment.dao.ExperimentDao;
 import com.bringit.experiment.dao.ExperimentFieldDao;
@@ -28,15 +25,12 @@ import com.bringit.experiment.dao.SystemSettingsDao;
 import com.bringit.experiment.dao.TargetColumnDao;
 import com.bringit.experiment.dao.TargetReportDao;
 import com.bringit.experiment.ui.design.FrequencyHistogramDesign;
-import com.bringit.experiment.util.Config;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
-import com.vaadin.data.Item;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.Between;
 import com.vaadin.data.util.filter.Compare;
@@ -44,49 +38,21 @@ import com.vaadin.data.util.filter.IsNull;
 import com.vaadin.data.util.filter.Like;
 import com.vaadin.data.util.filter.Not;
 import com.vaadin.data.util.filter.Or;
-import com.vaadin.data.util.sqlcontainer.connection.SimpleJDBCConnectionPool;
-import com.vaadin.data.util.sqlcontainer.query.OrderBy;
-import com.vaadin.data.util.sqlcontainer.query.TableQuery;
-import com.vaadin.data.util.sqlcontainer.query.generator.MSSQLGenerator;
-import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
-import com.vaadin.server.ExternalResource;
-import com.vaadin.server.FileResource;
-import com.vaadin.server.Page;
-import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable;
-import com.vaadin.server.StreamResource;
-import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
-import com.vaadin.ui.Embedded;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification.Type;
 
-import java.awt.BorderLayout;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -99,12 +65,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 
 @JavaScript({ "vaadin://themes/mytheme/QCSPCChartGWTWar/FrequencyHistogramForExperimentDesigner.js", "vaadin://themes/mytheme/QCSPCChartGWTWar/qcspcchartgwt/qcspcchartgwt.nocache.js"})
 @StyleSheet({"vaadin://themes/mytheme/QCSPCChartGWTWar/QCSPCChartGWT.css"})
@@ -131,6 +91,21 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
     
 	public FrequencyHistogramForm()
 	{
+		//Remove all temp reports associated to User
+		SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
+		String qcSpcLibraryPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/VAADIN/themes/mytheme/QCSPCChartGWTWar";
+		
+		File folder = new File(qcSpcLibraryPath);
+		File[] listOfFiles = folder.listFiles();
+
+	    for (int i = 0; listOfFiles != null && i < listOfFiles.length; i++) {
+	      if (listOfFiles[i].isFile() && listOfFiles[i].getName().startsWith("FrequencyHistogramtRpt") && !listOfFiles[i].getName().endsWith("__" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + "__" + sessionUser.getUserId() + ".html")) {
+	    	  listOfFiles[i].delete();
+	    	  i--;
+	      }
+	    }
+				
+		
 		//Loading Data Source Types
 		cbxDataSourceType.setContainerDataSource(null);
 		cbxDataSourceType.addItem(this.systemSettings.getExperimentLabel());
@@ -238,6 +213,8 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
                 				dataSourceDbTableName = new TargetReportDao().getTargetReportById(dataSourceId).getTargetReportDbRptTableNameId();
                 			
                 			String sqlQuery = "SELECT MIN(" + dataSourceLowerLimitDbTableColumnName + ") as LowerLimit FROM " + dataSourceDbTableName + ";";
+                			if(cbxDataSource.getValue().toString().contains("_max"))
+                				sqlQuery = "SELECT Max(" + dataSourceLowerLimitDbTableColumnName + ") as LowerLimit FROM " + dataSourceDbTableName + ";";
                 			
                 			ResultSet dwLowerLimitResultSet = new ExecuteQueryDao().getSqlSelectQueryResults(sqlQuery);
                      		if(dwLowerLimitResultSet != null)
@@ -307,6 +284,9 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
                 				dataSourceDbTableName = new TargetReportDao().getTargetReportById(dataSourceId).getTargetReportDbRptTableNameId();
                 			
                 			String sqlQuery = "SELECT Max(" + dataSourceUpperLimitDbTableColumnName + ") as UpperLimit FROM " + dataSourceDbTableName + ";";
+                			
+                			if(cbxDataSource.getValue().toString().contains("_min"))
+                				sqlQuery = "SELECT Min(" + dataSourceUpperLimitDbTableColumnName + ") as UpperLimit FROM " + dataSourceDbTableName + ";";
                 			
                 			ResultSet dwUpperLimitResultSet = new ExecuteQueryDao().getSqlSelectQueryResults(sqlQuery);
                      		if(dwUpperLimitResultSet != null)
@@ -404,7 +384,7 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
              		//Build Report Unique Name
                 	SysUser sessionUser = (SysUser)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("UserSession");
             		String themeResourcesPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/VAADIN/themes/mytheme/";
-            		String reportUniqueFileName = "QCSPCChartGWTWar/FrequencyHistogramtRpt-" + System.currentTimeMillis() + "__" + sessionUser.getUserId() + ".html";
+            		String reportUniqueFileName = "QCSPCChartGWTWar/FrequencyHistogramtRpt-" + System.currentTimeMillis() + "__" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + "__" + sessionUser.getUserId() + ".html";
             		String reportUniqueFileNameFullPath = themeResourcesPath + reportUniqueFileName;
                     
             		String reportTemplateContent = getFrequencyHistogramHtmlCode();//readFile(themeResourcesPath + "QCSPCChartGWTWar/FrequencyHistogramForExperimentDesigner.html");
@@ -554,11 +534,11 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 			cbxDataSourceField.setContainerDataSource(null);
 			for(int i=0; expFields != null && i<expFields.size(); i++)
 			{
-				cbxDataSourceField.addItem(expFields.get(i).getExpDbFieldNameId());
-				cbxDataSourceField.setItemCaption(expFields.get(i).getExpDbFieldNameId(), expFields.get(i).getExpFieldName());
-
 				if(expFields.get(i).getExpFieldType().equals("float") || expFields.get(i).getExpFieldType().equals("int"))
 				{
+					cbxDataSourceField.addItem(expFields.get(i).getExpDbFieldNameId());
+					cbxDataSourceField.setItemCaption(expFields.get(i).getExpDbFieldNameId(), expFields.get(i).getExpFieldName());
+
 					cbxLowerLimitSrc.addItem("exp_min_" + expFields.get(i).getExpDbFieldNameId());
 					cbxLowerLimitSrc.setItemCaption("exp_min_" + expFields.get(i).getExpDbFieldNameId(), "MIN OF " + expFields.get(i).getExpFieldName());
 
@@ -579,11 +559,11 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 			cbxDataSourceField.setContainerDataSource(null);
 			for(int i=0; fpyFields != null && i<fpyFields.size(); i++)
 			{
-				cbxDataSourceField.addItem(fpyFields.get(i).getExperimentField().getExpDbFieldNameId());
-				cbxDataSourceField.setItemCaption(fpyFields.get(i).getExperimentField().getExpDbFieldNameId(), fpyFields.get(i).getFpyInfoFieldLabel());
-			
 				if(fpyFields.get(i).getExperimentField().getExpFieldType().equals("float") || fpyFields.get(i).getExperimentField().getExpFieldType().equals("int"))
 				{
+					cbxDataSourceField.addItem(fpyFields.get(i).getExperimentField().getExpDbFieldNameId());
+					cbxDataSourceField.setItemCaption(fpyFields.get(i).getExperimentField().getExpDbFieldNameId(), fpyFields.get(i).getFpyInfoFieldLabel());
+				
 					cbxLowerLimitSrc.addItem("fpy_min_" + fpyFields.get(i).getExperimentField().getExpDbFieldNameId());
 					cbxLowerLimitSrc.setItemCaption("fpy_min_" + fpyFields.get(i).getExperimentField().getExpDbFieldNameId(), "MIN OF " + fpyFields.get(i).getFpyInfoFieldLabel());
 
@@ -614,11 +594,11 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 			cbxDataSourceField.setContainerDataSource(null);
 			for(int i=0; fnyFields != null && i<fnyFields.size(); i++)
 			{
-				cbxDataSourceField.addItem(fnyFields.get(i).getExperimentField().getExpDbFieldNameId());
-				cbxDataSourceField.setItemCaption(fnyFields.get(i).getExperimentField().getExpDbFieldNameId(), fnyFields.get(i).getFnyInfoFieldLabel());
-
 				if(fnyFields.get(i).getExperimentField().getExpFieldType().equals("float") || fnyFields.get(i).getExperimentField().getExpFieldType().equals("int"))
 				{
+					cbxDataSourceField.addItem(fnyFields.get(i).getExperimentField().getExpDbFieldNameId());
+					cbxDataSourceField.setItemCaption(fnyFields.get(i).getExperimentField().getExpDbFieldNameId(), fnyFields.get(i).getFnyInfoFieldLabel());
+
 					cbxLowerLimitSrc.addItem("fny_min_" + fnyFields.get(i).getExperimentField().getExpDbFieldNameId());
 					cbxLowerLimitSrc.setItemCaption("fny_min_" + fnyFields.get(i).getExperimentField().getExpDbFieldNameId(), "MIN OF " + fnyFields.get(i).getFnyInfoFieldLabel());
 
@@ -649,11 +629,11 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 			cbxDataSourceField.setContainerDataSource(null);
 			for(int i=0; ftyFields != null && i<ftyFields.size(); i++)
 			{
-				cbxDataSourceField.addItem(ftyFields.get(i).getExperimentField().getExpDbFieldNameId());
-				cbxDataSourceField.setItemCaption(ftyFields.get(i).getExperimentField().getExpDbFieldNameId(), ftyFields.get(i).getFtyInfoFieldLabel());
-
 				if(ftyFields.get(i).getExperimentField().getExpFieldType().equals("float") || ftyFields.get(i).getExperimentField().getExpFieldType().equals("int"))
 				{
+					cbxDataSourceField.addItem(ftyFields.get(i).getExperimentField().getExpDbFieldNameId());
+					cbxDataSourceField.setItemCaption(ftyFields.get(i).getExperimentField().getExpDbFieldNameId(), ftyFields.get(i).getFtyInfoFieldLabel());
+
 					cbxLowerLimitSrc.addItem("fty_min_" + ftyFields.get(i).getExperimentField().getExpDbFieldNameId());
 					cbxLowerLimitSrc.setItemCaption("fty_min_" + ftyFields.get(i).getExperimentField().getExpDbFieldNameId(), "MIN OF " + ftyFields.get(i).getFtyInfoFieldLabel());
 
@@ -684,11 +664,11 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 			cbxDataSourceField.setContainerDataSource(null);
 			for(int i=0; tgtCols != null && i<tgtCols.size(); i++)
 			{
-				cbxDataSourceField.addItem(tgtCols.get(i).getTargetColumnLabel().replaceAll(" ", "_"));
-				cbxDataSourceField.setItemCaption(tgtCols.get(i).getTargetColumnLabel().replaceAll(" ", "_"), tgtCols.get(i).getTargetColumnLabel());
-			
 				if(tgtCols.get(i).getExperimentField().getExpFieldType().equals("float") || tgtCols.get(i).getExperimentField().getExpFieldType().equals("int"))
 				{
+					cbxDataSourceField.addItem(tgtCols.get(i).getTargetColumnLabel().replaceAll(" ", "_"));
+					cbxDataSourceField.setItemCaption(tgtCols.get(i).getTargetColumnLabel().replaceAll(" ", "_"), tgtCols.get(i).getTargetColumnLabel());
+				
 					cbxLowerLimitSrc.addItem("tgt_min_" + tgtCols.get(i).getTargetColumnLabel().replaceAll(" ", "_"));
 					cbxLowerLimitSrc.setItemCaption("tgt_min_" + tgtCols.get(i).getTargetColumnLabel().replaceAll(" ", "_"), "MIN OF " + tgtCols.get(i).getExperimentField().getExpFieldName());
 
@@ -1563,33 +1543,9 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 		
 		
 	}
-    /*
-    private void fillCbxMultiFilterFields(ComboBox cbxExperimentFields)
-    {
-    	for (int i = 0; experimentFields != null && i < experimentFields.size(); i++) {
-            if (experimentFields.get(i).getExpFieldType().startsWith("varchar") || experimentFields.get(i).getExpFieldType().startsWith("char")
-                    || experimentFields.get(i).getExpFieldType().startsWith("text") || experimentFields.get(i).getExpFieldType().startsWith("nvarchar")
-                    || experimentFields.get(i).getExpFieldType().startsWith("nchar") || experimentFields.get(i).getExpFieldType().startsWith("ntext")
-                    || experimentFields.get(i).getExpFieldType().contains("date")) 
-            {
-            	cbxExperimentFields.addItem(experimentFields.get(i).getExpDbFieldNameId());
-            	cbxExperimentFields.setItemCaption(experimentFields.get(i).getExpDbFieldNameId(), experimentFields.get(i).getExpFieldName());
-            }
-        }
-
-     	cbxExperimentFields.addItem("CreatedDate");
-    	cbxExperimentFields.setItemCaption("CreatedDate", "Created Date");
-
-     	cbxExperimentFields.addItem("LastModifiedDate");
-    	cbxExperimentFields.setItemCaption("LastModifiedDate", "Last Modified Date");
-    }  
-	*/
 	
 	private String getFrequencyHistogramHtmlCode()
 	{
-		
-		//String htmlCode = "<iframe src='javascript:\"\"' id=\"qcspcchartgwt\" tabindex=\"-1\" style=\"position: absolute; width: 0px; height: 0px; border: none; left: -1000px; top: -1000px;\"></iframe>";
-				
 		String htmlCode = "<html> " +
 		  "<head> " +
 		 
@@ -1744,32 +1700,5 @@ public class FrequencyHistogramForm extends FrequencyHistogramDesign{
 		
 		return htmlCode;
 	}
-	
-	
-	
-	private StreamResource createCharImageStreamResource(BufferedImage bufferedChartImage, String fileName) {
-	    return new StreamResource(new StreamSource() {
-	        @Override
-	        public InputStream getStream() {
-	        	
-	        	System.out.println("Image size: " + bufferedChartImage.getHeight());
-	        	
-	            String text = "Date: " + DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.MEDIUM).format(new Date());
-
-	            //BufferedImage bi = new BufferedImage(370, 30, BufferedImage.TYPE_3BYTE_BGR);
-	            //bufferedChartImage.getGraphics().drawChars(text.toCharArray(), 0, text.length(), 10, 20);
-	            
-	            try {
-	                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	                ImageIO.write(bufferedChartImage, "jpg", bos);
-	                return new ByteArrayInputStream(bos.toByteArray());
-	            } catch (IOException e) {
-	                e.printStackTrace();
-	                return null;
-	            }
-	        }
-	    }, fileName);
-	}
-	
 	
 }

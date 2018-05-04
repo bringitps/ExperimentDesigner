@@ -261,7 +261,10 @@ public class ViewHorizontalReportDataForm extends ViewHorizontalReportDataDesign
 				List<ViewHorizontalReportColumn> vwHorizontalReportColumns = new ViewHorizontalReportColumnDao().getAllVwHorizontalReportColumnsByRptId(this.vwHorizontalReport.getVwHorizontalRptId());
 				if(vwHorizontalReportColumns != null)
 				{
-					String[] vwHorizontalReportVisibleColumns = new String[vwHorizontalReportColumns.size()]; 
+					String[] vwHorizontalReportVisibleColumns = new String[vwHorizontalReportColumns.size()+1]; 
+					
+					
+					
 					for(int i=0; i<vwHorizontalReportColumns.size(); i++)
 					{
 						this.tblVwHorizontalDataReport.setColumnHeader(vwHorizontalReportColumns.get(i).getVwHorizontalRptColumnDbId(), vwHorizontalReportColumns.get(i).getVwHorizontalRptColumnName());
@@ -292,6 +295,8 @@ public class ViewHorizontalReportDataForm extends ViewHorizontalReportDataDesign
 							});
 						}
 					}
+					
+					vwHorizontalReportVisibleColumns[vwHorizontalReportColumns.size()-1] = vwHorizontalReport.getVwHorizontalRptKeyColumnDbId(); 
 					
 					tblVwHorizontalDataReport.setVisibleColumns(vwHorizontalReportVisibleColumns);					
 				}

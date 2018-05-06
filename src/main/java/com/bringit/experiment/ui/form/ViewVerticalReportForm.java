@@ -67,7 +67,7 @@ public class ViewVerticalReportForm extends ViewVerticalReportDesign{
 
 		Window vwVerticalReportBuilderModalWindow = new Window("View Vertical Report Builder");
 		vwVerticalReportBuilderModalWindow.setModal(true);
-		vwVerticalReportBuilderModalWindow.setResizable(false);
+		vwVerticalReportBuilderModalWindow.setResizable(true);
 		vwVerticalReportBuilderModalWindow.setContent(new ViewVerticalReportBuilderForm(vwVerticalReportId));
 		vwVerticalReportBuilderModalWindow.setWidth(993, Unit.PIXELS);
 		vwVerticalReportBuilderModalWindow.setHeight(660, Unit.PIXELS);
